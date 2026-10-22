@@ -1154,3 +1154,277 @@ body {
 .eq {
   display: none;
 }
+
+/* ================= internet dos anos 2000 (js/internet2000.js) ================= */
+/* MSN: bolinha de status, linha do par e "Ouvindo:" */
+.msn-bola {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c, #3cc24a);
+  box-shadow:
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+    0 0 0 1.5px var(--surface);
+  vertical-align: -1px;
+  margin-right: 4px;
+}
+.msn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+  font-size: 13px;
+}
+.msn-ouvindo {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: var(--muted);
+  padding-left: 18px;
+}
+.msn-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Contador de visitas estilo MySpace */
+.ms-visitas {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+.contador {
+  display: inline-flex;
+  gap: 2px;
+}
+.contador i {
+  font-style: normal;
+  font-family: var(--f-mono);
+  font-weight: 700;
+  font-size: 14px;
+  color: #3cf26e;
+  background: #111;
+  border-radius: 3px;
+  padding: 1px 4px;
+  box-shadow: inset 0 -6px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Comunidades */
+.comunidades {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+.comunidade {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.com-icone {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+}
+
+/* Depoimentos */
+.depo.pendente {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px dashed var(--accent);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.depo p {
+  margin: 0;
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+form[data-form="depoimento"] {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Fotolog: fotos com borda branca, data laranja e flash estourado */
+.fl-galeria {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.fl-mini {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+.fl-mini:nth-child(odd) .fotolog-foto {
+  transform: rotate(-2deg);
+}
+.fl-mini:nth-child(even) .fotolog-foto {
+  transform: rotate(2deg);
+}
+.fl-mini.on .fotolog-foto {
+  outline: 2px solid var(--accent);
+}
+.fotolog-foto {
+  margin: 0;
+  background: #fff;
+  padding: 5px;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.fl-quadro {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--accent-soft), var(--sunken));
+}
+/* o "ângulo de cima": cabeça grande, meio torta, corpo saindo da foto */
+.fl-angulo {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-12deg) scale(1.3) translate(2%, 2%);
+  transform-origin: 50% 18%;
+}
+.fl-angulo svg {
+  width: 100%;
+  height: auto;
+}
+.fl-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.85), transparent 38%);
+  pointer-events: none;
+}
+.fl-data {
+  position: absolute;
+  right: 5px;
+  bottom: 3px;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #ff8a1f;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+}
+.fotolog-foto figcaption {
+  font-family: "Caveat", cursive;
+  font-size: 20px;
+  color: #222;
+  text-align: center;
+  padding: 4px 2px 2px;
+}
+.fl-aberta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.fotolog-foto.grande {
+  width: min(260px, 100%);
+  transform: rotate(-1.5deg);
+}
+.fotolog-foto.grande .fl-data {
+  font-size: 13px;
+}
+
+/* Fundos do perfil */
+.perfil-ms[data-layout]:not([data-layout="classico"]) {
+  padding: 10px;
+  border-radius: 18px;
+}
+.perfil-ms[data-layout="estrelas"] {
+  background:
+    radial-gradient(circle, #ff4fd8 1.6px, transparent 2.2px) 0 0 / 26px 26px,
+    radial-gradient(circle, #4fe3ff 1.3px, transparent 1.9px) 13px 9px / 34px 34px,
+    color-mix(in srgb, #ff4fd8 12%, var(--bg));
+}
+.perfil-ms[data-layout="xadrez"] {
+  background: repeating-conic-gradient(#141416 0 25%, #f2f2f2 0 50%) 0 0 / 22px 22px;
+}
+.perfil-ms[data-layout="oncinha"] {
+  background: radial-gradient(ellipse 7px 5px at 25% 30%, #3a2416 55%, transparent 60%),
+    radial-gradient(ellipse 6px 8px at 70% 65%, #3a2416 55%, transparent 60%),
+    radial-gradient(ellipse 9px 6px at 25% 30%, #8a5a2a 70%, transparent 74%),
+    radial-gradient(ellipse 8px 10px at 70% 65%, #8a5a2a 70%, transparent 74%), #e2b878;
+  background-size: 44px 40px;
+}
+.perfil-ms[data-layout="noite"] {
+  background:
+    radial-gradient(circle at 88% 6%, #f2ead3 18px, transparent 19px),
+    radial-gradient(circle, #fff 1px, transparent 1.6px) 0 0 / 30px 30px,
+    radial-gradient(circle, #fff 0.8px, transparent 1.3px) 15px 11px / 41px 41px,
+    #141a33;
+}
+.perfil-ms[data-layout="coracoes"] {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M10 15l-5-4.6a3 3 0 0 1 5-3.2 3 3 0 0 1 5 3.2z' fill='%23FF4FB0'/%3E%3Cpath d='M27 33l-4-3.7a2.4 2.4 0 0 1 4-2.6 2.4 2.4 0 0 1 4 2.6z' fill='%23C8102E'/%3E%3C/svg%3E"),
+    color-mix(in srgb, #ff8fcb 22%, var(--bg));
+}
+.perfil-ms[data-layout="xadrez"] .ms-topo,
+.perfil-ms[data-layout="oncinha"] .ms-topo,
+.perfil-ms[data-layout="noite"] .ms-topo {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+.duoinfo .msn {
+  justify-content: center;
+}
+.duoinfo .msn-ouvindo {
+  padding-left: 0;
+  text-align: center;
+}
+
+/* Hábitos sugeridos pelo mundo */
+.sugestoes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 10px;
+}
+
+/* Mixtape da semana (resumo do mundo emo) */
+.mixtape summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mixtape .k7 {
+  flex: 0 0 auto;
+}
+.faixas {
+  margin: 6px 0 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+.faixas li .mono {
+  float: right;
+  color: var(--muted);
+  font-size: 12px;
+  margin-left: 8px;
+}
+.faixas li.bonus {
+  color: var(--accent);
+  font-weight: 600;
+}
+.diario .nota-dia {
+  white-space: pre-line;
+}
+.diario .row {
+  flex-wrap: wrap;
+}
+.diario .row .btn {
+  white-space: normal;
+  text-align: center;
+}

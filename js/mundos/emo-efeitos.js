@@ -133,6 +133,27 @@ function sangueEscorrendo() {
   setTimeout(() => camada.remove(), 4200);
 }
 
+/* ---------- Rastro de brilho no cursor e no toque (só no subtema Scene colorido) ---------- */
+let ultimoBrilho = 0;
+document.addEventListener(
+  "pointermove",
+  e => {
+    const raiz = document.documentElement;
+    if (RM || raiz.dataset.mundo !== "emo" || raiz.dataset.variante !== "scene") return;
+    const agora = Date.now();
+    if (agora - ultimoBrilho < 45) return; // no máximo ~22 brilhos por segundo
+    ultimoBrilho = agora;
+    const b = document.createElement("span");
+    b.className = "rastro-brilho";
+    b.style.left = e.clientX + "px";
+    b.style.top = e.clientY + "px";
+    b.style.setProperty("--c", pick(["#FF4FD8", "#4FE3FF", "#FFE14F", "#B6F23C", "#FFFFFF"]));
+    document.body.appendChild(b);
+    setTimeout(() => b.remove(), 800);
+  },
+  { passive: true }
+);
+
 /* ---------- Ganchos usados pelo resto do app ---------- */
 MUNDO_FX.emo = {
   trocaAba: sangueEscorrendo,
@@ -182,12 +203,138 @@ MUNDO_FX.emo = {
   // Gotas em dobro na lua cheia
   multiplicadorGotas: () => (ehLuaCheia() ? 2 : 1),
 
-  // Textos trocados neste mundo
+  // Legendas do Fotolog (js/internet2000.js). {n} = tarefas feitas hoje, {ml} = água, {nome} = seu nome
+  legendasFotolog: [
+    "eu e minha franja contra o mundo",
+    "fotinho de cima porque o ângulo não mente =]",
+    "{n} tarefas hoje. o vazio perdeu",
+    "{ml} de lágrimas filtradas hoje",
+    "flash na cara e coração na mão",
+    "nem a lua entende esse olhar",
+    "xoxo, {nome} rawr",
+    "mais um dia sobrevivido no escuro"
+  ],
+
+  // Textos trocados neste mundo (a chave é usada em textoMundo("chave", "texto padrão") nas telas)
   textos: {
     diario: "Querido diário",
     diarioDica: "Escreve aqui o que doeu, o que foi bom, o que ficou pra amanhã...",
     foco: "Ensaio da banda",
-    sequencia: ["noite seguida", "noites seguidas"]
+    sequencia: ["noite seguida", "noites seguidas"],
+    // aba Hoje
+    tarefas: "Setlist",
+    adicionar: "Escrever",
+    vazioHoje: "Nenhuma tarefa. Só eu e o vazio.",
+    atrasadas: "Assombrando a lista",
+    trazerTudo: "Exorcizar tudo pra hoje",
+    fecharDia: "Apagar as velas",
+    fecharComPendentes: "Mandar {n} pra amanhã e apagar as velas",
+    diaFechado: "Velas apagadas. Boa noite.",
+    reabrir: "Acender de novo",
+    diaPerfeito: "Show esgotado",
+    conquista_dia_perfeito: "Show esgotado",
+    // outras abas
+    adicionarHabito: "Fazer um pacto",
+    vazioHabitos: "Nenhum hábito ainda. Até vampiro tem rotina: comece com um.",
+    vazioCompromissos: "Agenda vazia. Ninguém me chamou pra sair. Ainda.",
+    vazioPessoas: "Ninguém aqui ainda. Adiciona quem te entende de verdade.",
+    vazioEstudos: "Nenhum ensaio nesta semana. A banda tá parada.",
+    // parceria no tom vampiro
+    conviteTitulo: "Vampiro só entra se for convidado.",
+    conviteDica: "Você me convida pra entrar? Passe o seu código ou digite o do seu par.",
+    conviteBotao: "Convidar pra entrar",
+    pedidoChegou: "bateu na sua janela. Você convida pra entrar?"
+  },
+
+  // Hábitos sugeridos na aba Hábitos (um toque adiciona)
+  habitosSugeridos: [
+    "Passar delineado",
+    "Escrever no diário",
+    "Dormir antes das 3h",
+    "Ouvir um álbum inteiro"
+  ],
+
+  // Botão "Poema do dia" no diário: junta versos inventados
+  poemaDoDia() {
+    const abre = [
+      "A lua",
+      "Meu delineado",
+      "A chuva",
+      "O silêncio do quarto",
+      "Meu caderno",
+      "A franja",
+      "O fone sem bateria",
+      "A vela",
+      "Meu coração de vampiro",
+      "O ônibus das seis"
+    ];
+    const faz = [
+      "escorre devagar",
+      "chora baixinho",
+      "me entende",
+      "sussurra seu nome",
+      "não dorme",
+      "pinta tudo de cinza",
+      "guarda segredo",
+      "dança sozinho",
+      "brilha no escuro",
+      "esquece de mim"
+    ];
+    const onde = [
+      "na janela embaçada",
+      "às três da manhã",
+      "no fim da playlist",
+      "entre uma tarefa e outra",
+      "debaixo do edredom",
+      "na última página",
+      "no reflexo do espelho",
+      "no caminho de casa"
+    ];
+    const fecho = [
+      "e mesmo assim eu sigo.",
+      "mas hoje eu venci.",
+      "e amanhã tem mais.",
+      "rawr, fim.",
+      "e a água não me abandona.",
+      "e ninguém precisa entender.",
+      "e tá tudo bem não estar bem.",
+      "e eu escrevo pra não esquecer."
+    ];
+    const titulo = ["Noite", "Delineado", "Segunda-feira", "Chuva", "Eu", "Velas", "Lua"];
+    const a = pick(abre);
+    const b = pick(abre.filter(x => x !== a));
+    return `~ ${pick(titulo)} ~\n${a} ${pick(faz)}\n${pick(onde)},\n${b} ${pick(faz)}\n${pick(fecho)}`;
+  },
+
+  // Resumo da semana como mixtape: cada tarefa feita ou conquista da semana vira uma faixa inventada
+  resumoSemana() {
+    const fim = today(),
+      inicio = mondayOf(fim);
+    const hash = s => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+    const molde = [
+      t => `"${t}" (versão acústica)`,
+      t => `Balada pra ${t}`,
+      t => `${t} às 3 da manhã`,
+      t => `Eu e ${t} contra o mundo`,
+      t => `${t} (ao vivo no quarto)`,
+      t => `Carta para ${t}`,
+      t => `${t}, parte 2`
+    ];
+    const curto = s => (s.length > 26 ? s.slice(0, 25) + "…" : s).toLowerCase();
+    const faixas = S.tasks
+      .filter(t => t.done && t.date >= inicio && t.date <= fim)
+      .slice(0, 9)
+      .map(t => ({ nome: molde[hash(t.id) % molde.length](curto(t.title)), h: hash(t.id) }));
+    ACHS.filter(a => S.ach[a.id] && S.ach[a.id] >= inicio).forEach(a =>
+      faixas.push({ nome: `Hino de ${a.name.toLowerCase()} (faixa bônus)`, h: hash(a.id), bonus: true })
+    );
+    const tempo = h => `${2 + (h % 3)}:${pad((h >> 3) % 60)}`;
+    return `<section class="block mixtape"><details class="more"><summary><svg class="k7" viewBox="-12 -8 24 16" width="30" height="20" aria-hidden="true">${fitaK7("#141416", "#F2EAD3").replace(/var\(--ink\)/g, "#141416")}</svg>Mixtape da semana <span class="count">${faixas.length} ${faixas.length === 1 ? "faixa" : "faixas"}</span></summary>
+      ${
+        faixas.length
+          ? `<span class="note">Lado A · gravada de ${fmtShort(inicio)} até hoje</span><ol class="faixas">${faixas.map(f => `<li class="${f.bonus ? "bonus" : ""}"><span>${esc(f.nome)}</span><span class="mono">${tempo(f.h)}</span></li>`).join("")}</ol>`
+          : `<span class="note">Fita virgem. Conclua tarefas para gravar as faixas da semana.</span>`
+      }</details></section>`;
   },
 
   // Enfeite no cartão do Prumi: a lua de hoje

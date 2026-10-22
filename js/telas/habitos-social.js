@@ -21,9 +21,10 @@ function viewSocial() {
     <h2 class="h2">Hábitos</h2>
     <form class="add" data-form="habit" style="flex-direction:column;flex-wrap:nowrap">
       <div class="row"><input id="h-name" class="grow" type="text" placeholder="Ex.: ler 20 min, academia, dormir até 23h" autocomplete="off" required style="flex:1 1 200px"><input id="h-time" type="time" aria-label="Horário do lembrete"></div>
-      <div class="row" style="justify-content:space-between">${wdPicker("h-days", [0, 1, 2, 3, 4, 5, 6])}<button class="btn" type="submit">Adicionar hábito</button></div>
+      <div class="row" style="justify-content:space-between">${wdPicker("h-days", [0, 1, 2, 3, 4, 5, 6])}<button class="btn" type="submit">${textoMundo("adicionarHabito", "Adicionar hábito")}</button></div>
     </form>
-    ${S.habits.length ? `<ul class="list">${S.habits.map(h => habitRow(h, true)).join("")}</ul><span class="note">O quadriculado mostra as últimas 12 semanas. O ícone de agenda cria um lembrete que se repete nos dias escolhidos.</span>` : `<div class="empty">Nenhum hábito ainda. Comece com um ou dois. Hábitos pequenos e diários pegam mais fácil.</div>`}
+    ${sugestoesHabitosHTML()}
+    ${S.habits.length ? `<ul class="list">${S.habits.map(h => habitRow(h, true)).join("")}</ul><span class="note">O quadriculado mostra as últimas 12 semanas. O ícone de agenda cria um lembrete que se repete nos dias escolhidos.</span>` : `<div class="empty">${textoMundo("vazioHabitos", "Nenhum hábito ainda. Comece com um ou dois. Hábitos pequenos e diários pegam mais fácil.")}</div>`}
   </section>
   <section class="block">
     <h2 class="h2">Compromissos</h2>
@@ -42,7 +43,7 @@ function viewSocial() {
               return `<li class="a-social"><div class="item"><span class="slot">${ICON.pin}</span><div class="main"><span class="title">${esc(e.title)}</span><span class="meta"><span class="chip">${n === 0 ? "Hoje" : n === 1 ? "Amanhã" : esc(fmtLong(e.date))}</span>${e.time ? `<span>·</span><span class="mono">${esc(e.time)}</span>` : ""}${e.place ? `<span>·</span><span>${esc(e.place)}</span>` : ""}</span></div>${calLink({ title: e.title, date: e.date, time: e.time, dur: 120, location: e.place })}<button class="icon" data-act="del" data-list="events" data-id="${e.id}" aria-label="Apagar">${ICON.trash}</button></div></li>`;
             })
             .join("")}</ul>`
-        : `<div class="empty">Nenhum compromisso pela frente. Eles também aparecem na aba Hoje.</div>`
+        : `<div class="empty">${textoMundo("vazioCompromissos", "Nenhum compromisso pela frente. Eles também aparecem na aba Hoje.")}</div>`
     }
   </section>
   <section class="block">
@@ -67,7 +68,23 @@ function viewSocial() {
             .join(
               ""
             )}</ul><span class="note">Quem está mais atrasado em relação à meta de contato aparece primeiro.</span>`
-        : `<div class="empty">Adicione amigos e família. Quem estiver há muito tempo sem contato sobe para o topo.</div>`
+        : `<div class="empty">${textoMundo("vazioPessoas", "Adicione amigos e família. Quem estiver há muito tempo sem contato sobe para o topo.")}</div>`
     }
   </section>`;
 }
+
+/* Hábitos sugeridos pelo mundo atual (ex.: MUNDO_FX.emo.habitosSugeridos). Toque para adicionar. */
+function sugestoesHabitosHTML() {
+  const f = MUNDO_FX[S.persona];
+  const lista = ((f && f.habitosSugeridos) || []).filter(n => !S.habits.some(h => norm(h.name) === norm(n)));
+  if (!lista.length) return "";
+  return `<div class="sugestoes"><span class="note">Sugestões do mundo ${esc(P().name)}:</span><div class="chips">${lista.map(n => `<button class="chipbtn" data-act="habito-sugerido" data-n="${esc(n)}">+ ${esc(n)}</button>`).join("")}</div></div>`;
+}
+
+ACOES_EXTRAS["habito-sugerido"] = b => {
+  const name = b.dataset.n;
+  if (!name || S.habits.some(h => norm(h.name) === norm(name))) return;
+  S.habits.push({ id: newId(), name, time: "", days: [0, 1, 2, 3, 4, 5, 6], created: today() });
+  commit();
+  toast(`Hábito adicionado: ${name}`, false, "happy");
+};

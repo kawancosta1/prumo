@@ -186,7 +186,7 @@ document.addEventListener("submit", e => {
   const f = e.target.closest("form[data-form]");
   if (!f) return;
   e.preventDefault();
-  const fn = forms[f.dataset.form];
+  const fn = forms[f.dataset.form] || FORMS_EXTRAS[f.dataset.form];
   if (!fn) return;
   const focusId = fn(f);
   commit();
@@ -688,6 +688,7 @@ document.addEventListener("click", e => {
         }
       });
       S.journal[t] = { note: getV("jnote"), closed: true };
+      const fotoNova = tirarFotolog(); // foto do dia no Fotolog (js/internet2000.js)
       {
         const pd = paidDay(t);
         if (!pd.close) {
@@ -698,7 +699,7 @@ document.addEventListener("click", e => {
       }
       react(
         "sleepy",
-        `Dia fechado${n ? `, ${n} ${n === 1 ? "tarefa foi" : "tarefas foram"} pra amanhã` : ""}. Descansa, você merece.`,
+        `Dia fechado${n ? `, ${n} ${n === 1 ? "tarefa foi" : "tarefas foram"} pra amanhã` : ""}. Descansa, você merece.${fotoNova ? " Saiu foto nova no Fotolog." : ""}`,
         4000
       );
       commit();
@@ -743,6 +744,7 @@ document.addEventListener("click", e => {
       }
       break;
     case "ptab":
+      if (b.dataset.t === "perfil" && prumiTab !== "perfil") contarVisita(); // contador estilo MySpace
       prumiTab = b.dataset.t;
       tryItem = null;
       if (tryPal) {
@@ -954,6 +956,9 @@ document.addEventListener("click", e => {
     case "sample":
       loadSample();
       break;
+    default:
+      // Ações registradas por outros arquivos (ex.: js/internet2000.js)
+      if (ACOES_EXTRAS[act]) ACOES_EXTRAS[act](b, id);
   }
 });
 
@@ -961,6 +966,7 @@ document.addEventListener("change", e => {
   const el = e.target,
     c = el.dataset.change;
   if (!c) return;
+  if (MUDANCAS_EXTRAS[c]) return MUDANCAS_EXTRAS[c](el);
   const x = el.dataset.id ? S.tasks.find(t => t.id === el.dataset.id) : null;
   if (c === "meal") {
     const d = S.meals[mealDay] || (S.meals[mealDay] = {});

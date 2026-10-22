@@ -54,6 +54,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/efeitos.js` | Confete e animações de números |
 | `js/humor.js` | **Humor do Prumi** (`calcularHumor()`) |
 | `js/parceria.js` | Parceria: código, dupla abraçada, poses e mimos |
+| `js/internet2000.js` | Internet dos anos 2000 no perfil: status de MSN e "Ouvindo:", depoimentos com aprovação, comunidades (selos por conquista), contador de visitas, fundos do perfil e o Fotolog do dia |
 | `js/telas/*.js` | Uma função por aba (`viewHoje`, `viewEstudos`...) |
 | `js/telas/perfil.js` | Perfil estilo MySpace na aba Prumi: subnick, música, Top 8 e recados |
 | `js/render.js` | `render()`: desenha a aba atual |
@@ -119,8 +120,35 @@ Cada mundo pode ter um objeto `MUNDO_FX.<mundo>` com ganchos opcionais (veja o e
 - `camadasPrumi({ mood, temRosto, temCenario })`: devolve `{ fundo, rosto }` em SVG por cima/por trás do Prumi.
 - `aoTocar()`: roda ao tocar no Prumi (devolva `true` para pular a reação normal).
 - `musicas` e `subnicks`: usados no Perfil.
+- `legendasFotolog`: legendas das fotos do Fotolog.
+- `habitosSugeridos`: lista de hábitos que aparecem como sugestão na aba Hábitos.
+- `poemaDoDia()`: devolve um poema (texto). Mostra o botão "Poema do dia" no diário.
+- `resumoSemana()`: devolve HTML de um resumo da semana na aba Hoje (no emo, a "Mixtape da semana").
+- Nas telas, use `temGancho("nome")` para saber se o mundo tem um gancho e `ganchoMundo("nome")` para chamá-lo.
+
+Textos que cada mundo pode trocar em `textos` (chave → texto padrão): `tarefas`, `adicionar`, `vazioHoje`, `atrasadas`,
+`trazerTudo`, `fecharDia`, `fecharComPendentes` (use `{n}`), `diaFechado`, `reabrir`, `diaPerfeito`, `adicionarHabito`,
+`vazioHabitos`, `vazioCompromissos`, `vazioPessoas`, `vazioEstudos`, `conviteTitulo`, `conviteDica`, `conviteBotao`,
+`pedidoChegou` e `conquista_<id>` (nome de uma conquista).
 
 No CSS, use `html[data-mundo="emo"]` e `html[data-variante="scene"]` para enfeitar só um mundo ou tema.
+
+### Registrar um botão novo sem mexer no `acoes.js`
+
+Arquivos novos podem registrar seus próprios cliques, formulários e campos (os registros ficam em `js/util.js`):
+
+```js
+ACOES_EXTRAS["meu-botao"] = (botao, id) => { /* data-act="meu-botao" */ };
+FORMS_EXTRAS.meuForm = () => { /* data-form="meuForm" */ };
+MUDANCAS_EXTRAS["meu-campo"] = campo => { /* data-change="meu-campo" */ };
+```
+
+### Fotolog, comunidades e MSN
+
+- Fotolog: `tirarFotolog()` roda ao fechar o dia e guarda a foto em `S.fotolog` (uma por dia, até 40).
+  Cada mundo pode ter legendas próprias em `MUNDO_FX.<mundo>.legendasFotolog`.
+- Comunidades: lista `COMUNIDADES` em `js/internet2000.js`. Cada uma tem `ach` (a conquista que libera).
+- Status do MSN, "Ouvindo:" e depoimentos vão no perfil público da parceria (`montarPerfil()` em `js/parceria.js`).
 
 ### Criar um evento com itens limitados
 

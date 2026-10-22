@@ -33,7 +33,7 @@ function viewEstudos() {
   );
   return `
   <section class="block">
-    <h1 class="h1">Estudos<small>${total ? `${fmtMin(total)} nesta semana` : "Nenhum estudo registrado nesta semana"}${streak ? ` · ${streak} ${streak === 1 ? "dia seguido" : "dias seguidos"} estudando` : ""}</small></h1>
+    <h1 class="h1">Estudos<small>${total ? `${fmtMin(total)} nesta semana` : textoMundo("vazioEstudos", "Nenhum estudo registrado nesta semana")}${streak ? ` · ${streak} ${streak === 1 ? "dia seguido" : "dias seguidos"} estudando` : ""}</small></h1>
   </section>
   <section class="block">
     <h2 class="h2">${textoMundo("foco", "Foco")}</h2>

@@ -97,6 +97,16 @@ const textoMundo = (chave, padrao) => {
   const f = MUNDO_FX[S.persona];
   return (f && f.textos && f.textos[chave]) || padrao;
 };
+/** O mundo atual tem esse gancho? (ex.: temGancho("poemaDoDia")) */
+const temGancho = nome => {
+  const f = MUNDO_FX[S.persona];
+  return !!(f && f[nome]);
+};
+/** Chama um gancho do mundo atual e devolve o resultado (ou "" se o mundo não tiver). */
+const ganchoMundo = (nome, ...args) => {
+  const f = MUNDO_FX[S.persona];
+  return f && typeof f[nome] === "function" ? f[nome](...args) : "";
+};
 /** Enfeite do cartão do Prumi, se o mundo tiver (ex.: a lua de hoje no emo). */
 const enfeiteMundo = () => {
   const f = MUNDO_FX[S.persona];

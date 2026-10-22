@@ -70,7 +70,10 @@ function montarPerfil() {
     tipo: S.parceria.tipo || "namoro",
     mimo: S.parceria.mimoEnviado || null,
     subnick: S.perfil.subnick || "", // frase do "MSN" que aparece pro parceiro
-    recados: (S.parceria.recados || []).slice(0, 10) // recados que EU mandei (estilo Orkut)
+    recados: (S.parceria.recados || []).slice(0, 10), // recados que EU mandei (estilo Orkut)
+    status: statusMsn(), // status do MSN
+    ouvindo: S.perfil.status === "offline" ? "" : S.perfil.ouvindo || "",
+    depoimentos: (S.parceria.depoimentos || []).slice(0, 5) // depoimentos que EU escrevi (esperam aprovação)
   };
 }
 
@@ -375,7 +378,8 @@ function parceriaHeroHTML() {
   return `<div class="herobox">${enfeiteMundo()}
     <button class="duowrap" data-act="pose" aria-label="Trocar pose">${duoHTML()}</button>
     <div class="duoinfo"><span><b>${esc(S.name || "Você")}</b> e <b>${esc(nomeParceiro())}</b> · ${TIPOS_PARCERIA[S.parceria.tipo] || "Parceria"}</span>
-      ${p.subnick ? `<span class="subnick">${esc(nomeParceiro())} diz: ${esc(p.subnick)}</span>` : ""}
+      ${linhaMsnHTML(nomeParceiro(), p.status, p.ouvindo)}
+      ${p.subnick ? `<span class="subnick letreiro"><span>${esc(nomeParceiro())} diz: ${esc(p.subnick)}</span></span>` : ""}
       <span class="note">${esc(nomeParceiro())} está <b>${esc((p.humor && p.humor.nivel) || "de boa").toLowerCase()}</b> · água ${p.agua || 0}% · toque nos Prumis pra trocar a pose</span></div>
     <div class="bubble solo" id="bubble" aria-live="polite"></div>
     <div class="mimos">${mimos.map(([k, l]) => `<button class="btn small" data-act="mimo" data-t="${k}">${l}</button>`).join("")}</div>
@@ -386,11 +390,11 @@ function parceriaHeroHTML() {
 /* Seção de parceria na aba Hábitos e social */
 function parceriaSecaoHTML() {
   if (!banco) {
-    return `<section class="block"><h2 class="h2">Parceria</h2><div class="empty"><strong>Junte seu Prumi com o de outra pessoa.</strong>Para isso, o Prumo precisa estar aberto com a sua conta Claude (os dados sincronizados). A outra pessoa abre este mesmo link com a conta dela, depois que você compartilhar com permissão de edição.</div></section>`;
+    return `<section class="block"><h2 class="h2">Parceria</h2><div class="empty"><strong>${textoMundo("conviteTitulo", "Junte seu Prumi com o de outra pessoa.")}</strong>Para isso, o Prumo precisa estar aberto com a sua conta Claude (os dados sincronizados). A outra pessoa abre este mesmo link com a conta dela, depois que você compartilhar com permissão de edição.</div></section>`;
   }
   const pend = S.parceria.id && !parceriaAtiva();
   return `<section class="block"><h2 class="h2">Parceria</h2>
-    ${pedidos.map(p => `<div class="card pedido"><span><b>${esc(p.nome || "Alguém")}</b> quer ser ${p.tipo === "amizade" ? "seu amigo(a)" : "seu namorado(a)"} no Prumo.</span><div class="row"><button class="btn small primary" data-act="aceitar" data-id="${esc(p.id)}">Aceitar</button></div></div>`).join("")}
+    ${pedidos.map(p => `<div class="card pedido"><span><b>${esc(p.nome || "Alguém")}</b> ${textoMundo("pedidoChegou", `quer ser ${p.tipo === "amizade" ? "seu amigo(a)" : "seu namorado(a)"} no Prumo.`)}</span><div class="row"><button class="btn small primary" data-act="aceitar" data-id="${esc(p.id)}">Aceitar</button></div></div>`).join("")}
     ${
       parceriaAtiva()
         ? `<div class="card"><span>Você e <b>${esc(nomeParceiro())}</b> são <b>${(TIPOS_PARCERIA[S.parceria.tipo] || "").toLowerCase()}</b> no Prumo. Os dois Prumis aparecem juntos na aba Hoje.</span><div><button class="btn small ghost danger" data-act="desfazer">Desfazer parceria</button></div></div>`
@@ -398,11 +402,11 @@ function parceriaSecaoHTML() {
           ? `<div class="card"><span>Pedido enviado. Assim que a outra pessoa aceitar, os Prumis aparecem juntos.</span><div><button class="btn small ghost" data-act="desfazer">Cancelar pedido</button></div></div>`
           : `<div class="card">
           <span>Seu código: <b class="mono codigo">${esc(S.codigo || "…")}</b></span>
-          <span class="note">Passe esse código para a outra pessoa, ou digite o código dela aqui embaixo.</span>
+          <span class="note">${textoMundo("conviteDica", "Passe esse código para a outra pessoa, ou digite o código dela aqui embaixo.")}</span>
           <form class="row" data-form="parceria">
             <input id="par-codigo" type="text" maxlength="6" placeholder="Código" style="width:110px;text-transform:uppercase" autocomplete="off" required>
             <select id="par-tipo" aria-label="Tipo"><option value="namoro">Namorado(a)</option><option value="amizade">Amigo(a)</option></select>
-            <button class="btn primary" type="submit">Conectar</button>
+            <button class="btn primary" type="submit">${textoMundo("conviteBotao", "Conectar")}</button>
           </form>
         </div>`
     }

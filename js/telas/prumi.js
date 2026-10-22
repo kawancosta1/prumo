@@ -99,7 +99,7 @@ function viewPrumi() {
         li = a.legend ? ITEMS.find(i => i.p === S.persona && i.ach === a.id) : null,
         rw = li ? li.name + " (lendário)" : a.theme ? "Tema lendário" : "";
       const escondida = a.secreta && !done; // conquista secreta: só mostra depois de descoberta
-      return `<li class="${done ? "achdone" : ""}"><div class="item"><span class="trophy ${done ? "on" : ""}">${done ? ICON.trophy : ICON.lock}</span><div class="main"><span class="title"><b>${escondida ? "???" : esc(a.name)}</b></span><span class="meta">${escondida ? "Conquista secreta. Explore o Prumi..." : esc(a.desc)}</span>
+      return `<li class="${done ? "achdone" : ""}"><div class="item"><span class="trophy ${done ? "on" : ""}">${done ? ICON.trophy : ICON.lock}</span><div class="main"><span class="title"><b>${escondida ? "???" : esc(textoMundo("conquista_" + a.id, a.name))}</b></span><span class="meta">${escondida ? "Conquista secreta. Explore o Prumi..." : esc(a.desc)}</span>
         ${done ? `<span class="meta" style="color:var(--ok);font-weight:600">Conquistada em ${fmtShort(S.ach[a.id])}</span>` : escondida ? "" : `<div class="progress" style="margin-top:6px"><span style="width:${Math.round((c / a.goal) * 100)}%"></span></div><span class="meta mono">${a.fmt ? a.fmt(c) : c} / ${a.fmt ? a.fmt(a.goal) : a.goal}</span>`}</div>
         <span class="reward">${DROP}${a.reward}${rw ? `<small>+ ${esc(rw)}</small>` : ""}</span></div></li>`;
     }).join("")}</ul>
@@ -148,5 +148,5 @@ function viewPrumi() {
   <section class="block">${body}</section>
   <section class="block"><details class="more"><summary>Como ganhar gotas</summary><div class="earnlist">
     <span>Concluir tarefa <b>+5</b> (prioridade alta <b>+8</b>)</span><span>Marcar hábito <b>+5</b></span><span>Bater a meta de água <b>+20</b></span>
-    <span>Revisão espaçada <b>+8</b></span><span>Foco: <b>+2</b> a cada 5 min</span><span>Fechar o dia <b>+10</b></span><span>Falar com alguém <b>+3</b></span><span>Dia perfeito <b>+25</b></span><span>Conquistas dão bônus e itens exclusivos</span></div></details></section>`;
+    <span>Revisão espaçada <b>+8</b></span><span>Foco: <b>+2</b> a cada 5 min</span><span>Fechar o dia <b>+10</b></span><span>Falar com alguém <b>+3</b></span><span>${textoMundo("diaPerfeito", "Dia perfeito")} <b>+25</b></span><span>Conquistas dão bônus e itens exclusivos</span></div></details></section>`;
 }

@@ -4,6 +4,18 @@
 "use strict";
 
 /* ================= estado ================= */
+/* Campos do perfil estilo MySpace/Orkut/MSN (dados antigos ganham esses valores em normalize) */
+const perfilPadrao = () => ({
+  sobre: "",
+  subnick: "",
+  status: "online", // MSN: online, ausente, ocupado ou offline (aparecer offline)
+  ouvindo: "", // "Ouvindo:" do MSN
+  visitas: 0, // contador de visitas
+  layout: "classico", // fundo do perfil
+  depoAceitos: [], // depoimentos que você aprovou
+  depoVistos: [] // depoimentos já aprovados ou recusados (pelo horário de envio)
+});
+
 const blank = () => ({
   v: 2,
   tasks: [],
@@ -38,7 +50,8 @@ const blank = () => ({
   paid: {},
   stats: { tasks: 0, water: 0, focus: 0, reviews: 0, talked: 0, perfect: 0, closed: 0 },
   carinho: {},
-  perfil: { sobre: "", subnick: "" }, // perfil estilo MySpace
+  perfil: { sobre: "", subnick: "" }, // perfil estilo MySpace (o resto dos campos vem em perfilPadrao)
+  fotolog: [], // fotos do Fotolog, uma por dia fechado
   parceria: { id: null, tipo: "namoro" },
   codigo: "",
   events: [],
@@ -115,8 +128,12 @@ function normalize(x) {
   delete b.palette;
   delete b.ownedPal;
   if (!b.carinho || typeof b.carinho !== "object") b.carinho = {};
-  if (!b.perfil || typeof b.perfil !== "object") b.perfil = { sobre: "", subnick: "" };
+  if (!b.perfil || typeof b.perfil !== "object") b.perfil = {};
+  b.perfil = { ...perfilPadrao(), ...b.perfil };
+  for (const k of ["depoAceitos", "depoVistos"]) if (!Array.isArray(b.perfil[k])) b.perfil[k] = [];
+  if (!Array.isArray(b.fotolog)) b.fotolog = [];
   if (!b.parceria || typeof b.parceria !== "object") b.parceria = { id: null, tipo: "namoro" };
+  if (!Array.isArray(b.parceria.depoimentos)) b.parceria.depoimentos = [];
   if (!["m", "f", "n"].includes(b.gender)) b.gender = "m";
   b.v = 2;
   return b;
@@ -162,11 +179,17 @@ function commit() {
     react(
       "party",
       g.daily
-        ? `Dia perfeito! <b>+${g.reward} gotas</b>.`
+        ? `${textoMundo("diaPerfeito", "Dia perfeito")}! <b>+${g.reward} gotas</b>.`
         : `Conquista: <b>${esc(g.name)}</b>! +${g.reward} gotas${g.legend ? ` e itens lendários liberados` : g.theme ? ` e um tema lendário em cada personalidade` : ""}.`,
       5000
     );
-    toast(g.daily ? `Dia perfeito! +${g.reward} gotas` : `Conquista desbloqueada: ${g.name}`, false, "party");
+    toast(
+      g.daily
+        ? `${textoMundo("diaPerfeito", "Dia perfeito")}! +${g.reward} gotas`
+        : `Conquista desbloqueada: ${g.name}`,
+      false,
+      "party"
+    );
   }
 }
 

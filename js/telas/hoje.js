@@ -64,7 +64,7 @@ function viewHoje() {
     <h1 class="h1">${isToday ? "Hoje" : selDay === addDays(t, 1) ? "Amanhã" : selDay === addDays(t, -1) ? "Ontem" : esc(DIAS[parse(selDay).getDay()].replace(/^./, c => c.toUpperCase()))}<small>${fmtLong(selDay)}</small></h1>
     ${isToday ? (parceriaAtiva() ? parceriaHeroHTML() : heroHTML()) : ""}
     ${isToday && pedidos.length && !parceriaAtiva() ? `<button class="card pedido" data-tab="social"><span><b>${esc(pedidos[0].nome || "Alguém")}</b> quer juntar o Prumi com o seu. Toque para ver.</span></button>` : ""}
-    ${isToday ? `<div class="stats"><span>Tarefas <b>${done}/${tasks.length}</b></span><span>Água <b>${fmtML(waterToday())}</b> de ${fmtML(S.waterGoal)}</span>${habitsToday.length ? `<span>Hábitos <b>${habitsToday.filter(h => habitDone(h, t)).length}/${habitsToday.length}</b></span>` : ""}${S.sessions.some(s => s.date === t) ? `<span>Estudo <b>${fmtMin(S.sessions.filter(s => s.date === t).reduce((a, b) => a + b.min, 0))}</b></span>` : ""}</div>` : tasks.length ? `<div class="stats"><span>Tarefas <b>${done}/${tasks.length}</b></span></div>` : ""}
+    ${isToday ? `<div class="stats"><span>${textoMundo("tarefas", "Tarefas")} <b>${done}/${tasks.length}</b></span><span>Água <b>${fmtML(waterToday())}</b> de ${fmtML(S.waterGoal)}</span>${habitsToday.length ? `<span>Hábitos <b>${habitsToday.filter(h => habitDone(h, t)).length}/${habitsToday.length}</b></span>` : ""}${S.sessions.some(s => s.date === t) ? `<span>Estudo <b>${fmtMin(S.sessions.filter(s => s.date === t).reduce((a, b) => a + b.min, 0))}</b></span>` : ""}</div>` : tasks.length ? `<div class="stats"><span>${textoMundo("tarefas", "Tarefas")} <b>${done}/${tasks.length}</b></span></div>` : ""}
     ${tasks.length ? `<div class="progress"><span data-to="${Math.round((done / tasks.length) * 100)}" style="width:${fx.enter ? 0 : lastProg}%"></span></div>` : ""}
     <div class="days">${Array.from({ length: 9 }, (_, k) => k - 1)
       .map(i => {
@@ -77,13 +77,13 @@ function viewHoje() {
   </section>
   <section class="block">
     <form class="add quick" data-form="quick">
-      <div class="row1"><input id="q" type="text" placeholder="${esc(P().placeholder || "O que você precisa fazer?")}" autocomplete="off" required value="${esc(qp)}"><button class="btn primary" type="submit">Adicionar</button></div>
+      <div class="row1"><input id="q" type="text" placeholder="${esc(P().placeholder || "O que você precisa fazer?")}" autocomplete="off" required value="${esc(qp)}"><button class="btn primary" type="submit">${textoMundo("adicionar", "Adicionar")}</button></div>
       <div class="parsed" id="qparsed">${parsedPills(parseQuick(qp, selDay), qp)}</div>
       <div class="hint">Escreva do seu jeito: <code>revisar cálculo amanhã 19h #estudo !1</code> · <code>academia toda segunda 7h</code></div>
     </form>
-    ${listHtml ? `<ul class="list">${listHtml}</ul>` : fresh ? `<div class="empty"><strong>Seu dia começa aqui.</strong>Escreva uma tarefa acima. Data, horário, área (#estudo, #dieta, #social) e prioridade (!1, !2, !3) são entendidos sozinhos. O ícone azul cria o lembrete no Google Agenda, que aparece no Samsung se a conta Google estiver sincronizada.<button class="btn small" data-act="sample">Ver com exemplos</button></div>` : `<div class="empty">Nada marcado para ${isToday ? "hoje" : "este dia"}.</div>`}
+    ${listHtml ? `<ul class="list">${listHtml}</ul>` : fresh ? `<div class="empty"><strong>Seu dia começa aqui.</strong>Escreva uma tarefa acima. Data, horário, área (#estudo, #dieta, #social) e prioridade (!1, !2, !3) são entendidos sozinhos. O ícone azul cria o lembrete no Google Agenda, que aparece no Samsung se a conta Google estiver sincronizada.<button class="btn small" data-act="sample">Ver com exemplos</button></div>` : `<div class="empty">${isToday ? textoMundo("vazioHoje", "Nada marcado para hoje.") : "Nada marcado para este dia."}</div>`}
   </section>
-  ${overdue.length ? `<section class="block"><h2 class="h2">Atrasadas <span class="row" style="gap:6px"><span class="count">${overdue.length}</span><button class="btn small" data-act="rollover">Trazer tudo para hoje</button></span></h2><ul class="list">${overdue.map(x => taskRow(x, { showDate: true })).join("")}</ul></section>` : ""}
+  ${overdue.length ? `<section class="block"><h2 class="h2">${textoMundo("atrasadas", "Atrasadas")} <span class="row" style="gap:6px"><span class="count">${overdue.length}</span><button class="btn small" data-act="rollover">${textoMundo("trazerTudo", "Trazer tudo para hoje")}</button></span></h2><ul class="list">${overdue.map(x => taskRow(x, { showDate: true })).join("")}</ul></section>` : ""}
   ${bdays.length ? `<section class="block"><h2 class="h2">Aniversários chegando</h2><ul class="list">${bdays.map(({ p, d }) => `<li class="a-social"><div class="item"><span class="slot">${ICON.cake}</span><div class="main"><span class="title">${esc(p.name)}</span><span class="meta">${fmtLong(d)}</span></div>${dueTag(diffDays(t, d))}</div></li>`).join("")}</ul></section>` : ""}
   ${revDue.length ? `<section class="block"><h2 class="h2">Revisões de hoje <span class="count">${revDue.length}</span></h2><ul class="list">${revDue.map(reviewRow).join("")}</ul></section>` : ""}
   ${isToday && habitsToday.length ? `<section class="block"><h2 class="h2">Hábitos <span class="count">${habitsToday.filter(h => habitDone(h, t)).length}/${habitsToday.length}</span></h2><ul class="list">${habitsToday.map(h => habitRow(h, false)).join("")}</ul></section>` : ""}
@@ -94,14 +94,26 @@ function viewHoje() {
       ? `<section class="block diario"><h2 class="h2">${textoMundo("diario", "Fechar o dia")}</h2>
     <div class="card">${
       jr.closed
-        ? `<span class="closed">Dia fechado.</span>${jr.note ? `<span>${esc(jr.note)}</span>` : ""}<div><button class="btn small ghost" data-act="reopen">Reabrir</button></div>`
+        ? `<span class="closed">${textoMundo("diaFechado", "Dia fechado.")}</span>${jr.note ? `<span class="nota-dia">${esc(jr.note)}</span>` : ""}<div><button class="btn small ghost" data-act="reopen">${textoMundo("reabrir", "Reabrir")}</button></div>`
         : `
       <span class="note">${hour < 18 ? "Faça isso à noite: revise o que rolou e deixe amanhã pronto." : "Hora de revisar o dia e deixar amanhã pronto."} ${done} feitas, ${pend} pendentes, ${fmtML(waterToday())} de água.</span>
       <textarea id="jnote" placeholder="${textoMundo("diarioDica", "Como foi o dia? O que ficou de aprendizado? (opcional)")}">${esc(jr.note || "")}</textarea>
-      <div class="row"><button class="btn primary" data-act="closeday">${pend ? `Mover ${pend} ${pend === 1 ? "pendente" : "pendentes"} para amanhã e fechar` : "Fechar o dia"}</button></div>`
+      <div class="row"><button class="btn primary" data-act="closeday">${(pend ? textoMundo("fecharComPendentes", "Mover {n} para amanhã e fechar") : textoMundo("fecharDia", "Fechar o dia")).replace("{n}", `${pend} ${pend === 1 ? "pendente" : "pendentes"}`)}</button>${temGancho("poemaDoDia") ? `<button class="btn ghost" data-act="poema-do-dia">Poema do dia</button>` : ""}</div>`
     }
     </div></section>`
       : ""
   }
+  ${isToday && !fresh ? ganchoMundo("resumoSemana") : ""}
   `;
 }
+
+/* Botão "Poema do dia" no diário (só aparece se o mundo tiver poemaDoDia, ex.: emo) */
+ACOES_EXTRAS["poema-do-dia"] = () => {
+  const campo = document.getElementById("jnote");
+  if (!campo) return;
+  const poema = ganchoMundo("poemaDoDia");
+  campo.value = (campo.value.trim() ? campo.value.trim() + "\n\n" : "") + poema;
+  campo.style.height = "auto";
+  campo.style.height = campo.scrollHeight + "px";
+  react("happy", "Escrevi um poema pra hoje. Pode mexer, ele é seu.", 2600);
+};

@@ -1,6 +1,7 @@
 /*
   Perfil do Prumi no estilo MySpace/Orkut: foto de perfil, subnick, humor, música tocando,
   sobre mim, Top 8 amigos e recados da parceria.
+  MSN, depoimentos, comunidades, contador, fundos e Fotolog ficam em js/internet2000.js.
   Aparece na aba Prumi → Perfil. As músicas e frases podem ser trocadas por cada mundo
   (ex.: js/mundos/emo-efeitos.js define musicas e subnicks próprios).
 */
@@ -40,30 +41,34 @@ function perfilHTML() {
     return `<div class="top8-item vazio"><span class="top8-mais">+</span><span>${i === 0 ? "Seu par" : "Em breve"}</span></div>`;
   }).join("");
 
-  return `<div class="perfil-ms">
+  const st = STATUS_MSN[statusMsn()];
+  return `<div class="perfil-ms" data-layout="${esc(S.perfil.layout || "classico")}">
     <div class="ms-topo">
       <div class="ms-foto">${prumi({ mood: h.nivel.rosto === "cry" ? "sad" : "happy", fill: Math.min(1, waterToday() / S.waterGoal), size: 104, eq: S.equip })}</div>
       <div class="ms-info">
         <span class="ms-nome glitter">${esc(S.name || "Prumi")}</span>
-        ${S.perfil.subnick ? `<span class="subnick">${esc(S.perfil.subnick)}</span>` : ""}
+        ${S.perfil.subnick ? `<span class="subnick letreiro"><span>${esc(S.perfil.subnick)}</span></span>` : ""}
+        <span><i class="msn-bola" style="--c:${st.cor}"></i> ${statusMsn() === "offline" ? "Offline" : st.nome}</span>
         <span><b>Humor:</b> ${esc(h.nivel.nome)}</span>
-        <span><b>Ouvindo agora:</b> ♪ ${esc(musica)}</span>
+        <span><b>Ouvindo agora:</b> ♪ ${esc(S.perfil.ouvindo || musica)}</span>
         <span><b>Personalidade:</b> ${esc(P().name)} · <b>Nível</b> ${L.lvl}</span>
       </div>
     </div>
 
-    <div class="ms-bloco">
-      <span class="ms-titulo">Subnick</span>
-      <div class="row">
-        <input id="perfil-subnick" type="text" data-change="perfil-subnick" maxlength="60" value="${esc(S.perfil.subnick)}" placeholder="Sua frase do dia" autocomplete="off" style="flex:1">
-        <button class="btn small" data-act="sortear-subnick">Sortear frase</button>
-      </div>
-      <span class="note">Aparece para o seu par, igual o subnick do MSN.</span>
-    </div>
+    <div class="ms-visitas">Você é o visitante nº ${contadorHTML(S.perfil.visitas || 0)}</div>
+
+    ${msnBlocoHTML()}
 
     <div class="ms-bloco">
       <span class="ms-titulo">Sobre mim</span>
       <textarea id="perfil-sobre" data-change="perfil-sobre" maxlength="400" placeholder="Escreva sobre você, suas bandas, o que te define...">${esc(S.perfil.sobre)}</textarea>
+    </div>
+
+    ${comunidadesBlocoHTML()}
+
+    <div class="ms-bloco">
+      <span class="ms-titulo">Fotolog</span>
+      ${fotologHTML()}
     </div>
 
     <div class="ms-bloco">
@@ -80,5 +85,9 @@ function perfilHTML() {
           : `<span class="note">Conecte uma parceria (aba Hábitos e social) para trocar recados.</span>`
       }
     </div>
+
+    ${depoimentosBlocoHTML()}
+
+    ${layoutBlocoHTML()}
   </div>`;
 }

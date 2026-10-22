@@ -179,3 +179,12 @@ function gcal({ title, date, time, dur = 60, details = "", location = "", recur 
 }
 
 const pick = a => a[Math.floor(Math.random() * a.length)];
+
+/*
+  Ações extras: arquivos novos registram aqui os seus botões (data-act), formulários (data-form)
+  e campos (data-change), sem precisar mexer no switch grande de js/acoes.js.
+  Exemplo: ACOES_EXTRAS["minha-acao"] = (botao, id) => { ... };
+*/
+const ACOES_EXTRAS = {};
+const FORMS_EXTRAS = {};
+const MUDANCAS_EXTRAS = {};

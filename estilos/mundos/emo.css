@@ -643,3 +643,46 @@ html[data-variante="base"][data-mundo="emo"] .h1 {
 .sitem .prumi .brilhinho {
   transform: none;
 }
+
+/* ================= internet dos anos 2000 no emo ================= */
+
+/* Subnick rolando como letreiro (perfil e duo da Hoje) */
+html[data-mundo="emo"] .letreiro {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+html[data-mundo="emo"] .letreiro > span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: emoLetreiro 11s linear infinite;
+}
+@keyframes emoLetreiro {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* Rastro de brilho no cursor e no toque (só no subtema Scene colorido, criado em emo-efeitos.js) */
+.rastro-brilho {
+  position: fixed;
+  z-index: 70;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  pointer-events: none;
+  background: var(--c, #ff4fd8);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  animation: emoRastro 0.8s ease-out forwards;
+}
+@keyframes emoRastro {
+  from {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(16px) scale(0.2) rotate(90deg);
+    opacity: 0;
+  }
+}
