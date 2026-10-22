@@ -120,6 +120,7 @@ function sangueEscorrendo() {
 
   const camada = document.createElement("div");
   camada.id = "sangue";
+  camada.style.zIndex = "1";
   camada.setAttribute("aria-hidden", "true");
   camada.innerHTML =
     `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
@@ -128,7 +129,7 @@ function sangueEscorrendo() {
     `<linearGradient id="sangue-cor" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Math.round(H * 0.7)}">` +
     `<stop offset="0" class="c1"/><stop offset="0.25" class="c2"/><stop offset="1" class="c3"/></linearGradient></defs>` +
     `<g filter="url(#sangue-goo)" fill="url(#sangue-cor)">${poca}${fios}</g>${brilhos}</svg>`;
-  document.body.appendChild(camada);
+  document.body.insertBefore(camada, document.body.firstChild);
   setTimeout(() => camada.remove(), 4200);
 }
 
