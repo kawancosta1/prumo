@@ -1,0 +1,82 @@
+<title>Prumo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Pirata+One&family=Metal+Mania&family=Rye&family=DM+Serif+Display&family=Anton&family=Bungee&family=Righteous&family=Bowlby+One&family=Fredoka:wght@700&family=Press+Start+2P&family=M+PLUS+Rounded+1c:wght@800&family=VT323&family=Cormorant+Garamond:wght@700&family=Oswald:wght@700&family=Lora:wght@700&display=swap">
+<!-- Estilos do app (cada arquivo cuida de uma parte) -->
+<link rel="stylesheet" href="estilos/base.css">
+<link rel="stylesheet" href="estilos/mascote.css">
+<link rel="stylesheet" href="estilos/recursos.css">
+<link rel="stylesheet" href="estilos/animacoes.css">
+<link rel="stylesheet" href="estilos/responsivo.css">
+<div class="wrap">
+  <header class="top">
+    <div class="brandrow">
+      <div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 2v13"/><path d="M8 15l4 7 4-7z" fill="currentColor"/></svg>Prumo</div>
+      <div class="right">
+        <div class="sync" id="sync"><i></i><span>Carregando…</span></div>
+        <button class="coins" id="coins" data-tab="prumi" aria-label="Gotas"><svg class="drop" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5s-6.5 7.2-6.5 12a6.5 6.5 0 0 0 13 0c0-4.8-6.5-12-6.5-12z"/></svg><b id="coinsn">0</b></button>
+        <button class="icon" id="gear" data-tab="ajustes" aria-label="Ajustes" title="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Seções">
+      <span class="ind noanim" id="ind" aria-hidden="true"></span>
+      <button data-tab="hoje"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Hoje</button>
+      <button data-tab="estudos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z"/><path d="M22 5h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/></svg>Estudos</button>
+      <button data-tab="dieta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5s-6 6.6-6 11a6 6 0 0 0 12 0c0-4.4-6-11-6-11z"/></svg>Água</button>
+      <button data-tab="social"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/></svg>Hábitos</button>
+      <button data-tab="prumi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v4"/><path d="M12 5c4.4 0 6.5 3 6.5 6 0 3.5-3 6.5-6.5 11.5C8.5 17.5 5.5 14.5 5.5 11c0-3 2.1-6 6.5-6z"/></svg>Prumi</button>
+    </nav>
+  </header>
+  <main id="main" aria-live="polite"></main>
+</div>
+<div id="toast" class="toast" hidden></div>
+<input type="file" id="importfile" accept=".json,application/json" hidden>
+<canvas id="fxc" aria-hidden="true"></canvas>
+<div id="onb" class="onb" hidden role="dialog" aria-label="Boas-vindas"></div>
+
+<!-- Scripts do app. A ordem importa: cada arquivo usa coisas dos anteriores. -->
+<script src="js/util.js"></script>
+<script src="js/captura-rapida.js"></script>
+<script src="js/estado.js"></script>
+<script src="js/calculos.js"></script>
+<script src="js/componentes.js"></script>
+<script src="js/mascote/desenho.js"></script>
+<script src="js/mascote/roupas-base.js"></script>
+<script src="js/mascote/falas.js"></script>
+<script src="js/personalidades.js"></script>
+<script src="js/temas.js"></script>
+<script src="js/mundos/emo.js"></script>
+<script src="js/mundos/rock.js"></script>
+<script src="js/mundos/sertanejo.js"></script>
+<script src="js/mundos/cleanboy.js"></script>
+<script src="js/mundos/rapper.js"></script>
+<script src="js/mundos/trapper.js"></script>
+<script src="js/mundos/pagodeiro.js"></script>
+<script src="js/mundos/funkeiro.js"></script>
+<script src="js/mundos/forrozeiro.js"></script>
+<script src="js/mundos/gamer.js"></script>
+<script src="js/mundos/otaku.js"></script>
+<script src="js/mundos/programador.js"></script>
+<script src="js/mundos/zen.js"></script>
+<script src="js/mundos/coach.js"></script>
+<script src="js/mundos/vovo.js"></script>
+<script src="js/mundos/_indice.js"></script>
+<script src="js/conquistas.js"></script>
+<script src="js/agenda.js"></script>
+<script src="js/efeitos.js"></script>
+<script src="js/humor.js"></script>
+<script src="js/parceria.js"></script>
+<script src="js/telas/hoje.js"></script>
+<script src="js/telas/estudos.js"></script>
+<script src="js/telas/agua-dieta.js"></script>
+<script src="js/telas/habitos-social.js"></script>
+<script src="js/telas/prumi.js"></script>
+<script src="js/telas/ajustes.js"></script>
+<script src="js/telas/boas-vindas.js"></script>
+<script src="js/render.js"></script>
+<script src="js/acoes.js"></script>
+<script src="js/tempo.js"></script>
+<script src="js/exemplos.js"></script>
+<script src="js/inicio.js"></script>

@@ -1,0 +1,50 @@
+/* Ajustes para celular e para quem prefere menos movimento. */
+@media (max-width: 699px) {
+  .sync span {
+    display: none;
+  }
+  nav.tabs .ind {
+    background: var(--accent-soft);
+    box-shadow: none;
+  }
+  nav.tabs button[aria-current="page"] {
+    background: transparent;
+    color: var(--accent);
+  }
+  nav.tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    border-radius: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    z-index: 20;
+    padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px))
+      max(8px, env(safe-area-inset-left, 0px));
+  }
+  nav.tabs button {
+    font-size: 11px;
+    padding: 6px 2px;
+  }
+  nav.tabs button svg {
+    display: block;
+  }
+  main {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  }
+  .toast {
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+  .detail {
+    padding-left: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before {
+    transition: none !important;
+    animation: none !important;
+  }
+}

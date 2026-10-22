@@ -1,0 +1,370 @@
+/* Desenho e animações do Prumi (balanço, piscada, água, humores). */
+/* ================= mascote: Prumi ================= */
+.prumi {
+  display: block;
+  overflow: visible;
+}
+.prumi * {
+  transform-box: view-box;
+}
+.prumi .string {
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.prumi .cap {
+  fill: var(--ink);
+}
+.prumi .body {
+  fill: var(--mascot);
+}
+.prumi .outline {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.4;
+  stroke-linejoin: round;
+}
+.prumi .wave {
+  fill: var(--water);
+  animation: pwave 2.6s linear infinite;
+}
+.prumi .wave2 {
+  fill: var(--water);
+  opacity: 0.4;
+  animation: pwave 3.9s linear infinite reverse;
+}
+.prumi .shine {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+.prumi .ink {
+  fill: var(--mink, var(--ink));
+}
+.prumi .st {
+  fill: none;
+  stroke: var(--mink, var(--ink));
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.prumi .blush {
+  fill: var(--social);
+  opacity: 0.32;
+}
+.prumi .armp {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+.prumi .wet {
+  opacity: 0.55;
+}
+.prumi .band {
+  fill: none;
+  stroke: var(--danger);
+  stroke-width: 5.5;
+  stroke-linecap: round;
+}
+.prumi .swing {
+  transform-origin: 60px -2px;
+  animation: psway 4.2s ease-in-out infinite;
+}
+.prumi .eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pblink 5.2s infinite;
+}
+.prumi .bub {
+  fill: #fff;
+  opacity: 0;
+  animation: pbub 1.5s ease-in infinite;
+}
+.prumi .bub:nth-of-type(2) {
+  animation-delay: 0.4s;
+}
+.prumi .bub:nth-of-type(3) {
+  animation-delay: 0.8s;
+}
+.prumi .zz {
+  font-family: var(--f-display);
+  font-weight: 800;
+  fill: var(--muted);
+  opacity: 0;
+  animation: pzz 2.8s ease-out infinite;
+}
+.prumi .zz.z2 {
+  animation-delay: 1.4s;
+}
+.prumi .sweat {
+  fill: var(--water);
+  animation: psweat 1.7s ease-in infinite;
+}
+.prumi .spk {
+  fill: var(--warn);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ptwinkle 1.2s ease-in-out infinite;
+}
+.prumi .spk.s2 {
+  fill: var(--accent);
+  animation-delay: 0.5s;
+}
+.prumi .spk.s3 {
+  fill: var(--social);
+  animation-delay: 0.9s;
+}
+.prumi .arm.l {
+  transform-origin: 21px 71px;
+}
+.prumi .arm.r {
+  transform-origin: 99px 71px;
+}
+.prumi .hop {
+  transform-origin: 60px 133px;
+}
+.m-happy .hop {
+  animation: phop 1.9s cubic-bezier(0.3, 1.5, 0.5, 1) infinite;
+}
+.m-happy .arm.r,
+.m-party .arm.r {
+  animation: parmr 0.9s ease-in-out infinite;
+}
+.m-party .arm.l {
+  animation: parml 0.9s ease-in-out infinite 0.45s;
+}
+.m-party .hop {
+  animation: phop 0.95s cubic-bezier(0.3, 1.5, 0.5, 1) infinite;
+}
+.m-party .swing {
+  animation-duration: 1.6s;
+}
+.m-drink .hop {
+  animation: pgulp 0.45s ease-in-out 4;
+}
+.m-sleepy .swing {
+  animation-duration: 8s;
+}
+.m-worried .hop {
+  animation: pshiver 0.18s linear infinite alternate;
+}
+.m-focus .swing {
+  animation: none;
+}
+.m-focus .hop {
+  animation: pbreathe 3.2s ease-in-out infinite;
+}
+@keyframes psway {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+@keyframes pblink {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+  95.5% {
+    transform: scaleY(0.1);
+  }
+}
+@keyframes pwave {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(60px);
+  }
+}
+@keyframes phop {
+  0%,
+  50%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  12% {
+    transform: translateY(2px) scale(1.06, 0.94);
+  }
+  26% {
+    transform: translateY(-12px) scale(0.96, 1.05);
+  }
+  40% {
+    transform: translateY(0) scale(1.04, 0.96);
+  }
+}
+@keyframes pgulp {
+  50% {
+    transform: scale(1.07, 0.93);
+  }
+}
+@keyframes pshiver {
+  from {
+    transform: translateX(-0.9px);
+  }
+  to {
+    transform: translateX(0.9px);
+  }
+}
+@keyframes pbreathe {
+  50% {
+    transform: scale(1.03);
+  }
+}
+@keyframes parmr {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(-34deg);
+  }
+}
+@keyframes parml {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(34deg);
+  }
+}
+@keyframes pbub {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(-44px);
+    opacity: 0;
+  }
+}
+@keyframes pzz {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(12px, -22px);
+    opacity: 0;
+  }
+}
+@keyframes psweat {
+  0% {
+    transform: translateY(-4px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+@keyframes ptwinkle {
+  0%,
+  100% {
+    transform: scale(0.3) rotate(0);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1) rotate(45deg);
+    opacity: 1;
+  }
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 6px 14px 6px 4px;
+}
+.mslot {
+  flex: 0 0 auto;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+  border-radius: 14px;
+  display: block;
+}
+.mslot:active .prumi {
+  transform: scale(0.94);
+  transition: transform 0.1s;
+}
+.bubble {
+  position: relative;
+  background: var(--accent-soft);
+  color: var(--ink);
+  padding: 10px 13px;
+  border-radius: 14px;
+  font-size: 14.5px;
+  line-height: 1.38;
+  flex: 1;
+  min-width: 0;
+  text-wrap: pretty;
+}
+.bubble::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  margin-top: -7px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 8px solid var(--accent-soft);
+}
+.bubble b {
+  font-weight: 700;
+}
+.bubble.pop {
+  animation: bpop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+@keyframes bpop {
+  0% {
+    transform: scale(0.9) translateX(-6px);
+    opacity: 0.3;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+.timerrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.wfill {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--water-soft);
+  overflow: hidden;
+}
+.wfill span {
+  display: block;
+  height: 100%;
+  background: var(--water);
+  border-radius: 99px;
+  transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
