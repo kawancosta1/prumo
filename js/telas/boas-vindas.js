@@ -16,7 +16,7 @@ function onbHTML() {
   pe.starter.forEach(i => (e2[ITEM[i].slot] = i));
   let c = "";
   if (s === 0)
-    c = `<div class="ohero">${prumi({ mood: "happy", size: 140, eq: {} })}</div>
+    c = `<div class="ohero">${prumi({ mood: "happy", size: 140, eq: {}, gender: onb.gender })}</div>
     <h2 class="oh">Oi! Eu sou o Prumi.</h2><p class="op">Vou te ajudar a organizar estudos, água, hábitos e vida social. Cada meta cumprida me dá gotas pra comprar roupinhas novas.</p>
     <label class="ofield"><span class="label">Como posso te chamar?</span><input id="onb-name" type="text" value="${esc(onb.name)}" maxlength="30" autocomplete="off" placeholder="Seu nome"></label>
     <div class="ofield"><span class="label">Como prefere que eu fale com você?</span>
@@ -51,7 +51,7 @@ function onbHTML() {
     <div class="row"><button class="btn ghost" data-act="onbback">Voltar</button><button class="btn primary big" data-act="onbnext" style="flex:1">Continuar</button></div>`;
   else if (s === 2)
     c = `<h2 class="oh">Escolha meu jeito</h2><p class="op">Cada personalidade é um mundo: cores, água, jeito de falar e itens próprios. Dá pra trocar depois.</p>
-    <div class="opreview">${prumi({ mood: "happy", size: 96, eq: e2, fill: 0.55, p: onb.persona })}<div class="bubble">${say.call(null, "hi", { n: 3 }).replace("{nome}", "")}</div></div>
+    <div class="opreview">${prumi({ mood: "happy", size: 96, eq: e2, fill: 0.55, p: onb.persona, gender: onb.gender })}<div class="bubble">${say.call(null, "hi", { n: 3 }).replace("{nome}", "")}</div></div>
     <div class="ogrid">${Object.entries(PERSONAS)
       .map(([k, p]) => {
         const e3 = {};
@@ -63,7 +63,7 @@ function onbHTML() {
       .join("")}</div>
     <div class="row"><button class="btn ghost" data-act="onbback">Voltar</button><button class="btn primary big" data-act="onbnext" style="flex:1">Quero esse</button></div>`;
   else
-    c = `<div class="ohero">${prumi({ mood: "party", size: 140, eq: e2, fill: 0.7, p: onb.persona })}</div><h2 class="oh">Tudo pronto${onb.name ? ", " + esc(onb.name) : ""}!</h2>
+    c = `<div class="ohero">${prumi({ mood: "party", size: 140, eq: e2, fill: 0.7, p: onb.persona, gender: onb.gender })}</div><h2 class="oh">Tudo pronto${onb.name ? ", " + esc(onb.name) : ""}!</h2>
     <p class="op">Você ganhou <b>50 gotas</b> de boas-vindas. Cumpra metas, junte gotas e monte o meu visual na aba <b>Prumi</b>. Minha água agora é <b>${esc(waterOf(onb.persona).name.toLowerCase())}</b>.</p>
     <button class="btn primary big" data-act="onbdone">Começar</button>`;
   return `<div class="osheet">${dots}<div class="ostep" key="${s}">${c}</div></div>`;

@@ -54,6 +54,14 @@
   fill: var(--social);
   opacity: 0.32;
 }
+.prumi.fem .blush {
+  fill: #f472b6;
+  opacity: 0.55;
+}
+.prumi .fem-lash {
+  stroke: var(--ink);
+  stroke-linecap: round;
+}
 .prumi .armp {
   fill: none;
   stroke: var(--ink);

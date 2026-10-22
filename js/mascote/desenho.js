@@ -2,7 +2,6 @@
   Desenho do Prumi em SVG: corpo, rosto de cada humor, água, roupas por cima.
 */
 "use strict";
-
 /* ================= Prumi, o mascote ================= */
 const RM = (() => {
   try {
@@ -11,15 +10,10 @@ const RM = (() => {
     return false;
   }
 })();
-
 const BODY = "M60 24C86 24 100 44 100 63C100 86 77 108 60 133C43 108 20 86 20 63C20 44 34 24 60 24Z";
-
 const WAVE = "M-120 0Q-105-5-90 0T-60 0T-30 0T0 0T30 0T60 0T90 0T120 0T150 0T180 0V170H-120Z";
-
 const lvlFor = f => (f > 0 ? 133 - Math.pow(Math.min(1, f), 0.62) * 111 : 148);
-
 let mid = 0;
-
 function mouthAt(m) {
   if (m === "happy" || m === "party") return { y: 74.5, xs: [54.5, 65.5], open: true };
   if (m === "drink" || m === "sleepy") return null;
@@ -29,7 +23,6 @@ function mouthAt(m) {
   if (m === "focus") return { y: 81, xs: [55.5, 64.5] };
   return { y: 78.6, xs: [55.5, 64.5] };
 }
-
 const fangs = (m, blood) => {
   const a = mouthAt(m);
   if (!a) return "";
@@ -40,7 +33,6 @@ const fangs = (m, blood) => {
     )
     .join("");
 };
-
 const lips = (m, c, w = 5.6, op = 1) => {
   if (m === "happy" || m === "party")
     return `<path d="M49 74Q60 92 71 74Z" fill="none" stroke="${c}" stroke-width="${w * 0.6}" stroke-linejoin="round" opacity="${op}"/>`;
@@ -52,21 +44,26 @@ const lips = (m, c, w = 5.6, op = 1) => {
     return `<path d="M54 81H66" stroke="${c}" stroke-width="${w}" stroke-linecap="round" opacity="${op}"/>`;
   return `<path d="M52 77Q60 85 68 77" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" opacity="${op}"/>`;
 };
-
 const closedEyes = m => ["happy", "party", "drink", "sleepy", "cry"].includes(m);
-
 /*
   Desenha o Prumi. Opções:
   mood (rosto), fill (0 a 1, quanto de água), size (largura em px), eq (roupas por slot),
   p (personalidade, para a água e efeitos), semL/semR e armL/armR (braços, usados nas poses da dupla),
   vivo (true nos Prumis principais: deixa o mundo adicionar camadas, como óculos de sol ou caixão).
 */
-function prumi({ mood = "idle", fill = 0, size = 96, eq, p, semL, semR, armL: armLx, armR: armRx, vivo }) {
+function prumi({ mood = "idle", fill = 0, size = 96, eq, p, semL, semR, armL: armLx, armR: armRx, vivo, gender }) {
   const e = eq || (typeof S !== "undefined" && S.equip) || {};
   const it = s => (e[s] && ITEM[e[s]] ? ITEM[e[s]] : null);
   const id = "pm" + ++mid,
     lvl = lvlFor(fill).toFixed(1);
   const blush = `<ellipse class="blush" cx="38" cy="73" rx="6.5" ry="3.6"/><ellipse class="blush" cx="82" cy="73" rx="6.5" ry="3.6"/>`;
+  const g = gender || userG(),
+    fem = g === "f";
+  const lashes = fem
+    ? closedEyes(mood)
+      ? `<path class="st fem-lash" d="M41 64.5L37 62M42.5 62L39.5 58M79 64.5L83 62M77.5 62L80.5 58" stroke-width="1.8"/>`
+      : `<path class="st fem-lash" d="M43.5 61.2L39 58M45.5 59.5L42.5 55.5M76.5 61.2L81 58M74.5 59.5L77.5 55.5" stroke-width="1.8"/><circle cx="48.8" cy="62.5" r="1.3" fill="#fff"/><circle cx="74.8" cy="62.5" r="1.3" fill="#fff"/>`
+    : "";
   let face = "",
     up = false,
     extra = "",
@@ -161,7 +158,8 @@ function prumi({ mood = "idle", fill = 0, size = 96, eq, p, semL, semR, armL: ar
     efeitoMundo && efeitoMundo.camadasPrumi
       ? efeitoMundo.camadasPrumi({ mood, temRosto: !!it("face"), temCenario: !!bgI })
       : { fundo: "", rosto: "" };
-  return `<svg class="prumi m-${mood}" style="--ws:${tw.spd}s${skin ? `;--mink:${skin.ink}` : ""}" viewBox="0 -6 120 154" width="${size}" height="${Math.round(size * 1.28)}" role="img" aria-label="Prumi">
+  const bow = fem && !it("hat") && !it("hair") ? `<g class="fem-bow"><path d="M76 28C69 22 68 34 75 29Z" fill="#F472B6" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><path d="M76 28C83 22 84 34 77 29Z" fill="#F472B6" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><circle cx="76" cy="28.5" r="2.2" fill="#DB2777" stroke="var(--ink)" stroke-width="1.2"/></g>` : "";
+  return `<svg class="prumi m-${mood}${fem ? " fem" : ""}" style="--ws:${tw.spd}s${skin ? `;--mink:${skin.ink}` : ""}" viewBox="0 -6 120 154" width="${size}" height="${Math.round(size * 1.28)}" role="img" aria-label="Prumi">
     <defs><clipPath id="${id}"><path d="${BODY}"/></clipPath></defs>
     ${camadas.fundo}${bgI ? `<g class="bgi">${bgI.svg()}</g>` : ""}${pet ? `<g class="pet">${pet.svg()}</g>` : ""}
     <g class="swing"><g class="string-wrap">${str ? str.svg() : `<line class="string" x1="60" y1="-6" x2="60" y2="19"/>`}</g><g class="hop">
@@ -173,6 +171,6 @@ function prumi({ mood = "idle", fill = 0, size = 96, eq, p, semL, semR, armL: ar
       ${it("neck") ? it("neck").svg() : ""}
       <g class="arm l"><path class="armp" d="${armL}"/>${wr ? wr.svg(lp[0], lp[1]) : ""}</g>
       <g class="arm r"><path class="armp" d="${armR}"/>${hand ? hand.svg(hp[0], hp[1]) : ""}</g>
-      ${face}${ck ? ck.svg(mood) : ""}${mo ? mo.svg(mood) : ""}${it("face") ? it("face").svg(mood) : ""}${camadas.rosto}${it("hair") ? it("hair").svg() : ""}${it("hat") ? it("hat").svg() : ""}${extra}
+      ${face}${lashes}${bow}${ck ? ck.svg(mood) : ""}${mo ? mo.svg(mood) : ""}${it("face") ? it("face").svg(mood) : ""}${camadas.rosto}${it("hair") ? it("hair").svg() : ""}${it("hat") ? it("hat").svg() : ""}${extra}
     </g></g></svg>`;
 }
