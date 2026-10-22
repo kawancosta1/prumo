@@ -46,17 +46,20 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/personalidades.js` | `say()` (falas da personalidade atual), `setPersona()` |
 | `js/temas.js` | Aplica as cores do mundo atual, modo claro/escuro, água |
 | `js/mundos/*.js` | **Um arquivo por personalidade**: falas, tema e itens da loja |
+| `js/mundos/emo-efeitos.js` | Efeitos especiais do Emo: sangue na troca de aba, lua real, sol, caixão, segredo dos 13 toques |
+| `js/eventos.js` | Eventos com itens por tempo limitado (Halloween, Sexta-feira 13, Dia do Rock) |
 | `js/conquistas.js` | Conquistas, nível (XP) e gotas (`earn()`) |
 | `js/agenda.js` | Lembretes para Google, Samsung e Apple |
 | `js/efeitos.js` | Confete e animações de números |
 | `js/humor.js` | **Humor do Prumi** (`calcularHumor()`) |
 | `js/parceria.js` | Parceria: código, dupla abraçada, poses e mimos |
 | `js/telas/*.js` | Uma função por aba (`viewHoje`, `viewEstudos`...) |
+| `js/telas/perfil.js` | Perfil estilo MySpace na aba Prumi: subnick, música, Top 8 e recados |
 | `js/render.js` | `render()`: desenha a aba atual |
 | `js/acoes.js` | Cliques (`data-act`), formulários (`data-form`) e campos (`data-change`) |
 | `js/tempo.js` | Cronômetro de foco e virada do dia |
 | `js/inicio.js` | Liga tudo quando a página abre |
-| `estilos/*.css` | Visual: `base.css` (cores e componentes), `mascote.css`, `recursos.css`, `animacoes.css`, `responsivo.css` |
+| `estilos/*.css` | Visual: `base.css` (cores e componentes), `mascote.css`, `recursos.css`, `animacoes.css`, `responsivo.css`. Decoração própria de cada mundo em `estilos/mundos/` (ex.: `emo.css`) |
 
 ---
 
@@ -79,7 +82,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 ```
 
 **Slots:** `hat` chapéu, `hair` cabelo, `face` olhos, `cheek` maquiagem, `mouth` boca, `skin` pele,
-`neck` pescoço, `top` roupa, `back` costas, `wrist` pulso, `hand` mão, `pet` companheiro, `string` fio, `bg` cenário.
+`neck` pescoço, `top` roupa, `waist` cintura, `pins` bottons, `back` costas, `wrist` pulso, `hand` mão, `pet` companheiro, `string` fio, `bg` cenário.
 
 **Dicas para desenhar:**
 - O Prumi é desenhado numa área de **120 x 154**. O corpo vai mais ou menos de x=20 a x=100.
@@ -102,6 +105,26 @@ No arquivo do mundo, edite `THEMES.emo = { ... }`:
 - `water` define o nome, a velocidade da onda (`spd`), a altura da onda (`amp`) e o que flutua (`part`).
 - `vars` são os temas extras do mundo (com `price` para comprar, ou `ach` para lendário).
 
+### Dar efeitos especiais a um mundo (`MUNDO_FX`)
+
+Cada mundo pode ter um objeto `MUNDO_FX.<mundo>` com ganchos opcionais (veja o exemplo completo em `js/mundos/emo-efeitos.js`):
+- `trocaAba()`: roda ao trocar de aba (no emo, o sangue escorrendo).
+- `confete`: `{ cores, formas }` do confete.
+- `textos`: troca títulos, ex.: `{ diario: "Querido diário", foco: "Ensaio da banda" }`.
+- `humorNomes` e `humorExtra(soma)`: nomes do humor e fatores extras.
+- `multiplicadorGotas()`: multiplica as gotas ganhas.
+- `enfeiteHero()`: HTML extra no cartão do Prumi (no emo, a lua de hoje).
+- `camadasPrumi({ mood, temRosto, temCenario })`: devolve `{ fundo, rosto }` em SVG por cima/por trás do Prumi.
+- `aoTocar()`: roda ao tocar no Prumi (devolva `true` para pular a reação normal).
+- `musicas` e `subnicks`: usados no Perfil.
+
+No CSS, use `html[data-mundo="emo"]` e `html[data-variante="scene"]` para enfeitar só um mundo ou tema.
+
+### Criar um evento com itens limitados
+
+Em `js/eventos.js`, adicione o evento em `EVENTOS` (com `ativo(data)` e `prazo()`) e itens com `p: "*"` e `evento: "<id>"`.
+Eles aparecem em todos os mundos só enquanto o evento estiver ativo. Quem comprou fica com o item.
+
 ### Criar uma conquista
 
 Em `js/conquistas.js`, adicione um item em `ACHS`:
@@ -111,7 +134,7 @@ Em `js/conquistas.js`, adicione um item em `ACHS`:
   goal: 10, cur: () => S.stats.cedo, reward: 60 }
 ```
 
-`cur()` diz quanto falta. Quando `cur() >= goal`, a conquista é liberada sozinha.
+Use `secreta: true` para ela aparecer como "???" até ser descoberta. `cur()` diz quanto falta. Quando `cur() >= goal`, a conquista é liberada sozinha.
 
 ### Mexer no humor
 

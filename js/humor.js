@@ -86,12 +86,19 @@ function calcularHumor() {
   // Ontem foi dia perfeito?
   if (S.paid[ontem] && S.paid[ontem].perfect) soma(8, "ontem foi um dia perfeito");
 
+  // Fatores próprios do mundo (ex.: emo fica animado de noite e na lua cheia)
+  const efeitoMundo = MUNDO_FX[S.persona];
+  if (efeitoMundo && efeitoMundo.humorExtra) efeitoMundo.humorExtra(soma);
+
   // Carinho (toques no Prumi hoje)
   const carinho = Math.min(CARINHO_MAX, S.carinho[hoje] || 0);
   if (carinho) soma(carinho, "carinho");
 
   valor = Math.max(0, Math.min(100, Math.round(valor)));
-  const nivel = HUMOR_NIVEIS.find(n => valor >= n.min);
+  const nivelBase = HUMOR_NIVEIS.find(n => valor >= n.min);
+  // O mundo pode dar outro nome para o nível (ex.: "De boa" vira "Melancólico" no emo)
+  const nomes = (efeitoMundo && efeitoMundo.humorNomes) || {};
+  const nivel = { ...nivelBase, nome: nomes[nivelBase.nome] || nivelBase.nome };
   return { valor, nivel, motivos, atrasadas: atrasadas.length };
 }
 

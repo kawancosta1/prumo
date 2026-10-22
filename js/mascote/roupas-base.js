@@ -15,6 +15,8 @@ const SLOTS_EQ = [
   ["skin", "Pele"],
   ["neck", "Pescoço"],
   ["top", "Roupas"],
+  ["waist", "Cintura"],
+  ["pins", "Bottons"],
   ["back", "Costas"],
   ["wrist", "Pulso"],
   ["hand", "Nas mãos"],

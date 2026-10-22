@@ -886,3 +886,229 @@ body {
     transform: rotate(5deg);
   }
 }
+
+/* ================= perfil estilo MySpace ================= */
+.perfil-ms {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ms-topo {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  padding: 12px;
+}
+.ms-foto {
+  flex: 0 0 auto;
+  transform: rotate(-6deg); /* a clássica foto "de cima", meio torta */
+  background: var(--accent-soft);
+  border: 3px solid var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  border-radius: 6px;
+  padding: 4px 6px 0;
+}
+.ms-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  font-size: 14px;
+}
+.ms-nome {
+  font-family: var(--f-display);
+  font-size: calc(24px * var(--ds, 1));
+  line-height: 1.1;
+}
+.glitter {
+  background: linear-gradient(90deg, var(--accent), var(--water), var(--accent), #fff, var(--accent));
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: glitter 4s linear infinite;
+}
+@keyframes glitter {
+  to {
+    background-position: -300% 0;
+  }
+}
+.subnick {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--accent);
+}
+.ms-bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+}
+.ms-titulo {
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--surface);
+  background: var(--accent);
+  margin: -12px -12px 2px;
+  padding: 6px 12px;
+  border-radius: 12px 12px 0 0;
+}
+.top8 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.top8-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 0;
+}
+.top8-item.vazio {
+  color: var(--muted);
+  justify-content: center;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  min-height: 84px;
+}
+.top8-mais {
+  font-size: 20px;
+}
+.recados {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.recados li {
+  border-left: 3px solid var(--accent);
+  padding: 4px 10px;
+  background: var(--sunken);
+  border-radius: 0 8px 8px 0;
+}
+.recados p {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+/* ================= eventos ================= */
+.evento-aviso {
+  background: linear-gradient(90deg, #ff8a1f, #5b2e7a);
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+.evento-aviso b {
+  display: block;
+  font-family: var(--f-display);
+  font-size: 16px;
+}
+.sitem {
+  position: relative;
+}
+.selo-evento {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #ff8a1f;
+  color: #1a0e05;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+/* ================= lua, tremer, morcego secreto, equalizador ================= */
+.herobox {
+  position: relative;
+}
+.lua-hoje {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 14px 10px;
+  gap: 4px;
+  font-size: 10.5px;
+  color: var(--muted);
+  pointer-events: auto;
+}
+.lua-hoje.cheia .lua {
+  filter: drop-shadow(0 0 6px #f2ead3);
+}
+.wrap.tremendo {
+  animation: tremer 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+@keyframes tremer {
+  10%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  80% {
+    transform: translateX(4px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-8px);
+  }
+  40%,
+  60% {
+    transform: translateX(8px);
+  }
+}
+.voo-morcego {
+  position: fixed;
+  z-index: 66;
+  left: -100px;
+  top: 30%;
+  pointer-events: none;
+  animation: vooMorcego 3.2s ease-in-out forwards;
+}
+.voo-morcego .asas {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: flap 0.25s ease-in-out infinite alternate;
+}
+@keyframes vooMorcego {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+  }
+  30% {
+    transform: translate(45vw, -18vh) scale(1);
+  }
+  60% {
+    transform: translate(70vw, 10vh) scale(0.9);
+  }
+  100% {
+    transform: translate(calc(100vw + 120px), -30vh) scale(0.7);
+  }
+}
+.prumi-sumiu .mslot[data-kind="hero"] .prumi,
+.prumi-sumiu .mslot[data-kind="stage"] .prumi {
+  opacity: 0;
+  transform: scale(0.3);
+  transition: 0.3s;
+}
+.eq {
+  display: none;
+}

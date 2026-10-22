@@ -117,7 +117,7 @@ function updateMascots(pop) {
     const key = mood + "|" + fill.toFixed(3) + "|" + eqs;
     if (el.dataset.key === key) return;
     el.dataset.key = key;
-    el.innerHTML = prumi({ mood, fill, size: +el.dataset.size || 96, eq: JSON.parse(eqs) });
+    el.innerHTML = prumi({ mood, fill, size: +el.dataset.size || 96, eq: JSON.parse(eqs), vivo: true });
   });
   const b = document.getElementById("bubble");
   if (b) {
@@ -135,4 +135,4 @@ function updateMascots(pop) {
 }
 
 const heroHTML = () =>
-  `<div class="herobox"><div class="hero"><button class="mslot ${fx.entrada ? "entra-" + fx.entrada : ""}" data-kind="hero" data-size="78" data-act="poke" aria-label="Prumi, toque para um carinho"></button><div class="bubble" id="bubble" aria-live="polite"></div></div>${humorHTML()}</div>`;
+  `<div class="herobox"><div class="hero"><button class="mslot ${fx.entrada ? "entra-" + fx.entrada : ""}" data-kind="hero" data-size="78" data-act="poke" aria-label="Prumi, toque para um carinho"></button><div class="bubble" id="bubble" aria-live="polite"></div></div>${humorHTML()}${enfeiteMundo()}</div>`;

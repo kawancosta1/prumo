@@ -19,13 +19,15 @@ const MIMOS = {
     ["abraco", "Abraço"],
     ["beijinho", "Beijinho"],
     ["agua", "Bebe água!"],
-    ["forca", "Força!"]
+    ["forca", "Força!"],
+    ["nudge", "Chamar a atenção"]
   ],
   amizade: [
     ["highfive", "High-five"],
     ["abraco", "Abraço"],
     ["agua", "Bebe água!"],
-    ["forca", "Força!"]
+    ["forca", "Força!"],
+    ["nudge", "Chamar a atenção"]
   ]
 };
 
@@ -34,7 +36,8 @@ const MIMO_TEXTO = {
   beijinho: "te mandou um beijinho",
   agua: "mandou você beber água!",
   forca: "mandou força pra você hoje",
-  highfive: "te mandou um high-five"
+  highfive: "te mandou um high-five",
+  nudge: "chamou a sua atenção!"
 };
 
 let banco = null; // namespace do db, quando disponível
@@ -65,7 +68,9 @@ function montarPerfil() {
     codigo: S.codigo,
     parceiro: S.parceria.id || null,
     tipo: S.parceria.tipo || "namoro",
-    mimo: S.parceria.mimoEnviado || null
+    mimo: S.parceria.mimoEnviado || null,
+    subnick: S.perfil.subnick || "", // frase do "MSN" que aparece pro parceiro
+    recados: (S.parceria.recados || []).slice(0, 10) // recados que EU mandei (estilo Orkut)
   };
 }
 
@@ -123,6 +128,7 @@ function ouvirParceiro() {
     snap => {
       parceiroDados = snap.exists ? snap.data() : null;
       receberMimo();
+      avisarRecadoNovo();
       softRender();
     },
     () => {}
@@ -200,6 +206,7 @@ function receberMimo() {
     4500
   );
   toast(frase, false, "party");
+  if (m.tipo === "nudge") tremerTela(); // "chamar a atenção" do MSN: a tela treme
   if (m.tipo === "abraco" || m.tipo === "beijinho" || m.tipo === "highfive") setTimeout(bigConfetti, 200);
 }
 
@@ -239,6 +246,12 @@ const POSES = {
       extra: `<g class="dpulse"><path d="M120 66l-22-20a12 12 0 0 1 22-14 12 12 0 0 1 22 14z" fill="none" stroke="#E8337A" stroke-width="4.5" stroke-linejoin="round"/></g>`
     },
     {
+      nome: "Dividindo o fone",
+      l: { x: 22, rot: 4, mood: "happy", armR: "M99 71Q106 86 110 96" },
+      r: { x: 98, rot: -4, mood: "happy", armL: "M21 71Q14 86 10 96" },
+      extra: `<g class="fone"><path d="M119 70Q117 92 120 104M121 70Q124 92 120 104" fill="none" stroke="var(--ink)" stroke-width="1.6"/><circle cx="118.5" cy="69" r="2.6" fill="#F7F5FA" stroke="var(--ink)" stroke-width="1.2"/><circle cx="121.5" cy="69" r="2.6" fill="#F7F5FA" stroke="var(--ink)" stroke-width="1.2"/><rect x="113" y="104" width="14" height="22" rx="3" fill="#2B2D3A" stroke="var(--ink)" stroke-width="1.4"/><rect x="115" y="107" width="10" height="13" rx="1" fill="#7FE8FF"/></g><g class="dcorac"><path d="M140 40v-8l6 -2v8" fill="none" stroke="var(--muted)" stroke-width="1.4"/><circle cx="138" cy="40" r="2" fill="var(--muted)"/><circle cx="144" cy="38" r="2" fill="var(--muted)"/></g>`
+    },
+    {
       nome: "Juntinhos",
       l: { x: 29, rot: 12, mood: "sleepy", semR: true },
       r: { x: 91, rot: -12, mood: "sleepy", semL: true },
@@ -267,6 +280,12 @@ const POSES = {
       extra: ""
     },
     {
+      nome: "Dividindo o fone",
+      l: { x: 22, rot: 4, mood: "happy", armR: "M99 71Q106 86 110 96" },
+      r: { x: 98, rot: -4, mood: "happy", armL: "M21 71Q14 86 10 96" },
+      extra: `<g class="fone"><path d="M119 70Q117 92 120 104M121 70Q124 92 120 104" fill="none" stroke="var(--ink)" stroke-width="1.6"/><circle cx="118.5" cy="69" r="2.6" fill="#F7F5FA" stroke="var(--ink)" stroke-width="1.2"/><circle cx="121.5" cy="69" r="2.6" fill="#F7F5FA" stroke="var(--ink)" stroke-width="1.2"/><rect x="113" y="104" width="14" height="22" rx="3" fill="#2B2D3A" stroke="var(--ink)" stroke-width="1.4"/><rect x="115" y="107" width="10" height="13" rx="1" fill="#7FE8FF"/></g><g class="dcorac"><path d="M140 40v-8l6 -2v8" fill="none" stroke="var(--muted)" stroke-width="1.4"/><circle cx="138" cy="40" r="2" fill="var(--muted)"/><circle cx="144" cy="38" r="2" fill="var(--muted)"/></g>`
+    },
+    {
       nome: "Ombro a ombro",
       l: { x: 24, rot: 5, mood: "happy", semR: true },
       r: { x: 96, rot: -2, mood: "happy" },
@@ -277,6 +296,41 @@ const POSES = {
 };
 
 let poseIdx = Math.floor(Math.random() * 10);
+
+/* "Chamar a atenção": a tela toda treme por um instante */
+function tremerTela() {
+  if (RM) return;
+  const wrap = document.querySelector(".wrap");
+  wrap.classList.remove("tremendo");
+  void wrap.offsetWidth;
+  wrap.classList.add("tremendo");
+  setTimeout(() => wrap.classList.remove("tremendo"), 700);
+}
+
+/* ---------- Recados (estilo Orkut) ---------- */
+/* Cada um guarda os recados que MANDOU no próprio perfil; o parceiro lê os que são pra ele. */
+function recadosRecebidos() {
+  if (!parceiroDados || !Array.isArray(parceiroDados.recados)) return [];
+  return parceiroDados.recados.filter(r => r.para === meuId).sort((a, b) => b.em - a.em);
+}
+function enviarRecado(texto) {
+  texto = texto.trim().slice(0, 240);
+  if (!texto || !parceriaAtiva()) return;
+  S.parceria.recados = [{ para: S.parceria.id, texto, em: Date.now() }, ...(S.parceria.recados || [])].slice(
+    0,
+    10
+  );
+  persist();
+  publicarPerfil(true);
+  toast("Recado enviado!", false, "happy");
+}
+function avisarRecadoNovo() {
+  const r = recadosRecebidos()[0];
+  if (!r || r.em <= (S.parceria.recadoVisto || 0)) return;
+  S.parceria.recadoVisto = r.em;
+  persist();
+  toast(`Novo recado de ${nomeParceiro()}!`, false, "happy");
+}
 
 function duoHTML() {
   const tipo = S.parceria.tipo === "amizade" ? "amizade" : "namoro";
@@ -305,15 +359,23 @@ function duoHTML() {
     (parceiroDados.agua || 0) / 100,
     pose.r
   );
-  return `<svg class="duo" viewBox="0 0 240 175" role="img" aria-label="Você e ${esc(nomeParceiro())}, pose ${pose.nome}">${ele}${eu}${pose.bracos || ""}${pose.extra}</svg>`;
+  // Os dois com o colar de metade de coração: o coração se completa entre eles
+  const metades =
+    S.equip.neck === "emo_metade_coracao" &&
+    parceiroDados.equip &&
+    parceiroDados.equip.neck === "emo_metade_coracao"
+      ? `<g class="dpulse">${HEART(120, 94, 1.1, "#C8102E")}</g>`
+      : "";
+  return `<svg class="duo" viewBox="0 0 240 175" role="img" aria-label="Você e ${esc(nomeParceiro())}, pose ${pose.nome}">${ele}${eu}${pose.bracos || ""}${pose.extra}${metades}</svg>`;
 }
 
 function parceriaHeroHTML() {
   const p = parceiroDados;
   const mimos = MIMOS[S.parceria.tipo === "amizade" ? "amizade" : "namoro"];
-  return `<div class="herobox">
+  return `<div class="herobox">${enfeiteMundo()}
     <button class="duowrap" data-act="pose" aria-label="Trocar pose">${duoHTML()}</button>
     <div class="duoinfo"><span><b>${esc(S.name || "Você")}</b> e <b>${esc(nomeParceiro())}</b> · ${TIPOS_PARCERIA[S.parceria.tipo] || "Parceria"}</span>
+      ${p.subnick ? `<span class="subnick">${esc(nomeParceiro())} diz: ${esc(p.subnick)}</span>` : ""}
       <span class="note">${esc(nomeParceiro())} está <b>${esc((p.humor && p.humor.nivel) || "de boa").toLowerCase()}</b> · água ${p.agua || 0}% · toque nos Prumis pra trocar a pose</span></div>
     <div class="bubble solo" id="bubble" aria-live="polite"></div>
     <div class="mimos">${mimos.map(([k, l]) => `<button class="btn small" data-act="mimo" data-t="${k}">${l}</button>`).join("")}</div>

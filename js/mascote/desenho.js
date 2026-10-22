@@ -55,7 +55,13 @@ const lips = (m, c, w = 5.6, op = 1) => {
 
 const closedEyes = m => ["happy", "party", "drink", "sleepy", "cry"].includes(m);
 
-function prumi({ mood = "idle", fill = 0, size = 96, eq, p, semL, semR, armL: armLx, armR: armRx }) {
+/*
+  Desenha o Prumi. Opções:
+  mood (rosto), fill (0 a 1, quanto de água), size (largura em px), eq (roupas por slot),
+  p (personalidade, para a água e efeitos), semL/semR e armL/armR (braços, usados nas poses da dupla),
+  vivo (true nos Prumis principais: deixa o mundo adicionar camadas, como óculos de sol ou caixão).
+*/
+function prumi({ mood = "idle", fill = 0, size = 96, eq, p, semL, semR, armL: armLx, armR: armRx, vivo }) {
   const e = eq || (typeof S !== "undefined" && S.equip) || {};
   const it = s => (e[s] && ITEM[e[s]] ? ITEM[e[s]] : null);
   const id = "pm" + ++mid,
@@ -146,19 +152,27 @@ function prumi({ mood = "idle", fill = 0, size = 96, eq, p, semL, semR, armL: ar
     wr = it("wrist"),
     mo = it("mouth"),
     ck = it("cheek"),
-    lp = up ? [8, 52] : [9, 83];
+    lp = up ? [8, 52] : [9, 83],
+    cintura = it("waist"),
+    bottons = it("pins");
+  // Camadas extras que o mundo pode adicionar (ex.: emo-efeitos.js: caixão e óculos de sol)
+  const efeitoMundo = vivo && typeof MUNDO_FX !== "undefined" ? MUNDO_FX[p || S.persona] : null;
+  const camadas =
+    efeitoMundo && efeitoMundo.camadasPrumi
+      ? efeitoMundo.camadasPrumi({ mood, temRosto: !!it("face"), temCenario: !!bgI })
+      : { fundo: "", rosto: "" };
   return `<svg class="prumi m-${mood}" style="--ws:${tw.spd}s${skin ? `;--mink:${skin.ink}` : ""}" viewBox="0 -6 120 154" width="${size}" height="${Math.round(size * 1.28)}" role="img" aria-label="Prumi">
     <defs><clipPath id="${id}"><path d="${BODY}"/></clipPath></defs>
-    ${bgI ? `<g class="bgi">${bgI.svg()}</g>` : ""}${pet ? `<g class="pet">${pet.svg()}</g>` : ""}
+    ${camadas.fundo}${bgI ? `<g class="bgi">${bgI.svg()}</g>` : ""}${pet ? `<g class="pet">${pet.svg()}</g>` : ""}
     <g class="swing">${str ? str.svg() : `<line class="string" x1="60" y1="-6" x2="60" y2="19"/>`}<g class="hop">
       ${back ? back.svg() : ""}
       <rect class="cap" x="51.5" y="16.5" width="17" height="10" rx="3.5"/>
       <path class="body" d="${BODY}"${skin ? ` style="fill:${skin.color}"` : ""}/>
-      <g clip-path="url(#${id})">${top ? top.svg() : ""}<g class="waterg${top ? " wet" : ""}" data-lvl="${lvl}" transform="translate(0 ${lvl})"><g transform="translate(-20 -3)"><path class="wave2" d="${wv}"/></g><path class="wave" d="${wv}"/>${parts}</g>${inner}</g>
+      <g clip-path="url(#${id})">${top ? top.svg() : ""}${cintura ? cintura.svg() : ""}${bottons ? bottons.svg() : ""}<g class="waterg${top ? " wet" : ""}" data-lvl="${lvl}" transform="translate(0 ${lvl})"><g transform="translate(-20 -3)"><path class="wave2" d="${wv}"/></g><path class="wave" d="${wv}"/>${parts}</g>${inner}</g>
       <path class="outline" d="${BODY}"/>${top ? "" : `<path class="shine" d="M34 54Q36 40 49 35"/>`}
       ${it("neck") ? it("neck").svg() : ""}
       <g class="arm l"><path class="armp" d="${armL}"/>${wr ? wr.svg(lp[0], lp[1]) : ""}</g>
       <g class="arm r"><path class="armp" d="${armR}"/>${hand ? hand.svg(hp[0], hp[1]) : ""}</g>
-      ${face}${ck ? ck.svg(mood) : ""}${mo ? mo.svg(mood) : ""}${it("face") ? it("face").svg(mood) : ""}${it("hair") ? it("hair").svg() : ""}${it("hat") ? it("hat").svg() : ""}${extra}
+      ${face}${ck ? ck.svg(mood) : ""}${mo ? mo.svg(mood) : ""}${it("face") ? it("face").svg(mood) : ""}${camadas.rosto}${it("hair") ? it("hair").svg() : ""}${it("hat") ? it("hat").svg() : ""}${extra}
     </g></g></svg>`;
 }

@@ -37,6 +37,7 @@ const blank = () => ({
   paid: {},
   stats: { tasks: 0, water: 0, focus: 0, reviews: 0, talked: 0, perfect: 0, closed: 0 },
   carinho: {},
+  perfil: { sobre: "", subnick: "" }, // perfil estilo MySpace
   parceria: { id: null, tipo: "namoro" },
   codigo: "",
   events: [],
@@ -94,7 +95,7 @@ function normalize(x) {
     p.bday = p.bday || "";
   });
   if (!b.stats || typeof b.stats !== "object") b.stats = {};
-  for (const k of ["tasks", "water", "focus", "reviews", "talked", "perfect", "closed"])
+  for (const k of ["tasks", "water", "focus", "reviews", "talked", "perfect", "closed", "morcego"])
     b.stats[k] = +b.stats[k] || 0;
   if (!b.equip || typeof b.equip !== "object") b.equip = {};
   for (const k of Object.keys(b.equip)) if (!ITEM[b.equip[k]]) delete b.equip[k];
@@ -105,13 +106,15 @@ function normalize(x) {
     b.coins += Math.max(0, before - b.owned.length) * 80;
   }
   for (const k of Object.keys(b.equip))
-    if (!ITEM[b.equip[k]] || ITEM[b.equip[k]].p !== b.persona) delete b.equip[k];
+    if (!ITEM[b.equip[k]] || (ITEM[b.equip[k]].p !== b.persona && ITEM[b.equip[k]].p !== "*"))
+      delete b.equip[k];
   if (!b.equipBy || typeof b.equipBy !== "object") b.equipBy = {};
   if (!b.themeBy || typeof b.themeBy !== "object") b.themeBy = {};
   if (!Array.isArray(b.themeOwned)) b.themeOwned = [];
   delete b.palette;
   delete b.ownedPal;
   if (!b.carinho || typeof b.carinho !== "object") b.carinho = {};
+  if (!b.perfil || typeof b.perfil !== "object") b.perfil = { sobre: "", subnick: "" };
   if (!b.parceria || typeof b.parceria !== "object") b.parceria = { id: null, tipo: "namoro" };
   b.v = 2;
   return b;

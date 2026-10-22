@@ -23,13 +23,17 @@ PERSONAS.emo = {
     "Riscou! Isso merece uma música acústica no escuro.",
     "Concluída. Nem a morte me impede de ser produtivo.",
     "Mais uma. Vou escrever um poema sobre isso.",
-    "Feito com sangue, suor e delineado."
+    "Feito com sangue, suor e delineado.",
+    "Feito! =] (não se acostuma, eu continuo triste)",
+    "XD riscou! Meu coração de vampiro bateu uma vez.",
+    'Rawr! Isso quer dizer "mandou bem" em morceguês <3'
   ],
   drink: [
     "Glub... hoje é água, mas eu finjo que é vinho. <b>+{ml} mL</b>.",
     "A água é a única que me entende. <b>+{ml} mL</b>.",
     "<b>+{ml} mL</b>. Vampiro hidratado é vampiro feliz (ou quase).",
-    "Bebi <b>{ml} mL</b> de lágrimas filtradas."
+    "Bebi <b>{ml} mL</b> de lágrimas filtradas.",
+    "<b>+{ml} mL</b> =] pelo menos a água não me abandona."
   ],
   goal: [
     "Meta de água batida. Tô cheio... de água e de sentimentos.",
@@ -43,7 +47,8 @@ PERSONAS.emo = {
   ],
   late: [
     "<b>{n}</b> atrasadas... ninguém entende a minha dor. Bora resolver?",
-    "<b>{n}</b> tarefas assombrando a lista. Vamos exorcizar?"
+    "<b>{n}</b> tarefas assombrando a lista. Vamos exorcizar?",
+    "affs... <b>{n}</b> atrasadas viraram fantasminhas =("
   ],
   night: [
     "A noite chegou, minha hora favorita. Fecha o dia e descansa.",
@@ -63,6 +68,11 @@ THEMES.emo = {
   D: ["#0B090D", "#161219", "#EDE6EE", "#E0314F", "#8A55B5", "#D6CEDD", "#141016"],
   pat: ["bat", "heartb"],
   water: { name: "Lágrimas", spd: 4.8, amp: 3, part: "tear" },
+  /*
+    Sub-temas por era. Cada um pode trocar: a (destaque), w (água), L/D (cores inteiras), f (fonte),
+    part (o que flutua na água), wn (nome da água) e pat (desenhos do fundo).
+    A decoração extra de cada um fica em estilos/mundos/emo.css, com html[data-variante="<id>"].
+  */
   vars: [
     { id: "base", name: "Desfile negro" },
     {
@@ -77,12 +87,57 @@ THEMES.emo = {
     },
     {
       id: "caderno",
-      name: "Caderno rabiscado",
+      name: "Caderno de escola",
       price: 100,
       f: '"Permanent Marker"',
       ds: 0.95,
+      L: ["#F4F1E6", "#FFFEF9", "#1E2235", "#2B2B6E", "#5B6FC2", "#FFFFFF"],
       a: ["#2B2B6E", "#8C8CFF"],
+      wn: "Tinta de caneta",
       pat: ["star", "heartb"]
+    },
+    {
+      id: "scene",
+      name: "Scene colorido",
+      price: 140,
+      f: '"Bungee"',
+      ds: 0.8,
+      L: ["#FFF0FA", "#FFFFFF", "#1A1024", "#D0137A", "#18A8DC", "#FFFFFF"],
+      D: ["#0F0A14", "#1A1022", "#FFE8F7", "#FF4FD8", "#4FE3FF", "#2A1A35"],
+      part: "star",
+      wn: "Água neon",
+      pat: ["star", "heartb"]
+    },
+    {
+      id: "gotico",
+      name: "Gótico 80",
+      price: 120,
+      a: ["#3A3A44", "#C9C3D6"],
+      w: ["#2E2E38", "#5C5C70"],
+      wn: "Neblina",
+      pat: ["bat", "bat"]
+    },
+    {
+      id: "vitoriano",
+      name: "Vampiro vitoriano",
+      price: 160,
+      f: '"Cormorant Garamond"',
+      ds: 1.15,
+      L: ["#F3ECE9", "#FFFBFA", "#2A0F15", "#7A0F24", "#5C0A1E", "#FBF6F5"],
+      D: ["#0E0709", "#1A0E12", "#F0E2E6", "#C2304E", "#8A1F38", "#E6D8DC", "#1A0E12"],
+      part: "drop",
+      wn: "Sangue nobre (é água)",
+      pat: ["heartb", "drop"]
+    },
+    {
+      id: "praca",
+      name: "Emo de praça",
+      price: 100,
+      f: '"Permanent Marker"',
+      ds: 0.95,
+      a: ["#B3122E", "#FF4F6E"],
+      wn: "Água do bebedouro",
+      pat: ["heartb", "star"]
     },
     { id: "lenda", name: "Cinzas", ach: "nivel5", a: ["#4A4A52", "#B9B9C4"], w: ["#2E2E38", "#6C6C80"] }
   ]
@@ -897,31 +952,333 @@ ITEMS.push(
   }
 );
 
-/* ---------- efeitos especiais do mundo emo ---------- */
-/* A decoração visual (morcegos, presinhas, mordidas...) fica em estilos/mundos/emo.css */
-MUNDO_FX.emo = {
-  // Ao trocar de aba, escorre sangue do topo da tela
-  trocaAba() {
-    const antigo = document.getElementById("sangue");
-    if (antigo) antigo.remove();
-    const camada = document.createElement("div");
-    camada.id = "sangue";
-    camada.setAttribute("aria-hidden", "true");
-    let gotas = "";
-    for (let i = 0; i < 16; i++) {
-      const x = Math.round(Math.random() * 100); // posição na largura (%)
-      const largura = 6 + Math.round(Math.random() * 12); // px
-      const comprimento = 30 + Math.round(Math.random() * 130); // px
-      const atraso = (Math.random() * 0.25).toFixed(2); // s
-      gotas += `<i style="left:${x}%;width:${largura}px;height:${comprimento}px;animation-delay:${atraso}s"></i>`;
-    }
-    camada.innerHTML = gotas;
-    document.body.appendChild(camada);
-    setTimeout(() => camada.remove(), 1700);
+/* ---------- Roupas das eras: praça, scene, bandas inventadas, desfile branco ---------- */
+// Camiseta com nome de banda inventada (nada de banda de verdade)
+const camisetaBanda = (cor, corTexto, linha1, linha2, desenho = "") =>
+  tee(
+    cor,
+    `<text x="60" y="${linha2 ? 106 : 110}" font-size="7.2" font-weight="800" text-anchor="middle" fill="${corTexto}" font-family="Bungee,Impact,sans-serif">${linha1}</text>${linha2 ? `<text x="60" y="114" font-size="7.2" font-weight="800" text-anchor="middle" fill="${corTexto}" font-family="Bungee,Impact,sans-serif">${linha2}</text>` : ""}${desenho}`
+  );
+// Botton redondo (broche) na altura do peito
+const botton = (x, y, fundo, miolo) =>
+  `<g transform="translate(${x} ${y})"><circle r="5.6" fill="${fundo}" ${O} stroke-width="1.4"/><circle r="5.6" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1" transform="scale(.8)"/>${miolo}</g>`;
+const coracaoMini = (c = "#C8102E") =>
+  `<path d="M0 3L-3 0.4A1.7 1.7 0 0 1 0 -1.6A1.7 1.7 0 0 1 3 0.4Z" fill="${c}"/>`;
+
+ITEMS.push(
+  /* camisetas de bandas inventadas */
+  {
+    id: "emo_banda_coracao",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Coração Partido FC",
+    price: 110,
+    svg: () =>
+      camisetaBanda(
+        "#141416",
+        "#F2F2F2",
+        "CORAÇÃO",
+        "PARTIDO FC",
+        `<g transform="translate(60 124)">${coracaoMini("#C8102E")}</g>`
+      )
   },
-  // Confete do emo: morcegos, gotas de sangue e pétalas de rosa
-  confete: {
-    cores: ["#8A0F22", "#B3122E", "#141016", "#5B2E7A", "#E0314F"],
-    formas: ["morcego", "morcego", "gota", "petala"]
+  {
+    id: "emo_banda_melancolicos",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Os Melancólicos",
+    price: 110,
+    svg: () =>
+      camisetaBanda(
+        "#2A2733",
+        "#C9C3D6",
+        "OS",
+        "MELANCÓLICOS",
+        `<path d="M64 120a6 6 0 1 1 -6 -8a4.6 4.6 0 0 0 6 8z" fill="#F2EAD3"/>`
+      )
+  },
+  {
+    id: "emo_banda_neon",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Lágrimas de Neon",
+    price: 120,
+    svg: () =>
+      camisetaBanda(
+        "#5B2E7A",
+        "#4FE3FF",
+        "LÁGRIMAS",
+        "DE NEON",
+        `<path d="M60 119q3 4.6 0 6.6q-3-2 0-6.6z" fill="#FF4FD8"/>`
+      )
+  },
+  {
+    id: "emo_jaqueta_branca",
+    p: "emo",
+    slot: "top",
+    name: "Jaqueta de desfile branca",
+    price: 200,
+    svg: () =>
+      topBase("#EDEAE4") +
+      `<path d="M52 90V150M68 90V150" stroke="#141416" stroke-width="2"/>${[100, 112, 124, 136].map(y => `<circle cx="46" cy="${y}" r="2" fill="#B8975A"/><circle cx="74" cy="${y}" r="2" fill="#B8975A"/>`).join("")}<path d="M20 86L36 93M100 86L84 93" stroke="#141416" stroke-width="3"/><path d="M14 98H30" stroke="#C8102E" stroke-width="5"/>` +
+      topHem
+  },
+  /* cintura */
+  {
+    id: "emo_cinto_xadrez",
+    p: "emo",
+    slot: "waist",
+    name: "Cinto xadrez",
+    price: 70,
+    svg: () =>
+      `<rect x="0" y="110" width="120" height="8" fill="#141416"/>${Array.from({ length: 30 }, (_, i) => `<rect x="${i * 4}" y="${i % 2 ? 110 : 114}" width="4" height="4" fill="#F2F2F2"/>`).join("")}<rect x="54" y="108" width="12" height="12" rx="2" fill="none" stroke="#C9CED6" stroke-width="2.4"/>`
+  },
+  {
+    id: "emo_cinto_rebites",
+    p: "emo",
+    slot: "waist",
+    name: "Cinto de rebites",
+    price: 80,
+    svg: () =>
+      `<rect x="0" y="110" width="120" height="8" fill="#141416"/>${Array.from({ length: 14 }, (_, i) => `<path d="M${i * 9 + 3} 117L${i * 9 + 6} 111L${i * 9 + 9} 117Z" fill="#D9DDE3"/>`).join("")}<rect x="53" y="108" width="14" height="12" rx="2" fill="#B8BEC6" ${O} stroke-width="1.2"/>`
+  },
+  {
+    id: "emo_corrente_carteira",
+    p: "emo",
+    slot: "waist",
+    name: "Cinto com corrente de carteira",
+    price: 90,
+    svg: () =>
+      `<rect x="0" y="110" width="120" height="7" fill="#1E1F24"/><rect x="54" y="109" width="12" height="9" rx="2" fill="#C9CED6"/><path d="M36 117Q44 138 70 132" fill="none" stroke="#C9CED6" stroke-width="2.6" stroke-dasharray="3 1.6"/>`
+  },
+  /* bottons */
+  {
+    id: "emo_botton_estrela",
+    p: "emo",
+    slot: "pins",
+    name: "Botton de estrela",
+    price: 40,
+    svg: () =>
+      botton(
+        42,
+        100,
+        "#FF4FB0",
+        `<path d="M0 -3.2L0.9 -1L3.2 -1L1.4 0.5L2 2.8L0 1.5L-2 2.8L-1.4 0.5L-3.2 -1L-0.9 -1Z" fill="#141416"/>`
+      )
+  },
+  {
+    id: "emo_botton_coracao",
+    p: "emo",
+    slot: "pins",
+    name: "Botton coração partido",
+    price: 40,
+    svg: () =>
+      botton(
+        42,
+        100,
+        "#141416",
+        `<path d="M0 3L-3 0.4A1.7 1.7 0 0 1 0 -1.6L-0.6 0.6L0.6 1.4Z" fill="#C8102E"/><path d="M0.5 3L1.1 1.4L-0.1 0.6L0.5 -1.6A1.7 1.7 0 0 1 3 0.4Z" fill="#C8102E"/>`
+      )
+  },
+  {
+    id: "emo_botton_caveira",
+    p: "emo",
+    slot: "pins",
+    name: "Botton de caveira",
+    price: 40,
+    svg: () =>
+      botton(
+        78,
+        100,
+        "#2A2733",
+        `<circle cy="-0.6" r="2.6" fill="#EEE"/><rect x="-1.5" y="1.2" width="3" height="1.8" fill="#EEE"/><circle cx="-0.9" cy="-0.8" r=".7" fill="#2A2733"/><circle cx="0.9" cy="-0.8" r=".7" fill="#2A2733"/>`
+      )
+  },
+  {
+    id: "emo_botton_xoxo",
+    p: "emo",
+    slot: "pins",
+    name: "Botton XOXO",
+    price: 40,
+    svg: () =>
+      botton(
+        78,
+        100,
+        "#F2F2F2",
+        `<text y="1.8" font-size="3.6" font-weight="900" text-anchor="middle" fill="#C8102E" font-family="sans-serif">XOXO</text>`
+      )
+  },
+  {
+    id: "emo_botton_rawr",
+    p: "emo",
+    slot: "pins",
+    name: "Botton rawr",
+    price: 50,
+    svg: () =>
+      botton(
+        42,
+        100,
+        "#5FD06C",
+        `<text y="1.6" font-size="3.4" font-weight="900" text-anchor="middle" fill="#141416" font-family="sans-serif">rawr</text>`
+      )
+  },
+  {
+    id: "emo_bottons_combo",
+    p: "emo",
+    slot: "pins",
+    name: "Coleção de bottons",
+    price: 130,
+    svg: () =>
+      botton(
+        38,
+        98,
+        "#FF4FB0",
+        `<path d="M0 -3.2L0.9 -1L3.2 -1L1.4 0.5L2 2.8L0 1.5L-2 2.8L-1.4 0.5L-3.2 -1L-0.9 -1Z" fill="#141416"/>`
+      ) +
+      botton(
+        50,
+        108,
+        "#F2F2F2",
+        `<text y="1.8" font-size="3.6" font-weight="900" text-anchor="middle" fill="#C8102E" font-family="sans-serif">XOXO</text>`
+      ) +
+      botton(80, 98, "#141416", coracaoMini()) +
+      botton(
+        70,
+        110,
+        "#5FD06C",
+        `<text y="1.6" font-size="3.4" font-weight="900" text-anchor="middle" fill="#141416" font-family="sans-serif">rawr</text>`
+      )
+  },
+  /* costas */
+  {
+    id: "emo_mochila",
+    p: "emo",
+    slot: "back",
+    name: "Mochila cheia de bottons",
+    price: 140,
+    svg: () =>
+      `<rect x="10" y="44" width="100" height="84" rx="18" fill="#26272C" ${O}/>` +
+      botton(17, 64, "#FF4FB0", coracaoMini("#141416")) +
+      botton(
+        16,
+        80,
+        "#F2F2F2",
+        `<text y="1.8" font-size="3.6" font-weight="900" text-anchor="middle" fill="#C8102E" font-family="sans-serif">XOXO</text>`
+      ) +
+      botton(103, 70, "#5FD06C", "") +
+      botton(104, 86, "#C8102E", "")
+  },
+  {
+    id: "emo_violao_costas",
+    p: "emo",
+    slot: "back",
+    name: "Violão nas costas",
+    price: 150,
+    svg: () =>
+      `<g transform="rotate(32 60 80)"><rect x="57" y="-4" width="6" height="56" fill="#6B4E3D" ${O} stroke-width="1.6"/><rect x="55" y="-10" width="10" height="9" rx="2" fill="#3A2A1E"/><path d="M60 46C76 46 78 60 72 66C80 72 78 92 60 92C42 92 40 72 48 66C42 60 44 46 60 46Z" fill="#C98B4A" ${O}/></g>`
+  },
+  /* cabelos scene */
+  {
+    id: "emo_chapinha",
+    p: "emo",
+    slot: "hair",
+    name: "Franja de chapinha",
+    price: 120,
+    svg: () =>
+      `<path d="M20 58Q18 22 60 19Q96 20 100 46Q100 70 96 92Q90 70 88 56Q82 46 74 44Q66 60 58 84Q54 66 56 48Q40 44 28 52Q24 70 24 88Q18 74 20 58Z" fill="#141416" ${O}/><path d="M70 26Q80 30 84 40" stroke="#3A3A44" stroke-width="2" fill="none" stroke-linecap="round"/>`
+  },
+  {
+    id: "emo_bicolor",
+    p: "emo",
+    slot: "hair",
+    name: "Franja preta e rosa",
+    price: 130,
+    svg: () =>
+      `<path d="M21 55Q22 21 60 20Q95 21 99 50Q91 44 85 53Q79 67 66 77Q73 61 66 51Q50 41 34 47Q25 49 21 55Z" fill="#141416" ${O}/><path d="M60 20Q95 21 99 50Q91 44 85 53Q79 67 66 77Q73 61 66 51Q64 40 60 20Z" fill="#FF4FB0" ${O}/>`
+  },
+  {
+    id: "emo_scene_azul",
+    p: "emo",
+    slot: "hair",
+    name: "Cabelo scene com mechas",
+    price: 140,
+    svg: () =>
+      `<path d="M22 54Q16 34 26 26L22 12L38 20L42 6L52 16L60 2L68 16L78 6L82 20L98 12L94 26Q104 34 98 54Q94 44 86 52Q80 66 68 74Q74 58 66 50Q50 40 34 46Q26 48 22 54Z" fill="#141416" ${O}/><path d="M44 14L48 30M62 6L62 26M80 12L74 30" stroke="#4FE3FF" stroke-width="3.4" stroke-linecap="round"/>`
+  },
+  {
+    id: "emo_laco_rosa",
+    p: "emo",
+    slot: "hat",
+    name: "Laço rosa de bolinha",
+    price: 70,
+    svg: () =>
+      `<path d="M30 30L14 18Q8 28 14 38Z" fill="#FF4FB0" ${O}/><path d="M30 30L46 18Q52 28 46 38Z" fill="#FF4FB0" ${O}/><circle cx="30" cy="30" r="4.6" fill="#FF8FCB" ${O}/><circle cx="17" cy="25" r="1.4" fill="#fff"/><circle cx="19" cy="33" r="1.4" fill="#fff"/><circle cx="43" cy="25" r="1.4" fill="#fff"/><circle cx="41" cy="33" r="1.4" fill="#fff"/>`
+  },
+  /* olhos e maquiagem */
+  {
+    id: "emo_gatinho",
+    p: "emo",
+    slot: "face",
+    name: "Delineado gatinho",
+    price: 70,
+    svg: m =>
+      `<path d="M40 61Q47 57.5 54 60.5L60 55.5" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/><path d="M80 61Q73 57.5 66 60.5L60 55.5" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/><path d="M41 59.5l-2-2.6M44 58.3l-1.4-2.8M76 58.3l1.4-2.8M79 59.5l2-2.6" stroke="#111" stroke-width="1.2" stroke-linecap="round"/>`
+  },
+  {
+    id: "emo_aro_grosso",
+    p: "emo",
+    slot: "face",
+    name: "Óculos de aro grosso",
+    price: 80,
+    svg: () =>
+      lensPair("#BFE3F2", "#141416", 3, 56, 15, 0.15).replace(/stroke-width="2.4"/g, 'stroke-width="4"')
+  },
+  {
+    id: "emo_estrela_olho",
+    p: "emo",
+    slot: "cheek",
+    name: "Estrela pintada no olho",
+    price: 70,
+    svg: () =>
+      `<path d="M73 52L76 60.5L84.5 61L78 66.5L80.5 75L73 70L65.5 75L68 66.5L61.5 61L70 60.5Z" fill="none" stroke="#141416" stroke-width="2" stroke-linejoin="round"/>`
+  },
+  /* pescoço */
+  {
+    id: "emo_metade_coracao",
+    p: "emo",
+    slot: "neck",
+    name: "Colar metade de coração",
+    price: 90,
+    svg: () =>
+      chainN("#C9CED6", 2.2) +
+      `<path d="M60 108L52.4 100.8A4.4 4.4 0 0 1 59.6 95.4L61 98.4L59 101.4L61.4 104.4Z" fill="#C8102E" ${O} stroke-width="1.2"/>`
+  },
+  /* companheiros */
+  {
+    id: "emo_ursinho_zumbi",
+    p: "emo",
+    slot: "pet",
+    name: "Ursinho zumbi",
+    price: 130,
+    svg: () =>
+      `<g transform="translate(15 120)"><circle cx="-5.5" cy="-13" r="3.6" fill="#8C7A86" stroke="var(--ink)" stroke-width="1"/><circle cx="5.5" cy="-13" r="3.6" fill="#8C7A86" stroke="var(--ink)" stroke-width="1"/><circle cy="-6" r="7.5" fill="#A8949F" stroke="var(--ink)" stroke-width="1.2"/><ellipse cy="6" rx="8.5" ry="8" fill="#A8949F" stroke="var(--ink)" stroke-width="1.2"/><path d="M-4.4 -8.4l2.4 2.4M-2 -8.4l-2.4 2.4" stroke="#141416" stroke-width="1.1"/><circle cx="3" cy="-7" r="1.2" fill="#141416"/><path d="M-3 -2.5h6M-2 -3.6v2.2M0 -3.6v2.2M2 -3.6v2.2" stroke="#141416" stroke-width=".7"/><path d="M-4 4l8 0M-2 2.4v3.2M2 2.4v3.2" stroke="#C8102E" stroke-width=".9"/></g>`
+  },
+  {
+    id: "emo_coracao_pelucia",
+    p: "emo",
+    slot: "pet",
+    name: "Coração de pelúcia costurado",
+    price: 110,
+    svg: () =>
+      `<g transform="translate(16 30)"><path d="M0 10L-9 1.6A5.4 5.4 0 0 1 0 -5.2A5.4 5.4 0 0 1 9 1.6Z" fill="#C8102E" stroke="var(--ink)" stroke-width="1.2"/><path d="M-1 -4L1 2L-1 6" fill="none" stroke="#141416" stroke-width=".9" stroke-dasharray="1.4 1"/><path d="M-3 -1.4l2 .8M-2.6 2.4l2 .4M0 5l1.8-.6" stroke="#141416" stroke-width=".8"/></g>`
+  },
+  {
+    id: "emo_morcego_pendurado",
+    p: "emo",
+    slot: "pet",
+    name: "Morcego de cabeça pra baixo",
+    price: 120,
+    svg: () =>
+      `<g transform="translate(16 4)"><path d="M-10 -6H10" stroke="#6B4E3D" stroke-width="2.4" stroke-linecap="round"/><path d="M-1.5 -6V-3M1.5 -6V-3" stroke="#141416" stroke-width="1"/><path d="M0 -3Q7 -2 6 8Q4 13 0 14Q-4 13 -6 8Q-7 -2 0 -3Z" fill="#141416"/><path d="M-3 13L-2 16.5L0 14L2 16.5L3 13" fill="#141416"/><circle cx="-1.6" cy="10" r=".9" fill="#E0102E"/><circle cx="1.6" cy="10" r=".9" fill="#E0102E"/></g>`
   }
-};
+);

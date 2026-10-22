@@ -17,7 +17,8 @@ function taskRow(x, { showDate = false } = {}) {
     );
   if (x.repeat) meta.push(`<span title="${REPEAT[x.repeat]}" style="display:inline-flex">${ICON.rep}</span>`);
   if (x.sub.length) meta.push(`<span class="mono">${subDone}/${x.sub.length}</span>`);
-  return `<li class="a-${x.area} ${x.done ? "done" : ""} ${fx.newId === x.id ? "is-new" : ""} ${fx.toggled === x.id && x.done ? "just-done" : ""}">
+  const atrasada = !x.done && x.date < today(); // no emo, vira fantasminha (ver estilos/mundos/emo.css)
+  return `<li class="a-${x.area} ${x.done ? "done" : ""} ${atrasada ? "atrasada" : ""} ${fx.newId === x.id ? "is-new" : ""} ${fx.toggled === x.id && x.done ? "just-done" : ""}">
     <div class="item">
       <button class="check" data-act="toggle" data-id="${x.id}" aria-pressed="${!!x.done}" aria-label="Concluir ${esc(x.title)}">${ICON.check}</button>
       <div class="main clickable" data-act="open" data-id="${x.id}"><span class="title">${esc(x.title)}</span><span class="meta">${meta.join("<span>·</span>")}</span></div>
@@ -145,7 +146,7 @@ function habitRow(h, full) {
   return `<li class="a-social ${done ? "done" : ""} ${fx.habit === h.id && done ? "just-done" : ""}"><div class="item">
     <button class="check" data-act="habit" data-id="${h.id}" aria-pressed="${done}" aria-label="Marcar ${esc(h.name)}">${ICON.check}</button>
     <div class="main"><span class="title" style="text-decoration:none;color:var(--ink)">${esc(h.name)}</span>
-      <span class="meta">${h.time ? `<span class="mono">${esc(h.time)}</span><span>·</span>` : ""}${full ? `<span>${daysTxt}</span><span>·</span>` : ""}<span class="mono"><span class="${fx.habit === h.id && done ? "bump" : ""}">${st}</span> ${st === 1 ? "dia seguido" : "dias seguidos"}</span></span>
+      <span class="meta">${h.time ? `<span class="mono">${esc(h.time)}</span><span>·</span>` : ""}${full ? `<span>${daysTxt}</span><span>·</span>` : ""}<span class="mono"><span class="${fx.habit === h.id && done ? "bump" : ""}">${st}</span> ${st === 1 ? textoMundo("sequencia", ["dia seguido"])[0] : textoMundo("sequencia", [0, "dias seguidos"])[1]}</span></span>
       ${warn ? `<span class="warnline">Ontem ficou sem. Não deixe falhar dois dias seguidos.</span>` : ""}
     </div>
     ${full ? calLink({ title: h.name, date: t, time: h.time, dur: 15, recur: h.days.length === 7 ? "RRULE:FREQ=DAILY" : "RRULE:FREQ=WEEKLY;BYDAY=" + h.days.map(d => BYDAY[d]).join(","), details: "Hábito criado no Prumo" }, "Lembrete recorrente no Google Agenda") + `<button class="icon" data-act="del" data-list="habits" data-id="${h.id}" aria-label="Apagar hábito">${ICON.trash}</button>` : ""}

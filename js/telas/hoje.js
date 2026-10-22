@@ -91,13 +91,13 @@ function viewHoje() {
   ${exams.length && isToday ? `<section class="block"><h2 class="h2">Próximas provas</h2><ul class="list">${exams.map(e => `<li><div class="item"><div class="main"><span class="title">${esc(e.title)}</span><span class="meta"><span class="chip" style="--c:${subjColor(e.subjectId)}">${esc(subjName(e.subjectId) || "Sem matéria")}</span><span>·</span><span>${fmtShort(e.date)}</span></span></div>${dueTag(diffDays(t, e.date))}</div></li>`).join("")}</ul></section>` : ""}
   ${
     isToday && !fresh
-      ? `<section class="block"><h2 class="h2">Fechar o dia</h2>
+      ? `<section class="block diario"><h2 class="h2">${textoMundo("diario", "Fechar o dia")}</h2>
     <div class="card">${
       jr.closed
         ? `<span class="closed">Dia fechado.</span>${jr.note ? `<span>${esc(jr.note)}</span>` : ""}<div><button class="btn small ghost" data-act="reopen">Reabrir</button></div>`
         : `
       <span class="note">${hour < 18 ? "Faça isso à noite: revise o que rolou e deixe amanhã pronto." : "Hora de revisar o dia e deixar amanhã pronto."} ${done} feitas, ${pend} pendentes, ${fmtML(waterToday())} de água.</span>
-      <textarea id="jnote" placeholder="Como foi o dia? O que ficou de aprendizado? (opcional)">${esc(jr.note || "")}</textarea>
+      <textarea id="jnote" placeholder="${textoMundo("diarioDica", "Como foi o dia? O que ficou de aprendizado? (opcional)")}">${esc(jr.note || "")}</textarea>
       <div class="row"><button class="btn primary" data-act="closeday">${pend ? `Mover ${pend} ${pend === 1 ? "pendente" : "pendentes"} para amanhã e fechar` : "Fechar o dia"}</button></div>`
     }
     </div></section>`

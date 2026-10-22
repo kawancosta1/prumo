@@ -113,6 +113,16 @@ const ACHS = [
     cur: () => levelOf(S.xp).lvl,
     reward: 100,
     theme: true
+  },
+  {
+    // Secreta: aparece como "???" até ser descoberta (13 toques seguidos no Prumi emo)
+    id: "morcego",
+    name: "Segredo da noite",
+    desc: "Descobriu um segredo escondido no Prumi",
+    goal: 1,
+    cur: () => S.stats.morcego || 0,
+    reward: 30,
+    secreta: true
   }
 ];
 
@@ -136,13 +146,19 @@ function waterStreak() {
   return c;
 }
 
+/*
+  Dá (n > 0) ou tira (n < 0) gotas. Ganhos podem ser multiplicados pelo mundo
+  (ex.: lua cheia no emo dá gotas em dobro). Devolve quanto realmente entrou.
+*/
 function earn(n, el) {
-  if (!n) return;
+  if (!n) return 0;
+  const efeitoMundo = MUNDO_FX[S.persona];
+  if (n > 0 && efeitoMundo && efeitoMundo.multiplicadorGotas) n = n * efeitoMundo.multiplicadorGotas();
   S.coins = Math.max(0, S.coins + n);
   if (n > 0) S.xp += n;
-  if (RM) return;
+  if (RM) return n;
   const pill = document.getElementById("coins");
-  if (!pill) return;
+  if (!pill) return n;
   const r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : pill.getBoundingClientRect();
   const f = document.createElement("span");
   f.className = "coinfly" + (n < 0 ? " neg" : "");
@@ -154,6 +170,7 @@ function earn(n, el) {
   pill.classList.remove("bump");
   void pill.offsetWidth;
   pill.classList.add("bump");
+  return n;
 }
 
 const paidDay = d => S.paid[d] || (S.paid[d] = {});

@@ -92,6 +92,16 @@ let themePreview = null;
   O CSS de decoração de cada mundo fica em estilos/mundos/<nome>.css, usando html[data-mundo="<nome>"].
 */
 const MUNDO_FX = {};
+/** Texto trocado pelo mundo atual (ex.: "Fechar o dia" vira "Querido diário" no emo). */
+const textoMundo = (chave, padrao) => {
+  const f = MUNDO_FX[S.persona];
+  return (f && f.textos && f.textos[chave]) || padrao;
+};
+/** Enfeite do cartão do Prumi, se o mundo tiver (ex.: a lua de hoje no emo). */
+const enfeiteMundo = () => {
+  const f = MUNDO_FX[S.persona];
+  return f && f.enfeiteHero ? f.enfeiteHero() : "";
+};
 
 function applyTheme(personaOverride, varOverride) {
   const pid = personaOverride || S.persona,
@@ -102,7 +112,10 @@ function applyTheme(personaOverride, varOverride) {
   themePreview = varOverride ? { p: pid, v: varOverride } : personaOverride ? { p: pid, v: "base" } : null;
   const v = themeVar(pid),
     wo = waterOf(pid);
-  let [bg, surf, ink, acc, wat, masc] = dark ? th.D : th.L;
+  // O sub-tema pode trazer cores inteiras próprias (L/D); senão usa as do mundo
+  const cores = dark ? v.D || th.D : v.L || th.L;
+  document.documentElement.dataset.variante = v.id; // permite CSS próprio de cada sub-tema
+  let [bg, surf, ink, acc, wat, masc] = cores;
   if (v.a) acc = v.a[k];
   if (v.w) wat = v.w[k];
   const r = document.documentElement,
@@ -122,7 +135,7 @@ function applyTheme(personaOverride, varOverride) {
   set("--water-soft", mix(surf, wat, dark ? 0.24 : 0.16));
   set("--mascot", masc);
   {
-    const mk = (dark ? th.D : th.L)[6];
+    const mk = cores[6];
     if (mk) set("--mink", mk);
     else r.style.removeProperty("--mink");
   }

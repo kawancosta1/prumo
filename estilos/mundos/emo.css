@@ -13,7 +13,7 @@ html[data-mundo="emo"] body::after {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   pointer-events: none;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='300'%3E%3Cg fill='%23000' opacity='.18'%3E%3Cpath transform='translate(60 60) scale(1.3)' d='M0 -3Q2.5 -8 3.5 -3.5Q9 -8.5 15 -4Q12 0 13 4.5Q9 2 7 5.5Q4 2.5 2 4.5Q1 2.5 0 3.5Q-1 2.5 -2 4.5Q-4 2.5 -7 5.5Q-9 2 -13 4.5Q-12 0 -15 -4Q-9 -8.5 -3.5 -3.5Q-2.5 -8 0 -3Z'/%3E%3Cpath transform='translate(300 140) scale(.9)' d='M0 -3Q2.5 -8 3.5 -3.5Q9 -8.5 15 -4Q12 0 13 4.5Q9 2 7 5.5Q4 2.5 2 4.5Q1 2.5 0 3.5Q-1 2.5 -2 4.5Q-4 2.5 -7 5.5Q-9 2 -13 4.5Q-12 0 -15 -4Q-9 -8.5 -3.5 -3.5Q-2.5 -8 0 -3Z'/%3E%3Cpath transform='translate(180 250) scale(.7)' d='M0 -3Q2.5 -8 3.5 -3.5Q9 -8.5 15 -4Q12 0 13 4.5Q9 2 7 5.5Q4 2.5 2 4.5Q1 2.5 0 3.5Q-1 2.5 -2 4.5Q-4 2.5 -7 5.5Q-9 2 -13 4.5Q-12 0 -15 -4Q-9 -8.5 -3.5 -3.5Q-2.5 -8 0 -3Z'/%3E%3C/g%3E%3C/svg%3E")
@@ -29,70 +29,61 @@ html[data-mundo="emo"] body::after {
   }
 }
 
-/* ---------- Sangue escorrendo ao trocar de aba (criado por MUNDO_FX.emo.trocaAba) ---------- */
+/* ---------- Sangue escorrendo ao trocar de aba (criado em js/mundos/emo-efeitos.js) ---------- */
+/* Fica ATRÁS dos cartões (z-index negativo): aparece no topo e nos espaços entre eles. */
 #sangue {
   position: fixed;
   left: 0;
   right: 0;
-  top: 0;
-  height: 0;
-  z-index: 55;
-  pointer-events: none;
-  animation: emoSangueSome 1.7s ease-in forwards;
-}
-#sangue::before {
-  /* faixa do topo, com a borda de baixo ondulada */
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: calc(12px + env(safe-area-inset-top, 0px));
-  background: var(--sangue-escuro);
-  -webkit-mask: radial-gradient(10px 8px at 10px 100%, transparent 98%, #000) 0 0 / 20px 100% repeat-x;
-  mask: radial-gradient(10px 8px at 10px 100%, transparent 98%, #000) 0 0 / 20px 100% repeat-x;
-  animation: emoFaixa 1.7s ease-out forwards;
-}
-#sangue i {
-  position: absolute;
   top: env(safe-area-inset-top, 0px);
-  border-radius: 0 0 99px 99px;
-  background: linear-gradient(var(--sangue-escuro), var(--sangue));
+  z-index: -1;
+  pointer-events: none;
+  animation: emoSangueSome 2s ease-in forwards;
+}
+#sangue svg {
+  display: block;
+  overflow: visible;
+}
+#sangue path {
+  fill: var(--sangue);
+}
+#sangue .faixa {
+  fill: var(--sangue-escuro);
+  animation: emoFaixa 0.5s ease-out both;
+}
+#sangue path:not(.faixa):not(.pingo) {
+  transform-box: fill-box;
   transform-origin: top;
   transform: scaleY(0);
-  animation: emoEscorre 1.1s cubic-bezier(0.5, 0, 0.7, 1) forwards;
+  animation: emoEscorre 1.2s cubic-bezier(0.45, 0, 0.6, 1) forwards;
 }
-#sangue i::after {
-  /* a gota redonda na ponta */
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -5px;
-  width: 150%;
-  aspect-ratio: 1;
-  transform: translateX(-50%);
-  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-  background: var(--sangue);
+#sangue .pingo {
+  opacity: 0;
+  animation: emoPingo 0.9s ease-in forwards;
 }
 @keyframes emoEscorre {
-  0% {
-    transform: scaleY(0);
-  }
-  100% {
+  to {
     transform: scaleY(1);
   }
 }
 @keyframes emoFaixa {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-14px);
   }
-  20% {
-    transform: none;
+}
+@keyframes emoPingo {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(70px);
   }
 }
 @keyframes emoSangueSome {
   0%,
-  65% {
+  70% {
     opacity: 1;
   }
   100% {
@@ -280,4 +271,198 @@ html[data-mundo="emo"] {
   #sangue {
     display: none;
   }
+}
+
+/* ================= rotina com cara emo ================= */
+
+/* Tarefas atrasadas viram fantasminhas assombrando a lista */
+html[data-mundo="emo"] li.atrasada {
+  position: relative;
+}
+html[data-mundo="emo"] li.atrasada::after {
+  content: "";
+  position: absolute;
+  right: 92px;
+  top: 6px;
+  width: 22px;
+  height: 26px;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-9 -11 18 22'%3E%3Cpath d='M-8 10V-2A8 8 0 0 1 8 -2V10L5 7.5L2.5 10L0 7.5L-2.5 10L-5 7.5Z' fill='%23F7F5FA' stroke='%23141016' stroke-width='1.2'/%3E%3Cellipse cx='-2.6' cy='-1' rx='1.3' ry='1.8' fill='%23141016'/%3E%3Cellipse cx='2.6' cy='-1' rx='1.3' ry='1.8' fill='%23141016'/%3E%3Cellipse cy='3.2' rx='1.6' ry='1.2' fill='%23141016'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  opacity: 0.85;
+  animation: emoFantasma 3s ease-in-out infinite;
+}
+@keyframes emoFantasma {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-6deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(6deg);
+  }
+}
+
+/* Tarefa feita: risco de caneta feito à mão (em vez do tachado reto) + pétala caindo */
+html[data-mundo="emo"] li.done .title {
+  text-decoration: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='10' preserveAspectRatio='none'%3E%3Cpath d='M1 6Q20 2 40 6T80 5T119 4' fill='none' stroke='%23B3122E' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E")
+    0 55% / 100% 0.6em no-repeat;
+}
+html[data-mundo="emo"] li.just-done .title {
+  animation: emoRisco 0.5s ease-out;
+}
+@keyframes emoRisco {
+  from {
+    background-size: 0% 0.6em;
+  }
+}
+html[data-mundo="emo"] li.just-done {
+  position: relative;
+  overflow: visible;
+}
+html[data-mundo="emo"] li.just-done::before {
+  content: "";
+  position: absolute;
+  left: 30px;
+  top: 0;
+  width: 10px;
+  height: 14px;
+  border-radius: 50% 0;
+  background: #b3122e;
+  pointer-events: none;
+  animation: emoPetala 1.4s ease-in forwards;
+}
+@keyframes emoPetala {
+  0% {
+    transform: translate(0, -6px) rotate(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(40px, 60px) rotate(220deg);
+    opacity: 0;
+  }
+}
+
+/* Sequência de hábitos vira noites: os quadradinhos viram luas */
+html[data-mundo="emo"] .heat i {
+  border-radius: 50%;
+}
+html[data-mundo="emo"] .heat i.on {
+  background: radial-gradient(circle at 35% 40%, #f2ead3 55%, transparent 56%), var(--sangue);
+}
+
+/* Foco vira ensaio da banda: equalizador pulando enquanto o tempo corre */
+html[data-mundo="emo"] .timerrow.rodando .eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 36px;
+}
+html[data-mundo="emo"] .eq i {
+  width: 5px;
+  border-radius: 2px;
+  background: var(--sangue);
+  animation: emoEq 0.9s ease-in-out infinite alternate;
+}
+html[data-mundo="emo"] .eq i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+html[data-mundo="emo"] .eq i:nth-child(3) {
+  animation-delay: 0.5s;
+}
+html[data-mundo="emo"] .eq i:nth-child(4) {
+  animation-delay: 0.1s;
+}
+html[data-mundo="emo"] .eq i:nth-child(5) {
+  animation-delay: 0.35s;
+}
+@keyframes emoEq {
+  from {
+    height: 6px;
+  }
+  to {
+    height: 34px;
+  }
+}
+
+/* Querido diário: folha pautada com letra de caneta */
+html[data-mundo="emo"] .diario .card {
+  background: repeating-linear-gradient(
+    var(--surface) 0 23px,
+    color-mix(in srgb, #5b6fc2 30%, transparent) 23px 24px
+  );
+  border-left: 3px double var(--sangue);
+}
+html[data-mundo="emo"] .diario textarea {
+  background: transparent;
+  border: 0;
+  font-family: "Caveat", "Permanent Marker", cursive;
+  font-size: 20px;
+  line-height: 24px;
+  min-height: 96px;
+}
+
+/* ================= sub-temas por era ================= */
+
+/* Caderno de escola: fundo de folha pautada com margem vermelha */
+html[data-variante="caderno"][data-mundo="emo"] body {
+  background-image: linear-gradient(90deg, transparent 38px, #e8a0a0 38px 40px, transparent 40px),
+    repeating-linear-gradient(transparent 0 27px, color-mix(in srgb, #5b6fc2 22%, transparent) 27px 28px) !important;
+  background-size: auto !important;
+}
+
+/* Scene colorido: títulos com glitter e cartões com borda neon */
+html[data-variante="scene"][data-mundo="emo"] .h1,
+html[data-variante="scene"][data-mundo="emo"] .brand {
+  background: linear-gradient(90deg, #ff4fd8, #4fe3ff, #ffe14f, #ff4fd8);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: glitter 5s linear infinite;
+}
+html[data-variante="scene"][data-mundo="emo"] .herobox,
+html[data-variante="scene"][data-mundo="emo"] .stage {
+  box-shadow:
+    0 0 0 2px #ff4fd8,
+    0 0 18px color-mix(in srgb, #4fe3ff 45%, transparent);
+}
+
+/* Gótico 80: neblina passando devagar pelo fundo */
+html[data-variante="gotico"][data-mundo="emo"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: radial-gradient(60% 30% at 20% 80%, color-mix(in srgb, #9a96a8 22%, transparent), transparent),
+    radial-gradient(50% 25% at 80% 70%, color-mix(in srgb, #9a96a8 18%, transparent), transparent);
+  animation: emoNeblina 18s ease-in-out infinite alternate;
+}
+@keyframes emoNeblina {
+  to {
+    transform: translateX(8%);
+  }
+}
+
+/* Vampiro vitoriano: cartões com moldura dupla dourada */
+html[data-variante="vitoriano"][data-mundo="emo"] .herobox,
+html[data-variante="vitoriano"][data-mundo="emo"] .stage,
+html[data-variante="vitoriano"][data-mundo="emo"] .card {
+  outline: 1px solid #b8975a;
+  outline-offset: -5px;
+}
+
+/* Emo de praça: faixa xadrez preto e branco no topo do cartão (no lugar do sangue) */
+html[data-variante="praca"][data-mundo="emo"] .herobox::before,
+html[data-variante="praca"][data-mundo="emo"] .stage::before {
+  -webkit-mask: none;
+  mask: none;
+  height: 8px;
+  background: repeating-conic-gradient(#141416 0 25%, #f2f2f2 0 50%) 0 0 / 8px 8px;
+}
+
+/* Desfile negro: contraste alto, preto e branco com o vermelho do sangue */
+html[data-variante="base"][data-mundo="emo"] .h1 {
+  text-shadow: 2px 2px 0 color-mix(in srgb, var(--sangue) 35%, transparent);
 }

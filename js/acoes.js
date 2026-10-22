@@ -10,6 +10,11 @@ const getV = id => {
 };
 
 const forms = {
+  recado() {
+    enviarRecado(getV("recado-txt"));
+    const el = document.getElementById("recado-txt");
+    if (el) el.value = "";
+  },
   quick() {
     const raw = getV("q");
     if (!raw) return;
@@ -351,6 +356,10 @@ document.addEventListener("click", e => {
     case "poke": {
       tipI = (tipI + 1) % TIPS.length;
       const k = b.dataset.kind;
+      // O mundo pode ter um segredo ao tocar no Prumi (ex.: 13 toques viram morcego no emo)
+      const efeitoMundo = MUNDO_FX[S.persona];
+      if ((k === "hero" || k === "stage") && efeitoMundo && efeitoMundo.aoTocar && efeitoMundo.aoTocar())
+        break;
       if (k === "hero" || k === "stage") {
         const d = today(),
           antes = S.carinho[d] || 0;
@@ -396,9 +405,8 @@ document.addEventListener("click", e => {
           fx.burst = `[data-act="toggle"][data-id="${id}"]`;
           const eraAtrasada = x.date < today();
           if (!x.paid) {
-            x.paid = (x.prio === 3 ? 8 : 5) + (eraAtrasada ? 2 : 0);
             S.stats.tasks++;
-            earn(x.paid, b);
+            x.paid = earn((x.prio === 3 ? 8 : 5) + (eraAtrasada ? 2 : 0), b); // guarda o que ganhou para devolver se desmarcar
           }
           if (eraAtrasada) {
             react(
@@ -540,10 +548,11 @@ document.addEventListener("click", e => {
       const i = arr.indexOf(id);
       if (i > -1) {
         arr.splice(i, 1);
-        earn(-5, b);
+        earn(-(paidDay(d)["h_" + id] || 5), b); // devolve o que ganhou ao marcar
+        delete paidDay(d)["h_" + id];
       } else {
         arr.push(id);
-        earn(5, b);
+        paidDay(d)["h_" + id] = earn(5, b);
         fx.habit = id;
         fx.burst = `[data-act="habit"][data-id="${id}"]`;
         const h = S.habits.find(o => o.id === id);
@@ -782,6 +791,7 @@ document.addEventListener("click", e => {
       break;
     case "buy": {
       const it = ITEM[id];
+      if (it && it.evento && !eventoAtivo(it)) break; // evento acabou
       if (!it || S.owned.includes(it.id) || S.coins < it.price) break;
       earn(-it.price, b);
       S.owned.push(it.id);
@@ -909,6 +919,11 @@ document.addEventListener("click", e => {
       commit();
       break;
     }
+    case "sortear-subnick":
+      S.perfil.subnick = pick(subnicksDoMundo());
+      commit();
+      publicarPerfil(true);
+      break;
     case "humor":
       humorAberto = !humorAberto;
       render();
@@ -983,6 +998,17 @@ document.addEventListener("change", e => {
       S.cups[+el.dataset.i] = v;
       persist();
     }
+    return;
+  }
+  if (c === "perfil-subnick") {
+    S.perfil.subnick = el.value.trim().slice(0, 60);
+    persist();
+    publicarPerfil(true);
+    return;
+  }
+  if (c === "perfil-sobre") {
+    S.perfil.sobre = el.value.slice(0, 400);
+    persist();
     return;
   }
   if (c === "set-cal") {

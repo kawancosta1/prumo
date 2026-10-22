@@ -36,7 +36,7 @@ function viewEstudos() {
     <h1 class="h1">Estudos<small>${total ? `${fmtMin(total)} nesta semana` : "Nenhum estudo registrado nesta semana"}${streak ? ` · ${streak} ${streak === 1 ? "dia seguido" : "dias seguidos"} estudando` : ""}</small></h1>
   </section>
   <section class="block">
-    <h2 class="h2">Foco</h2>
+    <h2 class="h2">${textoMundo("foco", "Foco")}</h2>
     ${
       S.subjects.length
         ? `<div class="timer">
@@ -45,7 +45,7 @@ function viewEstudos() {
         <select id="tm-subj" data-change="tmsubj" aria-label="Matéria" ${busy ? "disabled" : ""}>${subjOpts(timer.subjectId)}</select>
         <div class="seg" role="group" aria-label="Duração">${[25, 50, 90].map(g => `<button data-act="goal" data-g="${g}" aria-pressed="${timer.goal === g}" ${busy ? "disabled" : ""}>${g} min</button>`).join("")}</div>
       </div>
-      <div class="timerrow"><div class="clock ${over ? "over" : ""}" id="clock">${over ? "+" : ""}${pad(Math.floor(shown / 60))}:${pad(shown % 60)}</div><button class="mslot" data-kind="timer" data-size="64" data-act="poke" aria-label="Prumi"></button></div>
+      <div class="timerrow ${timer.running ? "rodando" : ""}"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><div class="clock ${over ? "over" : ""}" id="clock">${over ? "+" : ""}${pad(Math.floor(shown / 60))}:${pad(shown % 60)}</div><button class="mslot" data-kind="timer" data-size="64" data-act="poke" aria-label="Prumi"></button></div>
       <div class="row">
         ${timer.running ? `<button class="btn" data-act="pause">Pausar</button>` : `<button class="btn primary" data-act="start">${timer.acc ? "Continuar" : "Começar"}</button>`}
         <button class="btn" data-act="finish" ${ms < 1000 ? "disabled" : ""}>Concluir e registrar</button>

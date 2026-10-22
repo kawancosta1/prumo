@@ -17,8 +17,12 @@ const owns = i => S.owned.includes(i.id) || (i.ach && !!S.ach[i.ach]);
 function itemState(i) {
   if (owns(i)) return S.equip[i.slot] === i.id ? "on" : "own";
   if (i.ach) return "lock";
+  if (i.evento && !eventoAtivo(i)) return "fora"; // evento já acabou
   return "buy";
 }
+/** Itens que aparecem na loja: os do mundo atual + itens de evento (ativos ou já comprados). */
+const itensDaLoja = () =>
+  ITEMS.filter(i => i.p === S.persona || (i.p === "*" && (eventoAtivo(i) || owns(i))));
 
 function viewPrumi() {
   const L = levelOf(S.xp),
@@ -28,7 +32,7 @@ function viewPrumi() {
     ti = tryItem ? ITEM[tryItem] : null,
     tp = tryPal ? th.vars.find(v => v.id === tryPal) : null,
     P0 = P();
-  const mine = ITEMS.filter(i => i.p === S.persona),
+  const mine = itensDaLoja(),
     ownedCount = mine.filter(owns).length,
     achCount = Object.keys(S.ach).length;
   const slots = SLOTS_EQ.filter(([k]) => mine.some(i => i.slot === k));
@@ -36,7 +40,9 @@ function viewPrumi() {
   let body = "";
   if (prumiTab === "visual") {
     const list = mine.filter(i => i.slot === slotSel);
-    body = `<span class="note">Itens exclusivos do mundo <b>${esc(P0.name)}</b>. ${ownedCount} de ${mine.length} conquistados.</span>
+    const eventos = eventosHoje();
+    body = `${eventos.map(([, ev]) => `<div class="evento-aviso"><b>${esc(ev.nome)}</b> Itens por tempo limitado, até ${ev.prazo()}. Procure o selo nas categorias.</div>`).join("")}
+    <span class="note">Itens exclusivos do mundo <b>${esc(P0.name)}</b>. ${ownedCount} de ${mine.length} conquistados.</span>
     <div class="chips" role="group" aria-label="Categoria">${slots.map(([k, l]) => `<button class="chipbtn" data-act="slot" data-s="${k}" aria-pressed="${slotSel === k}">${l}${S.equip[k] ? '<i class="dotm"></i>' : ""}</button>`).join("")}</div>
     <div class="shop">${list
       .map(i => {
@@ -50,7 +56,8 @@ function viewPrumi() {
               : st === "lock"
                 ? `<span class="tag lock">${ICON.lock} Lendário</span>`
                 : `<span class="tag price ${S.coins < i.price ? "short" : ""}">${DROP}${i.price}</span>`;
-        return `<button class="sitem ${st} ${i.ach ? "legend" : ""} ${tryItem === i.id ? "trying" : ""}" data-act="item" data-id="${i.id}" aria-label="${esc(i.name)}">${prumi({ mood: "idle", fill: 0, size: 62, eq: e2 })}<span class="sname">${esc(i.name)}</span>${foot}</button>`;
+        const selo = i.evento ? `<span class="selo-evento">${esc(EVENTOS[i.evento].nome)}</span>` : "";
+        return `<button class="sitem ${st} ${i.ach ? "legend" : ""} ${i.evento ? "do-evento" : ""} ${tryItem === i.id ? "trying" : ""}" data-act="item" data-id="${i.id}" aria-label="${esc(i.name)}">${selo}${prumi({ mood: "idle", fill: 0, size: 62, eq: e2 })}<span class="sname">${esc(i.name)}</span>${foot}</button>`;
       })
       .join("")}</div>
     ${S.equip[slotSel] ? `<div><button class="btn small ghost" data-act="unequip" data-s="${slotSel}">Tirar ${esc(ITEM[S.equip[slotSel]].name.toLowerCase())}</button></div>` : ""}`;
@@ -70,7 +77,7 @@ function viewPrumi() {
         const own =
             v.id === "base" || S.themeOwned.includes(S.persona + ":" + v.id) || (v.ach && S.ach[v.ach]),
           on = cur === v.id;
-        const base = dk ? th.D : th.L,
+        const base = dk ? v.D || th.D : v.L || th.L,
           a = v.a ? v.a[dk] : base[3],
           w = v.w ? v.w[dk] : base[4];
         const foot = on
@@ -83,14 +90,17 @@ function viewPrumi() {
         return `<button class="sitem ${on ? "on" : ""} ${tryPal === v.id ? "trying" : ""}" data-act="tvar" data-id="${v.id}"><span class="swatch" style="background:${base[0]}"><i style="background:${a}"></i><i class="w" style="background:${w}"></i></span><span class="sname">${esc(v.name)}</span>${foot}</button>`;
       })
       .join("")}</div>`;
+  } else if (prumiTab === "perfil") {
+    body = perfilHTML(); // js/telas/perfil.js
   } else if (prumiTab === "conquistas") {
     body = `<ul class="list">${ACHS.map(a => {
       const c = Math.min(a.goal, a.cur()),
         done = !!S.ach[a.id],
         li = a.legend ? ITEMS.find(i => i.p === S.persona && i.ach === a.id) : null,
         rw = li ? li.name + " (lendário)" : a.theme ? "Tema lendário" : "";
-      return `<li class="${done ? "achdone" : ""}"><div class="item"><span class="trophy ${done ? "on" : ""}">${done ? ICON.trophy : ICON.lock}</span><div class="main"><span class="title"><b>${esc(a.name)}</b></span><span class="meta">${esc(a.desc)}</span>
-        ${done ? `<span class="meta" style="color:var(--ok);font-weight:600">Conquistada em ${fmtShort(S.ach[a.id])}</span>` : `<div class="progress" style="margin-top:6px"><span style="width:${Math.round((c / a.goal) * 100)}%"></span></div><span class="meta mono">${a.fmt ? a.fmt(c) : c} / ${a.fmt ? a.fmt(a.goal) : a.goal}</span>`}</div>
+      const escondida = a.secreta && !done; // conquista secreta: só mostra depois de descoberta
+      return `<li class="${done ? "achdone" : ""}"><div class="item"><span class="trophy ${done ? "on" : ""}">${done ? ICON.trophy : ICON.lock}</span><div class="main"><span class="title"><b>${escondida ? "???" : esc(a.name)}</b></span><span class="meta">${escondida ? "Conquista secreta. Explore o Prumi..." : esc(a.desc)}</span>
+        ${done ? `<span class="meta" style="color:var(--ok);font-weight:600">Conquistada em ${fmtShort(S.ach[a.id])}</span>` : escondida ? "" : `<div class="progress" style="margin-top:6px"><span style="width:${Math.round((c / a.goal) * 100)}%"></span></div><span class="meta mono">${a.fmt ? a.fmt(c) : c} / ${a.fmt ? a.fmt(a.goal) : a.goal}</span>`}</div>
         <span class="reward">${DROP}${a.reward}${rw ? `<small>+ ${esc(rw)}</small>` : ""}</span></div></li>`;
     }).join("")}</ul>
     <span class="note">Conquistas valem para todas as personalidades: o item ou tema lendário fica liberado em cada mundo.</span>`;
@@ -128,8 +138,9 @@ function viewPrumi() {
     <div class="seg wide" role="group">${[
       ["visual", "Visual"],
       ["temas", "Temas"],
+      ["perfil", "Perfil"],
       ["conquistas", "Conquistas"],
-      ["persona", "Personalidade"]
+      ["persona", "Jeito"]
     ]
       .map(([k, l]) => `<button data-act="ptab" data-t="${k}" aria-pressed="${prumiTab === k}">${l}</button>`)
       .join("")}</div>
