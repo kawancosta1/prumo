@@ -30,13 +30,17 @@ html[data-mundo="emo"] body::after {
 }
 
 /* ---------- Sangue escorrendo ao trocar de aba (criado em js/mundos/emo-efeitos.js) ---------- */
-/* Fica por cima do topo da tela por alguns segundos e some. Não bloqueia toques. */
+/* Fica ATRÁS do conteúdo principal (título, palavras e cartões). Não bloqueia toques. */
+html[data-mundo="emo"] .wrap {
+  position: relative;
+  z-index: 2;
+}
 #sangue {
   position: fixed;
   left: 0;
   right: 0;
   top: 0;
-  z-index: 30;
+  z-index: 1;
   pointer-events: none;
   animation: emoSangueSome 4s linear forwards;
 }
