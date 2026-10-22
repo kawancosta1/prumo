@@ -14,3 +14,10 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "240385413893",
   appId: "1:240385413893:web:fcbe9d887c0063a0f25d6c"
 };
+
+/*
+  App Check (proteção contra robôs usando o seu Firebase). Desligado enquanto for null.
+  Para ligar: Console do Firebase → App Check → registrar o app Web com reCAPTCHA v3,
+  colar aqui a "chave do site" e, depois de uns dias funcionando, clicar em "Aplicar" no Firestore.
+*/
+const FIREBASE_APPCHECK_CHAVE = null;

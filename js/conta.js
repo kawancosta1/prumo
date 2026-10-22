@@ -37,6 +37,13 @@ async function carregarFirebase() {
     carregarScript(base + "firebase-firestore-compat.js")
   ]);
   firebase.initializeApp(FIREBASE_CONFIG);
+  // App Check: só liga se a chave do reCAPTCHA v3 estiver em js/firebase-config.js
+  if (typeof FIREBASE_APPCHECK_CHAVE !== "undefined" && FIREBASE_APPCHECK_CHAVE) {
+    try {
+      await carregarScript(base + "firebase-app-check-compat.js");
+      firebase.appCheck().activate(new firebase.appCheck.ReCaptchaV3Provider(FIREBASE_APPCHECK_CHAVE), true);
+    } catch (e) {}
+  }
   const db = firebase.firestore();
   try {
     // guarda uma cópia no aparelho: abre rápido e funciona sem internet
