@@ -18,7 +18,11 @@ const say = (k, v = {}) => {
   return s
     .replace("{nome}", nome())
     .replace("{n}", v.n ?? "")
-    .replace("{ml}", v.ml ?? "");
+    .replace("{ml}", v.ml ?? "")
+    .replace(/\{o\/a\}/g, flex("o", "a", "e"))
+    .replace(/\{ele\/ela\}/g, flex("ele", "ela", "elu"))
+    .replace(/\{amigo\/amiga\}/g, flex("amigo", "amiga", "amigue"))
+    .replace(/\{parceiro\/parceira\}/g, flex("parceiro", "parceira", "parceire"));
 };
 
 function setPersona(id) {

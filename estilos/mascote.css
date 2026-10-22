@@ -126,8 +126,14 @@
 .prumi .hop {
   transform-origin: 60px 133px;
 }
+.prumi .string-wrap {
+  transform-origin: 60px -6px;
+}
 .m-happy .hop {
   animation: phop 1.9s cubic-bezier(0.3, 1.5, 0.5, 1) infinite;
+}
+.m-happy .string-wrap {
+  animation: pstringhop 1.9s cubic-bezier(0.3, 1.5, 0.5, 1) infinite;
 }
 .m-happy .arm.r,
 .m-party .arm.r {
@@ -138,6 +144,9 @@
 }
 .m-party .hop {
   animation: phop 0.95s cubic-bezier(0.3, 1.5, 0.5, 1) infinite;
+}
+.m-party .string-wrap {
+  animation: pstringhop 0.95s cubic-bezier(0.3, 1.5, 0.5, 1) infinite;
 }
 .m-party .swing {
   animation-duration: 1.6s;
@@ -198,6 +207,22 @@
   }
   40% {
     transform: translateY(0) scale(1.04, 0.96);
+  }
+}
+@keyframes pstringhop {
+  0%,
+  50%,
+  100% {
+    transform: scaleY(1);
+  }
+  12% {
+    transform: scaleY(1.08);
+  }
+  26% {
+    transform: scaleY(0.52);
+  }
+  40% {
+    transform: scaleY(1);
   }
 }
 @keyframes pgulp {

@@ -4,7 +4,7 @@
 "use strict";
 
 /* ---------- boas-vindas ---------- */
-let onb = { step: 0, name: "", calendar: "google", persona: "zen" },
+let onb = { step: 0, name: "", gender: "m", calendar: "google", persona: "zen" },
   onbShown = false,
   appReady = false;
 
@@ -19,6 +19,13 @@ function onbHTML() {
     c = `<div class="ohero">${prumi({ mood: "happy", size: 140, eq: {} })}</div>
     <h2 class="oh">Oi! Eu sou o Prumi.</h2><p class="op">Vou te ajudar a organizar estudos, água, hábitos e vida social. Cada meta cumprida me dá gotas pra comprar roupinhas novas.</p>
     <label class="ofield"><span class="label">Como posso te chamar?</span><input id="onb-name" type="text" value="${esc(onb.name)}" maxlength="30" autocomplete="off" placeholder="Seu nome"></label>
+    <div class="ofield"><span class="label">Como prefere que eu fale com você?</span>
+      <div class="ogender">
+        <button type="button" class="ogbtn ${onb.gender === "m" ? "on" : ""}" data-act="onbgender" data-g="m"><b>Masculino</b><span>ele / dele</span></button>
+        <button type="button" class="ogbtn ${onb.gender === "f" ? "on" : ""}" data-act="onbgender" data-g="f"><b>Feminino</b><span>ela / dela</span></button>
+        <button type="button" class="ogbtn ${onb.gender === "n" ? "on" : ""}" data-act="onbgender" data-g="n"><b>Neutro</b><span>elu / neutro</span></button>
+      </div>
+    </div>
     <button class="btn primary big" data-act="onbnext">Continuar</button>`;
   else if (s === 1)
     c = `<h2 class="oh">Qual agenda você usa?</h2><p class="op">É onde os lembretes vão aparecer, com alarme no celular.</p>
@@ -77,6 +84,7 @@ function renderOnb() {
   if (!onbShown) {
     onbShown = true;
     onb.name = S.name || "";
+    onb.gender = S.gender || "m";
     onb.calendar = S.calendar || "google";
     onb.persona = S.persona || "zen";
   }

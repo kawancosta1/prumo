@@ -21,6 +21,7 @@ const blank = () => ({
   wake: "07:00",
   sleep: "23:00",
   name: "Kawan",
+  gender: "m",
   onboarded: false,
   welcomed: false,
   persona: "zen",
@@ -116,6 +117,7 @@ function normalize(x) {
   if (!b.carinho || typeof b.carinho !== "object") b.carinho = {};
   if (!b.perfil || typeof b.perfil !== "object") b.perfil = { sobre: "", subnick: "" };
   if (!b.parceria || typeof b.parceria !== "object") b.parceria = { id: null, tipo: "namoro" };
+  if (!["m", "f", "n"].includes(b.gender)) b.gender = "m";
   b.v = 2;
   return b;
 }

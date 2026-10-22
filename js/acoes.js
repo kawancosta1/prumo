@@ -851,6 +851,11 @@ document.addEventListener("click", e => {
       applyTheme();
       commit();
       break;
+    case "gender":
+      S.gender = b.dataset.g;
+      commit();
+      toast("Tratamento atualizado.");
+      break;
     case "persona": {
       if (S.persona === id) break;
       setPersona(id);
@@ -898,8 +903,13 @@ document.addEventListener("click", e => {
       applyTheme(onb.persona, "base");
       renderOnb();
       break;
+    case "onbgender":
+      onb.gender = b.dataset.g;
+      renderOnb();
+      break;
     case "onbdone": {
       S.name = onb.name;
+      S.gender = onb.gender || "m";
       S.calendar = onb.calendar;
       setPersona(onb.persona);
       applyTheme();

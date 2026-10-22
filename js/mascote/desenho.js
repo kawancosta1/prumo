@@ -164,7 +164,7 @@ function prumi({ mood = "idle", fill = 0, size = 96, eq, p, semL, semR, armL: ar
   return `<svg class="prumi m-${mood}" style="--ws:${tw.spd}s${skin ? `;--mink:${skin.ink}` : ""}" viewBox="0 -6 120 154" width="${size}" height="${Math.round(size * 1.28)}" role="img" aria-label="Prumi">
     <defs><clipPath id="${id}"><path d="${BODY}"/></clipPath></defs>
     ${camadas.fundo}${bgI ? `<g class="bgi">${bgI.svg()}</g>` : ""}${pet ? `<g class="pet">${pet.svg()}</g>` : ""}
-    <g class="swing">${str ? str.svg() : `<line class="string" x1="60" y1="-6" x2="60" y2="19"/>`}<g class="hop">
+    <g class="swing"><g class="string-wrap">${str ? str.svg() : `<line class="string" x1="60" y1="-6" x2="60" y2="19"/>`}</g><g class="hop">
       ${back ? back.svg() : ""}
       <rect class="cap" x="51.5" y="16.5" width="17" height="10" rx="3.5"/>
       <path class="body" d="${BODY}"${skin ? ` style="fill:${skin.color}"` : ""}/>

@@ -48,6 +48,13 @@ const esc = s =>
 
 const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
+const userG = () => (typeof S !== "undefined" && S.gender) || "m";
+
+const flex = (m, f, n) => {
+  const g = userG();
+  return g === "f" ? f : g === "n" ? (n ?? m) : m;
+};
+
 const fmtML = n =>
   n >= 1000 ? (n / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 2 }) + " L" : n + " mL";
 

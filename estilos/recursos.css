@@ -399,6 +399,48 @@ li.psel {
   font-size: 17px;
   min-height: 48px;
 }
+.ogender {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.ogbtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.12s;
+  text-align: center;
+}
+.ogbtn b {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ogbtn span {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.ogbtn.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.ogbtn.on b {
+  color: var(--accent);
+}
+.ogbtn:active {
+  transform: scale(0.97);
+}
 .btn.big {
   min-height: 50px;
   font-size: 16px;
