@@ -23,9 +23,20 @@ function viewAjustes() {
         .join("")}</select></div>
       <div class="setrow"><div class="lbl"><b>Rever boas-vindas</b><span class="note">Abre de novo a apresentação do Prumi.</span></div><button class="btn small" data-act="reonb">Abrir</button></div>
       <div class="setrow"><div class="lbl"><b>Como o Prumi te chama</b><span class="note">Aparece nas mensagens do mascote.</span></div><input id="set-name" type="text" value="${esc(S.name)}" data-change="set-name" maxlength="30" style="width:160px" autocomplete="off"></div>
-      <div class="setrow"><div class="lbl"><b>Tratamento</b><span class="note">Como o Prumi se refere a você nas falas.</span></div><div class="seg" role="group"><button data-act="gender" data-g="m" aria-pressed="${(S.gender || 'm') === 'm'}">Ele/Dele</button><button data-act="gender" data-g="f" aria-pressed="${S.gender === 'f'}">Ela/Dela</button><button data-act="gender" data-g="n" aria-pressed="${S.gender === 'n'}">Neutro</button></div></div>
+      <div class="setrow"><div class="lbl"><b>Tratamento</b><span class="note">Como o Prumi se refere a você nas falas.</span></div><div class="seg" role="group"><button data-act="gender" data-g="m" aria-pressed="${(S.gender || "m") === "m"}">Ele/Dele</button><button data-act="gender" data-g="f" aria-pressed="${S.gender === "f"}">Ela/Dela</button><button data-act="gender" data-g="n" aria-pressed="${S.gender === "n"}">Neutro</button></div></div>
     </div>
   </section>
+  ${
+    somDoMundo()
+      ? `<section class="block">
+    <h2 class="h2">Sons do clima</h2>
+    <div class="setbox">
+      <div class="setrow"><div class="lbl"><b>Chuva no foco</b><span class="note">Chuva ambiente enquanto o cronômetro roda.</span></div>${botaoSom("chuva", "Chuva")}</div>
+      <div class="setrow"><div class="lbl"><b>Virar página</b><span class="note">Toca ao concluir uma tarefa.</span></div>${botaoSom("pagina", "Página")}</div>
+    </div>
+  </section>`
+      : ""
+  }
   <section class="block">
     <h2 class="h2">Água</h2>
     <div class="setbox">

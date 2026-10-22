@@ -55,6 +55,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/humor.js` | **Humor do Prumi** (`calcularHumor()`) |
 | `js/parceria.js` | Parceria: código, dupla abraçada, poses e mimos |
 | `js/internet2000.js` | Internet dos anos 2000 no perfil: status de MSN e "Ouvindo:", depoimentos com aprovação, comunidades (selos por conquista), contador de visitas, fundos do perfil e o Fotolog do dia |
+| `js/sons.js` | Sons do clima do Emo, gerados com WebAudio: chuva durante o foco e virar página ao concluir tarefa (dá pra desligar) |
 | `js/telas/*.js` | Uma função por aba (`viewHoje`, `viewEstudos`...) |
 | `js/telas/perfil.js` | Perfil estilo MySpace na aba Prumi: subnick, música, Top 8 e recados |
 | `js/render.js` | `render()`: desenha a aba atual |

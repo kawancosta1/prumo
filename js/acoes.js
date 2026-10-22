@@ -401,6 +401,7 @@ document.addEventListener("click", e => {
       if (x) {
         toggleTask(x);
         if (x.done) {
+          somPagina(); // virar página (emo, js/sons.js)
           fx.toggled = id;
           fx.burst = `[data-act="toggle"][data-id="${id}"]`;
           const eraAtrasada = x.date < today();
