@@ -846,7 +846,7 @@ ITEMS.push(
     name: "Fio de corrente",
     price: 60,
     svg: () =>
-      `<line x1="60" y1="-6" x2="60" y2="19" stroke="#8C8A96" stroke-width="3.2" stroke-dasharray="3.4 1.8"/>`
+      `<line x1="60" y1="-40" x2="60" y2="19" stroke="#8C8A96" stroke-width="3.2" stroke-dasharray="3.4 1.8"/>`
   },
 
   {
@@ -856,7 +856,7 @@ ITEMS.push(
     name: "Fio com rosas",
     price: 90,
     svg: () =>
-      `<line x1="60" y1="-6" x2="60" y2="19" stroke="#2E5A2A" stroke-width="2"/>` +
+      `<line x1="60" y1="-40" x2="60" y2="19" stroke="#2E5A2A" stroke-width="2"/>` +
       rose(60, 2, 3.4) +
       rose(60, 11, 2.8)
   },
@@ -868,7 +868,7 @@ ITEMS.push(
     name: "Fio com aranha",
     price: 80,
     svg: () =>
-      `<line x1="60" y1="-6" x2="60" y2="19" stroke="#C9CED6" stroke-width="1.4"/><g transform="translate(60 6)"><ellipse rx="2.8" ry="3.4" fill="#141416"/><path d="M-2 -1L-6 -4M-2 1L-6.5 1M-2 2L-5.5 5.5M2 -1L6 -4M2 1L6.5 1M2 2L5.5 5.5" stroke="#141416" stroke-width="1"/></g>`
+      `<line x1="60" y1="-40" x2="60" y2="19" stroke="#C9CED6" stroke-width="1.4"/><g transform="translate(60 6)"><ellipse rx="2.8" ry="3.4" fill="#141416"/><path d="M-2 -1L-6 -4M-2 1L-6.5 1M-2 2L-5.5 5.5M2 -1L6 -4M2 1L6.5 1M2 2L5.5 5.5" stroke="#141416" stroke-width="1"/></g>`
   },
 
   {
@@ -877,7 +877,7 @@ ITEMS.push(
     slot: "string",
     name: "Fio vermelho",
     price: 40,
-    svg: () => `<line x1="60" y1="-6" x2="60" y2="19" stroke="#C8102E" stroke-width="2.4"/>`
+    svg: () => `<line x1="60" y1="-40" x2="60" y2="19" stroke="#C8102E" stroke-width="2.4"/>`
   },
 
   /* cenários */

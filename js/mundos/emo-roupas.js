@@ -562,7 +562,7 @@ ITEMS.push(
         for (let j = 0; j < 2; j++)
           if ((i + j) % 2)
             xadrez += `<rect x="${-6 + i * 2.6}" y="${-4.4 + j * 2.4}" width="2.6" height="2.4" fill="#141416"/>`;
-      return `<line x1="60" y1="-6" x2="60" y2="19" stroke="#F2F2F2" stroke-width="1.6"/><line x1="60" y1="-6" x2="60" y2="19" stroke="var(--ink)" stroke-width=".5" stroke-dasharray="1.4 2.2"/><g transform="translate(62 8) rotate(-18)"><path d="M-7 -5H2Q6 -5 8 -1Q10 1.6 8 2.4H-7Z" fill="#F2F2F2" stroke="var(--ink)" stroke-width="1"/>${xadrez}<rect x="-7.4" y="2" width="16" height="2.6" rx="1.2" fill="#F2F2F2" stroke="var(--ink)" stroke-width="1"/></g>`;
+      return `<line x1="60" y1="-40" x2="60" y2="19" stroke="#F2F2F2" stroke-width="1.6"/><line x1="60" y1="-40" x2="60" y2="19" stroke="var(--ink)" stroke-width=".5" stroke-dasharray="1.4 2.2"/><g transform="translate(62 8) rotate(-18)"><path d="M-7 -5H2Q6 -5 8 -1Q10 1.6 8 2.4H-7Z" fill="#F2F2F2" stroke="var(--ink)" stroke-width="1"/>${xadrez}<rect x="-7.4" y="2" width="16" height="2.6" rx="1.2" fill="#F2F2F2" stroke="var(--ink)" stroke-width="1"/></g>`;
     }
   },
   {
@@ -572,7 +572,7 @@ ITEMS.push(
     name: "Fio de fita K7",
     price: 70,
     svg: () =>
-      `<path d="M60 -6Q57 0 60 5Q63 10 60 14Q58 17 60 19" fill="none" stroke="#5A3A22" stroke-width="1.8"/><g transform="translate(60 3) scale(.5)">${fitaK7("#2B2D3A")}</g>`
+      `<path d="M60 -40V-6Q57 0 60 5Q63 10 60 14Q58 17 60 19" fill="none" stroke="#5A3A22" stroke-width="1.8"/><g transform="translate(60 3) scale(.5)">${fitaK7("#2B2D3A")}</g>`
   },
 
   /* ===================== cenários ===================== */
