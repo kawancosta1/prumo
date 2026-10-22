@@ -30,64 +30,109 @@ html[data-mundo="emo"] body::after {
 }
 
 /* ---------- Sangue escorrendo ao trocar de aba (criado em js/mundos/emo-efeitos.js) ---------- */
-/* Fica ATRÁS dos cartões (z-index negativo): aparece no topo e nos espaços entre eles. */
+/* Fica por cima do topo da tela por alguns segundos e some. Não bloqueia toques. */
 #sangue {
   position: fixed;
   left: 0;
   right: 0;
-  top: env(safe-area-inset-top, 0px);
-  z-index: -1;
+  top: 0;
+  z-index: 30;
   pointer-events: none;
-  animation: emoSangueSome 2s ease-in forwards;
+  animation: emoSangueSome 4s linear forwards;
 }
 #sangue svg {
   display: block;
   overflow: visible;
 }
-#sangue path {
-  fill: var(--sangue);
+#sangue .c1 {
+  stop-color: color-mix(in srgb, var(--sangue) 45%, #000);
+}
+#sangue .c2 {
+  stop-color: var(--sangue-escuro);
+}
+#sangue .c3 {
+  stop-color: var(--sangue);
 }
 #sangue .faixa {
-  fill: var(--sangue-escuro);
-  animation: emoFaixa 0.5s ease-out both;
+  animation: emoFaixa 0.45s cubic-bezier(0.3, 0.8, 0.4, 1) both;
 }
-#sangue path:not(.faixa):not(.pingo) {
+/* corpo do fio: cresce de cima para baixo, rápido no começo e cada vez mais devagar */
+#sangue .fio {
   transform-box: fill-box;
   transform-origin: top;
   transform: scaleY(0);
-  animation: emoEscorre 1.2s cubic-bezier(0.45, 0, 0.6, 1) forwards;
+  animation: emoEscorre var(--t) cubic-bezier(0.2, 0.55, 0.35, 1) var(--d) forwards;
 }
+/* ponta redonda e reflexo descem junto com o corpo */
+/* a ponta desce com transform, então leva a cor do fim do degradê */
+#sangue .ponta,
 #sangue .pingo {
+  fill: color-mix(in srgb, var(--sangue) 88%, #000);
+}
+#sangue .ponta,
+#sangue .brilho {
+  animation: emoPonta var(--t) cubic-bezier(0.2, 0.55, 0.35, 1) var(--d) forwards;
+}
+#sangue .brilho {
+  fill: #fff;
   opacity: 0;
-  animation: emoPingo 0.9s ease-in forwards;
+  animation:
+    emoPonta var(--t) cubic-bezier(0.2, 0.55, 0.35, 1) var(--d) forwards,
+    emoBrilho 0.4s ease-out calc(var(--d) + 0.1s) forwards;
+}
+/* gota que se solta: estica, cai acelerando e encolhe */
+#sangue .pingo {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: translateY(var(--y)) scale(0);
+  animation: emoPingo 0.75s cubic-bezier(0.55, 0, 0.9, 0.5) var(--d) forwards;
 }
 @keyframes emoEscorre {
   to {
     transform: scaleY(1);
   }
 }
+@keyframes emoPonta {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(var(--y));
+  }
+}
+@keyframes emoBrilho {
+  to {
+    opacity: 0.4;
+  }
+}
 @keyframes emoFaixa {
   from {
-    transform: translateY(-14px);
+    transform: translateY(-34px);
   }
 }
 @keyframes emoPingo {
   0% {
+    transform: translateY(var(--y)) scale(1);
+  }
+  20% {
+    transform: translateY(calc(var(--y) + 6px)) scale(0.9, 1.25);
+  }
+  85% {
+    transform: translateY(calc(var(--y) + var(--q))) scale(0.8, 1.2);
+  }
+  100% {
+    transform: translateY(calc(var(--y) + var(--q) + 20px)) scale(0);
+  }
+}
+@keyframes emoSangueSome {
+  0%,
+  75% {
     opacity: 1;
     transform: translateY(0);
   }
   100% {
     opacity: 0;
-    transform: translateY(70px);
-  }
-}
-@keyframes emoSangueSome {
-  0%,
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
+    transform: translateY(18px);
   }
 }
 
@@ -406,7 +451,8 @@ html[data-mundo="emo"] .diario textarea {
 
 /* Caderno de escola: fundo de folha pautada com margem vermelha */
 html[data-variante="caderno"][data-mundo="emo"] body {
-  background-image: linear-gradient(90deg, transparent 38px, #e8a0a0 38px 40px, transparent 40px),
+  background-image:
+    linear-gradient(90deg, transparent 38px, #e8a0a0 38px 40px, transparent 40px),
     repeating-linear-gradient(transparent 0 27px, color-mix(in srgb, #5b6fc2 22%, transparent) 27px 28px) !important;
   background-size: auto !important;
 }
@@ -435,7 +481,8 @@ html[data-variante="gotico"][data-mundo="emo"] body::before {
   inset: 0;
   z-index: -2;
   pointer-events: none;
-  background: radial-gradient(60% 30% at 20% 80%, color-mix(in srgb, #9a96a8 22%, transparent), transparent),
+  background:
+    radial-gradient(60% 30% at 20% 80%, color-mix(in srgb, #9a96a8 22%, transparent), transparent),
     radial-gradient(50% 25% at 80% 70%, color-mix(in srgb, #9a96a8 18%, transparent), transparent);
   animation: emoNeblina 18s ease-in-out infinite alternate;
 }

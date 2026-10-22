@@ -70,41 +70,66 @@ function virarMorcego() {
   }, 3200);
 }
 
-/* ---------- Sangue escorrendo (fino, irregular, atrás dos cartões) ---------- */
+/* ---------- Sangue escorrendo do topo ao trocar de aba ----------
+  Tudo fica dentro de um filtro "goo": borrões e círculos se fundem como líquido.
+  Cada fio é um corpo que cresce para baixo (scaleY) com uma ponta redonda que desce junto,
+  cada um com velocidade própria e desacelerando no fim. Alguns soltam uma gota que cai. */
 function sangueEscorrendo() {
   if (RM) return;
   const antigo = document.getElementById("sangue");
   if (antigo) antigo.remove();
-  const W = innerWidth;
-  // Faixa do topo com a borda de baixo irregular
-  let borda = `M0 0H${W}V6`;
-  for (let x = W; x > 0; x -= 14 + Math.random() * 18) {
-    borda += `Q${(x - 7).toFixed(0)} ${(9 + Math.random() * 6).toFixed(1)} ${(x - 16).toFixed(0)} ${(5 + Math.random() * 3).toFixed(1)}`;
+  const W = document.documentElement.clientWidth || innerWidth;
+  const H = Math.round(Math.min(innerHeight * 0.55, 380));
+  const r = (a, b) => a + Math.random() * (b - a);
+  const f = n => n.toFixed(1);
+
+  // Faixa do topo com a borda de baixo cheia de bolhas (o filtro junta tudo)
+  let poca = `<rect class="faixa" x="-20" y="-30" width="${W + 40}" height="${f(r(36, 40))}"/>`;
+  for (let x = -6; x < W + 10; x += r(7, 15)) {
+    poca += `<circle class="faixa" cx="${f(x)}" cy="${f(r(7, 12))}" r="${f(r(3, 7.5))}"/>`;
   }
-  borda += "V0Z";
-  // Escorridos: finos, com largura variando e afinando até a ponta
-  let escorridos = "";
-  let gotas = "";
-  const n = Math.round(W / 26);
-  for (let i = 0; i < n; i++) {
-    const x = Math.random() * W;
-    const larg = 1.6 + Math.random() * 3.4; // meia largura no topo
-    const comp = 24 + Math.random() * 150;
-    const ondula = (Math.random() - 0.5) * 6;
-    const d = `M${(x - larg).toFixed(1)} 4C${(x - larg * 0.7 + ondula).toFixed(1)} ${(comp * 0.4).toFixed(0)} ${(x - larg * 0.25).toFixed(1)} ${(comp * 0.75).toFixed(0)} ${x.toFixed(1)} ${comp.toFixed(0)}C${(x + larg * 0.25).toFixed(1)} ${(comp * 0.75).toFixed(0)} ${(x + larg * 0.7 + ondula).toFixed(1)} ${(comp * 0.4).toFixed(0)} ${(x + larg).toFixed(1)} 4Z`;
-    const atraso = (Math.random() * 0.35).toFixed(2);
-    escorridos += `<path d="${d}" style="animation-delay:${atraso}s"/>`;
-    if (Math.random() < 0.45) {
-      // gotinha em forma de lágrima que se solta da ponta
-      gotas += `<path class="pingo" d="M${x.toFixed(1)} ${(comp + 2).toFixed(0)}q2.6 4.2 0 6.2q-2.6-2 0-6.2z" style="animation-delay:${(0.6 + Number(atraso)).toFixed(2)}s"/>`;
+
+  // Fios escorrendo: a maioria curta, poucos bem longos
+  let fios = "";
+  let brilhos = "";
+  const n = Math.max(6, Math.round(W / 24));
+  let x = r(4, 14);
+  for (let i = 0; i < n && x < W - 4; i++) {
+    const w = r(2.2, 5.2); // meia largura do fio
+    const comp = Math.round(16 + Math.pow(Math.random(), 1.8) * (H * 0.62));
+    const dur = (0.9 + comp / 150 + r(0, 0.6)).toFixed(2);
+    const atraso = r(0.15, 0.75).toFixed(2);
+    const torto = r(-1.5, 1.5);
+    const ponta = w * r(1.15, 1.45);
+    // corpo: largo no topo, afina e engrossa de novo perto da ponta
+    const corpo =
+      `M${f(x - w * 1.6)} 0C${f(x - w)} ${f(comp * 0.25)} ${f(x - w * 0.6 + torto)} ${f(comp * 0.6)} ${f(x - w * 0.85 + torto)} ${comp}` +
+      `H${f(x + w * 0.85 + torto)}C${f(x + w * 0.6 + torto)} ${f(comp * 0.6)} ${f(x + w)} ${f(comp * 0.25)} ${f(x + w * 1.6)} 0Z`;
+    const t = `--t:${dur}s;--d:${atraso}s;--y:${comp}px`;
+    fios += `<path class="fio" d="${corpo}" style="${t}"/>`;
+    fios += `<circle class="ponta" cx="${f(x + torto)}" cy="0" r="${f(ponta)}" style="${t}"/>`;
+    if (comp > 40 && Math.random() < 0.5) {
+      // gota que se solta quando o fio termina de escorrer
+      const solta = (Number(atraso) + Number(dur) * 0.9).toFixed(2);
+      fios += `<circle class="pingo" cx="${f(x + torto)}" cy="0" r="${f(ponta * 0.9)}" style="--d:${solta}s;--y:${comp}px;--q:${Math.round(r(90, 170))}px"/>`;
     }
+    // reflexo de luz na ponta (fora do filtro para ficar nítido)
+    brilhos += `<circle class="brilho" cx="${f(x + torto - ponta * 0.35)}" cy="${f(-ponta * 0.3)}" r="${f(ponta * 0.32)}" style="${t}"/>`;
+    x += r(10, 44);
   }
+
   const camada = document.createElement("div");
   camada.id = "sangue";
   camada.setAttribute("aria-hidden", "true");
-  camada.innerHTML = `<svg width="${W}" height="260" viewBox="0 0 ${W} 260"><path class="faixa" d="${borda}"/>${escorridos}${gotas}</svg>`;
+  camada.innerHTML =
+    `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+    `<defs><filter id="sangue-goo" x="-10%" y="-20%" width="120%" height="140%" color-interpolation-filters="sRGB">` +
+    `<feGaussianBlur stdDeviation="2.6"/><feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 20 -9"/></filter>` +
+    `<linearGradient id="sangue-cor" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Math.round(H * 0.7)}">` +
+    `<stop offset="0" class="c1"/><stop offset="0.25" class="c2"/><stop offset="1" class="c3"/></linearGradient></defs>` +
+    `<g filter="url(#sangue-goo)" fill="url(#sangue-cor)">${poca}${fios}</g>${brilhos}</svg>`;
   document.body.appendChild(camada);
-  setTimeout(() => camada.remove(), 2000);
+  setTimeout(() => camada.remove(), 4200);
 }
 
 /* ---------- Ganchos usados pelo resto do app ---------- */
