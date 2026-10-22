@@ -1722,3 +1722,11 @@ button.top8-item {
   width: 100%;
   height: 54px;
 }
+
+/* Aviso de regras do Firestore desatualizadas (tela de Amigos) */
+.aviso-regras {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-left: 4px solid var(--warn);
+}

@@ -37,23 +37,30 @@ const nomeDe = uid => {
 };
 
 /* ---------- liga tudo ao entrar (chamado em ligarBanco, js/estado.js) ---------- */
+/* Se as regras do Firestore estiverem velhas, o Firebase nega o acesso: avisamos na tela de Amigos */
+let avisoRegras = false;
+const ehPermissao = e => !!e && (e.code === "permission-denied" || /permission/i.test(e.message || ""));
+function regrasBloquearam(e) {
+  if (!ehPermissao(e) || avisoRegras) return;
+  avisoRegras = true;
+  softRender();
+}
+
 function iniciarAmigos() {
   if (!modoFirebase()) return;
+  if (typeof publicarPerfil === "function") publicarPerfil(true); // garante que os outros conseguem te achar
   if (!S.privacidade || typeof S.privacidade !== "object") S.privacidade = privacidadePadrao();
   pararAmizades = banco
     .collection("amizades")
     .where("uids", "array-contains", meuId)
-    .onSnapshot(
-      snap => {
-        amizades = {};
-        snap.docs.forEach(d => (amizades[d.id] = d.data()));
-        // carrega o perfil de quem ainda não conhecemos (e a vitrine de quem é amigo)
-        amizadesLista().forEach(a => carregarAmigo(a.uid, a.estado === "aceita"));
-        softRender();
-        atualizarSino();
-      },
-      () => {}
-    );
+    .onSnapshot(snap => {
+      amizades = {};
+      snap.docs.forEach(d => (amizades[d.id] = d.data()));
+      // carrega o perfil de quem ainda não conhecemos (e a vitrine de quem é amigo)
+      amizadesLista().forEach(a => carregarAmigo(a.uid, a.estado === "aceita"));
+      softRender();
+      atualizarSino();
+    }, regrasBloquearam);
   pararCaixa = banco
     .collection(`caixa/${meuId}/itens`)
     .orderBy("em", "desc")
@@ -109,15 +116,35 @@ async function adicionarAmigo(quem) {
   quem = (quem || "").trim();
   if (!modoFirebase()) return toast("Entre com Google em Ajustes para ter amigos", false, "worried");
   if (!quem) return;
+  // aceita "@nome", "nome" ou o código de 6 letras (maiúsculo ou minúsculo): tenta os dois jeitos
+  const nome = quem.replace(/^@/, "").toLowerCase();
+  const codigo = quem.replace(/^@/, "").toUpperCase();
+  const pareceCodigo = /^[A-Z0-9]{6}$/.test(codigo) && !quem.startsWith("@");
+  const porNome = () => (/^[a-z0-9_.]{3,20}$/.test(nome) ? uidDoUsuario(nome) : null);
+  const porCodigo = async () => {
+    if (!/^[A-Z0-9]{6}$/.test(codigo)) return null;
+    const r = await banco.collection("perfis").where("codigo", "==", codigo).limit(1).get();
+    return r.empty ? null : r.docs[0].id;
+  };
   let uid = null;
-  try {
-    if (quem.startsWith("@") || /[a-z._]/.test(quem)) uid = await uidDoUsuario(quem);
-    else {
-      const r = await banco.collection("perfis").where("codigo", "==", quem.toUpperCase()).limit(1).get();
-      uid = r.empty ? null : r.docs[0].id;
+  let erro = null;
+  for (const busca of pareceCodigo ? [porCodigo, porNome] : [porNome, porCodigo]) {
+    try {
+      uid = await busca();
+    } catch (e) {
+      erro = e;
     }
-  } catch (e) {}
-  if (!uid) return toast(`Não achei ${quem}. Confere com a pessoa?`, false, "worried");
+    if (uid) break;
+  }
+  if (!uid && ehPermissao(erro)) {
+    regrasBloquearam(erro);
+    return toast(
+      "O Firebase bloqueou a busca. Atualize as regras do Firestore (veja o aviso em Amigos).",
+      false,
+      "worried"
+    );
+  }
+  if (!uid) return toast(`Não achei ${quem}. Confere o @ ou o código com a pessoa?`, false, "worried");
   if (uid === meuId) return toast("Esse é você =)", false, "happy");
   const id = parId(meuId, uid);
   const ja = amizades[id];
@@ -136,7 +163,15 @@ async function adicionarAmigo(quem) {
       .set({ uids: [meuId, uid].sort(), de: meuId, estado: "pendente", em: Date.now() });
     toast(textoMundo("pedidoAmizade", "Pedido de amizade enviado!"), false, "happy");
   } catch (e) {
-    toast("Não consegui mandar o pedido. Pode ser que essa pessoa não aceite pedidos.", false, "worried");
+    if (ehPermissao(e)) {
+      regrasBloquearam(e);
+      return toast(
+        "O Firebase bloqueou o pedido. Atualize as regras do Firestore (veja o aviso em Amigos).",
+        false,
+        "worried"
+      );
+    }
+    toast("Não consegui mandar o pedido agora. Confere a internet e tenta de novo.", false, "worried");
   }
 }
 async function aceitarAmigo(id) {

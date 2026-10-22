@@ -131,6 +131,11 @@ function viewAmigos() {
           .join("")}</ul></section>`
       : ""
   }
+  ${
+    avisoRegras
+      ? `<section class="block"><div class="card aviso-regras"><b>O Firebase está bloqueando os amigos.</b><span class="note">As regras do banco estão desatualizadas. No console do Firebase, abra Firestore → Regras, apague tudo, cole o conteúdo do arquivo <span class="mono">firestore.rules</span> do repositório e clique em Publicar. Depois recarregue o Prumo.</span></div></section>`
+      : ""
+  }
   <section class="block"><h2 class="h2">Adicionar</h2>
     <form class="add" data-form="amigo-add"><input id="amigo-quem" class="grow" type="text" placeholder="@usuario ou código" autocomplete="off" autocapitalize="off" required><button class="btn primary" type="submit">Adicionar</button></form>
     <div class="card convite">
