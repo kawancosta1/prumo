@@ -16,6 +16,16 @@ const perfilPadrao = () => ({
   depoVistos: [] // depoimentos já aprovados ou recusados (pelo horário de envio)
 });
 
+/* Dados da leitura: registro de páginas por dia, metas, moeda "páginas" e a decoração da estante */
+const leituraPadrao = () => ({
+  log: {},
+  metas: {},
+  saldo: 0,
+  total: 0,
+  decor: { movel: "clara", fundo: "liso", enfeites: [] },
+  comprados: []
+});
+
 const blank = () => ({
   v: 2,
   tasks: [],
@@ -54,6 +64,8 @@ const blank = () => ({
   fotolog: [], // fotos do Fotolog, uma por dia fechado
   sons: { chuva: true, pagina: true }, // sons do clima no emo (js/sons.js)
   noites: [], // dias em que o app foi usado depois das 22h
+  livros: [], // Estante de leitura (js/leitura.js)
+  leitura: leituraPadrao(),
   parceria: { id: null, tipo: "namoro" },
   codigo: "",
   events: [],
@@ -135,6 +147,17 @@ function normalize(x) {
   for (const k of ["depoAceitos", "depoVistos"]) if (!Array.isArray(b.perfil[k])) b.perfil[k] = [];
   if (!Array.isArray(b.fotolog)) b.fotolog = [];
   if (!Array.isArray(b.noites)) b.noites = [];
+  if (!Array.isArray(b.livros)) b.livros = [];
+  b.livros.forEach(l => {
+    for (const k of ["tags", "citacoes"]) if (!Array.isArray(l[k])) l[k] = [];
+    if (!l.pago || typeof l.pago !== "object") l.pago = {};
+    l.pagina = +l.pagina || 0;
+    l.contadas = +l.contadas || 0;
+  });
+  b.leitura = { ...leituraPadrao(), ...(b.leitura && typeof b.leitura === "object" ? b.leitura : {}) };
+  b.leitura.decor = { ...leituraPadrao().decor, ...b.leitura.decor };
+  if (!Array.isArray(b.leitura.decor.enfeites)) b.leitura.decor.enfeites = [];
+  if (!Array.isArray(b.leitura.comprados)) b.leitura.comprados = [];
   if (!b.sons || typeof b.sons !== "object") b.sons = {};
   b.sons = { chuva: b.sons.chuva !== false, pagina: b.sons.pagina !== false };
   if (!b.parceria || typeof b.parceria !== "object") b.parceria = { id: null, tipo: "namoro" };
@@ -156,6 +179,7 @@ function prune() {
     for (const k of Object.keys(o)) if (k < lim) delete o[k];
   const pl = addDays(today(), -400);
   for (const k of Object.keys(S.paid)) if (k < pl) delete S.paid[k];
+  for (const k of Object.keys(S.leitura.log)) if (k < pl) delete S.leitura.log[k]; // páginas por dia: guarda um ano
   const tl = addDays(today(), -45);
   S.tasks = S.tasks.filter(t => !(t.done && t.date < tl));
   S.events = S.events.filter(e => e.date >= tl);

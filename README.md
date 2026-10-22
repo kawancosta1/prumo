@@ -56,6 +56,9 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/parceria.js` | Parceria: código, dupla abraçada, poses e mimos |
 | `js/internet2000.js` | Internet dos anos 2000 no perfil: status de MSN e "Ouvindo:", depoimentos com aprovação, comunidades (selos por conquista), contador de visitas, fundos do perfil e o Fotolog do dia |
 | `js/sons.js` | Sons do clima do Emo, gerados com WebAudio: chuva durante o foco e virar página ao concluir tarefa (dá pra desligar) |
+| `js/leitura.js` | Estante de leitura (estilo Skoob): livros, progresso, notas, metas, moeda "páginas", conquistas de leitura, busca na Open Library e no Google Books e leitor de código de barras |
+| `js/estante-enfeites.js` | Móveis, paredes e enfeites da estante (comprados com páginas; alguns só aparecem num mundo) |
+| `js/telas/estante.js` | Aba Estante: desenho da estante, Lendo agora, Adicionar, Livros, Metas e Decorar |
 | `js/telas/*.js` | Uma função por aba (`viewHoje`, `viewEstudos`...) |
 | `js/telas/perfil.js` | Perfil estilo MySpace na aba Prumi: subnick, música, Top 8 e recados |
 | `js/render.js` | `render()`: desenha a aba atual |
@@ -155,6 +158,17 @@ MUDANCAS_EXTRAS["meu-campo"] = campo => { /* data-change="meu-campo" */ };
 
 Em `js/eventos.js`, adicione o evento em `EVENTOS` (com `ativo(data)` e `prazo()`) e itens com `p: "*"` e `evento: "<id>"`.
 Eles aparecem em todos os mundos só enquanto o evento estiver ativo. Quem comprou fica com o item.
+
+### Criar um enfeite da estante
+
+Em `js/estante-enfeites.js`, adicione em `ENFEITES`. O desenho fica em volta de (0, 0), que é o meio da base, em pé na prateleira:
+
+```js
+{ id: "abajur", nome: "Abajur", preco: 60, w: 20, mundo: "emo",
+  svg: () => `<rect x="-6" y="-20" width="12" height="20" fill="#C8102E"/>` }
+```
+
+`w` é a largura na prateleira, `mundo` deixa o enfeite só naquele mundo e `ach` no lugar de `preco` faz dele lendário.
 
 ### Criar uma conquista
 

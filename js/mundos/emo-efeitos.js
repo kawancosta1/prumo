@@ -243,7 +243,11 @@ MUNDO_FX.emo = {
     conviteTitulo: "Vampiro só entra se for convidado.",
     conviteDica: "Você me convida pra entrar? Passe o seu código ou digite o do seu par.",
     conviteBotao: "Convidar pra entrar",
-    pedidoChegou: "bateu na sua janela. Você convida pra entrar?"
+    pedidoChegou: "bateu na sua janela. Você convida pra entrar?",
+    // estante de leitura
+    notaIcone: "♥",
+    livroLido: "Terminou. Mais uma história pra chorar junto =] <b>+50 páginas</b>.",
+    vazioLeitura: "Nenhum livro aberto. Até vampiro lê no caixão."
   },
 
   // Hábitos sugeridos na aba Hábitos (um toque adiciona)

@@ -9,6 +9,7 @@ const VIEWS = {
   dieta: viewDieta,
   social: viewSocial,
   prumi: viewPrumi,
+  estante: viewEstante,
   ajustes: viewAjustes
 };
 
