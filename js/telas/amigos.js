@@ -60,7 +60,7 @@ function perfilAmigoHTML(uid) {
       v.estante
         ? `<div class="ms-bloco"><span class="ms-titulo">Estante (${v.estante.totalLidos} lidos)</span>
         ${v.livroAtual ? `<span><b>Lendo agora:</b> ${esc(v.livroAtual.titulo)}${v.livroAtual.autor ? ` · ${esc(v.livroAtual.autor)}` : ""} · ${v.livroAtual.progresso}%</span>` : ""}
-        <div class="estante-quadro">${estanteSVG({ lidos: v.estante.lidos, lendo: v.estante.lendo, decor: v.estante.decor, equip: v.equip, persona: v.persona, meu: false })}</div>
+        <div class="estante-quadro">${quartoSVG({ lidos: v.estante.lidos, lendo: v.estante.lendo, decor: v.estante.decor, equip: v.equip, persona: v.persona, meu: false })}</div>
         ${v.estante.lidos.length ? `<details class="more"><summary>Livros que leu</summary><ul class="list livros">${v.estante.lidos.map(l => `<li><div class="item">${capaHTML(l, 34)}<span class="main"><span class="title">${esc(l.titulo)}</span><span class="meta">${esc(l.autor || "")}</span>${l.nota ? notaHTML(l, false) : ""}</span></div></li>`).join("")}</ul></details>` : ""}
       </div>`
         : ""

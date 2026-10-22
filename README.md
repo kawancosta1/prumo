@@ -65,6 +65,8 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/telas/amigos.js` | Telas de Amigos (lista, perfil do amigo, privacidade) e Avisos (o sininho do topo) |
 | `js/pwa.js` | Prumo instalável no celular (service worker `sw.js`) e avisos do sistema |
 | `sw.js`, `manifest.webmanifest`, `icones/` | O app instalável: guarda o Prumo no aparelho (troque `VERSAO` no `sw.js` para forçar uma atualização geral) |
+| `js/capas.js` | Capas desenhadas com título estilizado (6 estilos) para livros sem foto |
+| `js/quarto.js` | Quarto de leitura: chão, janela, pôster, cama, tapete e luz comprados com páginas, com a estante dentro |
 | `js/telas/*.js` | Uma função por aba (`viewHoje`, `viewEstudos`...) |
 | `js/telas/perfil.js` | Perfil estilo MySpace na aba Prumi: subnick, música, Top 8 e recados |
 | `js/render.js` | `render()`: desenha a aba atual |

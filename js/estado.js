@@ -24,7 +24,7 @@ const leituraPadrao = () => ({
   metas: {},
   saldo: 0,
   total: 0,
-  decor: { movel: "clara", fundo: "liso", enfeites: [] },
+  decor: { movel: "clara", fundo: "liso", enfeites: [], quarto: {} }, // quarto: chão, janela, pôster, cama, tapete, luz (js/quarto.js)
   comprados: []
 });
 
@@ -168,6 +168,7 @@ function normalize(x) {
   b.leitura = { ...leituraPadrao(), ...(b.leitura && typeof b.leitura === "object" ? b.leitura : {}) };
   b.leitura.decor = { ...leituraPadrao().decor, ...b.leitura.decor };
   if (!Array.isArray(b.leitura.decor.enfeites)) b.leitura.decor.enfeites = [];
+  if (!b.leitura.decor.quarto || typeof b.leitura.decor.quarto !== "object") b.leitura.decor.quarto = {};
   if (!Array.isArray(b.leitura.comprados)) b.leitura.comprados = [];
   if (!b.sons || typeof b.sons !== "object") b.sons = {};
   b.sons = { chuva: b.sons.chuva !== false, pagina: b.sons.pagina !== false };

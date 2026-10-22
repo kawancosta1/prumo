@@ -168,15 +168,13 @@ async function bloquearAmigo(uid) {
   try {
     if (amizades[id]) await banco.doc("amizades/" + id).update({ estado: "bloqueada", bloqueadoPor: meuId });
     else
-      await banco
-        .doc("amizades/" + id)
-        .set({
-          uids: [meuId, uid].sort(),
-          de: meuId,
-          estado: "bloqueada",
-          bloqueadoPor: meuId,
-          em: Date.now()
-        });
+      await banco.doc("amizades/" + id).set({
+        uids: [meuId, uid].sort(),
+        de: meuId,
+        estado: "bloqueada",
+        bloqueadoPor: meuId,
+        em: Date.now()
+      });
     if (S.parceria.id === uid) desfazerParceria();
     amigoAberto = null;
     toast("Bloqueado. Essa pessoa não vê mais seu perfil nem te manda nada.", false, "happy");
@@ -209,17 +207,15 @@ function contarMimo(uid) {
 async function mandarParaCaixa(uid, tipo, texto = "", extra = {}) {
   if (!modoFirebase()) return false;
   try {
-    await banco
-      .collection(`caixa/${uid}/itens`)
-      .add({
-        tipo,
-        de: meuId,
-        deNome: S.name || "",
-        texto: String(texto).slice(0, 600),
-        em: Date.now(),
-        visto: false,
-        ...extra
-      });
+    await banco.collection(`caixa/${uid}/itens`).add({
+      tipo,
+      de: meuId,
+      deNome: S.name || "",
+      texto: String(texto).slice(0, 600),
+      em: Date.now(),
+      visto: false,
+      ...extra
+    });
     return true;
   } catch (e) {
     toast("Não consegui mandar agora", false, "worried");
@@ -585,14 +581,12 @@ function limparVitrine(v) {
       ? v.comunidades.filter(a => COMUNIDADES.some(c => c.ach === a))
       : [],
     top8: Array.isArray(v.top8)
-      ? v.top8
-          .slice(0, 8)
-          .map(t => ({
-            uid: texto(t && t.uid, 128),
-            nome: texto(t && t.nome, 30),
-            persona: mundoOk(t && t.persona),
-            equip: equipOk(t && t.equip)
-          }))
+      ? v.top8.slice(0, 8).map(t => ({
+          uid: texto(t && t.uid, 128),
+          nome: texto(t && t.nome, 30),
+          persona: mundoOk(t && t.persona),
+          equip: equipOk(t && t.equip)
+        }))
       : [],
     depoAceitos: Array.isArray(v.depoAceitos)
       ? v.depoAceitos
@@ -610,7 +604,16 @@ function limparVitrine(v) {
           decor: {
             movel: texto(dec.movel, 30),
             fundo: texto(dec.fundo, 30),
-            enfeites: Array.isArray(dec.enfeites) ? dec.enfeites.filter(e => ENFEITE[e]).slice(0, 30) : []
+            enfeites: Array.isArray(dec.enfeites) ? dec.enfeites.filter(e => ENFEITE[e]).slice(0, 30) : [],
+            quarto: Object.fromEntries(
+              Object.keys(LUGARES_QUARTO).map(slot => {
+                const id = dec.quarto && dec.quarto[slot];
+                return [
+                  slot,
+                  id === "" || (ITEM_QUARTO[id] && ITEM_QUARTO[id].slot === slot) ? id : QUARTO_PADRAO[slot]
+                ];
+              })
+            )
           }
         }
       : null,

@@ -34,7 +34,7 @@ function capaHTML(l, tam = 56) {
   const alt = Math.round(tam * 1.5);
   if (l.capa && /^https:\/\//.test(l.capa))
     return `<img class="capa" src="${esc(l.capa)}" alt="" width="${tam}" height="${alt}" loading="lazy" referrerpolicy="no-referrer">`;
-  return `<span class="capa desenhada" style="--c:${corDoLivro(l)};width:${tam}px;height:${alt}px"><b>${esc(l.titulo.slice(0, 40))}</b><small>${esc(l.autor.split(",")[0].slice(0, 24))}</small></span>`;
+  return capaDesenhada(l, corDoLivro(l)).replace("<svg ", `<svg width="${tam}" height="${alt}" `); // js/capas.js
 }
 
 const iconeNota = () => textoMundo("notaIcone", "★");
@@ -60,7 +60,7 @@ const minhaEstante = () => ({
   meu: true
 });
 
-function estanteSVG(d = minhaEstante()) {
+function estanteSVG(d = minhaEstante(), opcoes = {}) {
   const decor = d.decor || { movel: "clara", fundo: "liso", enfeites: [] };
   const doMundoDele = x => !x.mundo || x.mundo === d.persona;
   const movel = MOVEIS.find(m => m.id === decor.movel && doMundoDele(m)) || MOVEIS[0];
@@ -68,7 +68,7 @@ function estanteSVG(d = minhaEstante()) {
   const W = 360,
     x0 = 30,
     x1 = 330,
-    topo = 120, // altura da parte de cima (Prumi e livros deitados)
+    topo = opcoes.semPrumi ? 50 : 120, // altura da parte de cima (Prumi e livros deitados)
     alturaFileira = 82;
   // o que vai nas prateleiras: livros lidos (lombadas) e depois os enfeites colocados
   const pecas = [
@@ -105,7 +105,7 @@ function estanteSVG(d = minhaEstante()) {
       if (p.tipo === "livro") {
         const l = p.l,
           y = base(i);
-        miolo += `<g class="lombada" ${d.meu ? `data-act="livro-abrir" data-id="${l.id}"` : ""}><title>${esc(l.titulo)}</title><rect x="${x.toFixed(1)}" y="${(y - p.h).toFixed(1)}" width="${p.w.toFixed(1)}" height="${p.h.toFixed(1)}" rx="1.5" fill="${corDoLivro(l)}" stroke="rgba(0,0,0,.35)"/><path d="M${(x + 2).toFixed(1)} ${(y - p.h + 6).toFixed(1)}h${(p.w - 4).toFixed(1)}M${(x + 2).toFixed(1)} ${(y - 6).toFixed(1)}h${(p.w - 4).toFixed(1)}" stroke="rgba(255,255,255,.45)"/>${p.w >= 12 ? `<text transform="translate(${(x + p.w / 2 + 2.2).toFixed(1)} ${(y - 10).toFixed(1)}) rotate(-90)" font-size="6.4" fill="#fff" font-family="Instrument Sans,sans-serif">${esc(l.titulo.slice(0, Math.floor(p.h / 4.2)))}</text>` : ""}</g>`;
+        miolo += `<g class="lombada" ${d.meu ? `data-act="livro-abrir" data-id="${l.id}"` : ""}><title>${esc(l.titulo)}</title><rect x="${x.toFixed(1)}" y="${(y - p.h).toFixed(1)}" width="${p.w.toFixed(1)}" height="${p.h.toFixed(1)}" rx="1.5" fill="${corDoLivro(l)}" stroke="rgba(0,0,0,.35)"/><path d="M${(x + 2).toFixed(1)} ${(y - p.h + 6).toFixed(1)}h${(p.w - 4).toFixed(1)}M${(x + 2).toFixed(1)} ${(y - 6).toFixed(1)}h${(p.w - 4).toFixed(1)}" stroke="rgba(255,255,255,.45)"/>${p.w >= 12 ? `<text transform="translate(${(x + p.w / 2 + 2.2).toFixed(1)} ${(y - 10).toFixed(1)}) rotate(-90)" font-size="6.6" fill="#fff" font-family='${estiloCapa(l).fonte}'>${esc(l.titulo.slice(0, Math.floor(p.h / 4.2)))}</text>` : ""}</g>`;
       } else {
         miolo += `<g transform="translate(${(x + p.w / 2).toFixed(1)} ${base(i)})">${p.e.svg()}</g>`;
       }
@@ -142,8 +142,8 @@ function estanteSVG(d = minhaEstante()) {
     : "";
 
   return `<svg class="estante-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Estante com ${d.lidos.length} livros lidos">
-    <g class="parede">${fundo.svg(W, H)}</g>${corpo}${miolo}${pilha}
-    <g class="prumi-leitor" ${d.meu ? 'data-act="prumi-leitor"' : ""}>${leitor}${livroNaMao}</g>
+    ${opcoes.semParede ? "" : `<g class="parede">${fundo.svg(W, H)}</g>`}${corpo}${miolo}${pilha}
+    ${opcoes.semPrumi ? "" : `<g class="prumi-leitor" ${d.meu ? 'data-act="prumi-leitor"' : ""}>${leitor}${livroNaMao}</g>`}
   </svg>`;
 }
 
@@ -275,7 +275,7 @@ function decorarHTML() {
   const miniEnfeite = e =>
     `<svg viewBox="-20 -40 40 44" width="44" height="48" aria-hidden="true">${e.svg()}</svg>`;
   return `<span class="note">Você tem <b>${S.leitura.saldo}</b> páginas para gastar. Cada página lida vale 1; terminar um livro dá 50; uma resenha dá 20.</span>
-  <h3 class="h3">Móvel</h3><div class="shop pal">${MOVEIS.filter(doMundo)
+  <h3 class="h3">Estante</h3><div class="shop pal">${MOVEIS.filter(doMundo)
     .map(m =>
       botao(m, "movel", d.movel === m.id).replace(
         '<span class="sname">',
@@ -291,7 +291,27 @@ function decorarHTML() {
       )
     )
     .join("")}</div>
-  <h3 class="h3">Enfeites</h3><div class="shop">${ENFEITES.filter(doMundo)
+  ${Object.entries(LUGARES_QUARTO)
+    .map(([slot, lugar]) => {
+      const atual = (d.quarto || {})[slot] ?? QUARTO_PADRAO[slot];
+      const prev = i =>
+        slot === "chao"
+          ? `<svg class="swatch" viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice">${i.svg(60, 40)}</svg>`
+          : `<svg class="prev-quarto" viewBox="-4 -4 ${lugar.w + 8} ${lugar.h + 8}" aria-hidden="true">${i.svg()}</svg>`;
+      const itens = QUARTO.filter(i => i.slot === slot && doMundo(i));
+      const nenhum = ["poster", "tapete"].includes(slot)
+        ? `<button class="sitem ${!atual ? "on" : "own"}" data-act="quarto" data-slot="${slot}" data-id=""><span class="sname">Nenhum</span><span class="tag ${!atual ? "on" : ""}">${!atual ? "Usando" : "Usar"}</span></button>`
+        : "";
+      return `<h3 class="h3">${lugar.nome}</h3><div class="shop">${nenhum}${itens
+        .map(i =>
+          botao(i, "quarto", atual === i.id)
+            .replace('data-act="decor" data-tipo="quarto"', `data-act="quarto" data-slot="${slot}"`)
+            .replace('<span class="sname">', `${prev(i)}<span class="sname">`)
+        )
+        .join("")}</div>`;
+    })
+    .join("")}
+  <h3 class="h3">Enfeites da estante</h3><div class="shop">${ENFEITES.filter(doMundo)
     .map(e =>
       botao(e, "enfeite", d.enfeites.includes(e.id)).replace(
         '<span class="sname">',
@@ -308,7 +328,7 @@ function viewEstante() {
   const aberto = livroAberto && livro(livroAberto);
   let corpo = "";
   if (estanteTab === "estante") {
-    corpo = `<div class="estante-quadro">${estanteSVG()}</div>
+    corpo = `<div class="estante-quadro">${quartoSVG()}</div>
       ${aberto && estanteTab === "estante" ? detalheLivroHTML(aberto) : ""}
       <h2 class="h2">Lendo agora <span class="count">${lendo.length}</span></h2>
       ${lendo.length ? `<ul class="list">${lendo.map(cartaoLendoHTML).join("")}</ul>` : `<div class="empty">${textoMundo("vazioLeitura", "Nenhum livro aberto.")} <button class="btn small primary" data-act="estante-tab" data-t="adicionar">Adicionar um livro</button></div>`}`;
@@ -429,6 +449,30 @@ ACOES_EXTRAS["prumi-leitor"] = () => {
     3200
   );
   toast(l ? `${l.titulo}: ${progressoDe(l)}%` : "Adicione um livro pra eu ler junto", false, "happy");
+};
+// comprar ou usar uma parte do quarto (chão, janela, pôster, cama, tapete, luz)
+ACOES_EXTRAS.quarto = b => {
+  const slot = b.dataset.slot,
+    id = b.dataset.id;
+  const d = S.leitura.decor;
+  d.quarto = { ...QUARTO_PADRAO, ...(d.quarto || {}) };
+  if (!id) {
+    d.quarto[slot] = ""; // pôster e tapete podem ficar vazios
+    return commit();
+  }
+  const x = ITEM_QUARTO[id];
+  if (!x) return;
+  if (!temDecor(x)) {
+    if (x.ach)
+      return toast(`Lendário: libera com a conquista ${ACH[x.ach] ? ACH[x.ach].name : ""}`, false, "worried");
+    if (S.leitura.saldo < x.preco)
+      return toast(`Faltam ${x.preco - S.leitura.saldo} páginas. Bora ler!`, false, "worried");
+    S.leitura.saldo -= x.preco;
+    S.leitura.comprados.push(x.id);
+    toast(`${x.nome} é seu!`, false, "party");
+  }
+  d.quarto[slot] = x.id;
+  commit();
 };
 // comprar ou usar móvel, parede e enfeite
 ACOES_EXTRAS.decor = b => {
