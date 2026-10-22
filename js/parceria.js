@@ -84,11 +84,20 @@ function publicarPerfil(agora) {
   perfilTimer = setTimeout(
     async () => {
       const perfil = montarPerfil();
-      const json = JSON.stringify(perfil);
-      if (json === ultimoPerfilEnviado) return;
+      // Conta Firebase: perfil público mínimo + vitrine (só amigos leem). Artifact: o perfil completo, como antes.
+      const firebaseOn = typeof modoFirebase === "function" && modoFirebase();
+      const vitrine = firebaseOn ? montarVitrine() : null;
+      const json = JSON.stringify(firebaseOn ? { ...vitrine, visto: 0, codigo: perfil.codigo } : perfil);
+      if (json === ultimoPerfilEnviado && !(firebaseOn && agora)) return;
       ultimoPerfilEnviado = json;
       try {
-        await banco.doc("perfis/" + meuId).set({ ...perfil, atualizado: Date.now() });
+        if (firebaseOn) {
+          const { nome, usuario, codigo, persona, equip } = perfil;
+          await banco
+            .doc("perfis/" + meuId)
+            .set({ nome, usuario, codigo, persona, equip, atualizado: Date.now() });
+          await banco.doc("vitrines/" + meuId).set(vitrine);
+        } else await banco.doc("perfis/" + meuId).set({ ...perfil, atualizado: Date.now() });
       } catch (e) {
         ultimoPerfilEnviado = "";
       }
@@ -106,6 +115,8 @@ function iniciarParceria(db, uid) {
     persist();
   }
   publicarPerfil(true);
+  ouvirParceiro();
+  if (typeof modoFirebase === "function" && modoFirebase()) return; // com conta Google, pedidos de par chegam pela caixa de avisos
   // Quem está apontando para mim?
   db.collection("perfis")
     .where("parceiro", "==", uid)
@@ -118,7 +129,6 @@ function iniciarParceria(db, uid) {
       },
       () => {}
     );
-  ouvirParceiro();
 }
 
 function ouvirParceiro() {
@@ -128,9 +138,14 @@ function ouvirParceiro() {
   }
   parceiroDados = null;
   if (!banco || !S.parceria.id) return;
-  pararParceiro = banco.doc("perfis/" + S.parceria.id).onSnapshot(
+  const colecao = typeof modoFirebase === "function" && modoFirebase() ? "vitrines/" : "perfis/";
+  pararParceiro = banco.doc(colecao + S.parceria.id).onSnapshot(
     snap => {
-      parceiroDados = snap.exists ? snap.data() : null;
+      parceiroDados = snap.exists
+        ? typeof limparVitrine === "function" && colecao === "vitrines/"
+          ? limparVitrine(snap.data())
+          : snap.data()
+        : null;
       receberMimo();
       avisarRecadoNovo();
       softRender();
@@ -424,6 +439,14 @@ function parceriaHeroHTML() {
 
 /* Seção de parceria na aba Hábitos e social */
 function parceriaSecaoHTML() {
+  // Com conta Google: amigos de verdade (js/telas/amigos.js). O par é escolhido entre os amigos.
+  if (typeof modoFirebase === "function" && modoFirebase()) {
+    const n = amigosAceitos().length,
+      p = pedidosRecebidos().length;
+    return `<section class="block"><h2 class="h2">Amigos ${p ? `<span class="count">${p} ${p === 1 ? "pedido" : "pedidos"}</span>` : ""}</h2>
+      <button class="card amigos-atalho" data-tab="amigos"><span><b>${n} ${n === 1 ? "amigo" : "amigos"}</b>${parceriaAtiva() ? ` · seu par: <b>${esc(nomeParceiro())}</b>` : S.parceria.id ? " · pedido de par enviado" : ""}</span><span class="note">Toque para ver amigos, mandar convite e escolher seu par.</span></button>
+    </section>`;
+  }
   if (!banco) {
     return `<section class="block"><h2 class="h2">Parceria</h2><div class="empty"><strong>${textoMundo("conviteTitulo", "Junte seu Prumi com o de outra pessoa.")}</strong>${contaConfigurada() ? "Entre com Google em Ajustes. Depois é só passar seu código ou seu @ para a outra pessoa." : "Para isso, o Prumo precisa estar ligado a uma conta. A conta com Google chega em breve."}</div></section>`;
   }

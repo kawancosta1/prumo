@@ -32,7 +32,7 @@ const corDoLivro = l =>
 /** Capa do livro: a imagem da busca ou uma capa desenhada com o título. */
 function capaHTML(l, tam = 56) {
   const alt = Math.round(tam * 1.5);
-  if (l.capa)
+  if (l.capa && /^https:\/\//.test(l.capa))
     return `<img class="capa" src="${esc(l.capa)}" alt="" width="${tam}" height="${alt}" loading="lazy" referrerpolicy="no-referrer">`;
   return `<span class="capa desenhada" style="--c:${corDoLivro(l)};width:${tam}px;height:${alt}px"><b>${esc(l.titulo.slice(0, 40))}</b><small>${esc(l.autor.split(",")[0].slice(0, 24))}</small></span>`;
 }
@@ -50,10 +50,21 @@ const notaHTML = (l, interativa) =>
 const progressoDe = l => (l.paginas ? Math.round((l.pagina / l.paginas) * 100) : 0);
 
 /* ---------- desenho da estante ---------- */
-function estanteSVG() {
-  const decor = S.leitura.decor;
-  const movel = MOVEIS.find(m => m.id === decor.movel && doMundo(m)) || MOVEIS[0];
-  const fundo = FUNDOS.find(f => f.id === decor.fundo && doMundo(f)) || FUNDOS[0];
+/** Dados da minha estante. Para a estante de um amigo, a vitrine dele manda os mesmos campos. */
+const minhaEstante = () => ({
+  lidos: livrosEm("lido"),
+  lendo: [...livrosEm("lendo"), ...livrosEm("relendo")],
+  decor: S.leitura.decor,
+  equip: S.equip,
+  persona: S.persona,
+  meu: true
+});
+
+function estanteSVG(d = minhaEstante()) {
+  const decor = d.decor || { movel: "clara", fundo: "liso", enfeites: [] };
+  const doMundoDele = x => !x.mundo || x.mundo === d.persona;
+  const movel = MOVEIS.find(m => m.id === decor.movel && doMundoDele(m)) || MOVEIS[0];
+  const fundo = FUNDOS.find(f => f.id === decor.fundo && doMundoDele(f)) || FUNDOS[0];
   const W = 360,
     x0 = 30,
     x1 = 330,
@@ -61,7 +72,7 @@ function estanteSVG() {
     alturaFileira = 82;
   // o que vai nas prateleiras: livros lidos (lombadas) e depois os enfeites colocados
   const pecas = [
-    ...livrosEm("lido").map(l => ({
+    ...d.lidos.map(l => ({
       tipo: "livro",
       l,
       w: Math.max(10, Math.min(22, 7 + (l.paginas || 200) / 45)),
@@ -69,7 +80,7 @@ function estanteSVG() {
     })),
     ...decor.enfeites
       .map(id => ENFEITE[id])
-      .filter(e => e && doMundo(e) && temDecor(e))
+      .filter(e => e && doMundoDele(e) && (!d.meu || temDecor(e)))
       .map(e => ({ tipo: "enfeite", e, w: e.w + 6 }))
   ];
   // distribui as peças nas fileiras, da esquerda para a direita
@@ -94,7 +105,7 @@ function estanteSVG() {
       if (p.tipo === "livro") {
         const l = p.l,
           y = base(i);
-        miolo += `<g class="lombada" data-act="livro-abrir" data-id="${l.id}"><title>${esc(l.titulo)}</title><rect x="${x.toFixed(1)}" y="${(y - p.h).toFixed(1)}" width="${p.w.toFixed(1)}" height="${p.h.toFixed(1)}" rx="1.5" fill="${corDoLivro(l)}" stroke="rgba(0,0,0,.35)"/><path d="M${(x + 2).toFixed(1)} ${(y - p.h + 6).toFixed(1)}h${(p.w - 4).toFixed(1)}M${(x + 2).toFixed(1)} ${(y - 6).toFixed(1)}h${(p.w - 4).toFixed(1)}" stroke="rgba(255,255,255,.45)"/>${p.w >= 12 ? `<text transform="translate(${(x + p.w / 2 + 2.2).toFixed(1)} ${(y - 10).toFixed(1)}) rotate(-90)" font-size="6.4" fill="#fff" font-family="Instrument Sans,sans-serif">${esc(l.titulo.slice(0, Math.floor(p.h / 4.2)))}</text>` : ""}</g>`;
+        miolo += `<g class="lombada" ${d.meu ? `data-act="livro-abrir" data-id="${l.id}"` : ""}><title>${esc(l.titulo)}</title><rect x="${x.toFixed(1)}" y="${(y - p.h).toFixed(1)}" width="${p.w.toFixed(1)}" height="${p.h.toFixed(1)}" rx="1.5" fill="${corDoLivro(l)}" stroke="rgba(0,0,0,.35)"/><path d="M${(x + 2).toFixed(1)} ${(y - p.h + 6).toFixed(1)}h${(p.w - 4).toFixed(1)}M${(x + 2).toFixed(1)} ${(y - 6).toFixed(1)}h${(p.w - 4).toFixed(1)}" stroke="rgba(255,255,255,.45)"/>${p.w >= 12 ? `<text transform="translate(${(x + p.w / 2 + 2.2).toFixed(1)} ${(y - 10).toFixed(1)}) rotate(-90)" font-size="6.4" fill="#fff" font-family="Instrument Sans,sans-serif">${esc(l.titulo.slice(0, Math.floor(p.h / 4.2)))}</text>` : ""}</g>`;
       } else {
         miolo += `<g transform="translate(${(x + p.w / 2).toFixed(1)} ${base(i)})">${p.e.svg()}</g>`;
       }
@@ -112,27 +123,27 @@ function estanteSVG() {
   const corpo = `<rect x="${x0 - 10}" y="${topo}" width="${x1 - x0 + 20}" height="${H - topo - 18}" fill="${movel.fundo}" stroke="${movel.borda}" stroke-width="1.5"/><rect x="${x0}" y="${topo + 8}" width="${x1 - x0}" height="${H - topo - 34}" fill="rgba(0,0,0,.18)"/>${tabuas}<rect x="${x0 - 14}" y="${topo - 4}" width="${x1 - x0 + 28}" height="10" rx="2" fill="${movel.cor}" stroke="${movel.borda}"/><rect x="${x0 - 6}" y="${H - 18}" width="12" height="12" fill="${movel.borda}"/><rect x="${x1 - 6}" y="${H - 18}" width="12" height="12" fill="${movel.borda}"/>${movel.gotico ? `<path d="M${x0 - 14} ${topo - 4}L${W / 2} ${topo - 26}L${x1 + 14} ${topo - 4}" fill="${movel.fundo}" stroke="${movel.borda}" stroke-width="1.5"/>` : ""}`;
 
   // em cima: livros que você está lendo, deitados, e o Prumi lendo
-  const lendo = [...livrosEm("lendo"), ...livrosEm("relendo")].slice(0, 4);
+  const lendo = d.lendo.slice(0, 4);
   const pilha = lendo
     .map(
       (l, k) =>
-        `<g data-act="livro-abrir" data-id="${l.id}" class="lombada"><title>${esc(l.titulo)} · ${progressoDe(l)}%</title><rect x="${x0 + 6 + k * 2}" y="${topo - 14 - k * 9}" width="${70 - k * 4}" height="9" rx="1.5" fill="${corDoLivro(l)}" stroke="rgba(0,0,0,.35)"/><path d="M${x0 + 40 + k * 2} ${topo - 5 - k * 9}v8l3 -2.4 3 2.4v-8" fill="#C8102E"/></g>`
+        `<g ${d.meu ? `data-act="livro-abrir" data-id="${l.id}"` : ""} class="lombada"><title>${esc(l.titulo)}${l.paginas ? ` · ${progressoDe(l)}%` : ""}</title><rect x="${x0 + 6 + k * 2}" y="${topo - 14 - k * 9}" width="${70 - k * 4}" height="9" rx="1.5" fill="${corDoLivro(l)}" stroke="rgba(0,0,0,.35)"/><path d="M${x0 + 40 + k * 2} ${topo - 5 - k * 9}v8l3 -2.4 3 2.4v-8" fill="#C8102E"/></g>`
     )
     .join("");
-  const humor = calcularHumor().nivel.rosto;
+  const humor = d.meu ? calcularHumor().nivel.rosto : "happy";
   const leitor = prumi({
     mood: ["sad", "cry", "upset"].includes(humor) ? "sad" : lendo.length ? "focus" : "happy",
     size: 84,
-    eq: S.equip,
-    p: S.persona
+    eq: d.equip || {},
+    p: d.persona
   }).replace("<svg ", `<svg x="${W / 2 + 34}" y="${topo - 110}" `);
   const livroNaMao = lendo.length
     ? `<path d="M${W / 2 + 58} ${topo - 34}l18 -4 18 4v14l-18 -4 -18 4z" fill="#FBF7EC" stroke="var(--ink)" stroke-width="1.2"/><path d="M${W / 2 + 76} ${topo - 38}v14" stroke="var(--ink)"/>`
     : "";
 
-  return `<svg class="estante-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Sua estante com ${livrosEm("lido").length} livros lidos">
+  return `<svg class="estante-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Estante com ${d.lidos.length} livros lidos">
     <g class="parede">${fundo.svg(W, H)}</g>${corpo}${miolo}${pilha}
-    <g class="prumi-leitor" data-act="prumi-leitor">${leitor}${livroNaMao}</g>
+    <g class="prumi-leitor" ${d.meu ? 'data-act="prumi-leitor"' : ""}>${leitor}${livroNaMao}</g>
   </svg>`;
 }
 

@@ -11,6 +11,7 @@ const perfilPadrao = () => ({
   status: "online", // MSN: online, ausente, ocupado ou offline (aparecer offline)
   ouvindo: "", // "Ouvindo:" do MSN
   usuario: "", // nome de usuário (@), escolhido em Ajustes quando há conta
+  top8: [], // uids dos amigos no Top 8
   visitas: 0, // contador de visitas
   layout: "classico", // fundo do perfil
   depoAceitos: [], // depoimentos que você aprovou
@@ -43,7 +44,7 @@ const blank = () => ({
   cups: [200, 300, 500, 750],
   wake: "07:00",
   sleep: "23:00",
-  name: "Kawan",
+  name: "",
   gender: "m",
   onboarded: false,
   welcomed: false,
@@ -61,11 +62,13 @@ const blank = () => ({
   paid: {},
   stats: { tasks: 0, water: 0, focus: 0, reviews: 0, talked: 0, perfect: 0, closed: 0 },
   carinho: {},
-  perfil: { sobre: "", subnick: "" }, // perfil estilo MySpace (o resto dos campos vem em perfilPadrao)
+  perfil: perfilPadrao(), // perfil estilo MySpace/Orkut/MSN
   fotolog: [], // fotos do Fotolog, uma por dia fechado
   sons: { chuva: true, pagina: true }, // sons do clima no emo (js/sons.js)
   noites: [], // dias em que o app foi usado depois das 22h
   livros: [], // Estante de leitura (js/leitura.js)
+  privacidade: { estante: true, fotolog: true, humor: true, status: true }, // o que os amigos veem
+  avisosCelular: false, // notificações no celular (js/pwa.js)
   leitura: leituraPadrao(),
   parceria: { id: null, tipo: "namoro" },
   codigo: "",
@@ -145,7 +148,14 @@ function normalize(x) {
   if (!b.carinho || typeof b.carinho !== "object") b.carinho = {};
   if (!b.perfil || typeof b.perfil !== "object") b.perfil = {};
   b.perfil = { ...perfilPadrao(), ...b.perfil };
-  for (const k of ["depoAceitos", "depoVistos"]) if (!Array.isArray(b.perfil[k])) b.perfil[k] = [];
+  for (const k of ["depoAceitos", "depoVistos", "top8"]) if (!Array.isArray(b.perfil[k])) b.perfil[k] = [];
+  b.privacidade = {
+    estante: true,
+    fotolog: true,
+    humor: true,
+    status: true,
+    ...(b.privacidade && typeof b.privacidade === "object" ? b.privacidade : {})
+  };
   if (!Array.isArray(b.fotolog)) b.fotolog = [];
   if (!Array.isArray(b.noites)) b.noites = [];
   if (!Array.isArray(b.livros)) b.livros = [];
@@ -291,6 +301,7 @@ async function connect() {
 function ligarBanco(db, uid, caminho) {
   ref = db.doc(caminho);
   iniciarParceria(db, uid);
+  iniciarAmigos(); // amigos, avisos e vitrine (só com a conta Google; js/amigos.js)
   ref.onSnapshot(
     snap => {
       if (snap.metadata && snap.metadata.hasPendingWrites) return;

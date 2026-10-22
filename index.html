@@ -20,6 +20,8 @@
       <div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 2v13"/><path d="M8 15l4 7 4-7z" fill="currentColor"/></svg>Prumo</div>
       <div class="right">
         <div class="sync" id="sync" data-tab="ajustes" role="button" tabindex="0"><i></i><span>Carregando…</span></div>
+        <button class="icon topo-bt" id="amigos-bt" data-tab="amigos" aria-label="Amigos" title="Amigos" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/></svg></button>
+        <button class="icon topo-bt" id="sino" data-tab="avisos" aria-label="Avisos" title="Avisos" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><b id="sino-n" class="sino-n" hidden>0</b></button>
         <button class="coins" id="coins" data-tab="prumi" aria-label="Gotas"><svg class="drop" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5s-6.5 7.2-6.5 12a6.5 6.5 0 0 0 13 0c0-4.8-6.5-12-6.5-12z"/></svg><b id="coinsn">0</b></button>
         <button class="icon" id="gear" data-tab="ajustes" aria-label="Ajustes" title="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
       </div>
@@ -45,7 +47,7 @@
 <script src="js/util.js?v=6"></script>
 <script src="js/firebase-config.js?v=8"></script>
 <script src="js/captura-rapida.js"></script>
-<script src="js/estado.js?v=7"></script>
+<script src="js/estado.js?v=9"></script>
 <script src="js/calculos.js"></script>
 <script src="js/componentes.js"></script>
 <script src="js/mascote/desenho.js?v=6"></script>
@@ -55,7 +57,7 @@
 <script src="js/temas.js?v=6"></script>
 <script src="js/mundos/emo.js?v=6"></script>
 <script src="js/mundos/emo-roupas.js?v=6"></script>
-<script src="js/mundos/emo-efeitos.js?v=6"></script>
+<script src="js/mundos/emo-efeitos.js?v=9"></script>
 <script src="js/mundos/rock.js"></script>
 <script src="js/mundos/sertanejo.js"></script>
 <script src="js/mundos/cleanboy.js"></script>
@@ -79,20 +81,23 @@
 <script src="js/efeitos.js"></script>
 <script src="js/sons.js?v=6"></script>
 <script src="js/humor.js"></script>
-<script src="js/parceria.js?v=7"></script>
-<script src="js/internet2000.js?v=6"></script>
-<script src="js/conta.js?v=8"></script>
+<script src="js/parceria.js?v=9"></script>
+<script src="js/internet2000.js?v=9"></script>
+<script src="js/conta.js?v=9"></script>
+<script src="js/amigos.js?v=9"></script>
+<script src="js/pwa.js?v=9"></script>
 <script src="js/telas/hoje.js?v=6"></script>
 <script src="js/telas/estudos.js?v=6"></script>
 <script src="js/telas/agua-dieta.js"></script>
-<script src="js/telas/habitos-social.js?v=6"></script>
-<script src="js/telas/perfil.js?v=6"></script>
-<script src="js/telas/estante.js?v=7"></script>
+<script src="js/telas/habitos-social.js?v=9"></script>
+<script src="js/telas/perfil.js?v=9"></script>
+<script src="js/telas/estante.js?v=9"></script>
+<script src="js/telas/amigos.js?v=9"></script>
 <script src="js/telas/prumi.js?v=6"></script>
-<script src="js/telas/ajustes.js?v=7"></script>
+<script src="js/telas/ajustes.js?v=9"></script>
 <script src="js/telas/boas-vindas.js?v=6"></script>
-<script src="js/render.js?v=7"></script>
+<script src="js/render.js?v=9"></script>
 <script src="js/acoes.js?v=6"></script>
 <script src="js/tempo.js?v=6"></script>
 <script src="js/exemplos.js"></script>
-<script src="js/inicio.js"></script>
+<script src="js/inicio.js?v=9"></script>

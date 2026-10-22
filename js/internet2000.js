@@ -197,6 +197,13 @@ function msnBlocoHTML() {
 }
 
 function depoimentosBlocoHTML() {
+  if (typeof modoFirebase === "function" && modoFirebase()) {
+    const pend = depoimentosDaCaixa();
+    return `<div class="ms-bloco"><span class="ms-titulo">Depoimentos</span>
+      ${pend.map(d => `<div class="depo pendente"><span class="note"><b>${esc(d.deNome || nomeDe(d.de))}</b> escreveu um depoimento pra você. Aceitar?</span><p>${esc(d.texto)}</p><div class="row"><button class="btn small primary" data-act="depo-caixa" data-id="${esc(d.id)}" data-ok="1">Aceitar</button><button class="btn small ghost" data-act="depo-caixa" data-id="${esc(d.id)}" data-ok="0">Recusar</button></div></div>`).join("")}
+      ${S.perfil.depoAceitos.length ? `<ul class="recados depos">${S.perfil.depoAceitos.map(d => `<li><b>${esc(d.de)}</b> <span class="note">${fmtShort(ymd(new Date(d.em)))}</span><p>${esc(d.texto)}</p></li>`).join("")}</ul>` : pend.length ? "" : `<span class="note">Nenhum depoimento ainda. Seus amigos escrevem pelo seu perfil.</span>`}
+    </div>`;
+  }
   const amigo = parceriaAtiva();
   const pend = amigo ? depoimentosPendentes() : [];
   const aceitos = S.perfil.depoAceitos;

@@ -10,6 +10,8 @@ const VIEWS = {
   social: viewSocial,
   prumi: viewPrumi,
   estante: viewEstante,
+  amigos: viewAmigos,
+  avisos: viewAvisos,
   ajustes: viewAjustes
 };
 
@@ -47,6 +49,14 @@ function render() {
     .querySelectorAll("#tabs button")
     .forEach(b => b.setAttribute("aria-current", b.dataset.tab === tab ? "page" : "false"));
   document.getElementById("gear").setAttribute("aria-current", tab === "ajustes" ? "page" : "false");
+  for (const [id, t] of [
+    ["sino", "avisos"],
+    ["amigos-bt", "amigos"]
+  ]) {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute("aria-current", tab === t ? "page" : "false");
+  }
+  if (typeof atualizarSino === "function") atualizarSino();
   placeInd();
   const main = document.getElementById("main");
   main.classList.remove("enter");

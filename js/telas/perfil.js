@@ -32,9 +32,21 @@ function perfilHTML() {
   const L = levelOf(S.xp);
   const musica = musicasDoMundo()[h.nivel.rosto] || MUSICAS_PADRAO.idle;
   const amigo = parceriaAtiva() ? parceiroDados : null;
-  const recados = recadosRecebidos();
+  const firebaseOn = typeof modoFirebase === "function" && modoFirebase();
+  // com conta Google, os recados chegam de todos os amigos pela caixa de avisos
+  const recados = firebaseOn
+    ? recadosDaCaixa().map(r => ({ em: r.em, texto: r.texto, nome: r.deNome || nomeDe(r.de) }))
+    : recadosRecebidos().map(r => ({ ...r, nome: nomeParceiro() }));
   // Top 8: o parceiro ocupa o primeiro lugar; o resto fica esperando novos amigos
+  const top8Amigos = firebaseOn ? S.perfil.top8.filter(ehAmigo) : [];
   const top8 = Array.from({ length: 8 }, (_, i) => {
+    if (firebaseOn) {
+      const uid = top8Amigos[i];
+      if (!uid)
+        return `<button class="top8-item vazio" data-tab="amigos"><span class="top8-mais">+</span><span>Escolher</span></button>`;
+      const v = (amigosInfo[uid] || {}).vitrine || {};
+      return `<button class="top8-item" data-act="amigo-abrir" data-id="${esc(uid)}">${prumi({ mood: "happy", size: 52, eq: v.equip || {}, p: mundoOk(v.persona) })}<span>${esc(nomeDe(uid))}</span></button>`;
+    }
     if (i === 0 && amigo) {
       return `<div class="top8-item">${prumi({ mood: "happy", size: 52, eq: amigo.equip || {}, p: amigo.persona })}<span>${esc(nomeParceiro())}</span></div>`;
     }
@@ -79,10 +91,14 @@ function perfilHTML() {
     <div class="ms-bloco">
       <span class="ms-titulo">Recados</span>
       ${
-        amigo
-          ? `<form class="row" data-form="recado"><input id="recado-txt" type="text" maxlength="240" placeholder="Deixe um recado para ${esc(nomeParceiro())}" style="flex:1" autocomplete="off" required><button class="btn small primary" type="submit">Enviar</button></form>
-        ${recados.length ? `<ul class="recados">${recados.map(r => `<li><b>${esc(nomeParceiro())}</b> <span class="note">${fmtShort(ymd(new Date(r.em)))}</span><p>${esc(r.texto)}</p></li>`).join("")}</ul>` : `<span class="note">Nenhum recado ainda.</span>`}`
-          : `<span class="note">Conecte uma parceria (aba Hábitos e social) para trocar recados.</span>`
+        firebaseOn
+          ? recados.length
+            ? `<ul class="recados">${recados.map(r => `<li><b>${esc(r.nome)}</b> <span class="note">${fmtShort(ymd(new Date(r.em)))}</span><p>${esc(r.texto)}</p></li>`).join("")}</ul>`
+            : `<span class="note">Nenhum recado ainda. Seus amigos deixam recados pelo seu perfil.</span>`
+          : amigo
+            ? `<form class="row" data-form="recado"><input id="recado-txt" type="text" maxlength="240" placeholder="Deixe um recado para ${esc(nomeParceiro())}" style="flex:1" autocomplete="off" required><button class="btn small primary" type="submit">Enviar</button></form>
+        ${recados.length ? `<ul class="recados">${recados.map(r => `<li><b>${esc(r.nome)}</b> <span class="note">${fmtShort(ymd(new Date(r.em)))}</span><p>${esc(r.texto)}</p></li>`).join("")}</ul>` : `<span class="note">Nenhum recado ainda.</span>`}`
+            : `<span class="note">Conecte uma parceria (aba Hábitos e social) para trocar recados.</span>`
       }
     </div>
 

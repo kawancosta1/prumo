@@ -247,7 +247,11 @@ MUNDO_FX.emo = {
     // estante de leitura
     notaIcone: "♥",
     livroLido: "Terminou. Mais uma história pra chorar junto =] <b>+50 páginas</b>.",
-    vazioLeitura: "Nenhum livro aberto. Até vampiro lê no caixão."
+    vazioLeitura: "Nenhum livro aberto. Até vampiro lê no caixão.",
+    // amigos
+    pedidoAmizade: "Pedido mandado. Agora é esperar ela abrir a janela.",
+    pedirPar: "Ser meu par (até a eternidade)",
+    conviteTexto: "Vem pro meu Top 8 no Prumo =]"
   },
 
   // Hábitos sugeridos na aba Hábitos (um toque adiciona)

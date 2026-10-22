@@ -59,6 +59,10 @@ async function iniciarConta() {
       });
     });
     contaUsuario = user;
+    if (user && user.displayName && (!S.name || S.name === "Kawan")) {
+      S.name = user.displayName.split(" ")[0].slice(0, 30); // o Prumi chama a pessoa pelo primeiro nome
+      persist();
+    }
     softRender();
     return user ? { db, uid: user.uid } : null;
   } catch (e) {
@@ -139,11 +143,22 @@ function contaHTML() {
   if (!contaUsuario)
     return `<div class="setrow"><div class="lbl"><b>Conta</b><span class="note">Entre para guardar tudo na nuvem, usar no celular e no PC e ter amigos no Prumo.</span></div><button class="btn primary" data-act="conta-entrar">Entrar com Google</button></div>`;
   return `<div class="setrow"><div class="lbl"><b>${esc(contaUsuario.displayName || "Conta Google")}</b><span class="note">${esc(contaUsuario.email || "")} · sincronizado</span></div><button class="btn small ghost" data-act="conta-sair">Sair</button></div>
+    <div class="setrow"><div class="lbl"><b>Avisos no celular</b><span class="note">Notifica quando um amigo manda algo e o Prumo está em segundo plano.</span></div><button class="btn small ${S.avisosCelular ? "" : "ghost"}" data-act="avisos-celular">${S.avisosCelular ? "Ligados" : "Desligados"}</button></div>
+    ${typeof jaInstalado === "function" && !jaInstalado() ? `<div class="setrow"><div class="lbl"><b>Instalar o Prumo</b><span class="note">Ícone na tela inicial, abre em tela cheia e funciona sem internet.</span></div><button class="btn small" data-act="instalar">Instalar</button></div>` : ""}
+    <div class="setrow"><div class="lbl"><b>Seus dados</b><span class="note">Baixe tudo num arquivo ou apague a conta. Apagar tira você da nuvem e dos amigos; neste aparelho os dados continuam.</span></div><div class="row" style="gap:6px"><button class="btn small" data-act="export">Baixar meus dados</button><button class="btn small ghost danger" data-act="conta-apagar">Apagar conta</button></div></div>
     <div class="setrow"><div class="lbl"><b>Nome de usuário</b><span class="note">Seus amigos te acham por ele.</span></div><form class="row" data-form="conta-usuario" style="gap:6px"><input id="conta-usuario" type="text" maxlength="21" value="${S.perfil.usuario ? "@" + esc(S.perfil.usuario) : ""}" placeholder="@seunome" style="width:140px" autocomplete="off" autocapitalize="off"><button class="btn small" type="submit">Salvar</button></form></div>`;
 }
 
 ACOES_EXTRAS["conta-entrar"] = () => entrarComGoogle();
 ACOES_EXTRAS["conta-sair"] = () => sairDaConta();
+ACOES_EXTRAS["conta-apagar"] = b => {
+  if (!b.dataset.certeza) {
+    b.dataset.certeza = "1";
+    b.textContent = "Toque de novo para apagar de vez";
+    return;
+  }
+  apagarConta();
+};
 FORMS_EXTRAS["conta-usuario"] = () => {
   escolherUsuario(getV("conta-usuario"));
 };

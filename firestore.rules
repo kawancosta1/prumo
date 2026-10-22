@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // Regras do Firestore do Prumo. Cole tudo isto em: Console do Firebase → Firestore → Regras → Publicar.
-// Ideia geral: cada pessoa só escreve no que é dela.
+// Ideia geral: cada pessoa só escreve no que é dela, e só amigos veem a vitrine e mandam coisas na caixa.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -11,22 +11,36 @@ service cloud.firestore {
     function souEu(uid) {
       return logado() && request.auth.uid == uid;
     }
+    // id da amizade: os dois uids em ordem, separados por _
+    function parId(a, b) {
+      return a < b ? a + '_' + b : b + '_' + a;
+    }
+    function caminhoAmizade(uid) {
+      return /databases/$(database)/documents/amizades/$(parId(request.auth.uid, uid));
+    }
+    function somosAmigos(uid) {
+      return logado() && exists(caminhoAmizade(uid)) && get(caminhoAmizade(uid)).data.estado == 'aceita';
+    }
 
-    // Rotina completa (tarefas, água, hábitos, diário, estante...): só o dono lê e escreve
+    // Rotina completa (tarefas, água, hábitos, diário, estante...): só o dono
     match /usuarios/{uid}/{documento=**} {
       allow read, write: if souEu(uid);
     }
 
-    // Perfil público: quem está logado pode ler (para achar pelo código e ver o par);
-    // só o dono escreve. Tamanho limitado para ninguém lotar o banco.
+    // Perfil público mínimo (nome, @, código, mundo, roupas): para achar a pessoa e mandar pedido
     match /perfis/{uid} {
       allow read: if logado();
       allow create, update: if souEu(uid) && request.resource.data.size() < 40;
       allow delete: if souEu(uid);
     }
 
-    // Nome de usuário (@): cada @ aponta para um uid. Só dá para criar um @ livre, para você mesmo,
-    // e só o dono pode apagar.
+    // Vitrine: o que os amigos veem (humor, estante, Fotolog, status do MSN...)
+    match /vitrines/{uid} {
+      allow read: if souEu(uid) || somosAmigos(uid);
+      allow write: if souEu(uid);
+    }
+
+    // Nome de usuário (@): cada @ aponta para um uid; só dá para pegar um @ livre, para você mesmo
     match /nomes/{nome} {
       allow read: if logado();
       allow create: if logado()
@@ -34,6 +48,43 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.keys().hasOnly(['uid']);
       allow delete: if logado() && resource.data.uid == request.auth.uid;
+    }
+
+    // Amizades: pedido, aceite, bloqueio
+    match /amizades/{id} {
+      allow read: if logado() && request.auth.uid in resource.data.uids;
+      allow create: if logado()
+        && request.resource.data.de == request.auth.uid
+        && request.resource.data.uids.size() == 2
+        && request.auth.uid in request.resource.data.uids
+        && id == parId(request.resource.data.uids[0], request.resource.data.uids[1])
+        && (request.resource.data.estado == 'pendente'
+            || (request.resource.data.estado == 'bloqueada' && request.resource.data.bloqueadoPor == request.auth.uid));
+      allow update: if logado()
+        && request.auth.uid in resource.data.uids
+        && request.resource.data.uids == resource.data.uids
+        && request.resource.data.de == resource.data.de
+        && (
+          // aceitar: só quem recebeu o pedido
+          (resource.data.estado == 'pendente' && request.resource.data.estado == 'aceita' && request.auth.uid != resource.data.de)
+          // bloquear: qualquer um dos dois, em nome de si mesmo
+          || (request.resource.data.estado == 'bloqueada' && request.resource.data.bloqueadoPor == request.auth.uid && resource.data.estado != 'bloqueada')
+        );
+      // desfazer amizade ou recusar: qualquer um dos dois; desbloquear: só quem bloqueou
+      allow delete: if logado()
+        && request.auth.uid in resource.data.uids
+        && (resource.data.estado != 'bloqueada' || resource.data.bloqueadoPor == request.auth.uid);
+    }
+
+    // Caixa de avisos: amigos mandam recados, depoimentos, mimos, pedidos de par e visitas; só o dono lê
+    match /caixa/{uid}/itens/{item} {
+      allow read, update, delete: if souEu(uid);
+      allow create: if somosAmigos(uid)
+        && request.resource.data.de == request.auth.uid
+        && request.resource.data.tipo in ['recado', 'depoimento', 'mimo', 'par', 'visita']
+        && request.resource.data.texto is string
+        && request.resource.data.texto.size() <= 600
+        && request.resource.data.visto == false;
     }
 
     // Tudo o que não está listado acima fica fechado
