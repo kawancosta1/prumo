@@ -9,6 +9,7 @@ PERSONAS.emo = {
   name: "Emo",
   desc: "Sensível, dramático, meio vampiro e leal até o fim.",
   sad: "Você me esqueceu... igual todo mundo esquece.",
+  placeholder: "O que fazer antes do sol nascer?",
   starter: ["franja", "moletom_preto"],
   hi: [
     "Oi{nome}... mais um dia nesse mundo cinza. Mas tem <b>{n}</b> tarefas, então vamos.",
@@ -895,3 +896,32 @@ ITEMS.push(
       `<g class="wings"><path d="M26 62Q10 40 -4 44Q4 52 0 58Q8 58 6 66Q14 64 14 72Q20 68 26 74Z" fill="#141416" ${O}/><path d="M94 62Q110 40 124 44Q116 52 120 58Q112 58 114 66Q106 64 106 72Q100 68 94 74Z" fill="#141416" ${O}/></g>`
   }
 );
+
+/* ---------- efeitos especiais do mundo emo ---------- */
+/* A decoração visual (morcegos, presinhas, mordidas...) fica em estilos/mundos/emo.css */
+MUNDO_FX.emo = {
+  // Ao trocar de aba, escorre sangue do topo da tela
+  trocaAba() {
+    const antigo = document.getElementById("sangue");
+    if (antigo) antigo.remove();
+    const camada = document.createElement("div");
+    camada.id = "sangue";
+    camada.setAttribute("aria-hidden", "true");
+    let gotas = "";
+    for (let i = 0; i < 16; i++) {
+      const x = Math.round(Math.random() * 100); // posição na largura (%)
+      const largura = 6 + Math.round(Math.random() * 12); // px
+      const comprimento = 30 + Math.round(Math.random() * 130); // px
+      const atraso = (Math.random() * 0.25).toFixed(2); // s
+      gotas += `<i style="left:${x}%;width:${largura}px;height:${comprimento}px;animation-delay:${atraso}s"></i>`;
+    }
+    camada.innerHTML = gotas;
+    document.body.appendChild(camada);
+    setTimeout(() => camada.remove(), 1700);
+  },
+  // Confete do emo: morcegos, gotas de sangue e pétalas de rosa
+  confete: {
+    cores: ["#8A0F22", "#B3122E", "#141016", "#5B2E7A", "#E0314F"],
+    formas: ["morcego", "morcego", "gota", "petala"]
+  }
+};

@@ -13,9 +13,13 @@ let parts = [],
 function confetti(x, y, n = 24, power = 1, spread = Math.PI * 0.9) {
   if (RM || !fctx) return;
   const cs = getComputedStyle(document.documentElement),
-    cols = ["--accent", "--dieta", "--social", "--water", "--warn"].map(
-      v => cs.getPropertyValue(v).trim() || "#2340C4"
-    );
+    estilo = (MUNDO_FX[S.persona] && MUNDO_FX[S.persona].confete) || null, // confete próprio do mundo
+    cols = estilo
+      ? estilo.cores
+      : ["--accent", "--dieta", "--social", "--water", "--warn"].map(
+          v => cs.getPropertyValue(v).trim() || "#2340C4"
+        ),
+    formas = estilo ? estilo.formas : ["ret", "ret", "redondo"];
   for (let i = 0; i < n; i++) {
     const a = -Math.PI / 2 + (Math.random() - 0.5) * spread,
       v = (3 + Math.random() * 6) * power;
@@ -32,7 +36,7 @@ function confetti(x, y, n = 24, power = 1, spread = Math.PI * 0.9) {
       c: cols[i % cols.length],
       life: 0,
       max: 60 + Math.random() * 50,
-      round: Math.random() < 0.3
+      forma: formas[Math.floor(Math.random() * formas.length)]
     });
   }
   if (!fxRunning) {
@@ -64,11 +68,7 @@ function fxLoop() {
     fctx.translate(p.x, p.y);
     fctx.rotate(p.r);
     fctx.fillStyle = p.c;
-    if (p.round) {
-      fctx.beginPath();
-      fctx.arc(0, 0, p.w / 2.4, 0, 6.3);
-      fctx.fill();
-    } else fctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.life / 6)) + 1);
+    desenharParticula(p);
     fctx.restore();
   }
   if (parts.length) requestAnimationFrame(fxLoop);
@@ -76,6 +76,26 @@ function fxLoop() {
     fxRunning = false;
     fctx.clearRect(0, 0, W, H);
   }
+}
+
+/* Formas do confete: "ret" (retângulo), "redondo", "morcego", "gota", "petala" */
+const FORMAS_CONFETE = {
+  morcego: new Path2D(
+    "M0 -3Q2.5 -8 3.5 -3.5Q9 -8.5 15 -4Q12 0 13 4.5Q9 2 7 5.5Q4 2.5 2 4.5Q1 2.5 0 3.5Q-1 2.5 -2 4.5Q-4 2.5 -7 5.5Q-9 2 -13 4.5Q-12 0 -15 -4Q-9 -8.5 -3.5 -3.5Q-2.5 -8 0 -3Z"
+  ),
+  gota: new Path2D("M0 -6Q5 0 3.8 3A3.8 3.8 0 0 1 -3.8 3Q-5 0 0 -6Z"),
+  petala: new Path2D("M0 -6Q5 -2 0 6Q-5 -2 0 -6Z")
+};
+function desenharParticula(p) {
+  if (p.forma === "redondo") {
+    fctx.beginPath();
+    fctx.arc(0, 0, p.w / 2.4, 0, 6.3);
+    fctx.fill();
+  } else if (FORMAS_CONFETE[p.forma]) {
+    const escala = p.forma === "morcego" ? 0.55 + p.w / 20 : 0.8 + p.w / 12;
+    fctx.scale(escala, escala * (p.forma === "morcego" ? Math.abs(Math.cos(p.life / 4)) * 0.7 + 0.3 : 1));
+    fctx.fill(FORMAS_CONFETE[p.forma]);
+  } else fctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.life / 6)) + 1);
 }
 
 function bigConfetti() {

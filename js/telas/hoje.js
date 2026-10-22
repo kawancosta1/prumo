@@ -77,7 +77,7 @@ function viewHoje() {
   </section>
   <section class="block">
     <form class="add quick" data-form="quick">
-      <div class="row1"><input id="q" type="text" placeholder="O que você precisa fazer?" autocomplete="off" required value="${esc(qp)}"><button class="btn primary" type="submit">Adicionar</button></div>
+      <div class="row1"><input id="q" type="text" placeholder="${esc(P().placeholder || "O que você precisa fazer?")}" autocomplete="off" required value="${esc(qp)}"><button class="btn primary" type="submit">Adicionar</button></div>
       <div class="parsed" id="qparsed">${parsedPills(parseQuick(qp, selDay), qp)}</div>
       <div class="hint">Escreva do seu jeito: <code>revisar cálculo amanhã 19h #estudo !1</code> · <code>academia toda segunda 7h</code></div>
     </form>

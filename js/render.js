@@ -52,6 +52,8 @@ function render() {
   if (fx.enter && !RM) {
     void main.offsetWidth;
     main.classList.add("enter");
+    const efeitoMundo = MUNDO_FX[S.persona];
+    if (efeitoMundo && efeitoMundo.trocaAba) efeitoMundo.trocaAba(); // ex.: sangue escorrendo no emo
   }
   main.innerHTML = VIEWS[tab]();
   updateMascots(false);

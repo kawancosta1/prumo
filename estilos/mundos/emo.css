@@ -1,0 +1,283 @@
+/*
+  Decoração do mundo Emo (vampiros, sangue, morcegos).
+  Tudo aqui só vale quando a personalidade é emo: html[data-mundo="emo"].
+  As cores de sangue usam --accent, então acompanham o tema escolhido (Desfile, Vinho tinto...).
+*/
+html[data-mundo="emo"] {
+  --sangue: var(--accent);
+  --sangue-escuro: color-mix(in srgb, var(--accent) 60%, #000);
+}
+
+/* ---------- Fundo: vinheta escura nas bordas + morcegos voando bem devagar ---------- */
+html[data-mundo="emo"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='300'%3E%3Cg fill='%23000' opacity='.18'%3E%3Cpath transform='translate(60 60) scale(1.3)' d='M0 -3Q2.5 -8 3.5 -3.5Q9 -8.5 15 -4Q12 0 13 4.5Q9 2 7 5.5Q4 2.5 2 4.5Q1 2.5 0 3.5Q-1 2.5 -2 4.5Q-4 2.5 -7 5.5Q-9 2 -13 4.5Q-12 0 -15 -4Q-9 -8.5 -3.5 -3.5Q-2.5 -8 0 -3Z'/%3E%3Cpath transform='translate(300 140) scale(.9)' d='M0 -3Q2.5 -8 3.5 -3.5Q9 -8.5 15 -4Q12 0 13 4.5Q9 2 7 5.5Q4 2.5 2 4.5Q1 2.5 0 3.5Q-1 2.5 -2 4.5Q-4 2.5 -7 5.5Q-9 2 -13 4.5Q-12 0 -15 -4Q-9 -8.5 -3.5 -3.5Q-2.5 -8 0 -3Z'/%3E%3Cpath transform='translate(180 250) scale(.7)' d='M0 -3Q2.5 -8 3.5 -3.5Q9 -8.5 15 -4Q12 0 13 4.5Q9 2 7 5.5Q4 2.5 2 4.5Q1 2.5 0 3.5Q-1 2.5 -2 4.5Q-4 2.5 -7 5.5Q-9 2 -13 4.5Q-12 0 -15 -4Q-9 -8.5 -3.5 -3.5Q-2.5 -8 0 -3Z'/%3E%3C/g%3E%3C/svg%3E")
+      0 0 / 420px 300px repeat,
+    radial-gradient(120% 90% at 50% 40%, transparent 55%, color-mix(in srgb, #000 22%, transparent) 100%);
+  animation: emoMorcegos 90s linear infinite;
+}
+@keyframes emoMorcegos {
+  to {
+    background-position:
+      -420px -300px,
+      0 0;
+  }
+}
+
+/* ---------- Sangue escorrendo ao trocar de aba (criado por MUNDO_FX.emo.trocaAba) ---------- */
+#sangue {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 0;
+  z-index: 55;
+  pointer-events: none;
+  animation: emoSangueSome 1.7s ease-in forwards;
+}
+#sangue::before {
+  /* faixa do topo, com a borda de baixo ondulada */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(12px + env(safe-area-inset-top, 0px));
+  background: var(--sangue-escuro);
+  -webkit-mask: radial-gradient(10px 8px at 10px 100%, transparent 98%, #000) 0 0 / 20px 100% repeat-x;
+  mask: radial-gradient(10px 8px at 10px 100%, transparent 98%, #000) 0 0 / 20px 100% repeat-x;
+  animation: emoFaixa 1.7s ease-out forwards;
+}
+#sangue i {
+  position: absolute;
+  top: env(safe-area-inset-top, 0px);
+  border-radius: 0 0 99px 99px;
+  background: linear-gradient(var(--sangue-escuro), var(--sangue));
+  transform-origin: top;
+  transform: scaleY(0);
+  animation: emoEscorre 1.1s cubic-bezier(0.5, 0, 0.7, 1) forwards;
+}
+#sangue i::after {
+  /* a gota redonda na ponta */
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 150%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  background: var(--sangue);
+}
+@keyframes emoEscorre {
+  0% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+@keyframes emoFaixa {
+  from {
+    transform: translateY(-100%);
+  }
+  20% {
+    transform: none;
+  }
+}
+@keyframes emoSangueSome {
+  0%,
+  65% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Gota pingando do nome Prumo, no topo ---------- */
+html[data-mundo="emo"] .h1 {
+  position: relative;
+  letter-spacing: 0.01em;
+}
+html[data-mundo="emo"] .brand::after {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 13px;
+  margin-left: 6px;
+  align-self: flex-end;
+  margin-bottom: 4px;
+  background: var(--sangue);
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  clip-path: polygon(50% 0, 100% 55%, 100% 100%, 0 100%, 0 55%);
+  animation: emoPinga 3.2s ease-in infinite;
+}
+@keyframes emoPinga {
+  0%,
+  60% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  90% {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+  91%,
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+
+/* ---------- Cartão do Prumi e palco: borda de cima com sangue escorrendo ---------- */
+html[data-mundo="emo"] .herobox,
+html[data-mundo="emo"] .stage {
+  position: relative;
+  border-color: color-mix(in srgb, var(--sangue) 35%, var(--line));
+}
+html[data-mundo="emo"] .herobox::before,
+html[data-mundo="emo"] .stage::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 16px;
+  z-index: 1;
+  pointer-events: none;
+}
+html[data-mundo="emo"] .herobox::before,
+html[data-mundo="emo"] .stage::before {
+  background: var(--sangue);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='16'%3E%3Cpath d='M0 0H200V3Q194 3 193 9Q192 14 189 14Q186 14 186 9Q185 3 160 4Q150 4 149 7Q148 11 146 11Q144 11 144 7Q143 4 110 3Q100 3 99 12Q98 16 95 16Q92 16 92 12Q91 3 60 4Q48 4 47 6Q46 9 44 9Q42 9 42 6Q41 3 20 3Q12 3 11 8Q10 12 8 12Q6 12 6 8Q5 3 0 3Z'/%3E%3C/svg%3E")
+    0 0 / 200px 16px repeat-x;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='16'%3E%3Cpath d='M0 0H200V3Q194 3 193 9Q192 14 189 14Q186 14 186 9Q185 3 160 4Q150 4 149 7Q148 11 146 11Q144 11 144 7Q143 4 110 3Q100 3 99 12Q98 16 95 16Q92 16 92 12Q91 3 60 4Q48 4 47 6Q46 9 44 9Q42 9 42 6Q41 3 20 3Q12 3 11 8Q10 12 8 12Q6 12 6 8Q5 3 0 3Z'/%3E%3C/svg%3E")
+    0 0 / 200px 16px repeat-x;
+  border-radius: 16px 16px 0 0;
+}
+
+/* ---------- Abas: presinhas embaixo da aba ativa ---------- */
+html[data-mundo="emo"] nav.tabs .ind::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 16px;
+  height: 7px;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(135deg, transparent 50%, #fff 50%) 0 0 / 5px 7px no-repeat,
+    linear-gradient(225deg, transparent 50%, #fff 50%) 11px 0 / 5px 7px no-repeat;
+  filter: drop-shadow(0 0 0.5px #000);
+}
+html[data-mundo="emo"] nav.tabs .ind {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--sangue) 40%, transparent),
+    0 2px 10px color-mix(in srgb, var(--sangue) 25%, transparent);
+}
+
+/* ---------- Tarefa e hábito feitos: marca de mordida ---------- */
+html[data-mundo="emo"] .check {
+  position: relative;
+}
+html[data-mundo="emo"] .check[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  bottom: -5px;
+  width: 10px;
+  height: 5px;
+  background:
+    radial-gradient(circle, var(--sangue-escuro) 1.6px, transparent 2px) 0 0 / 5px 5px no-repeat,
+    radial-gradient(circle, var(--sangue-escuro) 1.6px, transparent 2px) 5px 0 / 5px 5px no-repeat;
+}
+html[data-mundo="emo"] li.just-done {
+  animation: emoMordida 0.9s ease-out;
+}
+@keyframes emoMordida {
+  0% {
+    background: color-mix(in srgb, var(--sangue) 30%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+/* ---------- Botões principais com gota de sangue ---------- */
+html[data-mundo="emo"] .btn.primary {
+  position: relative;
+  background: linear-gradient(180deg, var(--sangue), var(--sangue-escuro));
+  border-color: var(--sangue-escuro);
+  overflow: visible;
+}
+html[data-mundo="emo"] .btn.primary::after {
+  content: "";
+  position: absolute;
+  right: 22%;
+  bottom: -6px;
+  width: 6px;
+  height: 9px;
+  background: var(--sangue-escuro);
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  clip-path: polygon(50% 0, 100% 55%, 100% 100%, 0 100%, 0 55%);
+  transition: transform 0.4s ease;
+}
+html[data-mundo="emo"] .btn.primary:hover::after {
+  transform: translateY(3px) scaleY(1.3);
+}
+
+/* ---------- Barras de progresso viram sangue ---------- */
+html[data-mundo="emo"] .progress span,
+html[data-mundo="emo"] .humor .hbarra span {
+  background: linear-gradient(90deg, var(--sangue-escuro), var(--sangue)) !important;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--sangue) 55%, transparent);
+}
+
+/* ---------- Dia selecionado brilha em vermelho ---------- */
+html[data-mundo="emo"] .day[aria-pressed="true"] {
+  background: var(--sangue-escuro);
+  border-color: var(--sangue);
+  color: #fff;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--sangue) 50%, transparent);
+}
+
+/* ---------- Balão do Prumi e avisos ---------- */
+html[data-mundo="emo"] .bubble {
+  border: 1px solid color-mix(in srgb, var(--sangue) 30%, transparent);
+}
+html[data-mundo="emo"] .toast {
+  border-left: 4px solid var(--sangue);
+}
+
+/* ---------- Itens lendários com brilho vermelho ---------- */
+html[data-mundo="emo"] .sitem.legend {
+  background: linear-gradient(
+    160deg,
+    var(--surface) 55%,
+    color-mix(in srgb, var(--sangue) 18%, var(--surface))
+  );
+}
+html[data-mundo="emo"] .sitem:hover {
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--sangue) 25%, transparent);
+}
+
+/* ---------- Seleção de texto e barra de rolagem ---------- */
+html[data-mundo="emo"] ::selection {
+  background: var(--sangue);
+  color: #fff;
+}
+html[data-mundo="emo"] {
+  scrollbar-color: var(--sangue-escuro) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sangue {
+    display: none;
+  }
+}

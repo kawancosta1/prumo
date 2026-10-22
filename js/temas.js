@@ -86,11 +86,19 @@ const mix = (a, b, t) => {
 
 let themePreview = null;
 
+/*
+  Efeitos especiais de cada mundo (opcional). Um mundo pode definir, no seu arquivo em mundos/:
+    MUNDO_FX.emo = { trocaAba() {...}, confete: { cores: [...], formas: ["morcego", "gota"] } }
+  O CSS de decoração de cada mundo fica em estilos/mundos/<nome>.css, usando html[data-mundo="<nome>"].
+*/
+const MUNDO_FX = {};
+
 function applyTheme(personaOverride, varOverride) {
   const pid = personaOverride || S.persona,
     th = TH(pid),
     dark = isDark(),
     k = dark ? 1 : 0;
+  document.documentElement.dataset.mundo = pid; // permite CSS próprio de cada mundo
   themePreview = varOverride ? { p: pid, v: varOverride } : personaOverride ? { p: pid, v: "base" } : null;
   const v = themeVar(pid),
     wo = waterOf(pid);
