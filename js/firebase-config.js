@@ -6,4 +6,11 @@
 */
 "use strict";
 
-const FIREBASE_CONFIG = null;
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBBS4UyTDoBQmqF8B3udSRWCW99eioJOKI",
+  authDomain: "prumo-66d76.firebaseapp.com",
+  projectId: "prumo-66d76",
+  storageBucket: "prumo-66d76.firebasestorage.app",
+  messagingSenderId: "240385413893",
+  appId: "1:240385413893:web:fcbe9d887c0063a0f25d6c"
+};
