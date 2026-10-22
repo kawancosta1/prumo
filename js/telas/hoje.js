@@ -98,7 +98,7 @@ function viewHoje() {
         : `
       <span class="note">${hour < 18 ? "Faça isso à noite: revise o que rolou e deixe amanhã pronto." : "Hora de revisar o dia e deixar amanhã pronto."} ${done} feitas, ${pend} pendentes, ${fmtML(waterToday())} de água.</span>
       <textarea id="jnote" placeholder="${textoMundo("diarioDica", "Como foi o dia? O que ficou de aprendizado? (opcional)")}">${esc(jr.note || "")}</textarea>
-      <div class="row"><button class="btn primary" data-act="closeday">${(pend ? textoMundo("fecharComPendentes", "Mover {n} para amanhã e fechar") : textoMundo("fecharDia", "Fechar o dia")).replace("{n}", `${pend} ${pend === 1 ? "pendente" : "pendentes"}`)}</button>${temGancho("poemaDoDia") ? `<button class="btn ghost" data-act="poema-do-dia">Poema do dia</button>` : ""}</div>`
+      <div class="row"><button class="btn primary" data-act="closeday">${(pend ? textoMundo("fecharComPendentes", "Mover {n} para amanhã e fechar") : textoMundo("fecharDia", "Fechar o dia")).replace("{n}", `${pend} ${pend === 1 ? "pendente" : "pendentes"}`)}</button>${temGancho("poemaDoDia") ? `<button class="btn ghost" data-act="poema-do-dia">${textoMundo("poemaBotao", "Poema do dia")}</button>` : ""}</div>`
     }
     </div></section>`
       : ""
@@ -115,5 +115,5 @@ ACOES_EXTRAS["poema-do-dia"] = () => {
   campo.value = (campo.value.trim() ? campo.value.trim() + "\n\n" : "") + poema;
   campo.style.height = "auto";
   campo.style.height = campo.scrollHeight + "px";
-  react("happy", "Escrevi um poema pra hoje. Pode mexer, ele é seu.", 2600);
+  react("happy", textoMundo("poemaFala", "Escrevi um poema pra hoje. Pode mexer, ele é seu."), 2600);
 };

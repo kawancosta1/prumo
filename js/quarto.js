@@ -358,6 +358,79 @@ const QUARTO = [
             `<rect x="${x - 2}" y="${x === 18 ? 36 : 44}" width="4" height="${x === 18 ? 14 : 14}" fill="#1E1F24"/><path class="chama" d="M${x} ${x === 18 ? 28 : 36}Q${x + 2.6} ${x === 18 ? 32 : 40} ${x} ${x === 18 ? 36 : 44}Q${x - 2.6} ${x === 18 ? 32 : 40} ${x} ${x === 18 ? 28 : 36}Z" fill="#FFB020"/>`
         )
         .join("")}`
+  },
+  /* ---------- mundo Roqueiro ---------- */
+  {
+    slot: "chao",
+    id: "q_palco",
+    nome: "Chão de palco",
+    preco: 160,
+    mundo: "rock",
+    svg: (w = 360, h = 64) =>
+      `<rect width="${w}" height="${h}" fill="#1E1F24"/>${Array.from({ length: Math.ceil(w / 40) }, (_, k) => `<path d="M${k * 40} 0V${h}" stroke="#2B2B33"/>`).join("")}<path d="M${w * 0.3 - 6} ${h * 0.4}l12 12M${w * 0.3 + 6} ${h * 0.4}l-12 12M${w * 0.7 - 6} ${h * 0.5}l12 12M${w * 0.7 + 6} ${h * 0.5}l-12 12" stroke="#F2C318" stroke-width="3"/><path d="M8 ${h - 10}Q${w / 3} ${h - 22} ${w / 2} ${h - 8}T${w - 8} ${h - 14}" fill="none" stroke="#141416" stroke-width="3"/>`
+  },
+  {
+    slot: "janela",
+    id: "q_janela_estadio",
+    nome: "Vista do estádio",
+    preco: 150,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="4" y="4" width="82" height="66" fill="#10163A"/><path d="M20 4L4 50V4ZM70 4L86 50V4Z" fill="#FFF6C8" opacity=".25"/><path d="M4 54Q45 40 86 54V70H4Z" fill="#2B2B33"/>${Array.from({ length: 14 }, (_, i) => `<circle class="pisca" style="animation-delay:${((i * 0.37) % 2).toFixed(2)}s" cx="${8 + i * 5.6}" cy="${58 + (i % 3) * 3}" r="1" fill="#FFB020"/>`).join("")}<path d="M45 4V70M4 37H86" stroke="#2B2B33" stroke-width="3"/><rect x="4" y="4" width="82" height="66" fill="none" stroke="#3A3A44" stroke-width="5"/><rect x="0" y="68" width="90" height="8" rx="2" fill="#5A5A64"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_trovao",
+    nome: "Pôster Trovão Elétrico",
+    preco: 80,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#F2C318"/><text x="22" y="15" font-size="6.4" text-anchor="middle" fill="#F2C318" font-family="Metal Mania,Bungee,sans-serif">TROVÃO</text><path d="M25 19L16 33H22L18 45L29 29H23L27 19Z" fill="#F2C318"/><text x="22" y="52" font-size="3.4" text-anchor="middle" fill="#C9CED6" font-family="sans-serif">TURNÊ ELÉTRICA</text>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_guitarra",
+    nome: "Quadro com guitarra",
+    preco: 140,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#E9E7E2" stroke="#6B4A30" stroke-width="3"/><g transform="translate(22 30) scale(.9)">${guitar("#2F6FD6", "#3A2A1E").replace(/var\(--ink\)/g, "#141416")}</g>`
+  },
+  {
+    slot: "poster",
+    id: "q_disco_ouro",
+    nome: "Disco de ouro emoldurado",
+    ach: "star_power",
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#B8975A" stroke-width="3"/><circle cx="22" cy="24" r="14" fill="#E8C24A"/><circle cx="22" cy="24" r="9" fill="none" stroke="#B8975A"/><circle cx="22" cy="24" r="3.6" fill="#C8302C"/><rect x="10" y="42" width="24" height="7" fill="#E9E7E2"/><path d="M13 45.5H31" stroke="#141416" stroke-width=".8"/>`
+  },
+  {
+    slot: "cama",
+    id: "q_cama_case",
+    nome: "Cama de cases",
+    preco: 260,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="6" y="40" width="128" height="26" rx="2" fill="#1E1F24" stroke="#141416" stroke-width="1.6"/>${[18, 52, 86, 120].map(x => `<rect x="${x - 5}" y="44" width="10" height="5" fill="#C9CED6"/><rect x="${x - 5}" y="57" width="10" height="5" fill="#C9CED6"/>`).join("")}<rect x="6" y="30" width="128" height="12" rx="4" fill="#C8302C"/><rect x="10" y="22" width="32" height="12" rx="5" fill="#F2F2F2"/><rect x="6" y="10" width="10" height="32" fill="#1E1F24"/>${[0, 1, 2, 3, 4].map(i => `<circle cx="11" cy="${15 + i * 5}" r="1.4" fill="${["#2FB344", "#E0312F", "#F2C318", "#2F6FD6", "#F07A1A"][i]}"/>`).join("")}`
+  },
+  {
+    slot: "tapete",
+    id: "q_tapete_notas",
+    nome: "Tapete estrada de notas",
+    preco: 130,
+    mundo: "rock",
+    svg: () =>
+      `<path d="M40 4H110L144 30H6Z" fill="#141416"/>${[0, 1, 2, 3, 4, 5].map(i => `<path d="M${40 + i * 14} 4L${6 + i * 27.6} 30" stroke="#5A5A64"/>`).join("")}${["#2FB344", "#E0312F", "#F2C318", "#2F6FD6", "#F07A1A"].map((c, i) => `<ellipse cx="${19.8 + i * 27.6}" cy="25" rx="7" ry="3" fill="none" stroke="${c}" stroke-width="2"/>`).join("")}<ellipse cx="62" cy="12" rx="4" ry="1.8" fill="#E0312F"/><ellipse cx="96" cy="17" rx="5" ry="2.2" fill="#2F6FD6"/>`
+  },
+  {
+    slot: "luz",
+    id: "q_neon_raio",
+    nome: "Neon de raio",
+    preco: 120,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="6" y="56" width="24" height="36" rx="2" fill="#1E1F24"/><circle cx="18" cy="74" r="7" fill="#3A3A44"/><circle cx="18" cy="74" r="3" fill="#141416"/><path class="pisca" d="M22 10L10 32H17L12 50L27 26H19L24 10Z" fill="none" stroke="#4FE3FF" stroke-width="2.4" stroke-linejoin="round" style="filter:drop-shadow(0 0 3px #4FE3FF)"/>`
   }
 ];
 

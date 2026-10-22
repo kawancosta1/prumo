@@ -5,7 +5,7 @@
   - Firebase e APIs de livros: passam direto, nunca ficam guardados aqui.
   Para forçar todo mundo a baixar de novo, troque a VERSAO.
 */
-const VERSAO = "prumo-v1";
+const VERSAO = "prumo-v2";
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSAO).then(c => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./icones/icone-192.png"])));

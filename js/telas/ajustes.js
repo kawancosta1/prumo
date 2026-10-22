@@ -30,10 +30,10 @@ function viewAjustes() {
   ${
     somDoMundo()
       ? `<section class="block">
-    <h2 class="h2">Sons do clima</h2>
+    <h2 class="h2">${textoMundo("sonsTitulo", "Sons do clima")}</h2>
     <div class="setbox">
-      <div class="setrow"><div class="lbl"><b>Chuva no foco</b><span class="note">Chuva ambiente enquanto o cronômetro roda.</span></div>${botaoSom("chuva", "Chuva")}</div>
-      <div class="setrow"><div class="lbl"><b>Virar página</b><span class="note">Toca ao concluir uma tarefa.</span></div>${botaoSom("pagina", "Página")}</div>
+      <div class="setrow"><div class="lbl"><b>${textoMundo("somFocoNome", "Chuva no foco")}</b><span class="note">${textoMundo("somFocoDica", "Chuva ambiente enquanto o cronômetro roda.")}</span></div>${botaoSom("chuva", textoMundo("somFoco", "Chuva"))}</div>
+      <div class="setrow"><div class="lbl"><b>${textoMundo("somTarefaNome", "Virar página")}</b><span class="note">${textoMundo("somTarefaDica", "Toca ao concluir uma tarefa.")}</span></div>${botaoSom("pagina", textoMundo("somTarefa", "Página"))}</div>
     </div>
   </section>`
       : ""

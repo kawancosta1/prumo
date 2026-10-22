@@ -7,18 +7,61 @@
 
 PERSONAS.rock = {
   name: "Roqueiro",
-  desc: "Barulhento, intenso e cheio de energia.",
-  sad: "Cadê você? O show não pode parar!",
+  desc: "Barulhento, intenso e cheio de energia. Vive em turnê e toca no Expert.",
+  sad: "Cadê você? O show não pode parar! A plateia tá vaiando...",
+  placeholder: "Qual é a próxima música da setlist?",
   starter: ["bandana", "couro"],
-  hi: "E aí{nome}! Hoje são <b>{n}</b> tarefas. Bora fazer esse dia tocar alto!",
-  cheers: ["Isso é rock'n'roll!", "Mandou um solo de guitarra nessa!", "Riscou! A plateia vai à loucura!"],
-  drink: "Hidratação é o roadie da vida. <b>+{ml} mL</b>!",
-  goal: "Meta de água batida! Bis! Bis!",
-  thirsty: "Garganta seca não canta! Faltam <b>{ml} mL</b> pro ritmo.",
-  late: "<b>{n}</b> atrasadas? Até banda boa atrasa o show. Bora subir no palco!",
-  night: "Fim de show! Fecha o dia e descansa as cordas vocais.",
-  done: "Turnê do dia completa! Lendário.",
-  focus: "Modo estúdio: gravando sem distração."
+  hi: [
+    "E aí{nome}! Hoje são <b>{n}</b> tarefas. Bora fazer esse dia tocar alto!",
+    "Passagem de som feita{nome}. <b>{n}</b> músicas na setlist de hoje.",
+    "Som na caixa{nome}! <b>{n}</b> tarefas e a galera esperando o primeiro acorde.",
+    "Bem-vindo à turnê{nome}. Show de hoje: <b>{n}</b> tarefas, dificuldade Expert."
+  ],
+  cheers: [
+    "Isso é rock'n'roll!",
+    "Mandou um solo de guitarra nessa!",
+    "Riscou! A plateia vai à loucura!",
+    "Nota perfeita! Sequência subindo.",
+    "Acertou o acorde. Multiplicador ligado!",
+    "Isso aí! Mais uma estrela no show.",
+    "Hammer-on de produtividade. Que técnica!",
+    "A galera acendeu os isqueiros pra essa."
+  ],
+  drink: [
+    "Hidratação é o roadie da vida. <b>+{ml} mL</b>!",
+    "<b>+{ml} mL</b>. Garganta molhada, grito mais alto!",
+    "Gole entre as músicas: <b>+{ml} mL</b>. Profissional.",
+    "<b>+{ml} mL</b> de água elétrica. Volume no máximo!"
+  ],
+  goal: [
+    "Meta de água batida! Bis! Bis!",
+    "Taça cheia! Isso merece um solo de bateria.",
+    "Hidratado no Expert. Cinco estrelas!"
+  ],
+  thirsty: [
+    "Garganta seca não canta! Faltam <b>{ml} mL</b> pro ritmo.",
+    "Tô desafinando de sede. Faltam <b>{ml} mL</b>.",
+    "O roadie pediu água: faltam <b>{ml} mL</b>."
+  ],
+  late: [
+    "<b>{n}</b> atrasadas? Até banda boa atrasa o show. Bora subir no palco!",
+    "<b>{n}</b> notas perdidas. Ainda dá pra salvar a música!",
+    "O medidor tá no vermelho: <b>{n}</b> atrasadas. Toca elas agora!"
+  ],
+  night: [
+    "Fim de show! Fecha o dia e descansa as cordas vocais.",
+    "Luzes do palco apagando. Encerra o show e dorme, rockstar."
+  ],
+  done: [
+    "Turnê do dia completa! Lendário.",
+    "Você arrasou! Cinco estrelas e plateia de pé.",
+    "Setlist inteira tocada. Bis amanhã!"
+  ],
+  focus: [
+    "Modo estúdio: gravando sem distração.",
+    "Passagem de som. Foco no metrônomo.",
+    "Ensaio fechado: nem o empresário entra."
+  ]
 };
 
 THEMES.rock = {
@@ -26,10 +69,98 @@ THEMES.rock = {
   ds: 1,
   L: ["#E9E7E2", "#FFFFFF", "#151515", "#D9480F", "#1E7FD6", "#F7F7F5"],
   D: ["#0F0F10", "#1A1A1C", "#F0EEE9", "#FFB020", "#3FA9FF", "#26262A"],
+  pat: ["bolt", "star"],
   water: { name: "Água elétrica", spd: 1.5, amp: 7, part: "bolt" },
+  /*
+    Sub-temas por era do rock. Cada um pode trocar: a (destaque), w (água), L/D (cores inteiras), f (fonte),
+    part (o que flutua na água), wn (nome da água) e pat (desenhos do fundo).
+    A decoração de cada um fica em estilos/mundos/rock.css, com html[data-variante="<id>"].
+  */
   vars: [
     { id: "base", name: "Palco" },
     { id: "neon", name: "Neon", price: 120, a: ["#B0179E", "#FF4FD8"] },
+    {
+      id: "heroi",
+      name: "Herói da guitarra",
+      price: 160,
+      f: '"Bungee"',
+      ds: 0.82,
+      L: ["#E8ECF7", "#FFFFFF", "#0E1230", "#2F6FD6", "#1E7FD6", "#FFFFFF"],
+      D: ["#070A1C", "#10163A", "#E8ECFF", "#4FA3FF", "#3FA9FF", "#1B2350"],
+      part: "star",
+      wn: "Star Power",
+      pat: ["star", "bolt"]
+    },
+    {
+      id: "setentas",
+      name: "Anos 70",
+      price: 120,
+      f: '"Righteous"',
+      ds: 0.95,
+      L: ["#F4E9D8", "#FFFAF0", "#3A2414", "#C2541A", "#D98A1E", "#FFF5E6"],
+      D: ["#1E140C", "#2A1C12", "#F4E2C8", "#F08A3C", "#E8A33A", "#3A2818"],
+      part: "flag",
+      wn: "Água psicodélica",
+      pat: ["star", "heart"]
+    },
+    {
+      id: "glam",
+      name: "Glam 80",
+      price: 140,
+      f: '"Bowlby One"',
+      ds: 0.8,
+      L: ["#F7E8F7", "#FFFFFF", "#2A0F2E", "#D42A9C", "#7A3FD9", "#FFFFFF"],
+      D: ["#140818", "#22102A", "#FBE6FB", "#FF4FD8", "#B07AFF", "#2E1838"],
+      part: "spark",
+      wn: "Spray de laquê (é água)",
+      pat: ["star", "spark"]
+    },
+    {
+      id: "punk",
+      name: "Punk",
+      price: 120,
+      f: '"Permanent Marker"',
+      ds: 0.95,
+      L: ["#F2EFE6", "#FFFFFF", "#111111", "#E8337A", "#1E1F24", "#F7F7F5"],
+      D: ["#0C0C0C", "#181818", "#F2F2F2", "#FF4FA0", "#F2E14E", "#222222"],
+      a: ["#E8337A", "#FF4FA0"],
+      wn: "Água sem regras",
+      pat: ["bolt", "star"]
+    },
+    {
+      id: "grunge",
+      name: "Grunge 90",
+      price: 110,
+      f: '"Oswald"',
+      ds: 0.95,
+      L: ["#E4E2DA", "#F7F6F1", "#22251E", "#5A6B3A", "#4A6A7A", "#F2F1EC"],
+      D: ["#141612", "#1E211B", "#E6E8DE", "#9AB06A", "#6A93A6", "#2A2E24"],
+      part: "ripple",
+      wn: "Chuva de garagem",
+      pat: ["leaf", "ripple"]
+    },
+    {
+      id: "metal",
+      name: "Heavy metal",
+      price: 150,
+      L: ["#E6E6E6", "#FAFAFA", "#0E0E0E", "#8C8C96", "#5A6A7A", "#F2F2F2"],
+      D: ["#060606", "#121214", "#EDEDED", "#C9CED6", "#7A8A9A", "#1E1E22"],
+      a: ["#5A5A64", "#C9CED6"],
+      wn: "Metal líquido",
+      pat: ["bolt", "bolt"]
+    },
+    {
+      id: "nacional",
+      name: "Rock nacional",
+      price: 120,
+      f: '"Anton"',
+      ds: 0.9,
+      L: ["#EEF4E6", "#FFFFFF", "#132413", "#1C8350", "#F2C14E", "#FFFFFF"],
+      D: ["#0A140C", "#122016", "#E8F4E6", "#3FC27A", "#F2C14E", "#1C2E20"],
+      part: "note",
+      wn: "Água de festival",
+      pat: ["note", "star"]
+    },
     { id: "lenda", name: "Disco de ouro", ach: "nivel5", a: ["#9A6B00", "#F2C14E"] }
   ]
 };

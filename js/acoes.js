@@ -408,6 +408,7 @@ document.addEventListener("click", e => {
           if (!x.paid) {
             S.stats.tasks++;
             x.paid = earn((x.prio === 3 ? 8 : 5) + (eraAtrasada ? 2 : 0), b); // guarda o que ganhou para devolver se desmarcar
+            ganchoMundo("aoConcluir", x, b); // ex.: enche a barra do Star Power no rock
           }
           if (eraAtrasada) {
             react(

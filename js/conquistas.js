@@ -151,6 +151,43 @@ const ACHS = [
     legend: true
   },
   {
+    id: "star_power",
+    name: "Star Power",
+    desc: "Ativar o Star Power 5 vezes (mundo Roqueiro)",
+    goal: 5,
+    cur: () => (S.rock && S.rock.usos) || 0,
+    reward: 100,
+    legend: true
+  },
+  {
+    id: "solo_epico",
+    name: "Solo épico",
+    desc: "Concluir 10 tarefas em um só dia",
+    goal: 10,
+    cur: () => recordeNotasNumDia(),
+    reward: 120,
+    legend: true
+  },
+  {
+    id: "turne",
+    name: "Turnê completa",
+    desc: "Concluir pelo menos 1 tarefa por dia, 14 dias seguidos",
+    goal: 14,
+    cur: () => turneSeguida(),
+    reward: 150,
+    legend: true
+  },
+  {
+    // Secreta: 6 toques rápidos no Prumi roqueiro
+    id: "riff",
+    name: "Riff secreto",
+    desc: "Tocou o riff escondido no Prumi",
+    goal: 1,
+    cur: () => S.stats.riff || 0,
+    reward: 30,
+    secreta: true
+  },
+  {
     // Secreta: aparece como "???" até ser descoberta (13 toques seguidos no Prumi emo)
     id: "morcego",
     name: "Segredo da noite",

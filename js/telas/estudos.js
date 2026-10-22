@@ -51,7 +51,7 @@ function viewEstudos() {
         <button class="btn" data-act="finish" ${ms < 1000 ? "disabled" : ""}>Concluir e registrar</button>
         ${busy ? `<button class="btn ghost" data-act="reset">Zerar</button>` : ""}
       </div>
-      ${somDoMundo() ? `<div class="row">${botaoSom("chuva", "Chuva durante o foco")}</div>` : ""}
+      ${somDoMundo() ? `<div class="row">${botaoSom("chuva", textoMundo("somFocoNome", "Chuva durante o foco"))}</div>` : ""}
       <span class="note">Quando o tempo acaba, toca um aviso e o relógio continua contando o tempo extra. Ao concluir, os minutos vão para a matéria.</span>
     </div>`
         : `<div class="empty"><strong>Cadastre uma matéria primeiro.</strong>Use o campo de matérias mais abaixo, e o cronômetro de foco aparece aqui.</div>`

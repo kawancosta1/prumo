@@ -30,6 +30,15 @@ const MOVEIS = [
     fundo: "#140C10",
     gotico: true,
     mundo: "emo"
+  },
+  {
+    id: "case_rock",
+    nome: "Estante de cases",
+    preco: 300,
+    cor: "#2B2B33",
+    borda: "#C9CED6",
+    fundo: "#1E1F24",
+    mundo: "rock"
   }
 ];
 
@@ -74,6 +83,14 @@ const FUNDOS = [
     mundo: "emo",
     svg: (W, H) =>
       `<rect width="${W}" height="${H}" fill="#2A1F33"/><g transform="translate(14 10) rotate(-5)"><rect width="34" height="44" fill="#141416" stroke="#C8102E"/><text x="17" y="16" font-size="6" text-anchor="middle" fill="#E0314F" font-family="Bungee,sans-serif">LUA</text><text x="17" y="24" font-size="6" text-anchor="middle" fill="#E0314F" font-family="Bungee,sans-serif">FRIA</text></g><g transform="translate(${W - 50} 12) rotate(4)"><rect width="36" height="46" fill="#F2EAD3"/><text x="18" y="16" font-size="5" text-anchor="middle" fill="#141416" font-family="Bungee,sans-serif">VAMPIROS</text><text x="18" y="23" font-size="5" text-anchor="middle" fill="#141416" font-family="Bungee,sans-serif">DE SÁBADO</text></g>`
+  },
+  {
+    id: "parede_show",
+    nome: "Parede de show",
+    preco: 180,
+    mundo: "rock",
+    svg: (W, H) =>
+      `<rect width="${W}" height="${H}" fill="#1A1A1C"/><path d="M${W * 0.2} 0L${W * 0.05} ${H}H${W * 0.35}Z" fill="#FFF6C8" opacity=".07"/><path d="M${W * 0.8} 0L${W * 0.65} ${H}H${W * 0.95}Z" fill="#FFF6C8" opacity=".07"/><g transform="translate(14 10) rotate(-4)"><rect width="34" height="44" fill="#141416" stroke="#F2C318"/><text x="17" y="16" font-size="5.6" text-anchor="middle" fill="#F2C318" font-family="Bungee,sans-serif">TROVÃO</text><path d="M19 20L12 31H17L14 40L23 27H18L21 20Z" fill="#F2C318"/></g><g transform="translate(${W - 50} 12) rotate(5)"><rect width="36" height="46" fill="#E0312F"/><text x="18" y="16" font-size="4.6" text-anchor="middle" fill="#F2F2F2" font-family="Bungee,sans-serif">OS AMPLI</text><text x="18" y="23" font-size="4.6" text-anchor="middle" fill="#F2F2F2" font-family="Bungee,sans-serif">FICADOS</text><circle cx="18" cy="35" r="7" fill="#141416"/><circle cx="18" cy="35" r="2" fill="#F2C318"/></g>`
   }
 ];
 
@@ -271,6 +288,52 @@ const ENFEITES = [
     w: 18,
     svg: () =>
       `<path d="M-8 0H8M-8 -30H8" stroke="#6B4A30" stroke-width="2.4"/><path d="M-6 -29Q-6 -18 0 -15Q6 -18 6 -29ZM-6 -1Q-6 -12 0 -15Q6 -12 6 -1Z" fill="#DCEBF2" stroke="#9AA3AD"/><path d="M-4 -2Q0 -7 4 -2Z M-3 -25H3Q2 -20 0 -18Q-2 -20 -3 -25Z" fill="#E8C24A"/>`
+  },
+  /* ---------- mundo Roqueiro ---------- */
+  {
+    id: "mini_amp",
+    nome: "Mini amplificador",
+    preco: 90,
+    w: 24,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="-11" y="-20" width="22" height="20" rx="2" fill="#1E1F24" stroke="#141416"/><rect x="-9" y="-18" width="18" height="4" fill="#2B2B33"/>${[-6, -2, 2, 6].map(x => `<circle cx="${x}" cy="-16" r=".9" fill="#C9CED6"/>`).join("")}<rect x="-9" y="-12" width="18" height="10" fill="#3A3A44"/><text x="0" y="-5" font-size="3" text-anchor="middle" fill="#F2C318" font-family="Bungee,sans-serif">ROCK</text>`
+  },
+  {
+    id: "vinil_pe",
+    nome: "Vinil na capa",
+    preco: 70,
+    w: 26,
+    mundo: "rock",
+    svg: () =>
+      `<circle cx="4" cy="-13" r="11" fill="#141416"/><circle cx="4" cy="-13" r="3.4" fill="#E0312F"/><rect x="-12" y="-24" width="20" height="24" fill="#2F6FD6" stroke="#141416" stroke-width=".8"/><path d="M-2 -18L-7 -10H-3L-6 -4L1 -13H-3L0 -18Z" fill="#F2C318"/>`
+  },
+  {
+    id: "pote_baquetas",
+    nome: "Pote de baquetas",
+    preco: 60,
+    w: 18,
+    mundo: "rock",
+    svg: () =>
+      `<path d="M-4 -12L-8 -34M0 -12V-36M4 -12L8 -33" stroke="#D9B48A" stroke-width="2.2" stroke-linecap="round"/><path d="M-7 0L-8 -13H8L7 0Z" fill="#C8302C" stroke="#141416" stroke-width=".8"/>`
+  },
+  {
+    id: "mini_guitarra",
+    nome: "Guitarra em miniatura",
+    preco: 110,
+    w: 22,
+    mundo: "rock",
+    svg: () =>
+      `<path d="M-6 0L6 0L3 -4H-3Z" fill="#3A3A44"/><g transform="translate(0 -14) scale(.7) rotate(38)">${guitar("#F07A1A", "#3A2A1E").replace(/var\(--ink\)/g, "#141416")}</g>`
+  },
+  {
+    id: "palheta_ouro",
+    nome: "Palheta de ouro",
+    ach: "solo_epico",
+    w: 18,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="-7" y="-4" width="14" height="4" fill="#141416"/><path d="M-7 -24Q0 -28 7 -24Q7.6 -14 0 -6Q-7.6 -14 -7 -24Z" fill="#E8C24A" stroke="#B8975A"/><path d="M-3 -22Q0 -23 3 -22" stroke="#FFF6C8" stroke-width="1.2" fill="none"/>`
   },
   {
     id: "busto",

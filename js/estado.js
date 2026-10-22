@@ -66,6 +66,7 @@ const blank = () => ({
   fotolog: [], // fotos do Fotolog, uma por dia fechado
   sons: { chuva: true, pagina: true }, // sons do clima no emo (js/sons.js)
   noites: [], // dias em que o app foi usado depois das 22h
+  rock: { energia: 0, starAte: 0, usos: 0 }, // Star Power do mundo Roqueiro (js/mundos/rock-efeitos.js)
   livros: [], // Estante de leitura (js/leitura.js)
   privacidade: { estante: true, fotolog: true, humor: true, status: true }, // o que os amigos veem
   avisosCelular: false, // notificações no celular (js/pwa.js)
@@ -158,6 +159,12 @@ function normalize(x) {
   };
   if (!Array.isArray(b.fotolog)) b.fotolog = [];
   if (!Array.isArray(b.noites)) b.noites = [];
+  const rk = b.rock && typeof b.rock === "object" ? b.rock : {};
+  b.rock = {
+    energia: Math.max(0, Math.min(100, +rk.energia || 0)),
+    starAte: +rk.starAte || 0,
+    usos: +rk.usos || 0
+  };
   if (!Array.isArray(b.livros)) b.livros = [];
   b.livros.forEach(l => {
     for (const k of ["tags", "citacoes"]) if (!Array.isArray(l[k])) l[k] = [];

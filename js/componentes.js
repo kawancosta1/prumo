@@ -18,7 +18,7 @@ function taskRow(x, { showDate = false } = {}) {
   if (x.repeat) meta.push(`<span title="${REPEAT[x.repeat]}" style="display:inline-flex">${ICON.rep}</span>`);
   if (x.sub.length) meta.push(`<span class="mono">${subDone}/${x.sub.length}</span>`);
   const atrasada = !x.done && x.date < today(); // no emo, vira fantasminha (ver estilos/mundos/emo.css)
-  return `<li class="a-${x.area} ${x.done ? "done" : ""} ${atrasada ? "atrasada" : ""} ${fx.newId === x.id ? "is-new" : ""} ${fx.toggled === x.id && x.done ? "just-done" : ""}">
+  return `<li class="a-${x.area} ${x.prio ? "pr" + x.prio : ""} ${x.done ? "done" : ""} ${atrasada ? "atrasada" : ""} ${fx.newId === x.id ? "is-new" : ""} ${fx.toggled === x.id && x.done ? "just-done" : ""}">
     <div class="item">
       <button class="check" data-act="toggle" data-id="${x.id}" aria-pressed="${!!x.done}" aria-label="Concluir ${esc(x.title)}">${ICON.check}</button>
       <div class="main clickable" data-act="open" data-id="${x.id}"><span class="title">${esc(x.title)}</span><span class="meta">${meta.join("<span>·</span>")}</span></div>

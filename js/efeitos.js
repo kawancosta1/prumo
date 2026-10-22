@@ -87,7 +87,12 @@ const FORMAS_CONFETE =
           "M0 -3Q2.5 -8 3.5 -3.5Q9 -8.5 15 -4Q12 0 13 4.5Q9 2 7 5.5Q4 2.5 2 4.5Q1 2.5 0 3.5Q-1 2.5 -2 4.5Q-4 2.5 -7 5.5Q-9 2 -13 4.5Q-12 0 -15 -4Q-9 -8.5 -3.5 -3.5Q-2.5 -8 0 -3Z"
         ),
         gota: new Path2D("M0 -6Q5 0 3.8 3A3.8 3.8 0 0 1 -3.8 3Q-5 0 0 -6Z"),
-        petala: new Path2D("M0 -6Q5 -2 0 6Q-5 -2 0 -6Z")
+        petala: new Path2D("M0 -6Q5 -2 0 6Q-5 -2 0 -6Z"),
+        palheta: new Path2D("M-5 -4Q0 -6.5 5 -4Q5.4 2 0 7Q-5.4 2 -5 -4Z"),
+        estrela: new Path2D(
+          "M0 -6L1.8 -1.9L6 -1.6L2.8 1.3L3.7 5.6L0 3.4L-3.7 5.6L-2.8 1.3L-6 -1.6L-1.8 -1.9Z"
+        ),
+        raio: new Path2D("M2 -7L-4 1H0L-2 7L4 -1H0Z")
       };
 function desenharParticula(p) {
   if (p.forma === "redondo") {

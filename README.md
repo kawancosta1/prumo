@@ -48,6 +48,8 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/mundos/*.js` | **Um arquivo por personalidade**: falas, tema e itens da loja |
 | `js/mundos/emo-roupas.js` | Guarda-roupa extra do Emo: fedora, véu, moicano, maquiagem, jaqueta de couro, bolsa de sangue, pets, cenários (quarto, galeria, palco, show, igreja, janela) e a pele que brilha |
 | `js/mundos/emo-efeitos.js` | Efeitos especiais do Emo: sangue na troca de aba, lua real, sol, caixão, segredo dos 13 toques |
+| `js/mundos/rock-roupas.js` | Guarda-roupa extra do Roqueiro, por era (anos 70, glam, punk, grunge, metal, rockabilly) e do videogame de guitarra: cabelões, maquiagem, coletes, controle de 5 trastes, guitarra em V, baixo, pets, cenários (amplificadores, estádio, estrada de notas) |
+| `js/mundos/rock-efeitos.js` | Efeitos do Roqueiro: notas coloridas caindo ao trocar de aba, medidor da plateia, Star Power (gotas x2 por 30 min), turnê da semana, letra do dia, riff secreto dos 6 toques |
 | `js/eventos.js` | Eventos com itens por tempo limitado (Halloween, Sexta-feira 13, Dia do Rock, Dia dos Namorados e Natal gótico) |
 | `js/conquistas.js` | Conquistas, nível (XP) e gotas (`earn()`) |
 | `js/agenda.js` | Lembretes para Google, Samsung e Apple |
@@ -55,7 +57,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/humor.js` | **Humor do Prumi** (`calcularHumor()`) |
 | `js/parceria.js` | Parceria: código, dupla abraçada, poses e mimos |
 | `js/internet2000.js` | Internet dos anos 2000 no perfil: status de MSN e "Ouvindo:", depoimentos com aprovação, comunidades (selos por conquista), contador de visitas, fundos do perfil e o Fotolog do dia |
-| `js/sons.js` | Sons do clima do Emo, gerados com WebAudio: chuva durante o foco e virar página ao concluir tarefa (dá pra desligar) |
+| `js/sons.js` | Sons dos mundos, gerados com WebAudio. Emo: chuva no foco e virar página. Roqueiro: plateia no foco, palhetada ao concluir tarefa, acorde do Star Power e riff secreto (dá pra desligar) |
 | `js/leitura.js` | Estante de leitura (estilo Skoob): livros, progresso, notas, metas, moeda "páginas", conquistas de leitura, busca na Open Library e no Google Books e leitor de código de barras |
 | `js/estante-enfeites.js` | Móveis, paredes e enfeites da estante (comprados com páginas; alguns só aparecem num mundo) |
 | `js/telas/estante.js` | Aba Estante: desenho da estante, Lendo agora, Adicionar, Livros, Metas e Decorar |
@@ -73,7 +75,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/acoes.js` | Cliques (`data-act`), formulários (`data-form`) e campos (`data-change`) |
 | `js/tempo.js` | Cronômetro de foco e virada do dia |
 | `js/inicio.js` | Liga tudo quando a página abre |
-| `estilos/*.css` | Visual: `base.css` (cores e componentes), `mascote.css`, `recursos.css`, `animacoes.css`, `responsivo.css`. Decoração própria de cada mundo em `estilos/mundos/` (ex.: `emo.css`) |
+| `estilos/*.css` | Visual: `base.css` (cores e componentes), `mascote.css`, `recursos.css`, `animacoes.css`, `responsivo.css`. Decoração própria de cada mundo em `estilos/mundos/` (ex.: `emo.css`, `rock.css`) |
 
 ---
 
@@ -134,14 +136,27 @@ Cada mundo pode ter um objeto `MUNDO_FX.<mundo>` com ganchos opcionais (veja o e
 - `musicas` e `subnicks`: usados no Perfil.
 - `legendasFotolog`: legendas das fotos do Fotolog.
 - `habitosSugeridos`: lista de hábitos que aparecem como sugestão na aba Hábitos.
-- `poemaDoDia()`: devolve um poema (texto). Mostra o botão "Poema do dia" no diário.
+- `poemaDoDia()`: devolve um poema (texto). Mostra o botão "Poema do dia" no diário (o nome do botão vem de `textos.poemaBotao`; no rock é "Letra do dia").
+- `aoConcluir(tarefa)`: roda quando uma tarefa é concluída pela primeira vez (no rock, enche a barra do Star Power).
 - `resumoSemana()`: devolve HTML de um resumo da semana na aba Hoje (no emo, a "Mixtape da semana").
 - Nas telas, use `temGancho("nome")` para saber se o mundo tem um gancho e `ganchoMundo("nome")` para chamá-lo.
 
 Textos que cada mundo pode trocar em `textos` (chave → texto padrão): `tarefas`, `adicionar`, `vazioHoje`, `atrasadas`,
 `trazerTudo`, `fecharDia`, `fecharComPendentes` (use `{n}`), `diaFechado`, `reabrir`, `diaPerfeito`, `adicionarHabito`,
 `vazioHabitos`, `vazioCompromissos`, `vazioPessoas`, `vazioEstudos`, `conviteTitulo`, `conviteDica`, `conviteBotao`,
-`pedidoChegou` e `conquista_<id>` (nome de uma conquista).
+`pedidoChegou`, `poemaBotao`, `poemaFala`, os nomes dos sons (`sonsTitulo`, `somFoco`, `somFocoNome`, `somFocoDica`,
+`somTarefa`, `somTarefaNome`, `somTarefaDica`) e `conquista_<id>` (nome de uma conquista).
+
+### Mundo Roqueiro (videogame de guitarra)
+
+- Cada tarefa concluída é uma "nota": as caixinhas viram notas nas cores dos 5 trastes (verde, vermelho, amarelo, azul, laranja).
+- Tarefas de prioridade alta são "notas estrela": brilham e enchem mais a barra do Star Power (34% contra 20%).
+- Com a barra cheia, um toque no cartão do Prumi liga o Star Power: 30 minutos de gotas em dobro e tudo fica azul elétrico.
+  Os dados ficam em `S.rock = { energia, starAte, usos }`.
+- O cartão do Prumi mostra o medidor da plateia (vermelho, amarelo, verde), a dificuldade do dia (Fácil a Expert) e o multiplicador (x1 a x4).
+- A "Turnê da semana" dá de 1 a 5 estrelas para cada dia (tarefas feitas e meta de água), em palcos que crescem com o nível.
+- Conquistas: Star Power (5 ativações), Solo épico (10 tarefas num dia), Turnê completa (14 dias seguidos) e o secreto Riff.
+- Regra: nada de nome, logo ou letra de banda real. Bandas, turnês e letras são inventadas.
 
 No CSS, use `html[data-mundo="emo"]` e `html[data-variante="scene"]` para enfeitar só um mundo ou tema.
 

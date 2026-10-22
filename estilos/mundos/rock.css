@@ -1,0 +1,734 @@
+/*
+  Decoração do mundo Roqueiro (palco, guitarra e o videogame de guitarra).
+  Tudo aqui só vale quando a personalidade é rock: html[data-mundo="rock"].
+  Cores dos trastes: verde #2FB344, vermelho #E0312F, amarelo #F2C318, azul #2F6FD6, laranja #F07A1A.
+  O Star Power liga a classe html.star-power (js/mundos/rock-efeitos.js).
+*/
+html[data-mundo="rock"] {
+  --verde: #2fb344;
+  --vermelho: #e0312f;
+  --amarelo: #f2c318;
+  --azul: #2f6fd6;
+  --laranja: #f07a1a;
+  --star: #4fa3ff;
+}
+
+/* ---------- Fundo: luzes de palco vindo de cima ---------- */
+html[data-mundo="rock"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: conic-gradient(
+      from 170deg at 18% -10%,
+      transparent 0 4deg,
+      color-mix(in srgb, var(--accent) 14%, transparent) 6deg 14deg,
+      transparent 16deg
+    ),
+    conic-gradient(
+      from 176deg at 82% -10%,
+      transparent 0 4deg,
+      color-mix(in srgb, var(--water) 14%, transparent) 6deg 14deg,
+      transparent 16deg
+    ),
+    radial-gradient(120% 80% at 50% 0, transparent 60%, color-mix(in srgb, #000 14%, transparent) 100%);
+}
+
+/* ---------- Estrada de notas ao trocar de aba ---------- */
+html[data-mundo="rock"] .wrap {
+  position: relative;
+  z-index: 2;
+}
+#estrada-notas {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: calc(var(--alvo) + 40px);
+  z-index: 1;
+  pointer-events: none;
+}
+#estrada-notas .pista {
+  position: absolute;
+  top: 0;
+  height: var(--alvo);
+  background: repeating-linear-gradient(
+      90deg,
+      transparent 0 calc(20% - 1px),
+      color-mix(in srgb, #fff 30%, transparent) calc(20% - 1px) 20%
+    ),
+    linear-gradient(180deg, transparent, color-mix(in srgb, #000 55%, transparent));
+  opacity: 0;
+  animation: rockPista 1.6s ease-out forwards;
+}
+@keyframes rockPista {
+  15%,
+  70% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+#estrada-notas .traste {
+  position: absolute;
+  top: calc(var(--alvo) - 11px);
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  border-radius: 50%;
+  border: 3px solid var(--c);
+  background: color-mix(in srgb, var(--c) 20%, transparent);
+  opacity: 0;
+  animation: rockPista 1.6s ease-out forwards;
+}
+#estrada-notas .nota {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 14px;
+  margin: -7px 0 0 -11px;
+  border-radius: 50%;
+  background: var(--c);
+  border: 2px solid #141416;
+  box-shadow: 0 2px 0 #141416;
+  transform: translate(var(--x0), -10px) scale(0.45);
+  opacity: 0;
+  animation: rockNota 0.62s cubic-bezier(0.55, 0, 0.9, 0.6) var(--d) forwards;
+}
+#estrada-notas .nota i {
+  position: absolute;
+  inset: 3px 6px 5px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.8;
+}
+@keyframes rockNota {
+  0% {
+    opacity: 1;
+    transform: translate(var(--x0), -10px) scale(0.45);
+  }
+  96% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x1), var(--alvo)) scale(1);
+  }
+}
+/* acerto: anel de fogo onde a nota chega */
+#estrada-notas .acerto {
+  position: absolute;
+  top: var(--alvo);
+  left: 0;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 18%, #ffd23f 30%, var(--c) 52%, transparent 70%);
+  transform: translateX(var(--x1)) scale(0.2);
+  opacity: 0;
+  animation: rockAcerto 0.4s ease-out calc(var(--d) + 0.6s) forwards;
+}
+@keyframes rockAcerto {
+  0% {
+    opacity: 1;
+    transform: translateX(var(--x1)) scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(var(--x1)) scale(1.8);
+  }
+}
+
+/* ---------- Clarão do Star Power ---------- */
+.clarao-star {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 40%,
+    color-mix(in srgb, #8fd3ff 55%, transparent),
+    transparent 70%
+  );
+  animation: rockClarao 1.1s ease-out forwards;
+}
+.clarao-star svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: #e6f4ff;
+  stroke-width: 0.8;
+  filter: drop-shadow(0 0 2px #4fa3ff);
+}
+@keyframes rockClarao {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.4;
+  }
+  42% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Cartão do Prumi: treliça de luzes de palco no topo ---------- */
+html[data-mundo="rock"] .herobox,
+html[data-mundo="rock"] .stage {
+  position: relative;
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}
+html[data-mundo="rock"] .herobox::before,
+html[data-mundo="rock"] .stage::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 12px;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 16px 16px 0 0;
+  background:
+    radial-gradient(circle at 10px 7px, var(--verde) 2.6px, transparent 3.2px) 0 0 / 50px 12px repeat-x,
+    radial-gradient(circle at 20px 7px, var(--vermelho) 2.6px, transparent 3.2px) 0 0 / 50px 12px repeat-x,
+    radial-gradient(circle at 30px 7px, var(--amarelo) 2.6px, transparent 3.2px) 0 0 / 50px 12px repeat-x,
+    radial-gradient(circle at 40px 7px, var(--azul) 2.6px, transparent 3.2px) 0 0 / 50px 12px repeat-x,
+    radial-gradient(circle at 50px 7px, var(--laranja) 2.6px, transparent 3.2px) -10px 0 / 50px 12px repeat-x,
+    repeating-linear-gradient(45deg, #3a3a44 0 2px, transparent 2px 6px),
+    #1e1f24;
+}
+
+/* Medidor da plateia, dificuldade e Star Power (enfeiteHero) */
+.palco-hud {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 10px;
+  border-top: 1px solid var(--line);
+}
+.palco-hud .medidor {
+  flex: 0 0 auto;
+  display: grid;
+}
+.palco-hud .hud-txt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.palco-hud .hud-txt b {
+  font-size: 13px;
+}
+.palco-hud .hud-txt small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.palco-hud .mult {
+  display: inline-block;
+  margin-left: 2px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 800;
+  font-size: 10.5px;
+}
+.star-bt {
+  flex: 0 0 116px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: stretch;
+  padding: 5px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+}
+.star-bt small {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+.star-barra {
+  display: block;
+  height: 7px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--star) 15%, var(--surface));
+  overflow: hidden;
+}
+.star-barra i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #8fd3ff, var(--star));
+  transition: width 0.6s ease;
+}
+.star-bt.cheio {
+  border-color: var(--star);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--star) 55%, transparent);
+  animation: rockCheio 1.2s ease-in-out infinite alternate;
+}
+.star-bt.cheio small,
+.star-bt.ativo small {
+  color: var(--star);
+}
+@keyframes rockCheio {
+  to {
+    box-shadow: 0 0 20px color-mix(in srgb, var(--star) 85%, transparent);
+  }
+}
+.star-bt.ativo .star-barra i {
+  background: repeating-linear-gradient(90deg, #e6f4ff 0 6px, var(--star) 6px 12px);
+}
+
+/* ---------- Star Power ligado: tudo fica azul elétrico ---------- */
+html.star-power[data-mundo="rock"] {
+  --accent: var(--star);
+}
+html.star-power[data-mundo="rock"] .herobox {
+  border-color: var(--star);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--star) 45%, transparent);
+  animation: rockStar 2.4s ease-in-out infinite alternate;
+}
+@keyframes rockStar {
+  to {
+    box-shadow: 0 0 28px color-mix(in srgb, var(--star) 70%, transparent);
+  }
+}
+html.star-power[data-mundo="rock"] body::after {
+  background: conic-gradient(
+      from 170deg at 18% -10%,
+      transparent 0 4deg,
+      color-mix(in srgb, var(--star) 22%, transparent) 6deg 14deg,
+      transparent 16deg
+    ),
+    conic-gradient(
+      from 176deg at 82% -10%,
+      transparent 0 4deg,
+      color-mix(in srgb, var(--star) 22%, transparent) 6deg 14deg,
+      transparent 16deg
+    ),
+    radial-gradient(120% 80% at 50% 0, transparent 50%, color-mix(in srgb, var(--star) 14%, transparent) 100%);
+}
+
+/* ---------- Abas: a aba ativa ganha as cinco cores dos trastes embaixo ---------- */
+html[data-mundo="rock"] nav.tabs .ind::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 30px;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--verde) 0 20%,
+    var(--vermelho) 20% 40%,
+    var(--amarelo) 40% 60%,
+    var(--azul) 60% 80%,
+    var(--laranja) 80%
+  );
+}
+
+/* ---------- Caixinhas de concluir viram notas coloridas ---------- */
+html[data-mundo="rock"] .list > li .check {
+  border-radius: 50%;
+  border-width: 3px;
+  background: radial-gradient(
+    ellipse 45% 30% at 50% 38%,
+    color-mix(in srgb, #fff 55%, transparent),
+    transparent 70%
+  );
+}
+html[data-mundo="rock"] .list > li:nth-child(5n + 1) .check {
+  --c: var(--verde);
+}
+html[data-mundo="rock"] .list > li:nth-child(5n + 2) .check {
+  --c: var(--vermelho);
+}
+html[data-mundo="rock"] .list > li:nth-child(5n + 3) .check {
+  --c: var(--amarelo);
+}
+html[data-mundo="rock"] .list > li:nth-child(5n + 4) .check {
+  --c: var(--azul);
+}
+html[data-mundo="rock"] .list > li:nth-child(5n) .check {
+  --c: var(--laranja);
+}
+html[data-mundo="rock"] .list > li .check[aria-pressed="true"] {
+  background: radial-gradient(
+      ellipse 40% 26% at 50% 34%,
+      color-mix(in srgb, #fff 60%, transparent),
+      transparent 70%
+    ),
+    var(--c);
+}
+/* Nota estrela: tarefa de prioridade alta brilha (enche mais o Star Power) */
+html[data-mundo="rock"] .list > li.pr3:not(.done) .check {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, #fff 70%, transparent),
+    0 0 10px var(--star);
+  animation: rockEstrela 1.6s ease-in-out infinite alternate;
+}
+@keyframes rockEstrela {
+  to {
+    box-shadow:
+      0 0 0 2px #fff,
+      0 0 16px var(--star);
+  }
+}
+/* Acertou a nota: explosão de fogo em volta */
+html[data-mundo="rock"] li.just-done .check {
+  position: relative;
+  overflow: visible;
+}
+html[data-mundo="rock"] li.just-done .check::after {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, transparent 30%, #ffd23f 40%, #f07a1a 55%, transparent 70%);
+  animation: rockFogo 0.55s ease-out forwards;
+}
+@keyframes rockFogo {
+  from {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+html[data-mundo="rock"] li.done .title {
+  text-decoration-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  text-decoration-thickness: 2px;
+}
+
+/* Notas perdidas (atrasadas): treme de leve, como nota errada */
+html[data-mundo="rock"] li.atrasada .check {
+  border-style: dashed;
+  animation: rockErro 2.6s ease-in-out infinite;
+}
+@keyframes rockErro {
+  0%,
+  86%,
+  100% {
+    transform: none;
+  }
+  90% {
+    transform: translateX(-2px) rotate(-6deg);
+  }
+  95% {
+    transform: translateX(2px) rotate(6deg);
+  }
+}
+
+/* ---------- Botão principal: placa de metal com rebites ---------- */
+html[data-mundo="rock"] .btn.primary {
+  background: radial-gradient(
+      circle at 7px 50%,
+      color-mix(in srgb, #fff 55%, transparent) 1.6px,
+      transparent 2.2px
+    ),
+    radial-gradient(
+      circle at calc(100% - 7px) 50%,
+      color-mix(in srgb, #fff 55%, transparent) 1.6px,
+      transparent 2.2px
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 80%, #fff),
+      var(--accent) 45%,
+      color-mix(in srgb, var(--accent) 70%, #000)
+    );
+}
+
+/* ---------- Barras de progresso viram medidor (vermelho, amarelo, verde) ---------- */
+html[data-mundo="rock"] .progress span,
+html[data-mundo="rock"] .humor .hbarra span {
+  background: linear-gradient(90deg, var(--vermelho), var(--amarelo) 50%, var(--verde)) !important;
+  background-size: 100vw 100% !important;
+}
+
+/* ---------- Sequência de hábitos: quadradinhos viram notas na estrada ---------- */
+html[data-mundo="rock"] .heat i {
+  border-radius: 50%;
+}
+
+/* ---------- Foco vira estúdio: medidor de volume (VU) pulando ---------- */
+html[data-mundo="rock"] .timerrow.rodando .eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 36px;
+}
+html[data-mundo="rock"] .eq i {
+  width: 6px;
+  border-radius: 1px;
+  background: linear-gradient(0deg, var(--verde) 0 55%, var(--amarelo) 55% 80%, var(--vermelho) 80%);
+  background-size: 100% 34px;
+  background-position: bottom;
+  animation: rockVu 0.5s ease-in-out infinite alternate;
+}
+html[data-mundo="rock"] .eq i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+html[data-mundo="rock"] .eq i:nth-child(3) {
+  animation-delay: 0.35s;
+}
+html[data-mundo="rock"] .eq i:nth-child(4) {
+  animation-delay: 0.05s;
+}
+html[data-mundo="rock"] .eq i:nth-child(5) {
+  animation-delay: 0.25s;
+}
+@keyframes rockVu {
+  from {
+    height: 6px;
+  }
+  to {
+    height: 34px;
+  }
+}
+
+/* ---------- Fim de show: setlist de papel colada com fita no palco ---------- */
+html[data-mundo="rock"] .diario .card {
+  position: relative;
+  background: #f4f1e8;
+  color: #141416;
+  border: 0;
+  box-shadow: 0 2px 0 #00000030;
+  transform: rotate(-0.4deg);
+}
+html[data-mundo="rock"] .diario .card::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 70px;
+  height: 18px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: color-mix(in srgb, #3a3a44 85%, transparent);
+}
+html[data-mundo="rock"] .diario textarea {
+  background: transparent;
+  border: 0;
+  color: #141416;
+  font-family: "Permanent Marker", "Caveat", cursive;
+  font-size: 17px;
+  line-height: 24px;
+  min-height: 96px;
+}
+html[data-mundo="rock"] .diario .card .note,
+html[data-mundo="rock"] .diario .card .closed {
+  color: #3a3a44;
+}
+
+/* ---------- Turnê da semana (resumoSemana) ---------- */
+.turne summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shows {
+  list-style: none;
+  margin: 8px 0 6px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.shows li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.shows .dia {
+  flex: 0 0 34px;
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--muted);
+}
+.shows .palco {
+  flex: 1;
+  min-width: 0;
+}
+.shows .palco em {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--vermelho);
+  border-radius: 5px;
+  padding: 0 5px;
+  margin-left: 4px;
+  vertical-align: 1px;
+}
+.shows li.folga {
+  color: var(--muted);
+}
+.estrelas i {
+  font-style: normal;
+  color: color-mix(in srgb, var(--muted) 45%, transparent);
+  font-size: 15px;
+}
+.estrelas i.on {
+  color: var(--amarelo, #f2c318);
+  text-shadow: 0 0 6px color-mix(in srgb, #f2c318 60%, transparent);
+}
+
+/* ---------- Seleção, balão e avisos ---------- */
+html[data-mundo="rock"] ::selection {
+  background: var(--accent);
+  color: #fff;
+}
+html[data-mundo="rock"] .toast {
+  border-left: 4px solid var(--accent);
+}
+html[data-mundo="rock"] .sitem.legend {
+  background: linear-gradient(160deg, var(--surface) 55%, color-mix(in srgb, #e8c24a 22%, var(--surface)));
+}
+
+/* ================= sub-temas por era ================= */
+
+/* Herói da guitarra: estrada de notas no pé da página e estrelinhas no céu */
+html[data-variante="heroi"][data-mundo="rock"] body::before {
+  content: "";
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  width: min(100vw, 520px);
+  height: 34vh;
+  transform: translateX(-50%);
+  z-index: -1;
+  pointer-events: none;
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+  background: repeating-linear-gradient(
+      90deg,
+      transparent 0 calc(20% - 1px),
+      color-mix(in srgb, var(--ink) 18%, transparent) calc(20% - 1px) 20%
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 38px,
+      color-mix(in srgb, var(--ink) 10%, transparent) 38px 40px
+    ),
+    linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent) 16%, transparent));
+}
+html[data-variante="heroi"][data-mundo="rock"] .h1 {
+  text-shadow:
+    1.5px 1.5px 0 var(--verde),
+    3px 3px 0 var(--azul);
+}
+html[data-mundo="rock"] .h1 small {
+  text-shadow: none;
+  -webkit-text-stroke: 0;
+}
+
+/* Anos 70: faixas psicodélicas no topo */
+html[data-variante="setentas"][data-mundo="rock"] .herobox::before {
+  height: 14px;
+  background: linear-gradient(180deg, #c2541a 0 25%, #d98a1e 25% 50%, #e8b84a 50% 75%, #7a8a3a 75%);
+}
+html[data-variante="setentas"][data-mundo="rock"] .h1 {
+  letter-spacing: 0.02em;
+}
+
+/* Glam 80: títulos com degradê rosa e roxo e brilho */
+html[data-variante="glam"][data-mundo="rock"] .h1,
+html[data-variante="glam"][data-mundo="rock"] .brand {
+  background: linear-gradient(90deg, #ff4fd8, #b07aff, #4fe3ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Punk: cartões com fita adesiva e títulos tortos */
+html[data-variante="punk"][data-mundo="rock"] .h1 {
+  transform: rotate(-1.2deg);
+  display: inline-block;
+}
+html[data-variante="punk"][data-mundo="rock"] .card {
+  border-style: dashed;
+}
+
+/* Grunge 90: textura de chiado e listra de flanela no topo do cartão */
+html[data-variante="grunge"][data-mundo="rock"] .herobox::before {
+  background: repeating-linear-gradient(
+      90deg,
+      #3f5a2a 0 10px,
+      #141416 10px 12px,
+      #5a6b3a 12px 22px,
+      #141416 22px 24px
+    ),
+    #3f5a2a;
+}
+html[data-variante="grunge"][data-mundo="rock"] body::after {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='r'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23r)' opacity='.07'/%3E%3C/svg%3E"),
+    radial-gradient(120% 80% at 50% 0, transparent 60%, color-mix(in srgb, #000 18%, transparent) 100%);
+}
+
+/* Heavy metal: títulos cromados */
+html[data-variante="metal"][data-mundo="rock"] .h1 {
+  background: linear-gradient(180deg, #f2f2f2 0 40%, #8c8a96 50%, #e6e9ed 60%, #5a5a64);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 0.5px #141416;
+}
+
+/* Rock nacional: faixa verde e amarela */
+html[data-variante="nacional"][data-mundo="rock"] .herobox::before {
+  background: linear-gradient(90deg, #1c8350 0 50%, #f2c14e 50%);
+  height: 6px;
+}
+
+/* Neon: brilho nos títulos */
+html[data-variante="neon"][data-mundo="rock"] .h1 {
+  text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+/* Disco de ouro: tudo dourado */
+html[data-variante="lenda"][data-mundo="rock"] .h1,
+html[data-variante="lenda"][data-mundo="rock"] .brand {
+  background: linear-gradient(180deg, #fff6c8, #e8c24a 45%, #9a6b00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ================= movimento reduzido ================= */
+@media (prefers-reduced-motion: reduce) {
+  #estrada-notas,
+  .clarao-star {
+    display: none;
+  }
+  html[data-mundo="rock"] li.atrasada .check,
+  html[data-mundo="rock"] .list > li.pr3 .check,
+  .star-bt.cheio,
+  html.star-power[data-mundo="rock"] .herobox {
+    animation: none;
+  }
+}
