@@ -9,6 +9,7 @@ function viewAjustes() {
   <section class="block">
     <h2 class="h2">Você</h2>
     <div class="setbox">
+      ${contaHTML()}
       <div class="setrow"><div class="lbl"><b>Aparência</b><span class="note">Automático segue o tema do aparelho.</span></div><div class="seg" role="group">${[
         ["auto", "Auto"],
         ["light", "Claro"],

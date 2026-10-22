@@ -66,6 +66,7 @@ function montarPerfil() {
     humor: { valor: h.valor, nivel: h.nivel.nome, rosto: h.nivel.rosto },
     agua: Math.round(Math.min(1, waterToday() / S.waterGoal) * 100),
     codigo: S.codigo,
+    usuario: S.perfil.usuario || "",
     parceiro: S.parceria.id || null,
     tipo: S.parceria.tipo || "namoro",
     mimo: S.parceria.mimoEnviado || null,
@@ -143,13 +144,25 @@ const parceriaAtiva = () => !!(parceiroDados && S.parceria.id && parceiroDados.p
 const nomeParceiro = () => (parceiroDados && parceiroDados.nome) || "Seu parceiro";
 
 async function conectarPorCodigo(codigo, tipo) {
-  codigo = codigo.trim().toUpperCase();
-  if (!banco) return toast("A parceria precisa da sua conta Claude conectada", false, "worried");
+  codigo = codigo.trim();
+  if (!banco) return toast("A parceria precisa da sua conta conectada", false, "worried");
+  // pelo @ (conta Firebase): acha o uid direto em nomes/
+  if (codigo.startsWith("@") && typeof uidDoUsuario === "function") {
+    const uid = await uidDoUsuario(codigo).catch(() => null);
+    if (!uid) return toast(`Não achei ${codigo}. Confere o nome?`, false, "worried");
+    if (uid === meuId) return toast("Esse é você", false, "worried");
+    S.parceria = { ...S.parceria, id: uid, tipo };
+    commit();
+    publicarPerfil(true);
+    ouvirParceiro();
+    return toast("Pedido enviado! Falta a outra pessoa aceitar.", false, "happy");
+  }
+  codigo = codigo.toUpperCase();
   if (codigo === S.codigo) return toast("Esse é o seu próprio código", false, "worried");
   try {
     const res = await banco.collection("perfis").where("codigo", "==", codigo).limit(1).get();
     if (res.empty) return toast("Não achei esse código. Confere com a outra pessoa?", false, "worried");
-    S.parceria = { id: res.docs[0].id, tipo };
+    S.parceria = { ...S.parceria, id: res.docs[0].id, tipo };
     commit();
     publicarPerfil(true);
     ouvirParceiro();
@@ -162,7 +175,7 @@ async function conectarPorCodigo(codigo, tipo) {
 function aceitarPedido(id) {
   const p = pedidos.find(x => x.id === id);
   if (!p) return;
-  S.parceria = { id, tipo: p.tipo || "namoro" };
+  S.parceria = { ...S.parceria, id, tipo: p.tipo || "namoro" };
   commit();
   publicarPerfil(true);
   ouvirParceiro();
@@ -177,7 +190,7 @@ function aceitarPedido(id) {
 }
 
 function desfazerParceria() {
-  S.parceria = { id: null, tipo: "namoro" };
+  S.parceria = { ...S.parceria, id: null, tipo: "namoro" };
   commit();
   publicarPerfil(true);
   ouvirParceiro();
@@ -412,7 +425,7 @@ function parceriaHeroHTML() {
 /* Seção de parceria na aba Hábitos e social */
 function parceriaSecaoHTML() {
   if (!banco) {
-    return `<section class="block"><h2 class="h2">Parceria</h2><div class="empty"><strong>${textoMundo("conviteTitulo", "Junte seu Prumi com o de outra pessoa.")}</strong>Para isso, o Prumo precisa estar aberto com a sua conta Claude (os dados sincronizados). A outra pessoa abre este mesmo link com a conta dela, depois que você compartilhar com permissão de edição.</div></section>`;
+    return `<section class="block"><h2 class="h2">Parceria</h2><div class="empty"><strong>${textoMundo("conviteTitulo", "Junte seu Prumi com o de outra pessoa.")}</strong>${contaConfigurada() ? "Entre com Google em Ajustes. Depois é só passar seu código ou seu @ para a outra pessoa." : "Para isso, o Prumo precisa estar ligado a uma conta. A conta com Google chega em breve."}</div></section>`;
   }
   const pend = S.parceria.id && !parceriaAtiva();
   return `<section class="block"><h2 class="h2">Parceria</h2>
@@ -426,7 +439,7 @@ function parceriaSecaoHTML() {
           <span>Seu código: <b class="mono codigo">${esc(S.codigo || "…")}</b></span>
           <span class="note">${textoMundo("conviteDica", "Passe esse código para a outra pessoa, ou digite o código dela aqui embaixo.")}</span>
           <form class="row" data-form="parceria">
-            <input id="par-codigo" type="text" maxlength="6" placeholder="Código" style="width:110px;text-transform:uppercase" autocomplete="off" required>
+            <input id="par-codigo" type="text" maxlength="21" placeholder="Código ou @" style="width:130px" autocomplete="off" autocapitalize="off" required>
             <select id="par-tipo" aria-label="Tipo"><option value="namoro">Namorado(a)</option><option value="amizade">Amigo(a)</option></select>
             <button class="btn primary" type="submit">${textoMundo("conviteBotao", "Conectar")}</button>
           </form>

@@ -1,0 +1,44 @@
+rules_version = '2';
+
+// Regras do Firestore do Prumo. Cole tudo isto em: Console do Firebase → Firestore → Regras → Publicar.
+// Ideia geral: cada pessoa só escreve no que é dela.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() {
+      return request.auth != null;
+    }
+    function souEu(uid) {
+      return logado() && request.auth.uid == uid;
+    }
+
+    // Rotina completa (tarefas, água, hábitos, diário, estante...): só o dono lê e escreve
+    match /usuarios/{uid}/{documento=**} {
+      allow read, write: if souEu(uid);
+    }
+
+    // Perfil público: quem está logado pode ler (para achar pelo código e ver o par);
+    // só o dono escreve. Tamanho limitado para ninguém lotar o banco.
+    match /perfis/{uid} {
+      allow read: if logado();
+      allow create, update: if souEu(uid) && request.resource.data.size() < 40;
+      allow delete: if souEu(uid);
+    }
+
+    // Nome de usuário (@): cada @ aponta para um uid. Só dá para criar um @ livre, para você mesmo,
+    // e só o dono pode apagar.
+    match /nomes/{nome} {
+      allow read: if logado();
+      allow create: if logado()
+        && nome.matches('^[a-z0-9_.]{3,20}$')
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid']);
+      allow delete: if logado() && resource.data.uid == request.auth.uid;
+    }
+
+    // Tudo o que não está listado acima fica fechado
+    match /{caminho=**} {
+      allow read, write: if false;
+    }
+  }
+}

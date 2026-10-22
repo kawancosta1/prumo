@@ -5,7 +5,7 @@ Este é o código do Prumo, organizado para você mexer na mão.
 Para rodar no seu computador, abra o `index.html` no navegador.
 
 > No computador, os dados ficam salvos só naquele navegador (aparece "Só neste aparelho").
-> A sincronização entre aparelhos e a parceria só funcionam quando o Prumo está publicado no Claude.
+> A sincronização entre aparelhos e a parceria funcionam no Artifact do Claude ou, no GitHub Pages, com a conta Google (Firebase) ligada em `js/firebase-config.js`.
 
 ---
 
@@ -59,6 +59,8 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/leitura.js` | Estante de leitura (estilo Skoob): livros, progresso, notas, metas, moeda "páginas", conquistas de leitura, busca na Open Library e no Google Books e leitor de código de barras |
 | `js/estante-enfeites.js` | Móveis, paredes e enfeites da estante (comprados com páginas; alguns só aparecem num mundo) |
 | `js/telas/estante.js` | Aba Estante: desenho da estante, Lendo agora, Adicionar, Livros, Metas e Decorar |
+| `js/firebase-config.js` | A configuração do Firebase (enquanto for `null`, o app fica só no aparelho) |
+| `js/conta.js` | Conta com Google pelo Firebase: login, nome de usuário (@) e o bloco Conta em Ajustes. As regras do banco estão em `firestore.rules` |
 | `js/telas/*.js` | Uma função por aba (`viewHoje`, `viewEstudos`...) |
 | `js/telas/perfil.js` | Perfil estilo MySpace na aba Prumi: subnick, música, Top 8 e recados |
 | `js/render.js` | `render()`: desenha a aba atual |

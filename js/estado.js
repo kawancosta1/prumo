@@ -10,6 +10,7 @@ const perfilPadrao = () => ({
   subnick: "",
   status: "online", // MSN: online, ausente, ocupado ou offline (aparecer offline)
   ouvindo: "", // "Ouvindo:" do MSN
+  usuario: "", // nome de usuário (@), escolhido em Ajustes quando há conta
   visitas: 0, // contador de visitas
   layout: "classico", // fundo do perfil
   depoAceitos: [], // depoimentos que você aprovou
@@ -257,63 +258,70 @@ function setSync(mode) {
     mode === "ok"
       ? "Seus dados estão salvos na sua conta e aparecem no celular e no PC"
       : mode === "local"
-        ? "Os dados estão salvos só neste navegador"
+        ? contaConfigurada()
+          ? "Os dados estão só neste navegador. Entre com Google em Ajustes para salvar na nuvem."
+          : "Os dados estão salvos só neste navegador"
         : "";
 }
 
+/*
+  Liga os dados a uma conta. Dois caminhos:
+  1. Prumo aberto como Artifact do Claude: usa window.claude (banco e usuário do Claude).
+  2. GitHub Pages com Firebase configurado (js/firebase-config.js) e login com Google feito (js/conta.js).
+  Sem nenhum dos dois, fica "Só neste aparelho".
+*/
 async function connect() {
   const c = window.claude;
-  if (!c || typeof c.use !== "function") {
-    setSync("local");
-    return;
+  if (c && typeof c.use === "function") {
+    try {
+      const [db, user] = await Promise.all([c.use("db"), c.use("user")]);
+      const uid = db && user ? await user.id() : null;
+      if (uid) return ligarBanco(db, uid, "data/users/" + uid + "/rotina");
+    } catch (e) {}
+    return setSync("local");
   }
-  try {
-    const [db, user] = await Promise.all([c.use("db"), c.use("user")]);
-    if (!db || !user) {
-      setSync("local");
-      return;
-    }
-    const uid = await user.id();
-    if (!uid) {
-      setSync("local");
-      return;
-    }
-    ref = db.doc("data/users/" + uid + "/rotina");
-    iniciarParceria(db, uid);
-    ref.onSnapshot(
-      snap => {
-        if (snap.metadata && snap.metadata.hasPendingWrites) return;
-        if (!snap.exists) {
-          if (hasData()) push();
-          setSync("ok");
-          markReady();
-          return;
-        }
-        const d = snap.data();
+  if (contaConfigurada()) {
+    const conta = await iniciarConta(); // espera o Firebase dizer se tem alguém logado
+    if (conta) return ligarBanco(conta.db, conta.uid, "usuarios/" + conta.uid + "/dados/rotina");
+  }
+  setSync("local");
+}
+
+/* Sincroniza S com um documento do banco e liga a parceria. O mais novo (updatedAt) ganha. */
+function ligarBanco(db, uid, caminho) {
+  ref = db.doc(caminho);
+  iniciarParceria(db, uid);
+  ref.onSnapshot(
+    snap => {
+      if (snap.metadata && snap.metadata.hasPendingWrites) return;
+      if (!snap.exists) {
+        if (hasData()) push();
         setSync("ok");
-        if (!d || !d.state) {
-          markReady();
-          return;
-        }
-        if ((d.updatedAt || 0) > updatedAt) {
-          S = normalize(JSON.parse(JSON.stringify(d.state)));
-          updatedAt = d.updatedAt;
-          lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt }));
-          applyTheme();
-          softRender();
-        } else if (updatedAt > (d.updatedAt || 0) && updatedAt !== lastPushed) {
-          push();
-        }
         markReady();
-      },
-      () => {
-        setSync("local");
-        markReady();
+        return;
       }
-    );
-  } catch (e) {
-    setSync("local");
-  }
+      const d = snap.data();
+      setSync("ok");
+      if (!d || !d.state) {
+        markReady();
+        return;
+      }
+      if ((d.updatedAt || 0) > updatedAt) {
+        S = normalize(JSON.parse(JSON.stringify(d.state)));
+        updatedAt = d.updatedAt;
+        lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt }));
+        applyTheme();
+        softRender();
+      } else if (updatedAt > (d.updatedAt || 0) && updatedAt !== lastPushed) {
+        push();
+      }
+      markReady();
+    },
+    () => {
+      setSync("local");
+      markReady();
+    }
+  );
 }
 
 const hasData = () =>
