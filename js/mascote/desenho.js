@@ -168,7 +168,7 @@ function prumi({ mood = "idle", fill = 0, size = 96, eq, p, semL, semR, armL: ar
       ${back ? back.svg() : ""}
       <rect class="cap" x="51.5" y="16.5" width="17" height="10" rx="3.5"/>
       <path class="body" d="${BODY}"${skin ? ` style="fill:${skin.color}"` : ""}/>
-      <g clip-path="url(#${id})">${top ? top.svg() : ""}${cintura ? cintura.svg() : ""}${bottons ? bottons.svg() : ""}<g class="waterg${top ? " wet" : ""}" data-lvl="${lvl}" transform="translate(0 ${lvl})"><g transform="translate(-20 -3)"><path class="wave2" d="${wv}"/></g><path class="wave" d="${wv}"/>${parts}</g>${inner}</g>
+      <g clip-path="url(#${id})">${skin && skin.svg ? `<g class="pele-extra">${skin.svg()}</g>` : ""}${top ? top.svg() : ""}${cintura ? cintura.svg() : ""}${bottons ? bottons.svg() : ""}<g class="waterg${top ? " wet" : ""}" data-lvl="${lvl}" transform="translate(0 ${lvl})"><g transform="translate(-20 -3)"><path class="wave2" d="${wv}"/></g><path class="wave" d="${wv}"/>${parts}</g>${inner}</g>
       <path class="outline" d="${BODY}"/>${top ? "" : `<path class="shine" d="M34 54Q36 40 49 35"/>`}
       ${it("neck") ? it("neck").svg() : ""}
       <g class="arm l"><path class="armp" d="${armL}"/>${wr ? wr.svg(lp[0], lp[1]) : ""}</g>

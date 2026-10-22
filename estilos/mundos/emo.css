@@ -451,8 +451,7 @@ html[data-mundo="emo"] .diario textarea {
 
 /* Caderno de escola: fundo de folha pautada com margem vermelha */
 html[data-variante="caderno"][data-mundo="emo"] body {
-  background-image:
-    linear-gradient(90deg, transparent 38px, #e8a0a0 38px 40px, transparent 40px),
+  background-image: linear-gradient(90deg, transparent 38px, #e8a0a0 38px 40px, transparent 40px),
     repeating-linear-gradient(transparent 0 27px, color-mix(in srgb, #5b6fc2 22%, transparent) 27px 28px) !important;
   background-size: auto !important;
 }
@@ -481,8 +480,7 @@ html[data-variante="gotico"][data-mundo="emo"] body::before {
   inset: 0;
   z-index: -2;
   pointer-events: none;
-  background:
-    radial-gradient(60% 30% at 20% 80%, color-mix(in srgb, #9a96a8 22%, transparent), transparent),
+  background: radial-gradient(60% 30% at 20% 80%, color-mix(in srgb, #9a96a8 22%, transparent), transparent),
     radial-gradient(50% 25% at 80% 70%, color-mix(in srgb, #9a96a8 18%, transparent), transparent);
   animation: emoNeblina 18s ease-in-out infinite alternate;
 }
@@ -512,4 +510,132 @@ html[data-variante="praca"][data-mundo="emo"] .stage::before {
 /* Desfile negro: contraste alto, preto e branco com o vermelho do sangue */
 html[data-variante="base"][data-mundo="emo"] .h1 {
   text-shadow: 2px 2px 0 color-mix(in srgb, var(--sangue) 35%, transparent);
+}
+
+/* ================= animações das roupinhas extras (js/mundos/emo-roupas.js) ================= */
+
+/* Chama de vela tremendo */
+.prumi .chama {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: emoChama 0.7s ease-in-out infinite alternate;
+}
+@keyframes emoChama {
+  from {
+    transform: scale(1, 1) rotate(-3deg);
+  }
+  to {
+    transform: scale(0.88, 1.12) rotate(3deg);
+  }
+}
+
+/* Brilhinhos que piscam (pele "Brilha no sol", lágrima de glitter, câmera) */
+.prumi .brilhinho {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: emoBrilhinho 1.8s ease-in-out infinite;
+}
+@keyframes emoBrilhinho {
+  0%,
+  100% {
+    transform: scale(0.35);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+/* Vapor do café subindo */
+.prumi .vapor {
+  animation: emoVapor 2.4s ease-in-out infinite;
+}
+@keyframes emoVapor {
+  0% {
+    transform: translateY(2px);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-4px);
+    opacity: 0;
+  }
+}
+
+/* Luzinhas do quarto e telas de celular no show */
+.prumi .pisca {
+  animation: emoPisca 1.6s ease-in-out infinite alternate;
+}
+@keyframes emoPisca {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Letreiros de neon da galeria */
+.prumi .neon {
+  filter: drop-shadow(0 0 1.5px currentColor);
+  animation: emoPisca 2.2s steps(2, jump-none) infinite;
+}
+
+/* Holofote balançando no palco */
+.prumi .holofote {
+  transform-origin: 60px -2px;
+  animation: emoHolofote 5s ease-in-out infinite alternate;
+}
+@keyframes emoHolofote {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+
+/* Morcego voando em volta: vai e vem no x e no y, com 1/4 de volta de diferença (vira uma elipse).
+   Sem animação (loja e movimento reduzido), ele fica parado no canto de cima. */
+.prumi .orbita-x {
+  transform: translateX(-44px);
+  animation: emoOrbitaX 3.2s ease-in-out infinite alternate;
+}
+.prumi .orbita-y {
+  transform: translateY(-40px);
+  animation: emoOrbitaY 3.2s ease-in-out -1.6s infinite alternate;
+}
+@keyframes emoOrbitaX {
+  from {
+    transform: translateX(-50px);
+  }
+  to {
+    transform: translateX(50px);
+  }
+}
+@keyframes emoOrbitaY {
+  from {
+    transform: translateY(-58px);
+  }
+  to {
+    transform: translateY(52px);
+  }
+}
+
+/* Na loja os itens ficam parados */
+.sitem .prumi .chama,
+.sitem .prumi .brilhinho,
+.sitem .prumi .vapor,
+.sitem .prumi .pisca,
+.sitem .prumi .neon,
+.sitem .prumi .holofote,
+.sitem .prumi .orbita-x,
+.sitem .prumi .orbita-y {
+  animation: none;
+}
+.sitem .prumi .brilhinho {
+  transform: none;
 }

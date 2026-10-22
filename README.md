@@ -46,6 +46,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/personalidades.js` | `say()` (falas da personalidade atual), `setPersona()` |
 | `js/temas.js` | Aplica as cores do mundo atual, modo claro/escuro, água |
 | `js/mundos/*.js` | **Um arquivo por personalidade**: falas, tema e itens da loja |
+| `js/mundos/emo-roupas.js` | Guarda-roupa extra do Emo: fedora, véu, moicano, maquiagem, jaqueta de couro, bolsa de sangue, pets, cenários (quarto, galeria, palco, show, igreja, janela) e a pele que brilha |
 | `js/mundos/emo-efeitos.js` | Efeitos especiais do Emo: sangue na troca de aba, lua real, sol, caixão, segredo dos 13 toques |
 | `js/eventos.js` | Eventos com itens por tempo limitado (Halloween, Sexta-feira 13, Dia do Rock) |
 | `js/conquistas.js` | Conquistas, nível (XP) e gotas (`earn()`) |
@@ -90,7 +91,8 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 - `${O}` é o contorno padrão (linha escura). Use em quase tudo.
 - Itens de mão e pulso recebem `(x, y)`: use `H(x, y, "...desenho...")` para desenhar em volta de (0, 0).
 - Itens de rosto e boca recebem o humor (`m`), para se encaixar em cada expressão.
-- Pele não tem desenho: só `color` (cor do corpo) e `ink` (cor do rosto).
+- Pele tem `color` (cor do corpo) e `ink` (cor do rosto). Pode ter `svg()` também: o desenho fica por cima do corpo, por baixo da roupa (ex.: brilhinhos em `emo_pele_brilho`).
+- Animações prontas no CSS do emo: `class="chama"` (vela), `brilhinho`, `vapor`, `pisca`, `neon`, `holofote` e `orbita-x`/`orbita-y` (pet voando em volta).
 
 ### Mudar as falas de uma personalidade
 
