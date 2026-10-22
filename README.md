@@ -48,7 +48,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/mundos/*.js` | **Um arquivo por personalidade**: falas, tema e itens da loja |
 | `js/mundos/emo-roupas.js` | Guarda-roupa extra do Emo: fedora, véu, moicano, maquiagem, jaqueta de couro, bolsa de sangue, pets, cenários (quarto, galeria, palco, show, igreja, janela) e a pele que brilha |
 | `js/mundos/emo-efeitos.js` | Efeitos especiais do Emo: sangue na troca de aba, lua real, sol, caixão, segredo dos 13 toques |
-| `js/eventos.js` | Eventos com itens por tempo limitado (Halloween, Sexta-feira 13, Dia do Rock) |
+| `js/eventos.js` | Eventos com itens por tempo limitado (Halloween, Sexta-feira 13, Dia do Rock, Dia dos Namorados e Natal gótico) |
 | `js/conquistas.js` | Conquistas, nível (XP) e gotas (`earn()`) |
 | `js/agenda.js` | Lembretes para Google, Samsung e Apple |
 | `js/efeitos.js` | Confete e animações de números |
@@ -180,6 +180,8 @@ if (minutos >= 30) soma(6, "estudou 30 min hoje");
 O motivo aparece sozinho na lista que abre ao tocar na barra de humor.
 
 ### Criar uma pose nova da dupla
+
+Poses que valem para namoro e amizade ficam em `POSES_EXTRAS` (ex.: "Foto de Fotolog" e "Dividindo a franja"). Use `semCabelo: true` para tirar cabelo e chapéu dos dois na pose.
 
 Em `js/parceria.js`, adicione uma pose em `POSES.namoro` ou `POSES.amizade`.
 Cada pose diz a posição (`x`), a rotação (`rot`) e o rosto (`mood`) de cada Prumi, e um enfeite (`extra`) em SVG.

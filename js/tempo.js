@@ -36,6 +36,7 @@ setInterval(() => {
     softRender();
     return;
   }
+  if (marcarNoite()) persist(); // conquista Criatura da noite
   const n = nowHM();
   if (n.slice(0, 4) !== lastMin.slice(0, 4) && tab === "hoje" && !openTask) softRender();
   lastMin = n;

@@ -721,3 +721,60 @@ ITEMS.push(
         .join("")
   }
 );
+
+/* ===================== lendários das conquistas do emo (js/conquistas.js) ===================== */
+ITEMS.push(
+  {
+    id: "emo_pena",
+    p: "emo",
+    slot: "hand",
+    name: "Pena e tinteiro",
+    ach: "poeta",
+    svg: (x, y) =>
+      H(
+        x,
+        y,
+        `<path d="M-7 4H7L6 12H-6Z" fill="#1E1F24" ${O} stroke-width="1.4"/><ellipse cy="4" rx="7" ry="2" fill="#3A0610" ${O} stroke-width="1.2"/><path d="M2 3L12 -22Q16 -12 8 -4Q6 0 2 3Z" fill="#F2EAD3" ${O} stroke-width="1.3"/><path d="M3 2L11 -18" stroke="#B8975A" stroke-width=".9"/><path d="M8 -6l3-2M9 -10l3-2M10 -14l2.6-2" stroke="#B8975A" stroke-width=".7"/>` +
+          brilhinho(-9, -8, 2.6, "#FFD86B", 0.2)
+      )
+  },
+  {
+    id: "emo_tiara_lua",
+    p: "emo",
+    slot: "hat",
+    name: "Tiara da lua",
+    ach: "criatura_noite",
+    svg: () =>
+      `<path d="M26 44Q60 22 94 44" fill="none" stroke="#B8975A" stroke-width="3"/><circle cx="60" cy="18" r="13" fill="#F2EAD3" opacity=".25"/><path d="M64 6A12 12 0 1 0 70 28A9.6 9.6 0 1 1 64 6Z" fill="#F2EAD3" ${O} stroke-width="1.6"/><circle cx="40" cy="36" r="2.2" fill="#C8102E"/><circle cx="80" cy="36" r="2.2" fill="#C8102E"/>` +
+      brilhinho(80, 14, 3, "#FFFFFF", 0) +
+      brilhinho(42, 20, 2.4, "#F2EAD3", 0.7)
+  },
+  {
+    id: "emo_fio_lagrimas",
+    p: "emo",
+    slot: "string",
+    name: "Fio de lágrimas",
+    ach: "lagrimas_dia",
+    svg: () =>
+      `<line x1="60" y1="-40" x2="60" y2="19" stroke="#8FB4E8" stroke-width="1.4"/>${[-30, -16, -2, 11]
+        .map(
+          (y, i) =>
+            `<path d="M60 ${y - 4}Q63.4 ${y + 1} 62 ${y + 3}A2.4 2.4 0 0 1 58 ${y + 3}Q56.6 ${y + 1} 60 ${y - 4}Z" fill="#8FD8FF" stroke="#2F4F8F" stroke-width=".7"/>` +
+            brilhinho(61, y + 1, 1.2, "#FFFFFF", i * 0.4)
+        )
+        .join("")}`
+  },
+  {
+    id: "emo_bg_fotolog",
+    p: "emo",
+    slot: "bg",
+    name: "Flash de Fotolog",
+    ach: "fotologueiro",
+    svg: () =>
+      `<circle cx="96" cy="16" r="26" fill="#FFFFFF" opacity=".5"/><circle cx="96" cy="16" r="12" fill="#FFFFFF" opacity=".8"/><g transform="rotate(-10 18 30)"><rect x="4" y="14" width="28" height="32" fill="#fff" stroke="#141416" stroke-width=".8"/><rect x="7" y="17" width="22" height="20" fill="#C9B6FF"/></g><g transform="rotate(8 104 116)"><rect x="90" y="100" width="28" height="32" fill="#fff" stroke="#141416" stroke-width=".8"/><rect x="93" y="103" width="22" height="20" fill="#FF8FCB"/></g><text x="16" y="128" font-size="9" fill="#C8102E" font-family="Caveat,cursive" transform="rotate(-8 16 128)">xoxo</text>` +
+      brilhinho(70, 8, 4, "#FFFFFF", 0) +
+      brilhinho(112, 40, 3, "#FFD86B", 0.5) +
+      brilhinho(10, 70, 3, "#FF8FCB", 1) +
+      brilhinho(108, 76, 2.4, "#8FD8FF", 1.3)
+  }
+);

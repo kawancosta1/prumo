@@ -53,6 +53,7 @@ const blank = () => ({
   perfil: { sobre: "", subnick: "" }, // perfil estilo MySpace (o resto dos campos vem em perfilPadrao)
   fotolog: [], // fotos do Fotolog, uma por dia fechado
   sons: { chuva: true, pagina: true }, // sons do clima no emo (js/sons.js)
+  noites: [], // dias em que o app foi usado depois das 22h
   parceria: { id: null, tipo: "namoro" },
   codigo: "",
   events: [],
@@ -133,6 +134,7 @@ function normalize(x) {
   b.perfil = { ...perfilPadrao(), ...b.perfil };
   for (const k of ["depoAceitos", "depoVistos"]) if (!Array.isArray(b.perfil[k])) b.perfil[k] = [];
   if (!Array.isArray(b.fotolog)) b.fotolog = [];
+  if (!Array.isArray(b.noites)) b.noites = [];
   if (!b.sons || typeof b.sons !== "object") b.sons = {};
   b.sons = { chuva: b.sons.chuva !== false, pagina: b.sons.pagina !== false };
   if (!b.parceria || typeof b.parceria !== "object") b.parceria = { id: null, tipo: "namoro" };

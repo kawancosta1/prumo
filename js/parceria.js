@@ -298,6 +298,27 @@ const POSES = {
   ]
 };
 
+/* Poses extras da dupla, nas duas parcerias */
+const CAMERA_FOTOLOG = `<g class="dpop"><g transform="translate(206 26) rotate(12)"><rect x="-11" y="-7" width="22" height="14" rx="2.4" fill="#C9CED6" stroke="var(--ink)" stroke-width="1.6"/><circle cx="2" cy="0" r="4.6" fill="#2B2D3A"/><circle cx="2" cy="0" r="2.2" fill="#4A5A8A"/></g><path d="M178 10l2.6 6 6 2.6-6 2.6-2.6 6-2.6-6-6-2.6 6-2.6z" fill="#FFF6C8"/></g>`;
+const FRANJA_DIVIDIDA = `<path d="M54 64Q56 30 96 26Q120 22 144 26Q184 30 186 64Q172 52 160 58Q156 74 146 90Q148 70 134 60Q120 56 106 60Q92 70 94 90Q84 74 80 58Q68 52 54 64Z" fill="#141416" stroke="var(--ink)" stroke-width="2.4" stroke-linejoin="round"/><path d="M100 32Q120 26 140 32" stroke="#C8102E" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+const POSES_EXTRAS = [
+  {
+    nome: "Foto de Fotolog",
+    l: { x: 20, rot: 8, mood: "happy", semR: true },
+    r: { x: 100, rot: -8, mood: "party", semL: true, armR: "M99 69Q112 46 110 22" },
+    extra: CAMERA_FOTOLOG
+  },
+  {
+    nome: "Dividindo a franja",
+    l: { x: 24, rot: 9, mood: "happy", semR: true },
+    r: { x: 96, rot: -9, mood: "happy", semL: true },
+    semCabelo: true,
+    extra: FRANJA_DIVIDIDA
+  }
+];
+POSES.namoro.push(...POSES_EXTRAS);
+POSES.amizade.push(...POSES_EXTRAS);
+
 let poseIdx = Math.floor(Math.random() * 10);
 
 /* "Chamar a atenção": a tela toda treme por um instante */
@@ -341,6 +362,7 @@ function duoHTML() {
   const pose = lista[poseIdx % lista.length];
   const minhaAgua = Math.min(1, waterToday() / S.waterGoal);
   const desenhar = (lado, eq, persona, fill, def) => {
+    if (pose.semCabelo) eq = { ...eq, hair: undefined, hat: undefined };
     const svg = prumi({
       mood: def.mood,
       fill,

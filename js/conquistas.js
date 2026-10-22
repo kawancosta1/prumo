@@ -115,6 +115,42 @@ const ACHS = [
     theme: true
   },
   {
+    id: "poeta",
+    name: "Poeta",
+    desc: "Escrever no diário em 10 dias",
+    goal: 10,
+    cur: () => Object.values(S.journal).filter(j => j && (j.note || "").trim()).length,
+    reward: 80,
+    legend: true
+  },
+  {
+    id: "criatura_noite",
+    name: "Criatura da noite",
+    desc: "Usar o Prumo depois das 22h em 7 dias",
+    goal: 7,
+    cur: () => S.noites.length,
+    reward: 80,
+    legend: true
+  },
+  {
+    id: "lagrimas_dia",
+    name: "Lágrimas em dia",
+    desc: "Bater a meta de água 14 dias seguidos",
+    goal: 14,
+    cur: () => waterStreak(),
+    reward: 150,
+    legend: true
+  },
+  {
+    id: "fotologueiro",
+    name: "Fotologueiro",
+    desc: "Juntar 10 fotos no Fotolog (fechando o dia)",
+    goal: 10,
+    cur: () => S.fotolog.length,
+    reward: 100,
+    legend: true
+  },
+  {
     // Secreta: aparece como "???" até ser descoberta (13 toques seguidos no Prumi emo)
     id: "morcego",
     name: "Segredo da noite",
@@ -175,7 +211,16 @@ function earn(n, el) {
 
 const paidDay = d => S.paid[d] || (S.paid[d] = {});
 
+/* Guarda o dia quando o app é usado depois das 22h (conquista Criatura da noite). Devolve true se marcou agora. */
+function marcarNoite() {
+  const d = today();
+  if (new Date().getHours() < 22 || S.noites.includes(d)) return false;
+  S.noites = [...S.noites, d].slice(-30);
+  return true;
+}
+
 function checkAch() {
+  marcarNoite();
   const got = [];
   for (const a of ACHS) {
     if (S.ach[a.id]) continue;
