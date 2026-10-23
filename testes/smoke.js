@@ -119,6 +119,12 @@ module.exports = async url => {
   await espera(30);
   ok(ev(`tab === "hoje" && document.getElementById("q").value.includes("Duna")`), "virar tarefa preenche o campo de tarefa");
 
+  // resumo da semana
+  ev(`S.sessions.push({ id: "rs1", subjectId: "x", date: today(), min: 50 }); window.__rs = resumoSemanaHTML(mondayOf(today()));`);
+  ok(/Estudo/.test(ev("__rs")) && /Compartilhar/.test(ev("__rs")), "resumo da semana monta o cartão");
+  ev(`S.resumoVisto = mondayOf(today()); semanaDoResumo = () => null;`);
+  ok(ev("resumoSemanaHTML()") === "", "resumo some depois de fechado");
+
   fechar();
   return erros;
 };

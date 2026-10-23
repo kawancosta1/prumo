@@ -19,7 +19,7 @@ const forms = {
     const raw = getV("q");
     if (!raw) return;
     const p = parseQuick(raw, selDay);
-    if (!p.title) return toast("Escreva o nome da tarefa"), undefined;
+    if (!p.title) return (toast("Escreva o nome da tarefa"), undefined);
     const nid = newId();
     S.tasks.push({
       id: nid,
@@ -217,6 +217,9 @@ document.addEventListener("input", e => {
 
 function toggleTask(x) {
   x.done = !x.done;
+  if (x.done)
+    x.feitaEm = today(); // usado no resumo da semana
+  else delete x.feitaEm;
   if (x.done && x.repeat) {
     const base = x.date > today() ? x.date : today();
     const nd = nextDate(x.repeat, base);
