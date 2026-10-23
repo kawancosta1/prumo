@@ -15,6 +15,8 @@ const FEEDBACK_TIPOS = [
   ["outro", "Outro"]
 ];
 
+const FEEDBACK_ESPERA = 12e3; // se o FormSubmit não responder nesse tempo, a mensagem quase sempre já foi
+
 let feedback = {
   tipo: "ideia",
   texto: "",
@@ -34,7 +36,8 @@ const feedbackTipoNome = () => (FEEDBACK_TIPOS.find(([k]) => k === feedback.tipo
 
 /** Link de email já preenchido (plano B) */
 function feedbackMailto() {
-  const corpo = `${feedbackTipoNome()}\n\n${feedback.texto}${feedback.email ? `\n\nResponder para: ${feedback.email}` : ""}${feedback.tecnico ? `\n\n${feedbackTecnico()}` : ""}`;
+  const texto = feedback.texto || feedback.ultimaMsg || "";
+  const corpo = `${feedbackTipoNome()}\n\n${texto}${feedback.email ? `\n\nResponder para: ${feedback.email}` : ""}${feedback.tecnico ? `\n\n${feedbackTecnico()}` : ""}`;
   return `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(FEEDBACK_ASSUNTO)}&body=${encodeURIComponent(corpo)}`;
 }
 
@@ -43,7 +46,7 @@ function viewFeedback() {
     return `<section class="block feedback">
       <div class="fb-hero">${prumi({ mood: "party", size: 110, fill: Math.min(1, waterToday() / S.waterGoal) })}</div>
       <h1 class="h1">Valeu!</h1>
-      <p class="note">Sua mensagem chegou. Ela ajuda muito a deixar o Prumo melhor.${feedback.email ? " Se precisar, a gente responde no seu email." : ""}</p>
+      <p class="note">${feedback.incerto ? `Mandei, mas a confirmação demorou. Ela quase sempre chega. Se quiser garantir, <a href="${esc(feedbackMailto())}">mande também pelo app de email</a>.` : `Sua mensagem chegou. Ela ajuda muito a deixar o Prumo melhor.${feedback.email ? " Se precisar, a gente responde no seu email." : ""}`}</p>
       <div class="row"><button class="btn primary" data-act="fb-novo">Mandar outra</button><button class="btn ghost" data-tab="hoje">Voltar para Hoje</button></div>
     </section>`;
   const tipos = FEEDBACK_TIPOS.map(
@@ -103,21 +106,41 @@ async function enviarFeedback() {
     corpo._replyto = feedback.email;
   }
   if (feedback.tecnico) corpo.tecnico = feedbackTecnico();
+  // Formulário comum (não JSON): o navegador manda direto, sem a consulta prévia de CORS que pode travar.
+  const ctrl = typeof AbortController === "function" ? new AbortController() : null;
+  const limite = setTimeout(() => ctrl && ctrl.abort(), FEEDBACK_ESPERA);
+  const deuCerto = incerto => {
+    feedback = {
+      ...feedback,
+      ultimaMsg: feedback.texto,
+      texto: "",
+      enviando: false,
+      enviado: true,
+      incerto,
+      ultimo: Date.now()
+    };
+    fx.burst = ".fb-hero";
+    toast("Feedback enviado. Valeu!", false, "party");
+  };
   try {
     const r = await fetch("https://formsubmit.co/ajax/" + FEEDBACK_EMAIL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify(corpo)
+      headers: { Accept: "application/json" },
+      body: new URLSearchParams(corpo),
+      signal: ctrl ? ctrl.signal : undefined
     });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !(j.success === true || j.success === "true")) throw new Error(j.message || "falhou");
-    feedback = { ...feedback, texto: "", enviando: false, enviado: true, ultimo: Date.now() };
-    fx.burst = ".fb-hero";
-    toast("Feedback enviado. Valeu!", false, "party");
+    deuCerto(false);
   } catch (e) {
-    feedback.enviando = false;
-    feedback.erro = true;
+    if (e && e.name === "AbortError")
+      deuCerto(true); // demorou demais: o pedido já saiu, então tratamos como enviado
+    else {
+      feedback.enviando = false;
+      feedback.erro = true;
+    }
   }
+  clearTimeout(limite);
   render();
 }
 
@@ -131,6 +154,6 @@ ACOES_EXTRAS["fb-tipo"] = (b, id) => {
 };
 MUDANCAS_EXTRAS.fb = () => feedbackGuardar(); // guarda o rascunho ao sair do campo
 ACOES_EXTRAS["fb-novo"] = () => {
-  feedback.enviado = false;
+  feedback.enviado = feedback.incerto = false;
   render();
 };
