@@ -1,0 +1,546 @@
+/*
+  Peças comuns dos mundos (js/mundos/base-extras.js) e o que cada mundo novo usa.
+  Cada mundo tem sua seção marcada por [data-mundo="..."] mais abaixo.
+*/
+
+/* ===================== chuva de enfeites na troca de aba ===================== */
+#chuva-mundo {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  overflow: hidden;
+}
+#chuva-mundo span {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  animation-timing-function: cubic-bezier(0.3, 0.1, 0.6, 1);
+  animation-fill-mode: forwards;
+  will-change: transform, opacity;
+}
+#chuva-mundo.mv-cair span {
+  top: -40px !important;
+  animation-name: mv-cair;
+}
+#chuva-mundo.mv-subir span {
+  top: auto !important;
+  bottom: -40px;
+  animation-name: mv-subir;
+}
+#chuva-mundo.mv-atravessar span {
+  left: -40px !important;
+  animation-name: mv-atravessar;
+  animation-timing-function: linear;
+}
+#chuva-mundo.mv-brilhar span {
+  animation-name: mv-brilhar;
+}
+@keyframes mv-cair {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0);
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--deriva), 105vh) rotate(var(--giro));
+  }
+}
+@keyframes mv-subir {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--deriva), -100vh) scale(1.1) rotate(var(--giro));
+  }
+}
+@keyframes mv-atravessar {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(100vw + 80px), var(--deriva)) rotate(var(--giro));
+  }
+}
+@keyframes mv-brilhar {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.15) rotate(calc(var(--giro) / 4));
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.4) rotate(calc(var(--giro) / 2));
+  }
+}
+
+/* ===================== cartão do recurso exclusivo de cada mundo ===================== */
+.cartao-mundo {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  overflow: hidden;
+}
+.cartao-mundo .cm-topo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+.cartao-mundo .cm-topo .h2 {
+  margin: 0;
+}
+.cartao-mundo .cm-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.cartao-mundo .cm-cena {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+.cm-barra {
+  height: 10px;
+  border-radius: 99px;
+  background: var(--sunken);
+  overflow: hidden;
+}
+.cm-barra span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--accent);
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cm-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cm-lista li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 14px;
+}
+.cm-mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12.5px;
+}
+
+/* enfeite pequeno no cartão do Prumi (embaixo, à direita, como a lua do emo) */
+.enfeite-mundo {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 14px 10px;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.enfeite-mundo svg {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+/* ===================== Sertanejo: roça ===================== */
+.roca .estrela-roca {
+  animation: piscar 3s ease-in-out infinite;
+}
+.roca .vagalume {
+  animation: vagalume 3.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px #e6f96b);
+}
+@keyframes piscar {
+  50% {
+    opacity: 0.2;
+  }
+}
+@keyframes vagalume {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(6px, -8px);
+    opacity: 1;
+  }
+}
+
+/* ===================== Forrozeiro: arraiá ===================== */
+.arraia .bandeirinha {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: balancar-bandeira 2.4s ease-in-out infinite;
+}
+@keyframes balancar-bandeira {
+  50% {
+    transform: rotate(6deg);
+  }
+}
+.arraia .chama {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: chama 0.9s ease-in-out infinite alternate;
+}
+@keyframes chama {
+  to {
+    transform: scale(1.06, 0.94) skewX(3deg);
+  }
+}
+
+/* ===================== Pagodeiro: roda de samba ===================== */
+.roda {
+  color: var(--ink);
+}
+.roda .lugar.chegou {
+  animation: chegar 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes chegar {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ===================== Funkeiro: paredão ===================== */
+.paredao .eq-barra {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: eq-barra 0.7s ease-in-out infinite alternate;
+}
+.paredao.no-talo .eq-barra {
+  animation-duration: 0.35s;
+  filter: brightness(1.15);
+}
+@keyframes eq-barra {
+  from {
+    transform: scaleY(0.75);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* ===================== Rapper: caderno de rimas ===================== */
+.caderno {
+  background: repeating-linear-gradient(#fffdf5 0 27px, #c5d5ea 27px 28px);
+  border-left: 3px solid #e57373;
+  border-radius: 8px;
+  padding: 6px 12px 6px 16px;
+  color: #263238;
+  font-family: "Caveat", cursive;
+  font-size: 21px;
+  line-height: 28px;
+}
+.caderno p {
+  margin: 0;
+}
+.caderno .vazio {
+  font-size: 17px;
+  opacity: 0.6;
+}
+
+/* ===================== Trapper: cofre de joias ===================== */
+.cofre {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #1a1426, #2d1b4e);
+}
+.cofre figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.cofre figcaption {
+  font-size: 10px;
+  color: #d1c4e9;
+  text-align: center;
+}
+.joia {
+  width: 44px;
+  height: 44px;
+}
+.joia.liberada {
+  filter: drop-shadow(0 0 4px #80deea);
+}
+.joia .faisca {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: faisca 1.8s ease-in-out infinite;
+}
+@keyframes faisca {
+  0%,
+  60%,
+  100% {
+    transform: scale(0);
+  }
+  75% {
+    transform: scale(1.2);
+  }
+}
+.joia.flex {
+  animation: flex-joia 0.6s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+@keyframes flex-joia {
+  50% {
+    transform: scale(1.35) rotate(-8deg);
+    filter: drop-shadow(0 0 10px #e040fb);
+  }
+}
+
+/* ===================== Gamer: boss ===================== */
+.boss .boss-corpo {
+  animation: boss 1.2s steps(2) infinite;
+}
+.boss.vencido .boss-corpo {
+  animation: none;
+  opacity: 0.25;
+  filter: grayscale(1);
+}
+@keyframes boss {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+.cm-boss .cm-lista {
+  margin-top: 8px;
+  opacity: 0.85;
+}
+
+/* ===================== Otaku: álbum e aura ===================== */
+.album {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.album figure {
+  margin: 0;
+}
+.album svg {
+  width: 100%;
+  height: auto;
+}
+.figurinha.tem {
+  animation: figurinha 0.5s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+@keyframes figurinha {
+  from {
+    transform: rotateY(90deg);
+  }
+}
+html.aura-otaku .hero .prumi {
+  animation: aura 2.4s ease-in-out infinite;
+}
+@keyframes aura {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px #f48fb1) drop-shadow(0 0 10px #ce93d8);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px #fff59d) drop-shadow(0 0 18px #f48fb1);
+  }
+}
+
+/* ===================== Programador: commits ===================== */
+.cartao-mundo .contrib {
+  max-width: 280px;
+  margin: 0 auto;
+}
+.terminal {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #0d1117;
+  color: #c9d1d9;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.terminal .hash {
+  color: #ffa657;
+}
+.terminal .ok {
+  color: #40c463;
+}
+
+/* ===================== Zen: jardim e respiração ===================== */
+.jardim .risco {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: riscar 1.4s ease-out forwards;
+}
+@keyframes riscar {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+#respirar {
+  position: fixed;
+  inset: 0;
+  z-index: 66;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--ink);
+}
+.resp-circulo {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 45%, transparent),
+    color-mix(in srgb, var(--accent) 12%, transparent)
+  );
+  transform: scale(0.45);
+  transition: transform 4s ease-in-out;
+}
+.resp-circulo.cresce,
+.resp-circulo.cheio {
+  transform: scale(1);
+}
+.resp-circulo.diminui {
+  transform: scale(0.45);
+  transition-duration: 6s;
+}
+.resp-texto {
+  font-size: 22px;
+}
+.resp-tempo {
+  font-family: "JetBrains Mono", monospace;
+  opacity: 0.6;
+}
+
+/* ===================== Coach: desafio e energia ===================== */
+.desafio {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.desafio > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+.anel21 {
+  width: 96px;
+  height: 96px;
+  flex: none;
+  color: var(--ink);
+}
+.checkin {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.checkin .row {
+  gap: 6px;
+}
+.energia7 {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+}
+
+/* ===================== Vovó: manta ===================== */
+.manta .ponto {
+  animation: ponto 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+@keyframes ponto {
+  from {
+    opacity: 0;
+  }
+}
+.conselho {
+  margin: 10px 0 0;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+/* ===================== Clean boy: rotina ===================== */
+.cuidados .cuidado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.cuidados .cuidado-marca {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.6px solid color-mix(in srgb, var(--ink) 40%, transparent);
+  flex: none;
+  transition: all 0.25s ease;
+}
+.cuidados .cuidado[aria-pressed="true"] {
+  background: color-mix(in srgb, #d4af37 10%, transparent);
+}
+.cuidados .cuidado[aria-pressed="true"] .cuidado-marca {
+  background: #d4af37;
+  border-color: #d4af37;
+  box-shadow: inset 0 0 0 3px var(--surface);
+}
+.cm-rotina.impecavel {
+  background: linear-gradient(135deg, var(--surface), color-mix(in srgb, #d4af37 10%, var(--surface)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #chuva-mundo {
+    display: none;
+  }
+  .cartao-mundo *,
+  .enfeite-mundo * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

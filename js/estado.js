@@ -80,6 +80,7 @@ const blank = () => ({
   lembretes: { ligado: false, agua: true, tarefas: true, habitos: true, provas: true, tokens: [] }, // lembretes com o app fechado (js/lembretes.js)
   noites: [], // dias em que o app foi usado depois das 22h
   rock: { energia: 0, starAte: 0, usos: 0 }, // Star Power do mundo Roqueiro (js/mundos/rock-efeitos.js)
+  mundos: {}, // dados dos outros mundos: roça do sertanejo, boss do gamer... (js/mundos/*-extras.js)
   emo: { cartas: [], cadeado: null, mixtape: { nome: "", faixas: [] } }, // cartas, cadeado do diário e mixtape (js/mundos/emo-extras.js)
   livros: [], // Estante de leitura (js/leitura.js)
   privacidade: { estante: true, fotolog: true, humor: false, status: false }, // o que os amigos veem (humor e status começam escondidos)
@@ -244,6 +245,7 @@ function normalize(x) {
       ? b.lembretes.tokens.filter(t => typeof t === "string").slice(0, 5)
       : []
   };
+  if (!b.mundos || typeof b.mundos !== "object" || Array.isArray(b.mundos)) b.mundos = {}; // dados de cada mundo (js/mundos/*-extras.js)
   b.relatarErros = b.relatarErros === true; // relato de erros só com aceite (js/relato-erros.js)
   if (typeof b.resumoVisto !== "string") b.resumoVisto = ""; // segunda-feira da última semana resumida (js/resumo-semana.js)
   if (!b.parceria || typeof b.parceria !== "object") b.parceria = { id: null, tipo: "namoro" };

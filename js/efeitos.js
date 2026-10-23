@@ -78,7 +78,7 @@ function fxLoop() {
   }
 }
 
-/* Formas do confete: "ret" (retângulo), "redondo", "morcego", "gota", "petala" */
+/* Formas do confete: "ret" (retângulo), "redondo", "morcego", "gota", "petala", "palheta", "estrela", "raio" e as dos outros mundos */
 const FORMAS_CONFETE =
   typeof Path2D === "undefined" // navegadores muito antigos não têm Path2D
     ? {}
@@ -92,7 +92,20 @@ const FORMAS_CONFETE =
         estrela: new Path2D(
           "M0 -6L1.8 -1.9L6 -1.6L2.8 1.3L3.7 5.6L0 3.4L-3.7 5.6L-2.8 1.3L-6 -1.6L-1.8 -1.9Z"
         ),
-        raio: new Path2D("M2 -7L-4 1H0L-2 7L4 -1H0Z")
+        raio: new Path2D("M2 -7L-4 1H0L-2 7L4 -1H0Z"),
+        // usadas pelos outros mundos (js/mundos/<mundo>-extras.js)
+        folha: new Path2D("M0 -7Q6 -3 4 3Q2 6 0 7Q-2 6 -4 3Q-6 -3 0 -7Z"),
+        nota: new Path2D("M1 -7V3.5A2.6 2.2 0 1 1 -1 1.6V-7H5V-4.5H1Z"),
+        coracao: new Path2D("M0 6Q-7 0 -6 -3.5Q-4.5 -7 0 -3.5Q4.5 -7 6 -3.5Q7 0 0 6Z"),
+        diamante: new Path2D("M-5 -2L-2.5 -5.5H2.5L5 -2L0 6Z"),
+        pixel: new Path2D("M-3.5 -3.5H3.5V3.5H-3.5Z"),
+        flor: new Path2D(
+          "M0 -6A2.6 2.6 0 0 1 2.4 -1.4A2.6 2.6 0 0 1 5.5 1.6A2.6 2.6 0 0 1 1.5 4.6A2.6 2.6 0 0 1 -1.5 4.6A2.6 2.6 0 0 1 -5.5 1.6A2.6 2.6 0 0 1 -2.4 -1.4A2.6 2.6 0 0 1 0 -6Z"
+        ),
+        bandeira: new Path2D("M-5 -4H5L0 5Z"),
+        moeda: new Path2D(
+          "M0 -5A5 5 0 1 1 0 5A5 5 0 1 1 0 -5ZM0 -2.6A2.6 2.6 0 1 0 0 2.6A2.6 2.6 0 1 0 0 -2.6Z"
+        )
       };
 function desenharParticula(p) {
   if (p.forma === "redondo") {
