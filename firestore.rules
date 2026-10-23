@@ -151,7 +151,9 @@ service cloud.firestore {
         && request.resource.data.dono == resource.data.dono
         && clubeValido(request.resource.data)
         && (request.auth.uid == resource.data.dono
-            || request.resource.data.membros.toSet().difference(resource.data.membros.toSet()).size() == 0);
+            // quem não é dono só pode sair (tirar a si mesmo), sem mexer no resto
+            || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['membros'])
+                && request.resource.data.membros.toSet() == resource.data.membros.toSet().difference([request.auth.uid].toSet())));
       allow delete: if logado() && resource.data.dono == request.auth.uid;
 
       // progresso de cada membro no livro
