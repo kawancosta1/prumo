@@ -24,6 +24,10 @@ const leituraPadrao = () => ({
   metas: {},
   saldo: 0,
   total: 0,
+  minutos: {}, // minutos de leitura por dia (js/leitura-dia.js)
+  meta: { paginas: 10, minutos: 25 }, // meta do dia: páginas OU minutos de leitura e estudo
+  escudos: 0, // escudos guardados para a sequência
+  diasEscudo: [], // dias salvos por um escudo
   decor: {
     movel: "clara",
     fundo: "liso",
@@ -214,6 +218,14 @@ function normalize(x) {
     };
   }
   if (!Array.isArray(b.leitura.comprados)) b.leitura.comprados = [];
+  if (!b.leitura.minutos || typeof b.leitura.minutos !== "object") b.leitura.minutos = {};
+  if (!b.leitura.meta || typeof b.leitura.meta !== "object") b.leitura.meta = { paginas: 10, minutos: 25 };
+  b.leitura.meta = {
+    paginas: Math.max(1, Math.min(500, +b.leitura.meta.paginas || 10)),
+    minutos: Math.max(5, Math.min(600, +b.leitura.meta.minutos || 25))
+  };
+  b.leitura.escudos = Math.max(0, Math.min(3, +b.leitura.escudos || 0));
+  if (!Array.isArray(b.leitura.diasEscudo)) b.leitura.diasEscudo = [];
   if (!b.sons || typeof b.sons !== "object") b.sons = {};
   b.sons = { chuva: b.sons.chuva !== false, pagina: b.sons.pagina !== false };
   if (!b.parceria || typeof b.parceria !== "object") b.parceria = { id: null, tipo: "namoro" };
@@ -236,6 +248,7 @@ function prune() {
   const pl = addDays(today(), -400);
   for (const k of Object.keys(S.paid)) if (k < pl) delete S.paid[k];
   for (const k of Object.keys(S.leitura.log)) if (k < pl) delete S.leitura.log[k]; // páginas por dia: guarda um ano
+  for (const k of Object.keys(S.leitura.minutos || {})) if (k < pl) delete S.leitura.minutos[k];
   const tl = addDays(today(), -45);
   S.tasks = S.tasks.filter(t => !(t.done && t.date < tl));
   S.events = S.events.filter(e => e.date >= tl);

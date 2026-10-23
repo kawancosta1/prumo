@@ -156,4 +156,4 @@ function updateMascots(pop) {
 }
 
 const heroHTML = () =>
-  `<div class="herobox"><div class="hero"><button class="mslot ${fx.entrada ? "entra-" + fx.entrada : ""}" data-kind="hero" data-size="78" data-act="poke" aria-label="Prumi, toque para um carinho"></button><div class="bubble" id="bubble" aria-live="polite"></div></div>${humorHTML()}${enfeiteMundo()}</div>`;
+  `<div class="herobox"><div class="hero"><button class="mslot ${fx.entrada ? "entra-" + fx.entrada : ""}" data-kind="hero" data-size="78" data-act="poke" aria-label="Prumi, toque para um carinho"></button><div class="bubble" id="bubble" aria-live="polite"></div></div>${humorHTML()}${typeof metaDiaHTML === "function" ? metaDiaHTML() : ""}${enfeiteMundo()}</div>`;

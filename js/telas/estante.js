@@ -153,6 +153,7 @@ function cartaoLendoHTML(l) {
     <div class="main"><span class="title">${esc(l.titulo)}</span><span class="meta">${esc(l.autor || "Autor desconhecido")}</span>
       <div class="progress"><span style="width:${progressoDe(l)}%"></span></div>
       <span class="meta mono">${l.pagina}${l.paginas ? ` de ${l.paginas} páginas · ${progressoDe(l)}%` : " páginas"}</span>
+      ${typeof previsaoHTML === "function" ? previsaoHTML(l) : ""}
       <div class="row" style="gap:6px"><button class="btn small primary" data-act="livro-timer" data-id="${l.id}">Ler agora</button><button class="btn small" data-act="livro-mais" data-id="${l.id}" data-n="10">+10</button><button class="btn small" data-act="livro-mais" data-id="${l.id}" data-n="25">+25</button><button class="btn small ghost" data-act="livro-abrir" data-id="${l.id}">Detalhes</button></div>
     </div></li>`;
 }
@@ -347,13 +348,14 @@ function viewEstante() {
   const aberto = livroAberto && livro(livroAberto);
   let corpo = "";
   if (estanteTab === "estante") {
-    corpo = `<div class="estante-quadro">${casaSVG()}</div>${casaEscolhaHTML()}
+    corpo = `${typeof sessaoHTML === "function" ? sessaoHTML() : ""}<div class="estante-quadro">${casaSVG()}</div>${casaEscolhaHTML()}
       ${aberto && estanteTab === "estante" ? detalheLivroHTML(aberto) : ""}
       <h2 class="h2">Lendo agora <span class="count">${lendo.length}</span></h2>
       ${lendo.length ? `<ul class="list">${lendo.map(cartaoLendoHTML).join("")}</ul>` : `<div class="empty">${textoMundo("vazioLeitura", "Nenhum livro aberto.")} <button class="btn small primary" data-act="estante-tab" data-t="adicionar">Adicionar um livro</button></div>`}`;
   } else if (estanteTab === "adicionar") corpo = adicionarHTML();
   else if (estanteTab === "livros") corpo = prateleirasHTML();
-  else if (estanteTab === "metas") corpo = metasHTML();
+  else if (estanteTab === "metas")
+    corpo = (typeof metaAjustesHTML === "function" ? metaAjustesHTML() : "") + metasHTML();
   else corpo = decorarHTML();
   return `
   <section class="block"><h1 class="h1">Estante<small>${livrosEm("lido").length} lidos · ${lendo.length} lendo · ${S.leitura.saldo} páginas para decorar</small></h1>
@@ -494,19 +496,7 @@ ACOES_EXTRAS.quarto = b => {
   commit();
 };
 
-ACOES_EXTRAS["livro-timer"] = (b, id) => {
-  const l = livro(id);
-  if (!l) return;
-  timer.running = true;
-  timer.start = Date.now();
-  timer.acc = 0;
-  timer.beeped = false;
-  timer.label = "Lendo " + l.titulo;
-  saveTimerState();
-  toast("Sessão de leitura iniciada!", false, "focus");
-  react("focus", `Boa leitura de <b>${esc(l.titulo)}</b>! Eu fico aqui do seu lado.`, 3200);
-  render();
-};
+// "Ler agora" abre a sessão de leitura (js/leitura-dia.js)
 
 ACOES_EXTRAS["pet-tocar"] = () => {
   const decor = (S.leitura && S.leitura.decor && S.leitura.decor.quarto) || {};

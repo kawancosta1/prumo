@@ -61,6 +61,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/internet2000.js` | Internet dos anos 2000 no perfil: status de MSN e "Ouvindo:", depoimentos com aprovação, comunidades (selos por conquista), contador de visitas, fundos do perfil e o Fotolog do dia |
 | `js/sons.js` | Sons dos mundos, gerados com WebAudio. Emo: chuva no foco e virar página. Roqueiro: plateia no foco, palhetada ao concluir tarefa, acorde do Star Power e riff secreto (dá pra desligar) |
 | `js/leitura.js` | Estante de leitura (estilo Skoob): livros, progresso, notas, metas, moeda "páginas", conquistas de leitura, busca na Open Library e no Google Books e leitor de código de barras |
+| `js/leitura-dia.js` | Leitura no dia a dia: **sessão de leitura** com cronômetro, Prumi de óculos e sons ambiente (biblioteca, café, chuva, lareira), **meta do dia** (páginas ou minutos, anel no cartão do Prumi), **sequência** de dias lendo ou estudando com **escudos**, e previsão de término dos livros |
 | `js/estante-enfeites.js` | Móveis, paredes e enfeites da estante (comprados com páginas; alguns só aparecem num mundo) |
 | `js/telas/estante.js` | Aba Estante: desenho da estante, Lendo agora, Adicionar, Livros, Metas e Decorar |
 | `js/firebase-config.js` | A configuração do Firebase (enquanto for `null`, o app fica só no aparelho) |
