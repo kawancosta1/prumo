@@ -51,6 +51,7 @@ function perfilAmigoHTML(uid) {
 
     <div class="ms-bloco"><span class="ms-titulo">Mimos</span>
       <div class="mimos">${mimos.map(([k, l]) => `<button class="btn small" data-act="amigo-mimo" data-id="${esc(uid)}" data-t="${k}">${l}</button>`).join("")}</div>
+      ${typeof presenteHTML === "function" ? presenteHTML(uid) : ""}
       <span class="note">Até ${MIMOS_DIA} por dia pra cada amigo. ${mimosHoje(uid) ? `Hoje você já mandou ${mimosHoje(uid)}.` : ""}</span>
     </div>
 

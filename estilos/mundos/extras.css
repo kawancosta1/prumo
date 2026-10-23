@@ -544,3 +544,114 @@ html.aura-otaku .hero .prumi {
     transition: none !important;
   }
 }
+
+/* ===================== quarto: itens vivos (js/quarto-extras.js) ===================== */
+.quarto-noite .pisca .luzinha,
+.quarto-noite .luzinha {
+  animation: luzinha 1.6s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  filter: drop-shadow(0 0 3px currentColor);
+}
+@keyframes luzinha {
+  50% {
+    opacity: 0.45;
+  }
+}
+.quarto-svg .peixe {
+  animation: peixe 6s ease-in-out infinite;
+}
+.quarto-svg .peixe.p2 {
+  animation-duration: 8s;
+  animation-direction: reverse;
+}
+@keyframes peixe {
+  50% {
+    transform: translateX(10px);
+  }
+}
+.quarto-svg .estrelinha {
+  animation: piscar 3s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.quarto-svg .cadente path {
+  stroke-dasharray: 40;
+  animation: cadente 2.6s ease-in-out infinite;
+}
+@keyframes cadente {
+  0% {
+    stroke-dashoffset: 40;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  60%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+.quarto-svg .agua-cai {
+  stroke-dasharray: 3 3;
+  animation: agua-cai 0.6s linear infinite;
+}
+@keyframes agua-cai {
+  to {
+    stroke-dashoffset: -6;
+  }
+}
+.quarto-svg .roupa-chao:hover {
+  filter: brightness(1.15);
+}
+html.arrumando-quarto .quarto-svg .arrastavel {
+  cursor: grab;
+  outline: none;
+  filter: drop-shadow(0 0 3px var(--accent));
+  touch-action: none;
+}
+.arrumar-quarto {
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+.kit-mundo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+.kit-mundo .cm-barra {
+  width: 100%;
+}
+.sitem .epoca {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: #ff7043;
+  color: #fff;
+}
+.presentes-amigo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.presentes-amigo .row {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.presentes-amigo .btn svg {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .quarto-svg *,
+  .quarto-noite .luzinha {
+    animation: none !important;
+  }
+}

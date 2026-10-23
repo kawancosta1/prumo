@@ -342,6 +342,7 @@ function receberItem(i) {
     persist();
     if (i.mimo === "nudge") tremerTela();
     if (["abraco", "beijinho", "highfive"].includes(i.mimo)) setTimeout(bigConfetti, 200);
+    if (typeof guardarPresente === "function") guardarPresente(i); // presente aparece no quarto (js/quarto-extras.js)
   }
   react(i.tipo === "mimo" && i.mimo === "agua" ? "drink" : "party", msg + ".", 4500);
   notificar({

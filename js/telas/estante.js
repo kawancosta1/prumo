@@ -275,7 +275,7 @@ function decorarHTML() {
       : `<span class="tag price ${S.leitura.saldo < x.preco ? "short" : ""}">${x.preco} p.</span>`;
   const botao = (x, tipo, ativo) => {
     const tem = temDecor(x);
-    return `<button class="sitem ${ativo ? "on" : tem ? "own" : x.ach ? "lock" : "buy"}" data-act="decor" data-tipo="${tipo}" data-id="${x.id}"><span class="sname">${esc(x.nome)}</span>${ativo ? `<span class="tag on">${tipo === "enfeite" ? "Na estante" : "Usando"}</span>` : tem ? `<span class="tag">${tipo === "enfeite" ? "Colocar" : "Usar"}</span>` : preco(x)}</button>`;
+    return `<button class="sitem ${ativo ? "on" : tem ? "own" : x.ach ? "lock" : "buy"}" data-act="decor" data-tipo="${tipo}" data-id="${x.id}"><span class="sname">${esc(x.nome)}${x.epoca && typeof EPOCAS !== "undefined" ? ` <small class="epoca">${EPOCAS[x.epoca].nome}</small>` : ""}</span>${ativo ? `<span class="tag on">${tipo === "enfeite" ? "Na estante" : "Usando"}</span>` : tem ? `<span class="tag">${tipo === "enfeite" ? "Colocar" : "Usar"}</span>` : preco(x)}</button>`;
   };
   const miniEnfeite = e =>
     `<svg viewBox="-20 -40 40 44" width="44" height="48" aria-hidden="true">${e.svg()}</svg>`;
@@ -315,6 +315,8 @@ function decorarHTML() {
       </div>
     </div>
   </div>
+  ${typeof arrumarHTML === "function" ? arrumarHTML() : ""}
+  ${typeof kitsHTML === "function" ? kitsHTML() : ""}
   ${Object.entries(LUGARES_QUARTO)
     .map(([slot, lugar]) => {
       const atual = (d.quarto || {})[slot] ?? QUARTO_PADRAO[slot];
@@ -322,8 +324,13 @@ function decorarHTML() {
         slot === "chao"
           ? `<svg class="swatch" viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice">${i.svg(60, 40)}</svg>`
           : `<svg class="prev-quarto" viewBox="-4 -4 ${lugar.w + 8} ${lugar.h + 8}" aria-hidden="true">${i.svg()}</svg>`;
-      const itens = QUARTO.filter(i => i.slot === slot && doMundo(i));
-      const nenhum = ["poster", "tapete", "pet"].includes(slot)
+      const itens = QUARTO.filter(
+        i => i.slot === slot && doMundo(i) && (typeof quartoDisponivel !== "function" || quartoDisponivel(i))
+      );
+      const nenhum = (typeof LUGARES_OPCIONAIS !== "undefined"
+        ? LUGARES_OPCIONAIS
+        : ["poster", "tapete", "pet"]
+      ).includes(slot)
         ? `<button class="sitem ${!atual ? "on" : "own"}" data-act="quarto" data-slot="${slot}" data-id=""><span class="sname">Nenhum</span><span class="tag ${!atual ? "on" : ""}">${!atual ? "Usando" : "Usar"}</span></button>`
         : "";
       return `<h3 class="h3">${lugar.nome}</h3><div class="shop">${nenhum}${itens

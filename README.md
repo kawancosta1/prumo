@@ -89,6 +89,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/capas.js` | Capas desenhadas com título estilizado (6 estilos) para livros sem foto |
 | `js/quarto.js` | Quarto de leitura: chão, janela, pôster, cama, tapete e luz comprados com páginas, com a estante dentro |
 | `js/casa.js` | Casa da leitura: cômodos além do quarto (sala, cozinha, quintal com céu pela hora, varanda, escritório, sótão, cripta no emo, estúdio no rock e a biblioteca secreta com 1.000 páginas). Comprados com páginas, com opções de cor grátis. Dados em `S.leitura.decor.casa` |
+| `js/quarto-extras.js` | Quarto, parte 2: lugares novos (luzes e varais, cortina, planta, móvel, pelúcia), itens vivos (janela com o céu da hora e estrela cadente, planta que cresce com os hábitos, escrivaninha arrumada ou bagunçada, mural com as tarefas, calendário da sequência, quadro do Fotolog, troféus das provas), kits por mundo, decoração de época, vitrola e rádio que tocam, modo bagunça, presentes de amigos e arrastar coisas pelo quarto |
 | `js/telas/*.js` | Uma função por aba (`viewHoje`, `viewEstudos`...) |
 | `js/telas/perfil.js` | Perfil estilo MySpace na aba Prumi: subnick, música, Top 8 e recados |
 | `js/render.js` | `render()`: desenha a aba atual |

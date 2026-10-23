@@ -51,6 +51,37 @@ const FUNDOS = [
     svg: (W, H) => `<rect width="${W}" height="${H}" fill="var(--sunken)"/>`
   },
   {
+    id: "bolinhas",
+    nome: "Papel de bolinhas",
+    preco: 90,
+    svg: (W, H) => {
+      let s = `<rect width="${W}" height="${H}" fill="#FCE4EC"/>`;
+      for (let y = 10, i = 0; y < H; y += 20, i++)
+        for (let x = i % 2 ? 20 : 10; x < W; x += 20)
+          s += `<circle cx="${x}" cy="${y}" r="3" fill="#F8BBD0"/>`;
+      return s;
+    }
+  },
+  {
+    id: "folhagem",
+    nome: "Papel de folhagem",
+    preco: 120,
+    svg: (W, H) => {
+      let s = `<rect width="${W}" height="${H}" fill="#E8F5E9"/>`;
+      for (let y = 0, i = 0; y < H; y += 34, i++)
+        for (let x = i % 2 ? 22 : 0; x < W; x += 44)
+          s += `<path d="M${x + 10} ${y + 30}Q${x + 2} ${y + 14} ${x + 14} ${y + 4}Q${x + 20} ${y + 18} ${x + 10} ${y + 30}Z" fill="#A5D6A7"/><path d="M${x + 10} ${y + 30}Q${x + 12} ${y + 16} ${x + 14} ${y + 6}" stroke="#81C784" fill="none"/>`;
+      return s;
+    }
+  },
+  {
+    id: "madeira_ripada",
+    nome: "Painel ripado",
+    preco: 140,
+    svg: (W, H) =>
+      `<rect width="${W}" height="${H}" fill="#C8A47E"/>${Array.from({ length: Math.ceil(W / 12) }, (_, i) => `<rect x="${i * 12}" width="8" height="${H}" fill="#B98F66"/>`).join("")}`
+  },
+  {
     id: "tijolo",
     nome: "Tijolinho",
     preco: 120,
