@@ -25,6 +25,13 @@ const fitaK7 = (cor = "#141416", rotulo = "#F2EAD3") =>
 const poster = (x, y, giro, fundo, cor, l1, l2, desenho = "") =>
   `<g transform="translate(${x} ${y}) rotate(${giro})"><rect x="-13" y="-17" width="26" height="34" fill="${fundo}" stroke="#141416" stroke-width=".8"/><text y="-7" font-size="4.6" font-weight="800" text-anchor="middle" fill="${cor}" font-family="Bungee,Impact,sans-serif">${l1}</text><text y="-2" font-size="4.6" font-weight="800" text-anchor="middle" fill="${cor}" font-family="Bungee,Impact,sans-serif">${l2}</text>${desenho}<circle cx="-11" cy="-15" r=".9" fill="#C9CED6"/><circle cx="11" cy="-15" r=".9" fill="#C9CED6"/></g>`;
 
+// Camiseta de banda emo paródia
+const camisetaEmo = (cor, corTexto, l1, l2, desenho = "") =>
+  tee(
+    cor,
+    `<text x="60" y="${l2 ? 101 : 104}" font-size="5" font-weight="800" text-anchor="middle" fill="${corTexto}" font-family="Bungee,Impact,sans-serif">${l1}</text>${l2 ? `<text x="60" y="108" font-size="5" font-weight="800" text-anchor="middle" fill="${corTexto}" font-family="Bungee,Impact,sans-serif">${l2}</text>` : ""}${desenho}`
+  );
+
 ITEMS.push(
   /* ===================== cabeça ===================== */
   {
@@ -309,6 +316,141 @@ ITEMS.push(
         "#E9E6EC",
         `<path d="M44 87V150M76 87V150" stroke="#C8102E" stroke-width="5.4"/><rect x="40.6" y="122" width="6.8" height="5" rx="1" fill="#C9CED6" stroke="#141416" stroke-width=".8"/><rect x="72.6" y="122" width="6.8" height="5" rx="1" fill="#C9CED6" stroke="#141416" stroke-width=".8"/>`
       )
+  },
+  {
+    id: "emo_t_mcr",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Meu Romance",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#141416", "#C8102E", "MEU", "ROMANCE", '<path d="M57 114l3 3 3-3a2.5 2.5 0 0 0-3.5-3.5L60 111l-.5-.5A2.5 2.5 0 0 0 57 114z" fill="#C8102E"/>')
+  },
+  {
+    id: "emo_t_paramais",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Paramais",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#1E1F24", "#FFC21A", "PARA", "MAIS", '<path d="M52 113h16M52 116h16M52 119h16" stroke="#FF4FD8" stroke-width="1.2"/>')
+  },
+  {
+    id: "emo_t_fallout",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Cai Fora Boy",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#2A1F33", "#F2C14E", "CAI FORA", "BOY", '<path d="M56 113l2 4 4-2-2-4z" fill="#F2C14E"/>')
+  },
+  {
+    id: "emo_t_panic",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Pânico na Pista",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#1E1218", "#F2EAD3", "PÂNICO!", "NA PISTA", '<circle cx="60" cy="115" r="3" fill="#D9B86A"/>')
+  },
+  {
+    id: "emo_t_greenday",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Dia Verde",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#141416", "#4FC488", "DIA", "VERDE", '<circle cx="60" cy="114" r="2.8" fill="#C8102E"/><path d="M59 111v-2h2v2" stroke="#4FC488" stroke-width=".8"/>')
+  },
+  {
+    id: "emo_t_blink",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Pisca-182",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#1E1F24", "#4FE3FF", "PISCA", "182", '<circle cx="60" cy="114" r="3" fill="#FFD86B"/><path d="M58 113l2 2M62 113l-2 2" stroke="#141416" stroke-width=".6"/>')
+  },
+  {
+    id: "emo_t_evanescence",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Desvanecer",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#141824", "#8CBECF", "DESVA", "NECER", '<circle cx="60" cy="114" r="3" fill="none" stroke="#8CBECF" stroke-width=".8"/>')
+  },
+  {
+    id: "emo_t_simpleplan",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Plano Simples",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#22232A", "#E0312F", "PLANO", "SIMPLES", '<path d="M60 111l1 3h3l-2.4 1.8 1 3-2.6-2-2.6 2 1-3-2.4-1.8h3z" fill="#F2C14E"/>')
+  },
+  {
+    id: "emo_t_avril",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Abril Skater",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#141416", "#FF4FD8", "ABRIL", "SKATER", '<path d="M59 111v6M57 114h4" stroke="#FF4FD8" stroke-width="1"/>')
+  },
+  {
+    id: "emo_t_theused",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Os Usados",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#1B1B1E", "#D9D5CC", "OS", "USADOS", '<rect x="56" y="112" width="8" height="4" fill="#C8102E" rx="1"/>')
+  },
+  {
+    id: "emo_t_tbs",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Devolve o Domingo",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#201A24", "#E8C24A", "DEVOLVE", "DOMINGO", '<path d="M56 113h8" stroke="#E8C24A" stroke-width="1.2"/>')
+  },
+  {
+    id: "emo_t_ptv",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Fura o Véu",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#141416", "#FF6B8B", "FURA O", "VÉU", '<circle cx="60" cy="114" r="2.5" fill="#C8102E"/>')
+  },
+  {
+    id: "emo_t_sws",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Com Sereias",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#161E28", "#7FE3FF", "COM", "SEREIAS", '<path d="M57 115q3-3 6 0" stroke="#7FE3FF" stroke-width="1" fill="none"/>')
+  },
+  {
+    id: "emo_t_atl",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Fundo do Poço",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#1F1C24", "#FFB4D6", "FUNDO DO", "POÇO", '<circle cx="60" cy="114" r="2.2" fill="#F2F2F2"/><path d="M58 116l4-4M62 116l-4-4" stroke="#C8102E" stroke-width=".7"/>')
+  },
+  {
+    id: "emo_t_nx",
+    p: "emo",
+    slot: "top",
+    name: "Camiseta Gelo Zero",
+    price: 100,
+    svg: () =>
+      camisetaEmo("#181B22", "#4FE3FF", "GELO", "ZERO", '<ellipse cx="60" cy="114" rx="3.5" ry="4.5" fill="none" stroke="#4FE3FF" stroke-width="1.2"/>')
   },
   {
     id: "emo_gravata_borboleta",

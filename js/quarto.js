@@ -262,6 +262,280 @@ const QUARTO = [
       `<rect x="2" y="2" width="40" height="52" fill="#1E1F24" stroke="#4FE3FF" stroke-width="1.2"/><rect x="20" y="8" width="4" height="4" fill="#4FE3FF"/><rect x="20" y="12" width="4" height="4" fill="#4FE3FF"/><rect x="20" y="16" width="4" height="4" fill="#4FE3FF"/><rect x="20" y="20" width="4" height="4" fill="#4FE3FF"/><rect x="20" y="24" width="4" height="4" fill="#4FE3FF"/><rect x="12" y="28" width="20" height="4" fill="#F2C318"/><rect x="20" y="32" width="4" height="8" fill="#8A6A3A"/><rect x="18" y="40" width="8" height="4" fill="#F2C318"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
   },
 
+  /* ---------- pôsteres paródia: mundo emo ---------- */
+  {
+    slot: "poster",
+    id: "q_poster_mcr",
+    nome: "Pôster Meu Romance Químico",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#C8102E"/><text x="22" y="16" font-size="5" text-anchor="middle" fill="#E0314F" font-family="Bungee,sans-serif">MEU</text><text x="22" y="23" font-size="5" text-anchor="middle" fill="#E0314F" font-family="Bungee,sans-serif">ROMANCE</text><path d="M16 38l6 6 6-6a5 5 0 0 0-7-7l-1 1-1-1a5 5 0 0 0-7 7z" fill="#C8102E"/><text x="22" y="50" font-size="3" text-anchor="middle" fill="#C9C1AE" font-family="sans-serif">PARADA NEGRA</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_paramais",
+    nome: "Pôster Paramais",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#1E1F24" stroke="#FFC21A"/><text x="22" y="18" font-size="5" text-anchor="middle" fill="#FFC21A" font-family="Bungee,sans-serif">PARA</text><text x="22" y="25" font-size="5" text-anchor="middle" fill="#FFC21A" font-family="Bungee,sans-serif">MAIS</text><path d="M12 34h20M12 39h20M12 44h20" stroke="#FF4FD8" stroke-width="2.5"/><text x="22" y="51" font-size="3" text-anchor="middle" fill="#FFD86B" font-family="sans-serif">RIOT!</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_fallout",
+    nome: "Pôster Cai Fora Boy",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#241B2E" stroke="#F2C14E"/><text x="22" y="17" font-size="4.8" text-anchor="middle" fill="#F2C14E" font-family="Bungee,sans-serif">CAI FORA</text><text x="22" y="24" font-size="4.8" text-anchor="middle" fill="#F2C14E" font-family="Bungee,sans-serif">BOY</text><circle cx="22" cy="36" r="8" fill="#5B2E7A"/><path d="M18 36l3 3 5-5" stroke="#F2C14E" stroke-width="1.6" fill="none"/><text x="22" y="51" font-size="3" text-anchor="middle" fill="#F2EAD3" font-family="sans-serif">SOB A CORTINA</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_panic",
+    nome: "Pôster Pânico na Pista",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#1C141E" stroke="#D9B86A"/><text x="22" y="16" font-size="4.8" text-anchor="middle" fill="#D9B86A" font-family="Bungee,sans-serif">PÂNICO!</text><text x="22" y="23" font-size="4.8" text-anchor="middle" fill="#D9B86A" font-family="Bungee,sans-serif">NA PISTA</text><circle cx="22" cy="35" r="7" fill="#8A1A3A"/><polygon points="22,30 20,40 24,40" fill="#D9B86A"/><text x="22" y="51" font-size="2.8" text-anchor="middle" fill="#F2EAD3" font-family="sans-serif">FEBRE DE CABARÉ</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_greenday",
+    nome: "Pôster Dia Verde",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#4FC488"/><text x="22" y="16" font-size="5" text-anchor="middle" fill="#4FC488" font-family="Bungee,sans-serif">DIA</text><text x="22" y="23" font-size="5" text-anchor="middle" fill="#4FC488" font-family="Bungee,sans-serif">VERDE</text><circle cx="22" cy="35" r="7" fill="#C8102E"/><rect x="20" y="25" width="4" height="4" fill="#4FC488"/><text x="22" y="50" font-size="3" text-anchor="middle" fill="#4FC488" font-family="sans-serif">CORAÇÃO GRANADA</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_blink",
+    nome: "Pôster Pisca-182",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#1E1F24" stroke="#4FE3FF"/><text x="22" y="17" font-size="5" text-anchor="middle" fill="#4FE3FF" font-family="Bungee,sans-serif">PISCA</text><text x="22" y="24" font-size="5" text-anchor="middle" fill="#FFD86B" font-family="Bungee,sans-serif">182</text><circle cx="22" cy="36" r="8" fill="#FFD86B"/><circle cx="19" cy="34" r="1.4" fill="#141416"/><path d="M24 33l3 2-3 2" stroke="#141416" stroke-width="1.2" fill="none"/><path d="M18 39q4 3 8 0" stroke="#141416" stroke-width="1.2" fill="none"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_evanescence",
+    nome: "Pôster Desvanecer",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#0E121E" stroke="#8CBECF"/><text x="22" y="18" font-size="4.2" text-anchor="middle" fill="#8CBECF" font-family="serif">DESVANECER</text><circle cx="22" cy="34" r="9" fill="none" stroke="#8CBECF" stroke-width="1.2"/><circle cx="22" cy="34" r="6" fill="#182A4A" opacity=".7"/><text x="22" y="51" font-size="2.8" text-anchor="middle" fill="#7FA2E8" font-family="sans-serif">ME TRAGA À VIDA</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_simpleplan",
+    nome: "Pôster Plano Simples",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#22232A" stroke="#E0312F"/><text x="22" y="16" font-size="4.6" text-anchor="middle" fill="#E0312F" font-family="Bungee,sans-serif">PLANO</text><text x="22" y="23" font-size="4.6" text-anchor="middle" fill="#E0312F" font-family="Bungee,sans-serif">SIMPLES</text><polygon points="22,28 24,34 30,34 25,38 27,44 22,40 17,44 19,38 14,34 20,34" fill="#F2C14E"/><text x="22" y="51" font-size="3" text-anchor="middle" fill="#F2F2F2" font-family="sans-serif">SEM CAPACETE</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_avril",
+    nome: "Pôster Abril Skater",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#FF4FD8"/><text x="22" y="16" font-size="4.8" text-anchor="middle" fill="#FF4FD8" font-family="Bungee,sans-serif">ABRIL</text><text x="22" y="23" font-size="4.8" text-anchor="middle" fill="#FF4FD8" font-family="Bungee,sans-serif">SKATER</text><polygon points="22,28 24,34 30,34 25,38 27,44 22,40 17,44 19,38 14,34 20,34" fill="#141416" stroke="#FF4FD8" stroke-width="1.4"/><path d="M21 42l2 8 2-8z" fill="#C8102E"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_theused",
+    nome: "Pôster Os Usados",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#1B1B1E" stroke="#D9D5CC"/><text x="22" y="17" font-size="5" text-anchor="middle" fill="#D9D5CC" font-family="Bungee,sans-serif">OS</text><text x="22" y="24" font-size="5" text-anchor="middle" fill="#D9D5CC" font-family="Bungee,sans-serif">USADOS</text><rect x="14" y="31" width="16" height="10" fill="#C8102E" rx="2"/><rect x="18" y="29" width="8" height="14" fill="#FAF6EE" opacity=".6" transform="rotate(45 22 36)"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_tbs",
+    nome: "Pôster Devolve o Domingo",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#201A24" stroke="#E8C24A"/><text x="22" y="16" font-size="4.2" text-anchor="middle" fill="#E8C24A" font-family="Bungee,sans-serif">DEVOLVE O</text><text x="22" y="23" font-size="4.2" text-anchor="middle" fill="#E8C24A" font-family="Bungee,sans-serif">DOMINGO</text><circle cx="22" cy="35" r="7" fill="none" stroke="#E8C24A" stroke-width="1.4"/><path d="M22 31v4l3 2" stroke="#E8C24A" stroke-width="1.2" stroke-linecap="round"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_ptv",
+    nome: "Pôster Fura o Véu",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#FF6B8B"/><text x="22" y="16" font-size="4.6" text-anchor="middle" fill="#FF6B8B" font-family="Bungee,sans-serif">FURA O</text><text x="22" y="23" font-size="4.6" text-anchor="middle" fill="#FF6B8B" font-family="Bungee,sans-serif">VÉU</text><circle cx="22" cy="35" r="6" fill="#C8102E"/><path d="M18 42l8-14" stroke="#FAF6EE" stroke-width="1.4" stroke-linecap="round"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_sws",
+    nome: "Pôster Com Sereias",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141C24" stroke="#7FE3FF"/><text x="22" y="16" font-size="5" text-anchor="middle" fill="#7FE3FF" font-family="Bungee,sans-serif">COM</text><text x="22" y="23" font-size="4.4" text-anchor="middle" fill="#7FE3FF" font-family="Bungee,sans-serif">SEREIAS</text><path d="M12 36q5-4 10 0t10 0" stroke="#7FE3FF" stroke-width="2" fill="none"/><path d="M12 42q5-4 10 0t10 0" stroke="#7FE3FF" stroke-width="1.4" fill="none"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_atl",
+    nome: "Pôster Fundo do Poço",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#1E1A26" stroke="#FFB4D6"/><text x="22" y="16" font-size="4.2" text-anchor="middle" fill="#FFB4D6" font-family="Bungee,sans-serif">FUNDO DO</text><text x="22" y="23" font-size="5" text-anchor="middle" fill="#FFB4D6" font-family="Bungee,sans-serif">POÇO</text><circle cx="22" cy="35" r="6" fill="#FAF6EE"/><circle cx="20" cy="34" r="1.2" fill="#141416"/><circle cx="24" cy="34" r="1.2" fill="#141416"/><path d="M19 41l6-6M25 41l-6-6" stroke="#C8102E" stroke-width="1.2"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_nx",
+    nome: "Pôster Gelo Zero",
+    preco: 70,
+    mundo: "emo",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#161B24" stroke="#4FE3FF"/><text x="22" y="16" font-size="5" text-anchor="middle" fill="#4FE3FF" font-family="Bungee,sans-serif">GELO</text><text x="22" y="23" font-size="5" text-anchor="middle" fill="#4FE3FF" font-family="Bungee,sans-serif">ZERO</text><ellipse cx="22" cy="36" rx="7" ry="9" fill="none" stroke="#4FE3FF" stroke-width="2.5"/><text x="22" y="51" font-size="3" text-anchor="middle" fill="#FAF6EE" font-family="sans-serif">ALÉM DE MIM</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+
+  /* ---------- pôsteres paródia: mundo rock ---------- */
+  {
+    slot: "poster",
+    id: "q_poster_nirvana",
+    nome: "Pôster Sorriso Grunge",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#182A40" stroke="#FFD86B"/><text x="22" y="16" font-size="5" text-anchor="middle" fill="#FFD86B" font-family="Bungee,sans-serif">SORRISO</text><circle cx="22" cy="32" r="10" fill="none" stroke="#FFD86B" stroke-width="1.8"/><path d="M17 29l3 3M20 29l-3 3M24 29l3 3M27 29l-3 3M17 37q5 4 10 0" stroke="#FFD86B" stroke-width="1.4" fill="none"/><text x="22" y="50" font-size="3" text-anchor="middle" fill="#FFD86B" font-family="sans-serif">CHEIRO DE JOVEM</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_acdc",
+    nome: "Pôster Alta Voltagem",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#E0312F"/><text x="22" y="16" font-size="5" text-anchor="middle" fill="#E0312F" font-family="Bungee,sans-serif">ALTA</text><text x="22" y="24" font-size="5" text-anchor="middle" fill="#E0312F" font-family="Bungee,sans-serif">VOLTAGEM</text><path d="M23 26L14 39H20L17 48L28 35H22L25 26Z" fill="#F2C318"/><text x="22" y="51" font-size="3" text-anchor="middle" fill="#FAF6EE" font-family="sans-serif">ESTRADA DO SOM</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_queen",
+    nome: "Pôster Realeza",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#1C1A22" stroke="#F2C14E"/><text x="22" y="16" font-size="5" text-anchor="middle" fill="#F2C14E" font-family="Bungee,sans-serif">REALEZA</text><path d="M12 36l-2-10 6 5 6-7 6 7 6-5-2 10z" fill="#F2C14E"/><circle cx="16" cy="24" r="1.2" fill="#C8102E"/><circle cx="22" cy="22" r="1.4" fill="#2F6FD6"/><circle cx="28" cy="24" r="1.2" fill="#C8102E"/><text x="22" y="50" font-size="2.8" text-anchor="middle" fill="#F2EAD3" font-family="sans-serif">RAPSÓDIA BOÊMIA</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_guns",
+    nome: "Pôster Balas & Rosas",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#F2C318"/><text x="22" y="16" font-size="4.4" text-anchor="middle" fill="#F2C318" font-family="Bungee,sans-serif">BALAS &</text><text x="22" y="23" font-size="5" text-anchor="middle" fill="#F2C318" font-family="Bungee,sans-serif">ROSAS</text><circle cx="16" cy="34" r="5" fill="#C8102E"/><circle cx="28" cy="34" r="5" fill="#C8102E"/><path d="M12 39h20M22 28v16" stroke="#F2C318" stroke-width="1.8"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_metallica",
+    nome: "Pôster Metálica",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#C9CED6"/><text x="22" y="18" font-size="5" text-anchor="middle" fill="#C9CED6" font-family="Bungee,sans-serif">METÁLICA</text><path d="M8 24l14 8 14-8" stroke="#C9CED6" stroke-width="2" fill="none"/><rect x="18" y="36" width="8" height="12" fill="#FAF6EE" rx="1"/><text x="22" y="51" font-size="2.8" text-anchor="middle" fill="#C9CED6" font-family="sans-serif">MESTRE DAS CORDAS</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_pinkfloyd",
+    nome: "Pôster Prisma Cósmico",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#FAF6EE"/><text x="22" y="16" font-size="5" text-anchor="middle" fill="#FAF6EE" font-family="Bungee,sans-serif">PRISMA</text><polygon points="22,24 12,39 32,39" fill="none" stroke="#FAF6EE" stroke-width="1.4"/><path d="M22 31L38 34" stroke="#E0312F" stroke-width="1.2"/><path d="M22 32L38 36" stroke="#F2C318" stroke-width="1.2"/><path d="M22 33L38 38" stroke="#2FB344" stroke-width="1.2"/><path d="M22 34L38 40" stroke="#2F6FD6" stroke-width="1.2"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_stones",
+    nome: "Pôster Pedras Rolantes",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#1E1F24" stroke="#E0312F"/><text x="22" y="16" font-size="4.4" text-anchor="middle" fill="#FAF6EE" font-family="Bungee,sans-serif">PEDRAS</text><text x="22" y="23" font-size="4.4" text-anchor="middle" fill="#FAF6EE" font-family="Bungee,sans-serif">ROLANTES</text><ellipse cx="22" cy="32" rx="9" ry="6" fill="#C8102E"/><path d="M18 33c0 7 8 7 8 0" fill="#E0312F"/><path d="M22 33v5" stroke="#141416" stroke-width="1"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_led",
+    nome: "Pôster Dirigível",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#22232B" stroke="#E8C24A"/><text x="22" y="17" font-size="4.4" text-anchor="middle" fill="#E8C24A" font-family="Bungee,sans-serif">DIRIGÍVEL</text><ellipse cx="22" cy="32" rx="13" ry="5.5" fill="#8C96A6"/><rect x="18" y="37" width="8" height="2" fill="#606874"/><text x="22" y="50" font-size="2.8" text-anchor="middle" fill="#FAF6EE" font-family="sans-serif">ESCADA PRO CÉU</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_sabbath",
+    nome: "Pôster Sábado Negro",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#9A4FD8"/><text x="22" y="16" font-size="4.8" text-anchor="middle" fill="#9A4FD8" font-family="Bungee,sans-serif">SÁBADO</text><text x="22" y="23" font-size="5" text-anchor="middle" fill="#9A4FD8" font-family="Bungee,sans-serif">NEGRO</text><path d="M22 26v16M16 32h12" stroke="#9A4FD8" stroke-width="3" stroke-linecap="round"/><text x="22" y="50" font-size="3" text-anchor="middle" fill="#FAF6EE" font-family="sans-serif">PARANÓIDE</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_maiden",
+    nome: "Pôster Donzela de Ferro",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#E0312F"/><text x="22" y="16" font-size="4.4" text-anchor="middle" fill="#E0312F" font-family="Bungee,sans-serif">DONZELA</text><circle cx="22" cy="32" r="8" fill="#8A6A3A"/><circle cx="19" cy="31" r="1.4" fill="#FFC21A"/><circle cx="25" cy="31" r="1.4" fill="#FFC21A"/><path d="M18 36h8" stroke="#141416" stroke-width="1.2"/><text x="22" y="50" font-size="2.8" text-anchor="middle" fill="#FAF6EE" font-family="sans-serif">NÚMERO DA FERA</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_rhcp",
+    nome: "Pôster Pimenta Ardida",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#1E1F24" stroke="#FAF6EE"/><text x="22" y="16" font-size="4.4" text-anchor="middle" fill="#FAF6EE" font-family="Bungee,sans-serif">PIMENTA</text><path d="M22 24v18M13 33h18M16 27l12 12M28 27l-12 12" stroke="#E0312F" stroke-width="3" stroke-linecap="round"/><text x="22" y="50" font-size="2.8" text-anchor="middle" fill="#E0312F" font-family="sans-serif">CALIFÓRNIA</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_arctic",
+    nome: "Pôster Macacos do Gelo",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#141416" stroke="#FAF6EE"/><text x="22" y="16" font-size="4.2" text-anchor="middle" fill="#FAF6EE" font-family="Bungee,sans-serif">MACACOS</text><path d="M6 33q4-10 8 0t8 0t8 0t8 0" stroke="#FAF6EE" stroke-width="1.8" fill="none"/><text x="22" y="50" font-size="3" text-anchor="middle" fill="#FAF6EE" font-family="sans-serif">A.M.</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_strokes",
+    nome: "Pôster Os Traços",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#1E1F24" stroke="#FF8A00"/><text x="22" y="17" font-size="4.4" text-anchor="middle" fill="#FF8A00" font-family="Bungee,sans-serif">OS TRAÇOS</text><circle cx="22" cy="33" r="8" fill="none" stroke="#FF8A00" stroke-width="2.5"/><text x="22" y="50" font-size="2.8" text-anchor="middle" fill="#FAF6EE" font-family="sans-serif">IS THIS IT</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_radiohead",
+    nome: "Pôster Cabeça de Rádio",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#1A1A1E" stroke="#E0312F"/><text x="22" y="15" font-size="4" text-anchor="middle" fill="#E0312F" font-family="Bungee,sans-serif">CABEÇA DE</text><text x="22" y="22" font-size="4.8" text-anchor="middle" fill="#E0312F" font-family="Bungee,sans-serif">RÁDIO</text><circle cx="22" cy="34" r="8" fill="#FAF6EE"/><circle cx="19" cy="33" r="1.4" fill="#141416"/><circle cx="25" cy="33" r="1.4" fill="#141416"/><path d="M17 38l2-2 2 2 2-2 2 2" stroke="#141416" stroke-width="1" fill="none"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+  {
+    slot: "poster",
+    id: "q_poster_legiao",
+    nome: "Pôster Legião da Cidade",
+    preco: 70,
+    mundo: "rock",
+    svg: () =>
+      `<rect x="2" y="2" width="40" height="52" fill="#24252B" stroke="#FAF6EE"/><text x="22" y="17" font-size="5" text-anchor="middle" fill="#FAF6EE" font-family="Bungee,sans-serif">LEGIÃO</text><path d="M12 33h16M24 29l4 4-4 4" stroke="#FAF6EE" stroke-width="2" fill="none"/><text x="22" y="50" font-size="3" text-anchor="middle" fill="#FAF6EE" font-family="sans-serif">GERAÇÃO COCA-COLA</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
+  },
+
   /* ---------- cama ---------- */
   {
     slot: "cama",

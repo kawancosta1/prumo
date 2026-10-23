@@ -336,6 +336,141 @@ ITEMS.push(
       )
   },
   {
+    id: "rock_t_nirvana",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Sorriso Grunge",
+    price: 100,
+    svg: () =>
+      camisetaRock("#141416", "#FFD86B", "SORRISO", "", '<circle cx="60" cy="114" r="3.8" fill="none" stroke="#FFD86B" stroke-width=".9"/><path d="M58 113l1 1M59 113l-1 1M61 113l1 1M62 113l-1 1M58 116q2 1.4 4 0" stroke="#FFD86B" stroke-width=".6" fill="none"/>')
+  },
+  {
+    id: "rock_t_acdc",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Alta Voltagem",
+    price: 100,
+    svg: () =>
+      camisetaRock("#141416", "#E0312F", "ALTA", "VOLTAGEM", raio(60, 115, 0.65, "#FFC21A"))
+  },
+  {
+    id: "rock_t_queen",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Realeza",
+    price: 100,
+    svg: () =>
+      camisetaRock("#1E1F24", "#F2C14E", "REALEZA", "", '<path d="M56 115l-1-4 2.5 2 2.5-3 2.5 3 2.5-2-1 4z" fill="#F2C14E"/>')
+  },
+  {
+    id: "rock_t_guns",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Balas & Rosas",
+    price: 100,
+    svg: () =>
+      camisetaRock("#141416", "#FFD86B", "BALAS &", "ROSAS", '<circle cx="57" cy="114" r="2" fill="#C8102E"/><circle cx="63" cy="114" r="2" fill="#C8102E"/>')
+  },
+  {
+    id: "rock_t_metallica",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Metálica",
+    price: 100,
+    svg: () =>
+      camisetaRock("#141416", "#C9CED6", "METÁLICA", "", '<path d="M53 113l7 4 7-4" stroke="#C9CED6" stroke-width="1" fill="none"/>')
+  },
+  {
+    id: "rock_t_pinkfloyd",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Prisma Cósmico",
+    price: 100,
+    svg: () =>
+      camisetaRock("#141416", "#F2F2F2", "PRISMA", "", '<polygon points="60,111 56,117 64,117" fill="none" stroke="#F2F2F2" stroke-width=".8"/><path d="M60 114h5" stroke="#FF4FD8" stroke-width=".8"/>')
+  },
+  {
+    id: "rock_t_stones",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Pedras Rolantes",
+    price: 100,
+    svg: () =>
+      camisetaRock("#1E1F24", "#F2F2F2", "PEDRAS", "", '<ellipse cx="60" cy="113" rx="4" ry="2.5" fill="#C8102E"/><path d="M58 114c0 3 4 3 4 0" fill="#E0312F"/>')
+  },
+  {
+    id: "rock_t_led",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Dirigível",
+    price: 100,
+    svg: () =>
+      camisetaRock("#22232A", "#E8C24A", "DIRIGÍVEL", "", '<ellipse cx="60" cy="114" rx="5" ry="2" fill="#A8B0BC"/>')
+  },
+  {
+    id: "rock_t_sabbath",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Sábado Negro",
+    price: 100,
+    svg: () =>
+      camisetaRock("#141416", "#9A4FD8", "SÁBADO", "NEGRO", '<path d="M60 111v6M58 113h4" stroke="#9A4FD8" stroke-width="1.2"/>')
+  },
+  {
+    id: "rock_t_maiden",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Donzela de Ferro",
+    price: 100,
+    svg: () =>
+      camisetaRock("#141416", "#E0312F", "DONZELA", "", '<circle cx="60" cy="114" r="3" fill="#E8C24A"/><circle cx="59" cy="113" r=".6" fill="#C8102E"/><circle cx="61" cy="113" r=".6" fill="#C8102E"/>')
+  },
+  {
+    id: "rock_t_rhcp",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Pimenta Ardida",
+    price: 100,
+    svg: () =>
+      camisetaRock("#1E1F24", "#F2F2F2", "PIMENTA", "", '<path d="M60 110v8M56 114h8M57 111l6 6M63 111l-6 6" stroke="#C8102E" stroke-width="1.4"/>')
+  },
+  {
+    id: "rock_t_arctic",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Macacos do Gelo",
+    price: 100,
+    svg: () =>
+      camisetaRock("#141416", "#F2F2F2", "MACACOS", "", '<path d="M54 114q3-3 6 0t6 0" stroke="#F2F2F2" stroke-width="1" fill="none"/>')
+  },
+  {
+    id: "rock_t_strokes",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Os Traços",
+    price: 100,
+    svg: () =>
+      camisetaRock("#1E1F24", "#FF8A00", "OS TRAÇOS", "", '<circle cx="60" cy="114" r="3" fill="none" stroke="#FF8A00" stroke-width="1"/>')
+  },
+  {
+    id: "rock_t_radiohead",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Cabeça de Rádio",
+    price: 100,
+    svg: () =>
+      camisetaRock("#1B1B1E", "#E0312F", "CABEÇA", "DE RÁDIO", '<circle cx="60" cy="114" r="2.8" fill="#F2F2F2"/><circle cx="59" cy="113" r=".5" fill="#141416"/><circle cx="61" cy="113" r=".5" fill="#141416"/>')
+  },
+  {
+    id: "rock_t_legiao",
+    p: "rock",
+    slot: "top",
+    name: "Camiseta Legião da Cidade",
+    price: 100,
+    svg: () =>
+      camisetaRock("#25262B", "#F2F2F2", "LEGIÃO", "", '<path d="M57 114h6M61 112l2 2-2 2" stroke="#F2F2F2" stroke-width=".9" fill="none"/>')
+  },
+  {
     id: "rock_zebra",
     p: "rock",
     slot: "top",
