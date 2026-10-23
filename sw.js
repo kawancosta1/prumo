@@ -6,7 +6,7 @@
   - Firebase e APIs de livros: passam direto, nunca ficam guardados aqui.
   Para forçar todo mundo a baixar de novo, troque a VERSAO.
 */
-const VERSAO = "prumo-v7";
+const VERSAO = "prumo-v8";
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSAO).then(c => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./icones/icone-192.png"])));
@@ -32,14 +32,19 @@ self.addEventListener("fetch", e => {
   if (!guardavel(url)) return; // Firebase, Google Books, Open Library: direto pra internet
 
   if (req.mode === "navigate") {
+    // o app (raiz ou index.html) fica guardado como ./index.html; outras páginas (ex.: privacidade.html) com o próprio endereço
+    const ehApp = /\/(index\.html)?$/.test(url.pathname);
+    const chave = ehApp ? "./index.html" : url.pathname;
     e.respondWith(
       fetch(req)
         .then(r => {
-          const copia = r.clone();
-          caches.open(VERSAO).then(c => c.put("./index.html", copia));
+          if (r.ok) {
+            const copia = r.clone();
+            caches.open(VERSAO).then(c => c.put(chave, copia));
+          }
           return r;
         })
-        .catch(() => caches.match("./index.html"))
+        .catch(() => caches.match(chave).then(r => r || caches.match("./index.html")))
     );
     return;
   }

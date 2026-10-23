@@ -402,7 +402,7 @@ function decidirDepoimentoCaixa(id, aceitar) {
 }
 
 /* ---------- vitrine: o que os amigos veem ---------- */
-const privacidadePadrao = () => ({ estante: true, fotolog: true, humor: true, status: true });
+const privacidadePadrao = () => ({ estante: true, fotolog: true, humor: false, status: false }); // humor e status começam escondidos
 
 function montarVitrine() {
   const base = montarPerfil();

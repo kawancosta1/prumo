@@ -10,6 +10,7 @@ function viewAjustes() {
     <h2 class="h2">Você</h2>
     <div class="setbox">
       ${contaHTML()}
+      <div class="setrow"><div class="lbl"><b>Privacidade</b><span class="note">${S.consentimento ? `Você aceitou a política em ${fmtShort(ymd(new Date(S.consentimento.em)))}.` : "Como o Prumo guarda e usa seus dados."}</span></div><a class="btn small ghost" href="privacidade.html" target="_blank" rel="noopener">Ler a política</a></div>
       <div class="setrow"><div class="lbl"><b>Aparência</b><span class="note">Automático segue o tema do aparelho.</span></div><div class="seg" role="group">${[
         ["auto", "Auto"],
         ["light", "Claro"],

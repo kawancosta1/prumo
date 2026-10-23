@@ -5,15 +5,50 @@
   - Entrar com email e senha, e "Esqueci a senha" (link para trocar a senha)
   - Continuar sem conta: os dados ficam só neste aparelho, como antes (S.semConta)
   Conta com email só sincroniza depois de confirmar o email (as regras do Firestore também exigem isso).
+  LGPD: para ter conta a pessoa confirma que tem 18 anos ou mais, aceita a política (privacidade.html)
+  e dá o consentimento para os dados de saúde (água, refeições, humor, diário). O aceite fica em S.consentimento.
+  Se a política mudar, troque POLITICA_VERSAO: quem tem conta aceita de novo ao abrir o app.
 */
 "use strict";
 
-let entrar = { modo: "inicio", nome: "", email: "", senha: "", carregando: false, erro: "", aviso: "" },
+const POLITICA_VERSAO = "2026-10-23";
+
+let entrar = {
+    modo: "inicio",
+    nome: "",
+    email: "",
+    senha: "",
+    carregando: false,
+    erro: "",
+    aviso: "",
+    aceite: { idade: false, saude: false }
+  },
   entrarDesenhado = "";
+
+const consentimentoOk = () => !!(S.consentimento && S.consentimento.versao === POLITICA_VERSAO);
+const contaConfirmada = () => !!(contaUsuario && contaUsuario.emailVerified);
 
 /** A tela aparece quando a conta está ligada, o Firebase já respondeu e a pessoa não escolheu ficar sem conta. */
 const precisaEntrar = () =>
-  contaConfigurada() && contaChecada && !S.semConta && !(contaUsuario && contaUsuario.emailVerified);
+  contaConfigurada() && contaChecada && (contaConfirmada() ? !consentimentoOk() : !S.semConta);
+
+/** As duas caixinhas: 18 anos + política, e dados de saúde */
+const aceiteHTML = () => `<div class="oaceite">
+  <label><input type="checkbox" data-change="ent-aceite" data-k="idade" ${entrar.aceite.idade ? "checked" : ""}><span>Tenho 18 anos ou mais e li a <a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</span></label>
+  <label><input type="checkbox" data-change="ent-aceite" data-k="saude" ${entrar.aceite.saude ? "checked" : ""}><span>Autorizo guardar na minha conta os dados de saúde que eu registrar: água, refeições, humor e diário.</span></label>
+</div>`;
+
+/** Confere as caixinhas antes de criar ou entrar numa conta e guarda o aceite */
+function aceitou() {
+  if (!entrar.aceite.idade || !entrar.aceite.saude) {
+    entrar.erro = "Marque as duas caixinhas para criar ou entrar numa conta.";
+    renderOnb();
+    return false;
+  }
+  S.consentimento = { versao: POLITICA_VERSAO, em: Date.now() };
+  persist();
+  return true;
+}
 
 const ERROS_CONTA = {
   "auth/email-already-in-use": "Esse email já tem conta. Tente entrar.",
@@ -40,13 +75,14 @@ function entrarHTML() {
   let c2 = "";
   if (m === "inicio")
     c2 = `${hero("happy")}<h2 class="oh">Oi! Eu sou o Prumi.</h2>
-      <p class="op">Entre para guardar tudo na nuvem, usar no celular e no PC e ter amigos no Prumo.</p>${erro}
+      <p class="op">Entre para guardar tudo na nuvem, usar no celular e no PC e ter amigos no Prumo.</p>
+      ${aceiteHTML()}${erro}
       <button class="btn primary big" data-act="ent-google" ${c}>Entrar com Google</button>
       <div class="osep"><span>ou</span></div>
       <button class="btn big" data-act="ent-modo" data-id="criar" ${c}>Criar conta com email</button>
       <button class="btn ghost" data-act="ent-modo" data-id="email" ${c}>Já tenho conta com email</button>
       <button class="olink" data-act="ent-semconta">Continuar sem conta</button>
-      <p class="note ocentro">Sem conta, tudo fica salvo só neste aparelho.</p>`;
+      <p class="note ocentro">Sem conta, tudo fica salvo só neste aparelho. Menores de 18 anos usam sem conta.</p>`;
   else if (m === "criar")
     c2 = `${hero("idle")}<h2 class="oh">Criar conta</h2>
       <form class="col" data-form="ent-criar">
@@ -74,6 +110,13 @@ function entrarHTML() {
         <button class="btn primary big" type="submit" ${c}>${entrar.carregando ? "Mandando..." : "Mandar link"}</button>
       </form>
       <button class="olink" data-act="ent-modo" data-id="email">Voltar</button>`;
+  else if (m === "aceitar")
+    c2 = `${hero("idle")}<h2 class="oh">Sua privacidade</h2>
+      <p class="op">Atualizamos a <a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a>. Para continuar usando a conta, confirme:</p>
+      ${aceiteHTML()}${erro}
+      <button class="btn primary big" data-act="ent-aceitar">Aceitar e continuar</button>
+      <button class="btn ghost" data-act="ent-sair">Sair da conta</button>
+      <p class="note ocentro">Saindo, seus dados continuam neste aparelho. Para apagar a conta, entre e vá em Ajustes.</p>`;
   else if (m === "verificar")
     c2 = `${hero("focus")}<h2 class="oh">Confirme seu email</h2>
       <p class="op">Mandei um link para <b>${esc((contaUsuario && contaUsuario.email) || entrar.email)}</b>. Abra o email, toque no link e volte aqui.</p>
@@ -87,6 +130,7 @@ function entrarHTML() {
 /** Desenha a tela de entrada no mesmo painel das boas-vindas. Só redesenha quando algo muda (não apaga o que está sendo digitado). */
 function mostrarEntrar(el, forcar) {
   if (contaUsuario && !contaUsuario.emailVerified && entrar.modo !== "verificar") entrar.modo = "verificar";
+  if (contaConfirmada() && !consentimentoOk()) entrar.modo = "aceitar"; // conta antiga ou política nova
   const chave = JSON.stringify([entrar.modo, entrar.carregando, entrar.erro, entrar.aviso]);
   el.hidden = false;
   el.setAttribute("aria-label", "Entrar no Prumo");
@@ -129,13 +173,22 @@ const linkVolta = () => ({ url: location.origin + location.pathname });
 
 ACOES_EXTRAS["ent-google"] = () => {
   entrar.erro = "";
-  entrarComGoogle();
+  if (aceitou()) entrarComGoogle();
 };
 ACOES_EXTRAS["ent-modo"] = (b, id) => {
   guardarCampos();
+  if ((id === "criar" || id === "email") && entrar.modo === "inicio" && !aceitou()) return;
   entrar.modo = id;
   entrar.erro = entrar.aviso = "";
   renderOnb();
+};
+ACOES_EXTRAS["ent-aceitar"] = () => {
+  entrar.erro = "";
+  if (aceitou()) commit(); // a tela some e o app segue (o aceite vai junto para a nuvem)
+};
+ACOES_EXTRAS["ent-sair"] = () => sairDaConta();
+MUDANCAS_EXTRAS["ent-aceite"] = el => {
+  entrar.aceite[el.dataset.k] = el.checked;
 };
 ACOES_EXTRAS["ent-semconta"] = () => {
   S.semConta = true;

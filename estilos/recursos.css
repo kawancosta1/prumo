@@ -410,6 +410,34 @@ li.psel {
 .oentrar .btn.big {
   width: 100%;
 }
+.oaceite {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  font-size: 14.5px;
+}
+.oaceite label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+.oaceite input {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  margin: 1px 0 0;
+  flex: none;
+  accent-color: var(--accent);
+}
+.oaceite a,
+.op a {
+  color: var(--accent);
+}
 .osep {
   display: flex;
   align-items: center;

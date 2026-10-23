@@ -69,7 +69,8 @@ const blank = () => ({
   noites: [], // dias em que o app foi usado depois das 22h
   rock: { energia: 0, starAte: 0, usos: 0 }, // Star Power do mundo Roqueiro (js/mundos/rock-efeitos.js)
   livros: [], // Estante de leitura (js/leitura.js)
-  privacidade: { estante: true, fotolog: true, humor: true, status: true }, // o que os amigos veem
+  privacidade: { estante: true, fotolog: true, humor: false, status: false }, // o que os amigos veem (humor e status começam escondidos)
+  consentimento: null, // aceite da política de privacidade e dos dados de saúde: { versao, em } (js/telas/entrar.js)
   avisosCelular: false, // notificações no celular (js/pwa.js)
   leitura: leituraPadrao(),
   parceria: { id: null, tipo: "namoro" },
@@ -158,10 +159,12 @@ function normalize(x) {
   b.privacidade = {
     estante: true,
     fotolog: true,
-    humor: true,
-    status: true,
+    humor: false,
+    status: false,
     ...(b.privacidade && typeof b.privacidade === "object" ? b.privacidade : {})
   };
+  if (!b.consentimento || typeof b.consentimento !== "object" || !b.consentimento.versao)
+    b.consentimento = null;
   if (!Array.isArray(b.fotolog)) b.fotolog = [];
   if (!Array.isArray(b.noites)) b.noites = [];
   const rk = b.rock && typeof b.rock === "object" ? b.rock : {};
