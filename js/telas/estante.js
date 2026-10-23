@@ -153,7 +153,7 @@ function cartaoLendoHTML(l) {
     <div class="main"><span class="title">${esc(l.titulo)}</span><span class="meta">${esc(l.autor || "Autor desconhecido")}</span>
       <div class="progress"><span style="width:${progressoDe(l)}%"></span></div>
       <span class="meta mono">${l.pagina}${l.paginas ? ` de ${l.paginas} páginas · ${progressoDe(l)}%` : " páginas"}</span>
-      <div class="row" style="gap:6px"><button class="btn small" data-act="livro-mais" data-id="${l.id}" data-n="10">+10</button><button class="btn small" data-act="livro-mais" data-id="${l.id}" data-n="25">+25</button><button class="btn small ghost" data-act="livro-abrir" data-id="${l.id}">Detalhes</button></div>
+      <div class="row" style="gap:6px"><button class="btn small primary" data-act="livro-timer" data-id="${l.id}">Ler agora</button><button class="btn small" data-act="livro-mais" data-id="${l.id}" data-n="10">+10</button><button class="btn small" data-act="livro-mais" data-id="${l.id}" data-n="25">+25</button><button class="btn small ghost" data-act="livro-abrir" data-id="${l.id}">Detalhes</button></div>
     </div></li>`;
 }
 
@@ -299,7 +299,7 @@ function decorarHTML() {
           ? `<svg class="swatch" viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice">${i.svg(60, 40)}</svg>`
           : `<svg class="prev-quarto" viewBox="-4 -4 ${lugar.w + 8} ${lugar.h + 8}" aria-hidden="true">${i.svg()}</svg>`;
       const itens = QUARTO.filter(i => i.slot === slot && doMundo(i));
-      const nenhum = ["poster", "tapete"].includes(slot)
+      const nenhum = ["poster", "tapete", "pet"].includes(slot)
         ? `<button class="sitem ${!atual ? "on" : "own"}" data-act="quarto" data-slot="${slot}" data-id=""><span class="sname">Nenhum</span><span class="tag ${!atual ? "on" : ""}">${!atual ? "Usando" : "Usar"}</span></button>`
         : "";
       return `<h3 class="h3">${lugar.nome}</h3><div class="shop">${nenhum}${itens
@@ -450,14 +450,14 @@ ACOES_EXTRAS["prumi-leitor"] = () => {
   );
   toast(l ? `${l.titulo}: ${progressoDe(l)}%` : "Adicione um livro pra eu ler junto", false, "happy");
 };
-// comprar ou usar uma parte do quarto (chão, janela, pôster, cama, tapete, luz)
+// comprar ou usar uma parte do quarto (chão, janela, pôster, cama, tapete, luz, pet)
 ACOES_EXTRAS.quarto = b => {
   const slot = b.dataset.slot,
     id = b.dataset.id;
   const d = S.leitura.decor;
   d.quarto = { ...QUARTO_PADRAO, ...(d.quarto || {}) };
   if (!id) {
-    d.quarto[slot] = ""; // pôster e tapete podem ficar vazios
+    d.quarto[slot] = ""; // pôster, tapete e pet podem ficar vazios
     return commit();
   }
   const x = ITEM_QUARTO[id];
@@ -473,6 +473,38 @@ ACOES_EXTRAS.quarto = b => {
   }
   d.quarto[slot] = x.id;
   commit();
+};
+
+ACOES_EXTRAS["livro-timer"] = (b, id) => {
+  const l = livro(id);
+  if (!l) return;
+  timer.running = true;
+  timer.start = Date.now();
+  timer.acc = 0;
+  timer.beeped = false;
+  timer.label = "Lendo " + l.titulo;
+  saveTimerState();
+  toast("Sessão de leitura iniciada!", false, "focus");
+  react("focus", `Boa leitura de <b>${esc(l.titulo)}</b>! Eu fico aqui do seu lado.`, 3200);
+  render();
+};
+
+ACOES_EXTRAS["pet-tocar"] = () => {
+  const decor = (S.leitura && S.leitura.decor && S.leitura.decor.quarto) || {};
+  const pId = decor.pet;
+  const pet = ITEM_QUARTO[pId];
+  if (!pet) return;
+  const falas = {
+    q_pet_gato_preto: "O gatinho preto deu uma espreguiçada e ronronou baixinho: mrrr...",
+    q_pet_gato_laranja: "O gatinho laranja miou todo animado e esfregou a cabeça em você!",
+    q_pet_cachorro: "O cãozinho caramelo abanou o rabinho e te deu uma lambidinha carinhosa!",
+    q_pet_morcego: "O morceguinho bateu as asinhas de alegria!",
+    q_pet_planta: "Você borrifou uma aguinha na monstera. Folhas bem hidratadas!",
+    q_pet_hamster: "O hamster deu duas voltas na rodinha e pegou uma semente!"
+  };
+  const msg = falas[pet.id] || `Você fez um carinho no seu ${esc(pet.nome.toLowerCase())}!`;
+  react("happy", msg, 3200);
+  toast(msg, false, "happy");
 };
 // comprar ou usar móvel, parede e enfeite
 ACOES_EXTRAS.decor = b => {

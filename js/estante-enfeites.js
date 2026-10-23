@@ -81,16 +81,26 @@ const FUNDOS = [
     nome: "Pôsteres de banda",
     preco: 180,
     mundo: "emo",
-    svg: (W, H) =>
-      `<rect width="${W}" height="${H}" fill="#2A1F33"/><g transform="translate(14 10) rotate(-5)"><rect width="34" height="44" fill="#141416" stroke="#C8102E"/><text x="17" y="16" font-size="6" text-anchor="middle" fill="#E0314F" font-family="Bungee,sans-serif">LUA</text><text x="17" y="24" font-size="6" text-anchor="middle" fill="#E0314F" font-family="Bungee,sans-serif">FRIA</text></g><g transform="translate(${W - 50} 12) rotate(4)"><rect width="36" height="46" fill="#F2EAD3"/><text x="18" y="16" font-size="5" text-anchor="middle" fill="#141416" font-family="Bungee,sans-serif">VAMPIROS</text><text x="18" y="23" font-size="5" text-anchor="middle" fill="#141416" font-family="Bungee,sans-serif">DE SÁBADO</text></g>`
+    svg: (W, H, opts = {}) => {
+      const x1 = opts && opts.noQuarto ? 116 : 14;
+      const y1 = opts && opts.noQuarto ? 16 : 10;
+      const x2 = opts && opts.noQuarto ? 154 : W - 50;
+      const y2 = opts && opts.noQuarto ? 38 : 12;
+      return `<rect width="${W}" height="${H}" fill="#2A1F33"/><g transform="translate(${x1} ${y1}) rotate(-5)"><rect width="34" height="44" fill="#141416" stroke="#C8102E"/><text x="17" y="16" font-size="6" text-anchor="middle" fill="#E0314F" font-family="Bungee,sans-serif">LUA</text><text x="17" y="24" font-size="6" text-anchor="middle" fill="#E0314F" font-family="Bungee,sans-serif">FRIA</text><rect x="2" y="-1" width="8" height="3" fill="#EAD9A6" transform="rotate(-20 5 0)" opacity=".85"/><rect x="24" y="-1" width="8" height="3" fill="#EAD9A6" transform="rotate(20 28 0)" opacity=".85"/></g><g transform="translate(${x2} ${y2}) rotate(4)"><rect width="36" height="46" fill="#F2EAD3"/><text x="18" y="16" font-size="5" text-anchor="middle" fill="#141416" font-family="Bungee,sans-serif">VAMPIROS</text><text x="18" y="23" font-size="5" text-anchor="middle" fill="#141416" font-family="Bungee,sans-serif">DE SÁBADO</text><rect x="2" y="-1" width="8" height="3" fill="#EAD9A6" transform="rotate(-20 5 0)" opacity=".85"/><rect x="26" y="-1" width="8" height="3" fill="#EAD9A6" transform="rotate(20 30 0)" opacity=".85"/></g>`;
+    }
   },
   {
     id: "parede_show",
     nome: "Parede de show",
     preco: 180,
     mundo: "rock",
-    svg: (W, H) =>
-      `<rect width="${W}" height="${H}" fill="#1A1A1C"/><path d="M${W * 0.2} 0L${W * 0.05} ${H}H${W * 0.35}Z" fill="#FFF6C8" opacity=".07"/><path d="M${W * 0.8} 0L${W * 0.65} ${H}H${W * 0.95}Z" fill="#FFF6C8" opacity=".07"/><g transform="translate(14 10) rotate(-4)"><rect width="34" height="44" fill="#141416" stroke="#F2C318"/><text x="17" y="16" font-size="5.6" text-anchor="middle" fill="#F2C318" font-family="Bungee,sans-serif">TROVÃO</text><path d="M19 20L12 31H17L14 40L23 27H18L21 20Z" fill="#F2C318"/></g><g transform="translate(${W - 50} 12) rotate(5)"><rect width="36" height="46" fill="#E0312F"/><text x="18" y="16" font-size="4.6" text-anchor="middle" fill="#F2F2F2" font-family="Bungee,sans-serif">OS AMPLI</text><text x="18" y="23" font-size="4.6" text-anchor="middle" fill="#F2F2F2" font-family="Bungee,sans-serif">FICADOS</text><circle cx="18" cy="35" r="7" fill="#141416"/><circle cx="18" cy="35" r="2" fill="#F2C318"/></g>`
+    svg: (W, H, opts = {}) => {
+      const x1 = opts && opts.noQuarto ? 116 : 14;
+      const y1 = opts && opts.noQuarto ? 16 : 10;
+      const x2 = opts && opts.noQuarto ? 154 : W - 50;
+      const y2 = opts && opts.noQuarto ? 38 : 12;
+      return `<rect width="${W}" height="${H}" fill="#1A1A1C"/><path d="M${W * 0.2} 0L${W * 0.05} ${H}H${W * 0.35}Z" fill="#FFF6C8" opacity=".07"/><path d="M${W * 0.8} 0L${W * 0.65} ${H}H${W * 0.95}Z" fill="#FFF6C8" opacity=".07"/><g transform="translate(${x1} ${y1}) rotate(-4)"><rect width="34" height="44" fill="#141416" stroke="#F2C318"/><text x="17" y="16" font-size="5.6" text-anchor="middle" fill="#F2C318" font-family="Bungee,sans-serif">TROVÃO</text><path d="M19 20L12 31H17L14 40L23 27H18L21 20Z" fill="#F2C318"/><rect x="2" y="-1" width="8" height="3" fill="#EAD9A6" transform="rotate(-20 5 0)" opacity=".85"/><rect x="24" y="-1" width="8" height="3" fill="#EAD9A6" transform="rotate(20 28 0)" opacity=".85"/></g><g transform="translate(${x2} ${y2}) rotate(5)"><rect width="36" height="46" fill="#E0312F"/><text x="18" y="16" font-size="4.6" text-anchor="middle" fill="#F2F2F2" font-family="Bungee,sans-serif">OS AMPLI</text><text x="18" y="23" font-size="4.6" text-anchor="middle" fill="#F2F2F2" font-family="Bungee,sans-serif">FICADOS</text><circle cx="18" cy="35" r="7" fill="#141416"/><circle cx="18" cy="35" r="2" fill="#F2C318"/><rect x="2" y="-1" width="8" height="3" fill="#EAD9A6" transform="rotate(-20 5 0)" opacity=".85"/><rect x="26" y="-1" width="8" height="3" fill="#EAD9A6" transform="rotate(20 30 0)" opacity=".85"/></g>`;
+    }
   }
 ];
 

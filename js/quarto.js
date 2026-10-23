@@ -13,6 +13,7 @@ const LUGARES_QUARTO = {
   janela: { nome: "Janela", w: 90, h: 80 },
   poster: { nome: "Pôster", w: 44, h: 56 },
   cama: { nome: "Cama", w: 140, h: 70 },
+  pet: { nome: "Bichinho", w: 48, h: 40 },
   tapete: { nome: "Tapete", w: 150, h: 34 },
   luz: { nome: "Luz", w: 36, h: 92 },
   chao: { nome: "Chão", w: 360, h: 64 }
@@ -165,11 +166,26 @@ const QUARTO = [
   /* ---------- pôster ---------- */
   {
     slot: "poster",
+    id: "q_poster_livro_fav",
+    nome: "Quadro do livro favorito",
+    preco: 80,
+    svg: () => {
+      const fav =
+        (typeof S !== "undefined" && S.livros && S.livros.find(l => l.fav)) ||
+        (typeof S !== "undefined" && S.livros && S.livros.find(l => l.estante === "lido")) ||
+        (typeof S !== "undefined" && S.livros && S.livros[0]);
+      const tit = fav ? fav.titulo : "Meu Livro";
+      const cor = fav && typeof corLivro === "function" ? corLivro(fav.titulo) : "#C8302C";
+      return `<rect x="2" y="2" width="40" height="52" fill="#FAF6EE" stroke="#6B4A30" stroke-width="2.2"/><rect x="5" y="5" width="34" height="46" fill="${cor}" stroke="#3A2A1E" stroke-width=".8"/><rect x="8" y="10" width="28" height="20" fill="#FAF6EE" rx="1"/><text x="22" y="18" font-size="3.6" font-weight="bold" text-anchor="middle" fill="#141416" font-family="sans-serif">${esc(tit.slice(0, 10))}</text><text x="22" y="25" font-size="2.8" text-anchor="middle" fill="#666" font-family="sans-serif">${esc(tit.slice(10, 20))}</text><path d="M19 36l3 3 3-3-3-3z" fill="#D9B86A"/><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`;
+    }
+  },
+  {
+    slot: "poster",
     id: "q_poster_gato",
     nome: "Pôster de gatinho",
     preco: 50,
     svg: () =>
-      `<rect x="2" y="2" width="40" height="52" fill="#FBE3EA" stroke="#141416" stroke-width=".8"/><ellipse cx="22" cy="36" rx="10" ry="8" fill="#6C6A76"/><circle cx="22" cy="24" r="7" fill="#6C6A76"/><path d="M16 20l-1-7 5 4zM28 20l1-7-5 4z" fill="#6C6A76"/><circle cx="19.5" cy="24" r="1" fill="#141416"/><circle cx="24.5" cy="24" r="1" fill="#141416"/><text x="22" y="50" font-size="4.6" text-anchor="middle" fill="#5A1630" font-family="Caveat,cursive">miau</text>`
+      `<rect x="2" y="2" width="40" height="52" fill="#FBE3EA" stroke="#141416" stroke-width=".8"/><ellipse cx="22" cy="36" rx="10" ry="8" fill="#6C6A76"/><circle cx="22" cy="24" r="7" fill="#6C6A76"/><path d="M16 20l-1-7 5 4zM28 20l1-7-5 4z" fill="#6C6A76"/><circle cx="19.5" cy="24" r="1" fill="#141416"/><circle cx="24.5" cy="24" r="1" fill="#141416"/><text x="22" y="50" font-size="4.6" text-anchor="middle" fill="#5A1630" font-family="Caveat,cursive">miau</text><rect x="1" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(-25 5 1)" opacity=".85"/><rect x="35" y="0" width="8" height="3" fill="#EAD9A6" transform="rotate(25 39 1)" opacity=".85"/>`
   },
   {
     slot: "poster",
@@ -255,6 +271,57 @@ const QUARTO = [
     preco: 200,
     svg: () =>
       `<rect x="6" y="0" width="6" height="70" fill="#6B4A30"/><rect x="128" y="0" width="6" height="70" fill="#6B4A30"/><rect x="10" y="14" width="120" height="12" fill="#F2F2F2"/><path d="M40 12H130V24H40Z" fill="#5E9E5A"/><rect x="10" y="48" width="120" height="12" fill="#F2F2F2"/><path d="M40 46H130V58H40Z" fill="#C8102E" opacity=".85"/><rect x="8" y="26" width="124" height="4" fill="#6B4A30"/><rect x="8" y="60" width="124" height="4" fill="#6B4A30"/><path d="M118 26v20M124 26v20M118 32h6M118 38h6" stroke="#6B4A30" stroke-width="1.6"/>`
+  },
+
+  /* ---------- bichinho (pet) ---------- */
+  {
+    slot: "pet",
+    id: "q_pet_gato_preto",
+    nome: "Gato preto na cama",
+    preco: 60,
+    svg: () =>
+      `<ellipse cx="22" cy="24" rx="16" ry="11" fill="#18181C"/><circle cx="12" cy="18" r="9" fill="#18181C"/><path d="M6 14l-2-6 6 3zM14 12l3-6 1 6z" fill="#18181C"/><path d="M6 13l-1-4 4 2zM14 12l2-4 1 4z" fill="#E8829C"/><ellipse cx="10" cy="19" rx="1.4" ry=".6" fill="#E8829C"/><path d="M8 22c2 1 4 1 6 0" stroke="#444" stroke-width=".6" fill="none"/><path d="M36 26c4-1 6-4 5-8" stroke="#18181C" stroke-width="3" stroke-linecap="round" fill="none"/><text x="30" y="11" font-size="6.5" font-family="Caveat,cursive" fill="#888">zZz</text>`
+  },
+  {
+    slot: "pet",
+    id: "q_pet_gato_laranja",
+    nome: "Gato laranja curioso",
+    preco: 90,
+    svg: () =>
+      `<ellipse cx="22" cy="25" rx="15" ry="10" fill="#E88538"/><path d="M15 17l2 4M21 16l1 4M27 17l-1 4" stroke="#C4601A" stroke-width="1.2" stroke-linecap="round"/><circle cx="12" cy="18" r="8.5" fill="#E88538"/><path d="M6 13l-2-6 6 3zM15 12l3-6 1 6z" fill="#E88538"/><path d="M6 12l-1-4 4 2zM15 11l2-4 1 4z" fill="#FCE4D6"/><ellipse cx="10" cy="17" rx="1.4" ry="1.8" fill="#141416"/><ellipse cx="15" cy="17" rx="1.4" ry="1.8" fill="#141416"/><ellipse cx="12.5" cy="20" rx="1.2" ry=".7" fill="#FCE4D6"/><path d="M35 25c4-1 6-5 4-9" stroke="#E88538" stroke-width="3" stroke-linecap="round" fill="none"/>`
+  },
+  {
+    slot: "pet",
+    id: "q_pet_cachorro",
+    nome: "Cachorrinho caramelo",
+    preco: 110,
+    svg: () =>
+      `<ellipse cx="24" cy="25" rx="16" ry="11" fill="#C99452"/><circle cx="13" cy="19" r="8.5" fill="#C99452"/><ellipse cx="7" cy="19" rx="3.5" ry="6" fill="#9C682B" transform="rotate(15 7 19)"/><ellipse cx="17" cy="19" rx="3.5" ry="6" fill="#9C682B" transform="rotate(-15 17 19)"/><circle cx="10.5" cy="18" r="1.2" fill="#141416"/><circle cx="15.5" cy="18" r="1.2" fill="#141416"/><ellipse cx="13" cy="21" rx="2" ry="1.2" fill="#141416"/><ellipse cx="11" cy="31" rx="4" ry="2" fill="#C99452"/><ellipse cx="20" cy="31" rx="4" ry="2" fill="#C99452"/><path d="M38 24c3-2 5-6 3-8" stroke="#C99452" stroke-width="3" stroke-linecap="round" fill="none"/>`
+  },
+  {
+    slot: "pet",
+    id: "q_pet_morcego",
+    nome: "Morceguinho de estimação",
+    preco: 100,
+    mundo: "emo",
+    svg: () =>
+      `<path d="M22 14c-6-8-16-6-20 2 6 3 9 9 10 14 3-3 7-4 10-4s7 1 10 4c1-5 4-11 10-14-4-8-14-10-20-2z" fill="#1E1624"/><ellipse cx="22" cy="24" rx="7" ry="10" fill="#2E2436"/><circle cx="22" cy="15" r="5.5" fill="#2E2436"/><path d="M18 11l-2-5 4 3zM26 11l2-5-4 3z" fill="#2E2436"/><circle cx="20" cy="15" r="1.2" fill="#C8102E"/><circle cx="24" cy="15" r="1.2" fill="#C8102E"/><path d="M20 18l1 2 1-2 1 2 1-2" stroke="#fff" stroke-width=".8" fill="none"/>`
+  },
+  {
+    slot: "pet",
+    id: "q_pet_planta",
+    nome: "Vaso de Monstera",
+    preco: 70,
+    svg: () =>
+      `<path d="M12 24h20l-3 14H15Z" fill="#C98A60"/><rect x="10" y="22" width="24" height="3" rx="1" fill="#DF9F74"/><path d="M22 22V6M22 14q-10-8-12-3q4 6 12 3M22 12q10-8 12-3q-4 6-12 3M22 8q-6-8-8-4q3 5 8 4" stroke="#2B6B38" stroke-width="2.2" stroke-linecap="round" fill="none"/>`
+  },
+  {
+    slot: "pet",
+    id: "q_pet_hamster",
+    nome: "Hamster na gaiolinha",
+    preco: 90,
+    svg: () =>
+      `<rect x="6" y="12" width="32" height="24" rx="4" fill="#E8F4F8" stroke="#8CBECF" stroke-width="1.2" opacity=".9"/><path d="M10 12v24M16 12v24M22 12v24M28 12v24M34 12v24" stroke="#8CBECF" stroke-width=".8"/><ellipse cx="22" cy="27" rx="6" ry="5" fill="#E8B07A"/><circle cx="17" cy="25" r="3.5" fill="#E8B07A"/><circle cx="16" cy="24" r=".9" fill="#141416"/><circle cx="15" cy="26" r=".6" fill="#E8829C"/>`
   },
 
   /* ---------- tapete ---------- */
@@ -439,6 +506,7 @@ const QUARTO_PADRAO = {
   janela: "q_noite",
   poster: "",
   cama: "q_cama",
+  pet: "",
   tapete: "",
   luz: "q_abajur"
 };
@@ -485,13 +553,14 @@ function quartoSVG(d = minhaEstante()) {
     ? `<path d="M${(temCama ? 40 : 70) + 18} ${temCama ? chaoY - 46 : chaoY - 2}l13 -3 13 3v10l-13 -3 -13 3z" fill="#FBF7EC" stroke="var(--ink)" stroke-width="1"/>`
     : "";
   return `<svg class="estante-svg quarto-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Quarto de leitura com ${d.lidos.length} livros lidos">
-    <g class="parede">${fundo.svg(W, chaoY)}</g>
+    <g class="parede">${fundo.svg(W, chaoY, { noQuarto: true })}</g>
     ${luz && luz.topo ? `<g>${luz.topo(W)}</g>` : ""}
     ${em("janela", 16, 22)}${em("poster", 120, 30)}
     <g transform="translate(0 ${chaoY})">${chao ? chao.svg(W, altChao) : ""}</g>
     <rect x="0" y="${chaoY - 4}" width="${W}" height="5" fill="rgba(0,0,0,.18)"/>
     ${em("tapete", 20, chaoY + 16)}
     ${em("cama", 4, chaoY - 62)}
+    <g class="q-pet-slot" ${d.meu ? 'data-act="pet-tocar"' : ""} style="cursor:pointer">${em("pet", temCama ? 104 : 76, temCama ? chaoY - 48 : chaoY - 36)}</g>
     ${em("luz", 146, chaoY - 86)}
     <svg x="${W - largE - 6}" y="${chaoY + 6 - altE}" width="${largE}" height="${altE}" viewBox="0 0 360 ${altEst}">${est.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "")}</svg>
     <g class="prumi-leitor" ${d.meu ? 'data-act="prumi-leitor"' : ""}>${leitor}${livroNaMao}</g>
