@@ -2519,3 +2519,89 @@ button.top8-item {
 .mudanca .btn {
   flex: none;
 }
+
+/* ===================== banner de aviso (js/notificacoes.js) ===================== */
+.banner-aviso {
+  position: fixed;
+  left: 50%;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  z-index: 70;
+  width: min(420px, calc(100% - 20px));
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 14px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  backdrop-filter: blur(22px) saturate(1.6);
+  border: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  box-shadow:
+    0 10px 30px rgb(0 0 0 / 0.18),
+    0 1px 3px rgb(0 0 0 / 0.08);
+  color: var(--ink);
+  transform: translate(-50%, calc(-100% - 24px));
+  opacity: 0;
+  transition:
+    transform 0.55s cubic-bezier(0.2, 1.25, 0.35, 1),
+    opacity 0.3s ease;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+.banner-aviso.on {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+.banner-aviso.sai {
+  transform: translate(-50%, calc(-100% - 24px));
+  opacity: 0;
+  transition:
+    transform 0.35s cubic-bezier(0.5, 0, 0.75, 0),
+    opacity 0.35s ease;
+}
+.banner-aviso.arrastando {
+  transition: none;
+}
+.banner-aviso .ba-icone {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  overflow: hidden;
+}
+.banner-aviso .ba-corpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+.banner-aviso .ba-topo {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+.banner-aviso .ba-topo b {
+  font-weight: 600;
+}
+.banner-aviso .ba-titulo {
+  font-size: 14px;
+}
+.banner-aviso .ba-texto {
+  font-size: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .banner-aviso,
+  .banner-aviso.on,
+  .banner-aviso.sai {
+    transform: translate(-50%, 0);
+    transition: opacity 0.25s ease;
+  }
+}

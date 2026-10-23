@@ -29,6 +29,7 @@ function viewAjustes() {
       <div class="setrow"><div class="lbl"><b>Tratamento</b><span class="note">Como o Prumi se refere a você nas falas.</span></div><div class="seg" role="group"><button data-act="gender" data-g="m" aria-pressed="${(S.gender || "m") === "m"}">Ele/Dele</button><button data-act="gender" data-g="f" aria-pressed="${S.gender === "f"}">Ela/Dela</button><button data-act="gender" data-g="n" aria-pressed="${S.gender === "n"}">Neutro</button></div></div>
     </div>
   </section>
+  ${notificacoesAjustesHTML()}
   ${
     somDoMundo()
       ? `<section class="block">

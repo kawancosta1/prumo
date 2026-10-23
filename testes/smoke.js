@@ -96,6 +96,13 @@ module.exports = async url => {
   ev(`S.journal["2020-01-01"] = { note: "texto antigo", closed: true }; S.journal["2020-01-02"] = { note: "", closed: true }; prune();`);
   ok(ev(`S.journal["2020-01-01"] && S.journal["2020-01-01"].note`) === "texto antigo" && !ev(`S.journal["2020-01-02"]`), "diário antigo com texto fica, dia vazio some");
 
+  // avisos: banner no topo, escapa texto, configurações
+  ev(`notificar({ titulo: "Oi <b>", texto: "Bia <img src=x> te mandou algo" })`);
+  await espera(50);
+  const ban = w.document.querySelector(".banner-aviso");
+  ok(ban && /te mandou algo/.test(ban.textContent) && !ban.querySelector("img[src=x]"), "banner de aviso aparece e escapa o texto");
+  ok(ev(`normalize({}).notif.som === true && normalize({ notif: { som: false } }).notif.som === false`), "som dos avisos ligado por padrão e respeita desligado");
+
   fechar();
   return erros;
 };

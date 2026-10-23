@@ -76,6 +76,7 @@ const blank = () => ({
   perfil: perfilPadrao(), // perfil estilo MySpace/Orkut/MSN
   fotolog: [], // fotos do Fotolog, uma por dia fechado
   sons: { chuva: true, pagina: true }, // sons do clima no emo (js/sons.js)
+  notif: { som: true, vibrar: true }, // som e vibração dos avisos (js/notificacoes.js)
   noites: [], // dias em que o app foi usado depois das 22h
   rock: { energia: 0, starAte: 0, usos: 0 }, // Star Power do mundo Roqueiro (js/mundos/rock-efeitos.js)
   emo: { cartas: [], cadeado: null, mixtape: { nome: "", faixas: [] } }, // cartas, cadeado do diário e mixtape (js/mundos/emo-extras.js)
@@ -229,6 +230,8 @@ function normalize(x) {
   if (!Array.isArray(b.leitura.diasEscudo)) b.leitura.diasEscudo = [];
   if (!b.sons || typeof b.sons !== "object") b.sons = {};
   b.sons = { chuva: b.sons.chuva !== false, pagina: b.sons.pagina !== false };
+  if (!b.notif || typeof b.notif !== "object") b.notif = {};
+  b.notif = { som: b.notif.som !== false, vibrar: b.notif.vibrar !== false };
   if (!b.parceria || typeof b.parceria !== "object") b.parceria = { id: null, tipo: "namoro" };
   if (!Array.isArray(b.parceria.depoimentos)) b.parceria.depoimentos = [];
   if (!["m", "f", "n"].includes(b.gender)) b.gender = "m";
@@ -279,6 +282,7 @@ function commit() {
     const g = got[got.length - 1];
     fx.big = true;
     setTimeout(bigConfetti, 150);
+    if (typeof tocarSom === "function") setTimeout(() => (tocarSom("conquista"), vibrar("conquista")), 150);
     react(
       "party",
       g.daily

@@ -344,7 +344,11 @@ function receberItem(i) {
     if (["abraco", "beijinho", "highfive"].includes(i.mimo)) setTimeout(bigConfetti, 200);
   }
   react(i.tipo === "mimo" && i.mimo === "agua" ? "drink" : "party", msg + ".", 4500);
-  toast(msg.replace(/<[^>]+>/g, ""), false, "party");
+  notificar({
+    texto: msg.replace(/<[^>]+>/g, ""),
+    mood: i.tipo === "mimo" && i.mimo === "agua" ? "drink" : "party",
+    aba: VIEWS.avisos ? "avisos" : "amigos"
+  });
   avisarNoCelular(msg.replace(/<[^>]+>/g, ""));
 }
 
