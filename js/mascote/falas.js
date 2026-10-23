@@ -128,7 +128,14 @@ function updateMascots(pop) {
     const key = mood + "|" + fill.toFixed(3) + "|" + eqs;
     if (el.dataset.key === key) return;
     el.dataset.key = key;
-    el.innerHTML = prumi({ mood, fill, size: +el.dataset.size || 96, eq: JSON.parse(eqs), vivo: true });
+    el.innerHTML = prumi({
+      mood,
+      fill,
+      size: +el.dataset.size || 96,
+      eq: JSON.parse(eqs),
+      vivo: true,
+      cordaLonga: k === "hero" // o cartão do Prumi corta a corda na borda de cima
+    });
   });
   const b = document.getElementById("bubble");
   if (b) {

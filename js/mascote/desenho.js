@@ -49,6 +49,7 @@ const closedEyes = m => ["happy", "party", "drink", "sleepy", "cry"].includes(m)
   Desenha o Prumi. Opções:
   mood (rosto), fill (0 a 1, quanto de água), size (largura em px), eq (roupas por slot),
   p (personalidade, para a água e efeitos), semL/semR e armL/armR (braços, usados nas poses da dupla),
+  cordaLonga (true no cartão principal: a corda sobe além do desenho até a borda do cartão, que corta o excesso),
   vivo (true nos Prumis principais: deixa o mundo adicionar camadas, como óculos de sol ou caixão).
 */
 function prumi({
@@ -62,7 +63,8 @@ function prumi({
   armL: armLx,
   armR: armRx,
   vivo,
-  gender
+  gender,
+  cordaLonga
 }) {
   const e = eq || (typeof S !== "undefined" && S.equip) || {};
   const it = s => (e[s] && ITEM[e[s]] ? ITEM[e[s]] : null);
@@ -178,9 +180,9 @@ function prumi({
   // Assim, quando a tela é redesenhada, o Prumi continua o balanço de onde estava em vez de pular pro começo.
   const fase = typeof performance !== "undefined" ? -Math.round(performance.now()) : 0;
   return `<svg class="prumi m-${mood}${fem ? " fem" : ""}" style="--ws:${tw.spd}s;--fase:${fase}ms${skin ? `;--mink:${skin.ink}` : ""}" viewBox="0 -6 120 154" width="${size}" height="${Math.round(size * 1.28)}" role="img" aria-label="Prumi">
-    <defs><clipPath id="${id}"><path d="${BODY}"/></clipPath><clipPath id="${id}t"><rect x="-20" y="-6" width="160" height="170"/></clipPath></defs>
+    <defs><clipPath id="${id}"><path d="${BODY}"/></clipPath><clipPath id="${id}t"><rect x="-20" y="${cordaLonga ? -160 : -6}" width="160" height="${cordaLonga ? 324 : 170}"/></clipPath></defs>
     ${camadas.fundo}${bgI ? `<g class="bgi">${bgI.svg()}</g>` : ""}${pet ? `<g class="pet">${pet.svg()}</g>` : ""}
-    <g class="swing"><g clip-path="url(#${id}t)"><g class="hop corda">${str ? str.svg() : `<line class="string" x1="60" y1="-40" x2="60" y2="19"/>`}</g></g><g class="hop">
+    <g class="entra"><g class="swing"><g clip-path="url(#${id}t)"><g class="hop corda">${str ? str.svg() : `<line class="string" x1="60" y1="-40" x2="60" y2="19"/>`}</g></g><g class="gira"><g class="hop">
       ${back ? back.svg() : ""}
       <rect class="cap" x="51.5" y="16.5" width="17" height="10" rx="3.5"/>
       <path class="body" d="${BODY}"${skin ? ` style="fill:${skin.color}"` : ""}/>
@@ -190,5 +192,5 @@ function prumi({
       <g class="arm l"><path class="armp" d="${armL}"/>${wr ? wr.svg(lp[0], lp[1]) : ""}</g>
       <g class="arm r"><path class="armp" d="${armR}"/>${hand ? hand.svg(hp[0], hp[1]) : ""}</g>
       ${face}${lashes}${bow}${ck ? ck.svg(mood) : ""}${mo ? mo.svg(mood) : ""}${it("face") ? it("face").svg(mood) : ""}${camadas.rosto}${it("hair") ? it("hair").svg() : ""}${it("hat") ? it("hat").svg() : ""}${extra}
-    </g></g></svg>`;
+    </g></g></g></g></svg>`;
 }
