@@ -11,7 +11,9 @@ let audio = null; // AudioContext, criado só quando precisa
 let chuva = null; // { parar() } quando está chovendo
 let pingoTimer = null;
 
-const somDoMundo = () => S.persona === "emo" || S.persona === "rock"; // mundos com sons próprios
+// mundos com sons próprios: emo e rock aqui; os outros em SONS_MUNDO (js/mundos/base-extras.js e <mundo>-extras.js)
+const somProprio = () => (typeof SONS_MUNDO !== "undefined" && SONS_MUNDO[S.persona]) || null;
+const somDoMundo = () => S.persona === "emo" || S.persona === "rock" || !!somProprio();
 
 function pegarAudio() {
   if (!audio) {
@@ -42,6 +44,11 @@ function comecarChuva() {
   if (S.persona === "rock") return comecarPlateia();
   const ctx = pegarAudio();
   if (!ctx) return;
+  const proprio = somProprio();
+  if (proprio) {
+    if (proprio.ambiente) chuva = proprio.ambiente(ctx);
+    return;
+  }
   const fonte = ctx.createBufferSource();
   fonte.buffer = ruido(ctx, 4);
   fonte.loop = true;
@@ -107,6 +114,11 @@ function somPagina() {
   if (S.persona === "rock") return somPalhetada();
   const ctx = pegarAudio();
   if (!ctx) return;
+  const proprio = somProprio();
+  if (proprio) {
+    if (proprio.concluir) proprio.concluir(ctx, saidaMundo(ctx, 0.9), ctx.currentTime + 0.02);
+    return;
+  }
   const t = ctx.currentTime;
   const p = ctx.createBufferSource();
   p.buffer = ruido(ctx, 0.35);

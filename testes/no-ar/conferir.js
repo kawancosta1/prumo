@@ -4,7 +4,17 @@
 const { chromium } = require("playwright");
 
 const SITE = (process.argv[2] || "https://prumo-66d76.web.app/").replace(/\/?$/, "/");
-const CARIMBO = (process.env.GITHUB_SHA || "").slice(0, 10);
+let CARIMBO = (process.env.GITHUB_SHA || "").slice(0, 10);
+const { execSync } = require("child_process");
+/** Quem está no ar é um commit mais novo que este? (outro envio publicou logo depois) */
+function maisNovoNoAr(noAr) {
+  try {
+    execSync(`git merge-base --is-ancestor ${process.env.GITHUB_SHA} $(git rev-parse ${noAr})`, { stdio: "ignore" });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 const problemas = [];
 const ok = (cond, msg) => {
   if (cond) console.log("  ok  " + msg);
@@ -41,6 +51,13 @@ const espera = ms => new Promise(r => setTimeout(r, ms));
     html = await (await fetch(SITE + "?conferir=" + Date.now(), { cache: "no-store" })).text();
     if (!CARIMBO || html.includes("?v=" + CARIMBO)) break;
     await espera(5000);
+  }
+  if (CARIMBO && !html.includes("?v=" + CARIMBO)) {
+    const noAr = (/\?v=([0-9a-f]{10})"/.exec(html) || [])[1];
+    if (noAr && maisNovoNoAr(noAr)) {
+      console.log(`  (no ar já está ${noAr}, mais novo que ${CARIMBO}: confiro esse)`);
+      CARIMBO = noAr;
+    }
   }
   ok(!CARIMBO || html.includes("?v=" + CARIMBO), `index.html da publicação ${CARIMBO || "(local)"} no ar`);
 

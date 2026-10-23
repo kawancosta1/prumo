@@ -369,7 +369,7 @@ function tocarAmbiente(tipo) {
   if (tipo === "biblioteca") {
     chiado(400, "lowpass", 0.05);
     timers.push(
-      setInterval(() => Math.random() < 0.3 && typeof somPagina === "function" && somPagina(), 9000)
+      setInterval(() => Math.random() < 0.3 && S.persona === "emo" && typeof somPagina === "function" && somPagina(), 9000) // páginas virando (som do emo)
     );
   } else if (tipo === "cafe") {
     chiado(700, "bandpass", 0.16, 0.5);
