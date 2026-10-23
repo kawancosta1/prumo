@@ -103,6 +103,11 @@ module.exports = async url => {
   ok(ban && /te mandou algo/.test(ban.textContent) && !ban.querySelector("img[src=x]"), "banner de aviso aparece e escapa o texto");
   ok(ev(`normalize({}).notif.som === true && normalize({ notif: { som: false } }).notif.som === false`), "som dos avisos ligado por padrão e respeita desligado");
 
+  // espaço usado aparece em Ajustes
+  ev(`tab = "ajustes"; commit();`);
+  await espera(50);
+  ok(/Espaço usado/.test(w.document.getElementById("main").textContent) && ev("tamanhoDados") > 100, "Ajustes mostra o espaço usado pelos dados");
+
   fechar();
   return erros;
 };

@@ -36,7 +36,7 @@ jobs:
         run: npm install --prefix testes/regras
       - name: Testar as regras no emulador
         working-directory: testes/regras
-        run: npx firebase emulators:exec --only firestore --project demo-prumo "node rodar.js"
+        run: bash ../../.github/mostrar-erro.sh "Regras do Firestore" npx firebase emulators:exec --only firestore --project demo-prumo "node rodar.js"
 
   publicar:
     needs: [testes, regras]
@@ -93,4 +93,4 @@ jobs:
           npm install --prefix testes/no-ar
           npx --prefix testes/no-ar playwright install --with-deps chromium
       - name: Conferir o site no ar
-        run: node testes/no-ar/conferir.js https://prumo-66d76.web.app/
+        run: bash .github/mostrar-erro.sh "Site no ar" node testes/no-ar/conferir.js https://prumo-66d76.web.app/

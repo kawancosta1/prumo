@@ -267,11 +267,36 @@ function persist() {
   if (typeof publicarPerfil === "function") publicarPerfil();
   updatedAt = Date.now();
   prune();
-  lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt }));
+  const texto = JSON.stringify({ state: S, updatedAt });
+  lsSet(LS_KEY, texto);
+  tamanhoDados = texto.length;
+  avisarTamanho();
   if (ref) {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(push, 600);
   }
+}
+
+/* Limite do banco: tudo vai num documento do Firestore, que aceita até 1 MB.
+   Avisa (uma vez por dia) quando passa de 75%, para dar tempo de fazer backup e limpar. */
+const LIMITE_DADOS = 1000000;
+let tamanhoDados = 0;
+const usoDados = () => Math.min(1, tamanhoDados / LIMITE_DADOS);
+function avisarTamanho() {
+  if (usoDados() < 0.75 || typeof notificar !== "function") return;
+  const k = "prumo-aviso-tamanho";
+  if (lsGet(k) === today()) return;
+  lsSet(k, today());
+  setTimeout(
+    () =>
+      notificar({
+        titulo: "Seus dados estão quase no limite",
+        texto: `Já usam ${Math.round(usoDados() * 100)}% do espaço da conta. Veja em Ajustes.`,
+        mood: "worried",
+        aba: "ajustes"
+      }),
+    1500
+  );
 }
 
 function commit() {
@@ -308,7 +333,15 @@ function push() {
     .then(
       () => setSync("ok"),
       e => {
-        setSync(e && e.code === "invalid_argument" ? "local" : "err");
+        const grande = e && e.code === "invalid-argument";
+        setSync(grande || (e && e.code === "invalid_argument") ? "local" : "err");
+        if (grande && typeof notificar === "function")
+          notificar({
+            titulo: "Não deu pra salvar na conta",
+            texto: "Seus dados passaram do limite. Faça um backup em Ajustes e apague coisas antigas.",
+            mood: "worried",
+            aba: "ajustes"
+          });
       }
     );
 }

@@ -2605,3 +2605,15 @@ button.top8-item {
     transition: opacity 0.25s ease;
   }
 }
+
+/* espaço usado (Ajustes, Seus dados) */
+.uso-dados {
+  margin-top: 8px;
+  max-width: 240px;
+}
+.uso-dados span {
+  transition: none;
+}
+.uso-dados.cheio span {
+  background: var(--danger, #c8102e);
+}
