@@ -1,11 +1,12 @@
 /*
   Service worker do Prumo: guarda o app no aparelho para abrir rápido e funcionar sem internet.
   - Página (index.html): tenta a internet primeiro; sem internet, usa a cópia guardada.
-  - Arquivos do app (js, css, ícones, fontes): usa a cópia guardada e atualiza por trás.
+  - Código do app (js, css): tenta a internet primeiro; sem internet, usa a cópia guardada.
+  - Ícones e fontes: usa a cópia guardada e atualiza por trás.
   - Firebase e APIs de livros: passam direto, nunca ficam guardados aqui.
   Para forçar todo mundo a baixar de novo, troque a VERSAO.
 */
-const VERSAO = "prumo-v6";
+const VERSAO = "prumo-v7";
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSAO).then(c => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./icones/icone-192.png"])));
@@ -39,6 +40,23 @@ self.addEventListener("fetch", e => {
           return r;
         })
         .catch(() => caches.match("./index.html"))
+    );
+    return;
+  }
+
+  // Código do app (js e css): internet primeiro, para nunca misturar versão nova com velha depois de um envio.
+  // Sem internet, usa a cópia guardada (ignorando o ?v=, que muda a cada versão).
+  if (url.origin === self.location.origin && /\.(js|css)$/.test(url.pathname)) {
+    e.respondWith(
+      fetch(req)
+        .then(r => {
+          if (r.ok) {
+            const copia = r.clone();
+            caches.open(VERSAO).then(c => c.put(req, copia));
+          }
+          return r;
+        })
+        .catch(() => caches.match(req, { ignoreSearch: true }))
     );
     return;
   }

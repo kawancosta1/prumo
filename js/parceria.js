@@ -141,17 +141,32 @@ function ouvirParceiro() {
   const colecao = typeof modoFirebase === "function" && modoFirebase() ? "vitrines/" : "perfis/";
   pararParceiro = banco.doc(colecao + S.parceria.id).onSnapshot(
     snap => {
-      parceiroDados = snap.exists
-        ? typeof limparVitrine === "function" && colecao === "vitrines/"
-          ? limparVitrine(snap.data())
-          : snap.data()
-        : null;
+      parceiroDados = snap.exists ? limparParceiro(snap.data()) : null;
       receberMimo();
       avisarRecadoNovo();
       softRender();
     },
     () => {}
   );
+}
+
+/* O perfil do par vem de outra pessoa: passa pela mesma limpeza da vitrine (js/amigos.js),
+   mais os recados e depoimentos que só existem no perfil da parceria. */
+function limparParceiro(d) {
+  const v = limparVitrine(d);
+  if (!v) return null;
+  const lista = (a, max, f) => (Array.isArray(a) ? a.slice(0, max).map(f) : []);
+  const msg = (x, max) => ({
+    para: texto(x && x.para, 128),
+    texto: texto(x && x.texto, max),
+    em: numero(x && x.em)
+  });
+  return {
+    ...v,
+    codigo: texto(d.codigo, 12),
+    recados: lista(d.recados, 10, r => msg(r, 240)),
+    depoimentos: lista(d.depoimentos, 5, x => msg(x, 400))
+  };
 }
 
 const parceriaAtiva = () => !!(parceiroDados && S.parceria.id && parceiroDados.parceiro === meuId);

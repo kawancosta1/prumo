@@ -99,7 +99,7 @@ async function carregarAmigo(uid, vitrineTambem, forcar) {
   i.em = Date.now();
   try {
     const p = await banco.doc("perfis/" + uid).get();
-    i.perfil = p.exists ? p.data() : null;
+    i.perfil = p.exists ? limparPerfilPublico(p.data()) : null;
     if (vitrineTambem) {
       const v = await banco.doc("vitrines/" + uid).get();
       i.vitrine = v.exists ? limparVitrine(v.data()) : null;
@@ -570,6 +570,20 @@ function equipOk(e) {
 }
 const texto = (s, max = 200) => (typeof s === "string" ? s.slice(0, max) : "");
 const numero = (n, max = 1e15) => Math.max(0, Math.min(max, +n || 0));
+
+/* Perfil público (perfis/{uid}): qualquer pessoa logada lê, então também vem limpo */
+function limparPerfilPublico(p) {
+  if (!p || typeof p !== "object") return null;
+  return {
+    nome: texto(p.nome, 30),
+    usuario: texto(p.usuario, 21),
+    codigo: texto(p.codigo, 12),
+    persona: mundoOk(p.persona),
+    equip: equipOk(p.equip),
+    parceiro: texto(p.parceiro, 128) || null,
+    tipo: p.tipo === "amizade" ? "amizade" : "namoro"
+  };
+}
 
 function limparVitrine(v) {
   if (!v || typeof v !== "object") return null;

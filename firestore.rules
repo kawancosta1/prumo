@@ -27,17 +27,55 @@ service cloud.firestore {
       allow read, write: if souEu(uid);
     }
 
+    // Texto opcional: se o campo existe, precisa ser texto de até max letras
+    function textoOpcional(d, campo, max) {
+      return !(campo in d) || (d[campo] is string && d[campo].size() <= max);
+    }
+
+    // Perfil público mínimo: só estes campos, com tipos e tamanhos (o app também limpa ao ler)
+    function perfilValido(d) {
+      return d.keys().hasOnly(['nome', 'usuario', 'codigo', 'persona', 'equip', 'atualizado'])
+        && d.nome is string && d.nome.size() <= 60
+        && d.usuario is string && d.usuario.size() <= 21
+        && d.codigo is string && d.codigo.size() <= 12
+        && d.persona is string && d.persona.size() <= 30
+        && d.equip is map && d.equip.size() <= 20
+        && d.atualizado is number;
+    }
+
+    // Vitrine: só os campos que o app publica (montarVitrine em js/amigos.js), com tipos e tamanhos
+    function vitrineValida(d) {
+      return d.keys().hasOnly(['nome', 'usuario', 'persona', 'equip', 'parceiro', 'tipo', 'mimo', 'visto',
+          'nivel', 'sobre', 'visitas', 'layout', 'comunidades', 'top8', 'depoAceitos', 'status', 'ouvindo',
+          'subnick', 'humor', 'agua', 'livroAtual', 'estante', 'fotolog'])
+        && d.nome is string && d.nome.size() <= 60
+        && d.usuario is string && d.usuario.size() <= 21
+        && d.persona is string && d.persona.size() <= 30
+        && d.equip is map && d.equip.size() <= 20
+        && d.visto is number && d.nivel is number && d.visitas is number
+        && d.sobre is string && d.sobre.size() <= 400
+        && d.status is string && d.status.size() <= 20
+        && textoOpcional(d, 'ouvindo', 120)
+        && textoOpcional(d, 'subnick', 120)
+        && (!('agua' in d) || d.agua is number)
+        && d.comunidades is list && d.comunidades.size() <= 50
+        && d.top8 is list && d.top8.size() <= 8
+        && d.depoAceitos is list && d.depoAceitos.size() <= 20
+        && (!('fotolog' in d) || (d.fotolog is list && d.fotolog.size() <= 9));
+    }
+
     // Perfil público mínimo (nome, @, código, mundo, roupas): para achar a pessoa e mandar pedido
     match /perfis/{uid} {
       allow read: if logado();
-      allow create, update: if souEu(uid) && request.resource.data.size() < 40;
+      allow create, update: if souEu(uid) && perfilValido(request.resource.data);
       allow delete: if souEu(uid);
     }
 
     // Vitrine: o que os amigos veem (humor, estante, Fotolog, status do MSN...)
     match /vitrines/{uid} {
       allow read: if souEu(uid) || somosAmigos(uid);
-      allow write: if souEu(uid);
+      allow create, update: if souEu(uid) && vitrineValida(request.resource.data);
+      allow delete: if souEu(uid);
     }
 
     // Nome de usuário (@): cada @ aponta para um uid; só dá para pegar um @ livre, para você mesmo
