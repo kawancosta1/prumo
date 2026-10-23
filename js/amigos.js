@@ -330,7 +330,8 @@ function receberItem(i) {
     recado: `<b>${quem}</b> te deixou um recado`,
     depoimento: `<b>${quem}</b> escreveu um depoimento pra você`,
     par: `<b>${quem}</b> quer ser seu par (${i.texto === "amizade" ? "amizade" : "namoro"})`,
-    mimo: `<b>${quem}</b> ${MIMO_TEXTO[i.mimo] || "te mandou um mimo"}!`
+    mimo: `<b>${quem}</b> ${MIMO_TEXTO[i.mimo] || "te mandou um mimo"}!`,
+    mixtape: `<b>${quem}</b> te mandou uma mixtape`
   };
   const msg = textos[i.tipo] || `Novidade de <b>${quem}</b>`;
   if (i.tipo === "mimo") {
@@ -457,6 +458,12 @@ function montarVitrine() {
     };
   }
   if (pv.fotolog) v.fotolog = S.fotolog.slice(0, 9);
+  // Emo: a fita montada; Roqueiro: os ingressos da coleção (js/mundos/*-extras.js)
+  const fita = S.emo && S.emo.mixtape;
+  if (fita && fita.faixas && fita.faixas.length)
+    v.mixtape = { nome: fita.nome || "", faixas: fita.faixas.slice(0, 10) };
+  const ing = S.rock && S.rock.ingressos;
+  if (ing && ing.length) v.ingressos = { total: ing.length, ultimos: ing.slice(0, 6) };
   return v;
 }
 
@@ -666,6 +673,29 @@ function limparVitrine(v) {
           }
         }
       : null,
+    mixtape:
+      v.mixtape && typeof v.mixtape === "object" && Array.isArray(v.mixtape.faixas)
+        ? {
+            nome: texto(v.mixtape.nome, 40),
+            faixas: v.mixtape.faixas
+              .slice(0, 10)
+              .map(f => texto(f, 60))
+              .filter(Boolean)
+          }
+        : null,
+    ingressos:
+      v.ingressos && typeof v.ingressos === "object" && Array.isArray(v.ingressos.ultimos)
+        ? {
+            total: numero(v.ingressos.total, 999),
+            ultimos: v.ingressos.ultimos.slice(0, 6).map(i => ({
+              semana: /^\d{4}-\d\d-\d\d$/.test(i && i.semana) ? i.semana : today(),
+              shows: numero(i && i.shows, 7),
+              estrelas: numero(i && i.estrelas, 5),
+              palco: texto(i && i.palco, 40),
+              cor: /^#[0-9a-f]{6}$/i.test(i && i.cor) ? i.cor : "#E0312F"
+            }))
+          }
+        : null,
     fotolog: Array.isArray(v.fotolog)
       ? v.fotolog.slice(0, 9).map(f => ({
           id: texto(f && f.id, 40),

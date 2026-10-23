@@ -78,6 +78,16 @@ function perfilHTML() {
 
     ${comunidadesBlocoHTML()}
 
+    ${
+      S.rock && S.rock.ingressos && S.rock.ingressos.length && typeof ingressoHTML === "function"
+        ? `<div class="ms-bloco"><span class="ms-titulo">Ingressos (${S.rock.ingressos.length})</span><div class="ing-lista">${S.rock.ingressos
+            .slice(0, 6)
+            .map(i => ingressoHTML(i, true))
+            .join("")}</div></div>`
+        : ""
+    }
+    ${S.emo && S.emo.mixtape && S.emo.mixtape.faixas.length ? `<div class="ms-bloco"><span class="ms-titulo">Mixtape: ${esc(S.emo.mixtape.nome || "sem nome")}</span><ol class="faixas">${S.emo.mixtape.faixas.map(f => `<li><span>${esc(f)}</span></li>`).join("")}</ol></div>` : ""}
+
     <div class="ms-bloco">
       <span class="ms-titulo">Fotolog</span>
       ${fotologHTML()}

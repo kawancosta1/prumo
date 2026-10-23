@@ -31,6 +31,9 @@ function mascotContext() {
   const jr = S.journal[t] || {};
   if (timer.running)
     return { mood: "focus", msg: say("focus") + (timer.label ? ` <b>${esc(timer.label)}</b>.` : "") };
+  // O mundo pode ter uma fala própria para o momento (ex.: madrugada no emo)
+  const doMundo = ganchoMundo("contextoMascote");
+  if (doMundo && doMundo.msg) return doMundo;
   if (night) return { mood: "sleepy", msg: jr.closed ? `Dia fechado. Boa noite${nome()}!` : say("night") };
   if (tasks.length && done === tasks.length && goalHit)
     return { mood: "party", msg: say("done") + ` E ainda bateu <b>${fmtML(S.waterGoal)}</b> de água!` };

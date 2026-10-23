@@ -66,6 +66,8 @@ function perfilAmigoHTML(uid) {
         : ""
     }
 
+    ${v.mixtape && v.mixtape.faixas.length ? `<div class="ms-bloco"><span class="ms-titulo">Mixtape: ${esc(v.mixtape.nome || "sem nome")}</span><ol class="faixas">${v.mixtape.faixas.map(f => `<li><span>${esc(f)}</span></li>`).join("")}</ol></div>` : ""}
+    ${v.ingressos && v.ingressos.ultimos.length && typeof ingressoHTML === "function" ? `<div class="ms-bloco"><span class="ms-titulo">Ingressos (${v.ingressos.total})</span><div class="ing-lista">${v.ingressos.ultimos.map(i => ingressoHTML(i, true)).join("")}</div></div>` : ""}
     ${fotos.length ? `<div class="ms-bloco"><span class="ms-titulo">Fotolog</span><div class="fl-galeria">${fotos.map(f => `<div class="fl-mini">${fotoHTML(f, false)}</div>`).join("")}</div></div>` : ""}
 
     ${
@@ -191,6 +193,13 @@ function viewAvisos() {
     if (i.tipo === "depoimento") return `${quem} escreveu um depoimento pra você<p>${esc(i.texto)}</p>`;
     if (i.tipo === "mimo") return `${quem} ${esc(MIMO_TEXTO[i.mimo] || "te mandou um mimo")}`;
     if (i.tipo === "par") return `${quem} quer ser seu ${i.texto === "amizade" ? "melhor amigo" : "par"}`;
+    if (i.tipo === "mixtape") {
+      const [nomeFita, ...faixas] = String(i.texto || "").split("\n");
+      return `${quem} te mandou uma mixtape: <b>${esc(nomeFita || "Mixtape")}</b><ol class="faixas">${faixas
+        .slice(0, 10)
+        .map(f => `<li><span>${esc(f)}</span></li>`)
+        .join("")}</ol>`;
+    }
     return quem;
   };
   const acoes = i => {

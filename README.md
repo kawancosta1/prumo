@@ -50,6 +50,8 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/mundos/emo-efeitos.js` | Efeitos especiais do Emo: sangue na troca de aba, lua real, sol, caixão, segredo dos 13 toques |
 | `js/mundos/rock-roupas.js` | Guarda-roupa extra do Roqueiro, por era (anos 70, glam, punk, grunge, metal, rockabilly) e do videogame de guitarra: cabelões, maquiagem, coletes, controle de 5 trastes, guitarra em V, baixo, pets, cenários (amplificadores, estádio, estrada de notas) |
 | `js/mundos/rock-efeitos.js` | Efeitos do Roqueiro: notas coloridas caindo ao trocar de aba, medidor da plateia, Star Power (gotas x2 por 30 min), turnê da semana, letra do dia, riff secreto dos 6 toques |
+| `js/mundos/rock-extras.js` | Roqueiro, parte 2: guarda-roupa extra, setlist numerada com **bis** (tarefa bônus com gotas em dobro), **Ensaio relâmpago** (minijogo de ritmo de 30 s, 1x por dia vale gotas), **Sua banda** (amigos na bateria, baixo, guitarra e teclado) e **ingressos** colecionáveis (semana com 5+ shows). Dados em `S.rock` |
+| `js/mundos/emo-extras.js` | Emo, parte 2: **madrugada** (cartão escuro, olheiras e falas da meia-noite às 5h), **chuva no vidro** durante o foco, **cartas pro futuro**, **Querido diário** com cadeado de PIN e **mixtape montável** (manda para amigos). Dados em `S.emo` |
 | `js/eventos.js` | Eventos com itens por tempo limitado (Halloween, Sexta-feira 13, Dia do Rock, Dia dos Namorados e Natal gótico) |
 | `js/conquistas.js` | Conquistas, nível (XP) e gotas (`earn()`) |
 | `js/agenda.js` | Lembretes para Google, Samsung e Apple |
@@ -129,6 +131,9 @@ No arquivo do mundo, edite `THEMES.emo = { ... }`:
 
 Cada mundo pode ter um objeto `MUNDO_FX.<mundo>` com ganchos opcionais (veja o exemplo completo em `js/mundos/emo-efeitos.js`):
 - `trocaAba()`: roda ao trocar de aba (no emo, o sangue escorrendo).
+- `secaoHoje()`: devolve HTML de seções extras no fim da aba Hoje (no rock: bis, ensaio, banda e ingressos; no emo: cartas, diário e mixtape).
+- `contextoMascote()`: devolve `{ mood, msg }` para o Prumi falar algo próprio do mundo naquele momento (no emo, a madrugada), ou `""`.
+- `diarioTrancado()`: `true` esconde a nota do dia fechado na aba Hoje (cadeado do diário no emo).
 - `confete`: `{ cores, formas }` do confete.
 - `textos`: troca títulos, ex.: `{ diario: "Querido diário", foco: "Ensaio da banda" }`.
 - `humorNomes` e `humorExtra(soma)`: nomes do humor e fatores extras.

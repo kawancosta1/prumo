@@ -48,7 +48,7 @@ service cloud.firestore {
     function vitrineValida(d) {
       return d.keys().hasOnly(['nome', 'usuario', 'persona', 'equip', 'parceiro', 'tipo', 'mimo', 'visto',
           'nivel', 'sobre', 'visitas', 'layout', 'comunidades', 'top8', 'depoAceitos', 'status', 'ouvindo',
-          'subnick', 'humor', 'agua', 'livroAtual', 'estante', 'fotolog'])
+          'subnick', 'humor', 'agua', 'livroAtual', 'estante', 'fotolog', 'mixtape', 'ingressos'])
         && d.nome is string && d.nome.size() <= 60
         && d.usuario is string && d.usuario.size() <= 21
         && d.persona is string && d.persona.size() <= 30
@@ -62,7 +62,9 @@ service cloud.firestore {
         && d.comunidades is list && d.comunidades.size() <= 50
         && d.top8 is list && d.top8.size() <= 8
         && d.depoAceitos is list && d.depoAceitos.size() <= 20
-        && (!('fotolog' in d) || (d.fotolog is list && d.fotolog.size() <= 9));
+        && (!('fotolog' in d) || (d.fotolog is list && d.fotolog.size() <= 9))
+        && (!('mixtape' in d) || (d.mixtape is map && d.mixtape.faixas is list && d.mixtape.faixas.size() <= 10))
+        && (!('ingressos' in d) || (d.ingressos is map && d.ingressos.ultimos is list && d.ingressos.ultimos.size() <= 6));
     }
 
     // Perfil público mínimo (nome, @, código, mundo, roupas): para achar a pessoa e mandar pedido
@@ -120,7 +122,7 @@ service cloud.firestore {
       allow read, update, delete: if souEu(uid);
       allow create: if somosAmigos(uid)
         && request.resource.data.de == request.auth.uid
-        && request.resource.data.tipo in ['recado', 'depoimento', 'mimo', 'par', 'visita']
+        && request.resource.data.tipo in ['recado', 'depoimento', 'mimo', 'par', 'visita', 'mixtape']
         && request.resource.data.texto is string
         && request.resource.data.texto.size() <= 600
         && request.resource.data.visto == false;

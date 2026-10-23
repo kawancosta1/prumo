@@ -68,6 +68,7 @@ const blank = () => ({
   sons: { chuva: true, pagina: true }, // sons do clima no emo (js/sons.js)
   noites: [], // dias em que o app foi usado depois das 22h
   rock: { energia: 0, starAte: 0, usos: 0 }, // Star Power do mundo Roqueiro (js/mundos/rock-efeitos.js)
+  emo: { cartas: [], cadeado: null, mixtape: { nome: "", faixas: [] } }, // cartas, cadeado do diário e mixtape (js/mundos/emo-extras.js)
   livros: [], // Estante de leitura (js/leitura.js)
   privacidade: { estante: true, fotolog: true, humor: false, status: false }, // o que os amigos veem (humor e status começam escondidos)
   consentimento: null, // aceite da política de privacidade e dos dados de saúde: { versao, em } (js/telas/entrar.js)
@@ -169,9 +170,23 @@ function normalize(x) {
   if (!Array.isArray(b.noites)) b.noites = [];
   const rk = b.rock && typeof b.rock === "object" ? b.rock : {};
   b.rock = {
+    ...rk,
     energia: Math.max(0, Math.min(100, +rk.energia || 0)),
     starAte: +rk.starAte || 0,
-    usos: +rk.usos || 0
+    usos: +rk.usos || 0,
+    bis: +rk.bis || 0,
+    bisDia: typeof rk.bisDia === "string" ? rk.bisDia : "",
+    jogo: rk.jogo && typeof rk.jogo === "object" ? rk.jogo : { dia: "", recorde: 0, vezes: 0 }, // ensaio relâmpago
+    banda: rk.banda && typeof rk.banda === "object" ? rk.banda : {}, // amigos na banda (js/mundos/rock-extras.js)
+    ingressos: Array.isArray(rk.ingressos) ? rk.ingressos : [] // ingressos colecionáveis
+  };
+  // Mundo Emo: cartas pro futuro, cadeado do diário e a mixtape montada (js/mundos/emo-extras.js)
+  const em = b.emo && typeof b.emo === "object" ? b.emo : {};
+  b.emo = {
+    ...em,
+    cartas: Array.isArray(em.cartas) ? em.cartas : [],
+    cadeado: em.cadeado && typeof em.cadeado === "object" ? em.cadeado : null,
+    mixtape: em.mixtape && typeof em.mixtape === "object" ? em.mixtape : { nome: "", faixas: [] }
   };
   if (!Array.isArray(b.livros)) b.livros = [];
   b.livros.forEach(l => {

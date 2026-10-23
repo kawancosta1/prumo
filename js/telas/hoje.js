@@ -113,7 +113,7 @@ function viewHoje() {
       ? `<section class="block diario"><h2 class="h2">${textoMundo("diario", "Fechar o dia")}</h2>
     <div class="card">${
       jr.closed
-        ? `<span class="closed">${textoMundo("diaFechado", "Dia fechado.")}</span>${jr.note ? `<span class="nota-dia">${esc(jr.note)}</span>` : ""}<div><button class="btn small ghost" data-act="reopen">${textoMundo("reabrir", "Reabrir")}</button></div>`
+        ? `<span class="closed">${textoMundo("diaFechado", "Dia fechado.")}</span>${jr.note ? (ganchoMundo("diarioTrancado") ? `<span class="note">A nota de hoje está no diário trancado.</span>` : `<span class="nota-dia">${esc(jr.note)}</span>`) : ""}<div><button class="btn small ghost" data-act="reopen">${textoMundo("reabrir", "Reabrir")}</button></div>`
         : `
       <span class="note">${hour < 18 ? "Faça isso à noite: revise o que rolou e deixe amanhã pronto." : "Hora de revisar o dia e deixar amanhã pronto."} ${done} feitas, ${pend} pendentes, ${fmtML(waterToday())} de água.</span>
       <textarea id="jnote" placeholder="${textoMundo("diarioDica", "Como foi o dia? O que ficou de aprendizado? (opcional)")}">${esc(jr.note || "")}</textarea>
@@ -123,6 +123,7 @@ function viewHoje() {
       : ""
   }
   ${isToday && !fresh ? ganchoMundo("resumoSemana") : ""}
+  ${isToday && !fresh ? ganchoMundo("secaoHoje") : ""}
   `;
 }
 

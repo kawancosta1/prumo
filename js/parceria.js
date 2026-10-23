@@ -96,7 +96,15 @@ function publicarPerfil(agora) {
           await banco
             .doc("perfis/" + meuId)
             .set({ nome, usuario, codigo, persona, equip, atualizado: Date.now() });
-          await banco.doc("vitrines/" + meuId).set(vitrine);
+          try {
+            await banco.doc("vitrines/" + meuId).set(vitrine);
+          } catch (e) {
+            // regras antigas no Firebase ainda não conhecem mixtape e ingressos: publica sem eles
+            if (!(vitrine.mixtape || vitrine.ingressos)) throw e;
+            delete vitrine.mixtape;
+            delete vitrine.ingressos;
+            await banco.doc("vitrines/" + meuId).set(vitrine);
+          }
         } else await banco.doc("perfis/" + meuId).set({ ...perfil, atualizado: Date.now() });
       } catch (e) {
         ultimoPerfilEnviado = "";
