@@ -62,7 +62,8 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/estante-enfeites.js` | Móveis, paredes e enfeites da estante (comprados com páginas; alguns só aparecem num mundo) |
 | `js/telas/estante.js` | Aba Estante: desenho da estante, Lendo agora, Adicionar, Livros, Metas e Decorar |
 | `js/firebase-config.js` | A configuração do Firebase (enquanto for `null`, o app fica só no aparelho) |
-| `js/conta.js` | Conta com Google pelo Firebase: login, nome de usuário (@) e o bloco Conta em Ajustes. As regras do banco estão em `firestore.rules` |
+| `js/conta.js` | Conta pelo Firebase (Google ou email): login, nome de usuário (@) e o bloco Conta em Ajustes. As regras do banco estão em `firestore.rules` |
+| `js/telas/entrar.js` | Tela de entrada ao abrir o app: entrar com Google, criar conta e entrar com email e senha (confirmação por link no email), esqueci a senha e continuar sem conta (`S.semConta`) |
 | `js/amigos.js` | Amigos (com a conta Google): pedidos, vitrine (o que amigos veem), caixa de avisos (recados, depoimentos, mimos, par, visitas), bloqueio, visto por último, convite por link e QR, apagar conta |
 | `js/telas/amigos.js` | Telas de Amigos (lista, perfil do amigo, privacidade) e Avisos (o sininho do topo) |
 | `js/pwa.js` | Prumo instalável no celular (service worker `sw.js`) e avisos do sistema |

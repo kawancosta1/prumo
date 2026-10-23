@@ -48,6 +48,7 @@ const blank = () => ({
   gender: "m",
   onboarded: false,
   welcomed: false,
+  semConta: false, // escolheu "Continuar sem conta" na tela de entrada (js/telas/entrar.js)
   persona: "zen",
   calendar: "google",
   mode: "auto",

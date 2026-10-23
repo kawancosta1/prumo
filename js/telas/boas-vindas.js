@@ -71,6 +71,10 @@ function onbHTML() {
 
 function renderOnb() {
   const el = document.getElementById("onb");
+  // Tela de entrada (Google ou email) vem antes de tudo: js/telas/entrar.js
+  if (appReady && typeof precisaEntrar === "function" && precisaEntrar()) return mostrarEntrar(el);
+  entrarDesenhado = "";
+  el.setAttribute("aria-label", "Boas-vindas");
   if (S.onboarded || !appReady) {
     if (!el.hidden) {
       el.classList.add("out");

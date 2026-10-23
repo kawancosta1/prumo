@@ -14,6 +14,7 @@
 const FIREBASE_VERSAO = "10.14.1";
 let fb = null; // { auth, db } depois que o Firebase carrega
 let contaUsuario = null; // usuário logado (nome, e-mail, foto, uid)
+let contaChecada = false; // o Firebase já respondeu se tem alguém logado (libera a tela de entrada)
 
 const contaConfigurada = () =>
   !!(typeof FIREBASE_CONFIG !== "undefined" && FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey);
@@ -50,6 +51,7 @@ async function carregarFirebase() {
     db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
   } catch (e) {}
   fb = { auth: firebase.auth(), db };
+  fb.auth.languageCode = "pt-BR"; // emails de confirmação e de senha em português
   return fb;
 }
 
@@ -66,6 +68,12 @@ async function iniciarConta() {
       });
     });
     contaUsuario = user;
+    contaChecada = true;
+    // conta com email só sincroniza depois de confirmar o email (a tela de entrada pede a confirmação)
+    if (user && !user.emailVerified) {
+      softRender();
+      return null;
+    }
     if (user && user.displayName && (!S.name || S.name === "Kawan")) {
       S.name = user.displayName.split(" ")[0].slice(0, 30); // o Prumi chama a pessoa pelo primeiro nome
       persist();
@@ -147,9 +155,9 @@ async function uidDoUsuario(u) {
 function contaHTML() {
   if (!contaConfigurada())
     return `<div class="setrow"><div class="lbl"><b>Conta</b><span class="note">A conta com Google ainda não foi ligada. Por enquanto tudo fica salvo neste aparelho.</span></div></div>`;
-  if (!contaUsuario)
-    return `<div class="setrow"><div class="lbl"><b>Conta</b><span class="note">Entre para guardar tudo na nuvem, usar no celular e no PC e ter amigos no Prumo.</span></div><button class="btn primary" data-act="conta-entrar">Entrar com Google</button></div>`;
-  return `<div class="setrow"><div class="lbl"><b>${esc(contaUsuario.displayName || "Conta Google")}</b><span class="note">${esc(contaUsuario.email || "")} · sincronizado</span></div><button class="btn small ghost" data-act="conta-sair">Sair</button></div>
+  if (!contaUsuario || !contaUsuario.emailVerified)
+    return `<div class="setrow"><div class="lbl"><b>Conta</b><span class="note">${contaUsuario ? `Falta confirmar o email ${esc(contaUsuario.email || "")}.` : "Entre para guardar tudo na nuvem, usar no celular e no PC e ter amigos no Prumo."}</span></div><button class="btn primary" data-act="conta-abrir">${contaUsuario ? "Confirmar email" : "Entrar ou criar conta"}</button></div>`;
+  return `<div class="setrow"><div class="lbl"><b>${esc(contaUsuario.displayName || "Sua conta")}</b><span class="note">${esc(contaUsuario.email || "")} · sincronizado</span></div><button class="btn small ghost" data-act="conta-sair">Sair</button></div>
     <div class="setrow"><div class="lbl"><b>Avisos no celular</b><span class="note">Notifica quando um amigo manda algo e o Prumo está em segundo plano.</span></div><button class="btn small ${S.avisosCelular ? "" : "ghost"}" data-act="avisos-celular">${S.avisosCelular ? "Ligados" : "Desligados"}</button></div>
     ${typeof jaInstalado === "function" && !jaInstalado() ? `<div class="setrow"><div class="lbl"><b>Instalar o Prumo</b><span class="note">Ícone na tela inicial, abre em tela cheia e funciona sem internet.</span></div><button class="btn small" data-act="instalar">Instalar</button></div>` : ""}
     <div class="setrow"><div class="lbl"><b>Seus dados</b><span class="note">Baixe tudo num arquivo ou apague a conta. Apagar tira você da nuvem e dos amigos; neste aparelho os dados continuam.</span></div><div class="row" style="gap:6px"><button class="btn small" data-act="export">Baixar meus dados</button><button class="btn small ghost danger" data-act="conta-apagar">Apagar conta</button></div></div>
@@ -157,6 +165,12 @@ function contaHTML() {
 }
 
 ACOES_EXTRAS["conta-entrar"] = () => entrarComGoogle();
+// Abre a tela de entrada (Google ou email) a partir de Ajustes
+ACOES_EXTRAS["conta-abrir"] = () => {
+  S.semConta = false;
+  if (typeof entrar === "object") entrar.modo = contaUsuario ? "verificar" : "inicio";
+  commit();
+};
 ACOES_EXTRAS["conta-sair"] = () => sairDaConta();
 ACOES_EXTRAS["conta-apagar"] = b => {
   if (!b.dataset.certeza) {

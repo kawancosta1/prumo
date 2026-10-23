@@ -399,6 +399,63 @@ li.psel {
   font-size: 17px;
   min-height: 48px;
 }
+
+/* tela de entrada (js/telas/entrar.js) */
+.oentrar {
+  max-width: 420px;
+}
+.oentrar form {
+  gap: 12px;
+}
+.oentrar .btn.big {
+  width: 100%;
+}
+.osep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.osep::before,
+.osep::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.olink {
+  align-self: center;
+  background: none;
+  border: 0;
+  padding: 6px 10px;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.ocentro {
+  text-align: center;
+  margin: 0;
+}
+.oerro,
+.oaviso {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14.5px;
+  text-align: center;
+}
+.oerro {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+.oaviso {
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 12%, transparent);
+}
 .ogender {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
