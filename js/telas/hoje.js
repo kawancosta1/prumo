@@ -54,6 +54,14 @@ function viewHoje() {
     .map(p => ({ p, d: bdayNext(p.bday) }))
     .filter(o => diffDays(t, o.d) <= 7)
     .sort((a, b) => (a.d < b.d ? -1 : 1));
+  const peopleDue = S.people
+    .filter(p => p.every && (!p.last || diffDays(p.last, t) >= p.every))
+    .sort((a, b) => {
+      const sa = !a.last ? 1e6 : diffDays(a.last, t) - a.every;
+      const sb = !b.last ? 1e6 : diffDays(b.last, t) - b.every;
+      return sb - sa;
+    })
+    .slice(0, 3);
   const fresh = !hasData(),
     hour = new Date().getHours(),
     jr = S.journal[t] || {};
@@ -85,6 +93,17 @@ function viewHoje() {
   </section>
   ${overdue.length ? `<section class="block"><h2 class="h2">${textoMundo("atrasadas", "Atrasadas")} <span class="row" style="gap:6px"><span class="count">${overdue.length}</span><button class="btn small" data-act="rollover">${textoMundo("trazerTudo", "Trazer tudo para hoje")}</button></span></h2><ul class="list">${overdue.map(x => taskRow(x, { showDate: true })).join("")}</ul></section>` : ""}
   ${bdays.length ? `<section class="block"><h2 class="h2">Aniversários chegando</h2><ul class="list">${bdays.map(({ p, d }) => `<li class="a-social"><div class="item"><span class="slot">${ICON.cake}</span><div class="main"><span class="title">${esc(p.name)}</span><span class="meta">${fmtLong(d)}</span></div>${dueTag(diffDays(t, d))}</div></li>`).join("")}</ul></section>` : ""}
+  ${
+    isToday && peopleDue.length
+      ? `<section class="block"><h2 class="h2">Falar hoje <span class="count">${peopleDue.length}</span></h2><ul class="list">${peopleDue
+          .map(p => {
+            const dias = p.last ? diffDays(p.last, t) : null;
+            const waNum = p.phone ? p.phone.replace(/\D/g, "") : "";
+            return `<li class="a-social"><div class="item"><span class="slot" style="color:var(--social)">${ICON.heart}</span><div class="main"><span class="title">${esc(p.name)}</span><span class="meta">${dias === null ? "Sem registro de contato" : `Sem contato há ${dias} ${dias === 1 ? "dia" : "dias"}`} · meta: ${p.every === 7 ? "toda semana" : p.every === 14 ? "a cada 2 sem." : p.every === 30 ? "todo mês" : "a cada 3 meses"}</span></div>${waNum ? `<a class="btn small ghost" href="https://wa.me/${waNum}" target="_blank" rel="noopener">WhatsApp</a>` : ""}<button class="btn small" data-act="talked" data-id="${p.id}">Falei hoje</button></div></li>`;
+          })
+          .join("")}</ul></section>`
+      : ""
+  }
   ${revDue.length ? `<section class="block"><h2 class="h2">Revisões de hoje <span class="count">${revDue.length}</span></h2><ul class="list">${revDue.map(reviewRow).join("")}</ul></section>` : ""}
   ${isToday && habitsToday.length ? `<section class="block"><h2 class="h2">Hábitos <span class="count">${habitsToday.filter(h => habitDone(h, t)).length}/${habitsToday.length}</span></h2><ul class="list">${habitsToday.map(h => habitRow(h, false)).join("")}</ul></section>` : ""}
   ${isToday ? `<section class="block"><h2 class="h2">Água</h2>${waterWidget(false)}</section>` : ""}

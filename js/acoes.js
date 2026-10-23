@@ -132,7 +132,19 @@ const forms = {
     let bday = "";
     const m = getV("p-bday").match(/^(\d{1,2})\/(\d{1,2})$/);
     if (m && +m[1] >= 1 && +m[1] <= 31 && +m[2] >= 1 && +m[2] <= 12) bday = `${pad(+m[2])}-${pad(+m[1])}`;
-    S.people.push({ id: newId(), name, last: "", every: +getV("p-every") || 0, bday });
+    const group = getV("p-group") || "amigos";
+    const phone = getV("p-phone") || "";
+    S.people.push({
+      id: newId(),
+      name,
+      last: "",
+      every: +getV("p-every") || 0,
+      bday,
+      group,
+      phone,
+      notes: "",
+      history: []
+    });
     return "p-name";
   },
   parceria() {
@@ -630,7 +642,11 @@ document.addEventListener("click", e => {
     case "talked": {
       const p = S.people.find(o => o.id === id);
       if (p) {
-        p.last = today();
+        const d = today();
+        p.last = d;
+        if (!Array.isArray(p.history)) p.history = [];
+        p.history.unshift({ date: d, note: "" });
+        if (p.history.length > 20) p.history = p.history.slice(0, 20);
         earn(3, b);
         S.stats.talked++;
         react("happy", `Que bom que falou com <b>${esc(p.name)}</b>! Gente faz bem.`, 2600);

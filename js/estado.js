@@ -126,6 +126,10 @@ function normalize(x) {
   b.people.forEach(p => {
     p.every = p.every || 0;
     p.bday = p.bday || "";
+    p.group = p.group || "amigos";
+    p.notes = p.notes || "";
+    p.phone = p.phone || "";
+    p.history = Array.isArray(p.history) ? p.history : p.last ? [{ date: p.last, note: "" }] : [];
   });
   if (!b.stats || typeof b.stats !== "object") b.stats = {};
   for (const k of ["tasks", "water", "focus", "reviews", "talked", "perfect", "closed", "morcego"])

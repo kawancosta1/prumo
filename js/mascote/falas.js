@@ -63,6 +63,16 @@ function mascotContext() {
     .sort((a, b) => (a.time < b.time ? -1 : 1))[0];
   if (next && hm2min(next.time) - nm <= 60)
     return { mood: "idle", msg: `Daqui a <b>${hm2min(next.time) - nm} min</b>: ${esc(next.title)}.` };
+  const latePerson = S.people
+    .filter(p => p.every && p.last && diffDays(p.last, t) >= p.every * 1.5)
+    .sort((a, b) => diffDays(b.last, t) - b.every - (diffDays(a.last, t) - a.every))[0];
+  if (latePerson && !tasks.filter(x => !x.done).length) {
+    const d = diffDays(latePerson.last, t);
+    return {
+      mood: "idle",
+      msg: `Faz <b>${d} dias</b> que você não fala com <b>${esc(latePerson.name)}</b>. Que tal mandar um 'oi' hoje?`
+    };
+  }
   if (humor.valor < 30) return { mood: humor.nivel.rosto, msg: say("sad") };
   const rosto = humor.nivel.rosto === "party" ? "happy" : humor.nivel.rosto;
   if (!tasks.length)
@@ -80,6 +90,7 @@ const TIPS = [
   "Cada copo que você registra me enche um pouquinho. Glub!",
   "Estudou algo hoje? Registra na revisão espaçada e eu te lembro na hora certa.",
   "Toque no ícone azul de agenda para criar o lembrete no seu celular.",
+  "Manter contato com quem importa faz bem. Registre na aba Social quando falar com seus amigos!",
   "Não precisa ser perfeito, só não falhar dois dias seguidos."
 ];
 
