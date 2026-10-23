@@ -177,6 +177,30 @@ service cloud.firestore {
       }
     }
 
+    // Relato de erro (só com aceite em Ajustes): qualquer pessoa logada manda, ninguém lê pelo app.
+    // Lê-se no Console do Firebase.
+    match /erros/{id} {
+      allow create: if logado()
+        && request.resource.data.keys().hasOnly(['msg', 'onde', 'versao', 'em', 'navegador'])
+        && request.resource.data.msg is string && request.resource.data.msg.size() <= 500
+        && request.resource.data.onde is string && request.resource.data.onde.size() <= 200
+        && request.resource.data.versao is string && request.resource.data.versao.size() <= 20
+        && request.resource.data.navegador is string && request.resource.data.navegador.size() <= 120
+        && request.resource.data.em is number;
+    }
+
+    // Lembretes com o app fechado: os próximos avisos e os aparelhos (tokens) de cada pessoa.
+    // O envio é feito pela Action agendada (conta de serviço, que não passa por estas regras).
+    match /lembretes/{uid} {
+      allow read, delete: if souEu(uid);
+      allow create, update: if souEu(uid)
+        && request.resource.data.keys().hasOnly(['tokens', 'itens', 'fuso', 'atualizado', 'enviados'])
+        && request.resource.data.tokens is list && request.resource.data.tokens.size() <= 5
+        && request.resource.data.itens is list && request.resource.data.itens.size() <= 60
+        && request.resource.data.fuso is string && request.resource.data.fuso.size() <= 60
+        && request.resource.data.atualizado is number;
+    }
+
     // Tudo o que não está listado acima fica fechado
     match /{caminho=**} {
       allow read, write: if false;

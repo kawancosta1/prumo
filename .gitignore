@@ -2,3 +2,5 @@
 node_modules/
 testes/node_modules/
 testes/package-lock.json
+
+testes/*/package-lock.json

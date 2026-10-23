@@ -1,5 +1,8 @@
-# Roda os testes do Prumo a cada push na main. Se algo quebrar, aparece um X vermelho no commit.
-# Se os testes passarem, publica o site e as regras do Firestore no Firebase.
+# A cada push na main:
+#  1. testes do app (jsdom) e testes das regras do Firestore (emulador) rodam juntos;
+#  2. se os dois passarem, publica o site e as regras no Firebase;
+#  3. depois confere o site no ar num navegador de verdade.
+# Se algo falhar, aparece um X vermelho no commit e o motivo vai no resumo da execução.
 name: Testes
 on:
   push:
@@ -9,8 +12,8 @@ jobs:
   testes:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - name: Instalar
@@ -18,16 +21,35 @@ jobs:
       - name: Testar
         run: node testes/rodar.js
 
+  regras:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Instalar
+        run: npm install --prefix testes/regras
+      - name: Testar as regras no emulador
+        working-directory: testes/regras
+        run: npx firebase emulators:exec --only firestore --project demo-prumo "node rodar.js"
+
   publicar:
-    needs: testes
+    needs: [testes, regras]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     concurrency: publicar
     env:
       CHAVE: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    outputs:
+      publicou: ${{ steps.chave.outputs.tem }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - name: Conferir a chave
@@ -40,6 +62,9 @@ jobs:
             printf '%s' "$CHAVE" > "$RUNNER_TEMP/chave.json"
             echo "tem=sim" >> "$GITHUB_OUTPUT"
           fi
+      - name: Carimbar a versão (cache novo a cada publicação)
+        if: steps.chave.outputs.tem == 'sim'
+        run: bash .github/carimbar.sh
       - name: Publicar o site
         if: steps.chave.outputs.tem == 'sim'
         env:
@@ -53,3 +78,19 @@ jobs:
       - name: Apagar a chave
         if: always()
         run: rm -f "$RUNNER_TEMP/chave.json"
+
+  conferir:
+    needs: publicar
+    if: needs.publicar.outputs.publicou == 'sim'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Instalar navegador
+        run: |
+          npm install --prefix testes/no-ar
+          npx --prefix testes/no-ar playwright install --with-deps chromium
+      - name: Conferir o site no ar
+        run: node testes/no-ar/conferir.js https://prumo-66d76.web.app/

@@ -4,12 +4,40 @@
   - Código do app (js, css): tenta a internet primeiro; sem internet, usa a cópia guardada.
   - Ícones e fontes: usa a cópia guardada e atualiza por trás.
   - Firebase e APIs de livros: passam direto, nunca ficam guardados aqui.
-  Para forçar todo mundo a baixar de novo, troque a VERSAO.
+  Na publicação (Firebase), a Action troca CARIMBO pelo código do commit e põe ?v=<commit> em todo js e css.
+  Com isso:
+  - Na instalação, o app inteiro (todos os js e css que o index.html usa) fica guardado de uma vez:
+    da segunda visita em diante abre na hora, mesmo sem internet.
+  - js e css com o carimbo vêm direto da cópia guardada (cada publicação tem endereços novos, nunca mistura versão).
+  - Cada publicação nova apaga as cópias da anterior.
+  Sem carimbo (GitHub Pages antigo, testes), continua tudo como antes: internet primeiro.
 */
-const VERSAO = "prumo-v8";
+const CARIMBO = "DEV";
+const VERSAO = "prumo-v9-" + CARIMBO;
+const COM_CARIMBO = CARIMBO !== "DEV";
+
+/** Todos os js e css que o index.html carrega (lidos do próprio index, então nunca fica lista velha). */
+async function arquivosDoApp() {
+  const r = await fetch("./index.html", { cache: "no-store" });
+  const html = await r.text();
+  if (!r.ok) throw new Error("sem index");
+  const lista = [...html.matchAll(/(?:src|href)="((?:js|estilos)\/[^"]+\.(?:js|css)(?:\?[^"]*)?)"/g)].map(m => "./" + m[1]);
+  return { lista: [...new Set(lista)] };
+}
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(VERSAO).then(c => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./icones/icone-192.png"])));
+  e.waitUntil(
+    (async () => {
+      const c = await caches.open(VERSAO);
+      await c.addAll(["./manifest.webmanifest", "./icones/icone-192.png"]);
+      try {
+        const { lista } = await arquivosDoApp();
+        await c.addAll(["./index.html", ...(COM_CARIMBO ? lista : [])]);
+      } catch (e) {
+        await c.addAll(["./index.html"]).catch(() => {});
+      }
+    })()
+  );
   self.skipWaiting();
 });
 
@@ -45,6 +73,24 @@ self.addEventListener("fetch", e => {
           return r;
         })
         .catch(() => caches.match(chave).then(r => r || caches.match("./index.html")))
+    );
+    return;
+  }
+
+  // Código do app com carimbo: a cópia guardada vale (o endereço muda a cada publicação).
+  if (COM_CARIMBO && url.origin === self.location.origin && /\.(js|css)$/.test(url.pathname) && url.searchParams.get("v") === CARIMBO) {
+    e.respondWith(
+      caches.match(req).then(
+        guardado =>
+          guardado ||
+          fetch(req).then(r => {
+            if (r.ok) {
+              const copia = r.clone();
+              caches.open(VERSAO).then(c => c.put(req, copia));
+            }
+            return r;
+          })
+      )
     );
     return;
   }

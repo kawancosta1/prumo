@@ -1,0 +1,8 @@
+{
+  "name": "prumo-teste-no-ar",
+  "private": true,
+  "description": "Confere o site publicado de verdade (roda na Action depois de publicar)",
+  "dependencies": {
+    "playwright": "^1.56.0"
+  }
+}

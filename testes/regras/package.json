@@ -1,0 +1,13 @@
+{
+  "name": "prumo-testes-regras",
+  "private": true,
+  "description": "Testa o firestore.rules no emulador do Firebase (roda na Action antes de publicar)",
+  "scripts": {
+    "testar": "firebase emulators:exec --only firestore --project demo-prumo \"node rodar.js\""
+  },
+  "dependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "firebase": "^13.0.0",
+    "firebase-tools": "^15.0.0"
+  }
+}
