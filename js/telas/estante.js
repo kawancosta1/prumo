@@ -291,6 +291,25 @@ function decorarHTML() {
       )
     )
     .join("")}</div>
+  <h3 class="h3">Posições no quarto</h3>
+  <div class="card" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+    <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+      <span class="label" style="font-size:13px">Colar pôster em:</span>
+      <div class="seg" role="group">
+        <button class="${(d.quarto?.posPoster || "centro") === "esquerda" ? "on" : ""}" data-act="quarto-pos" data-campo="posPoster" data-val="esquerda">Esquerda</button>
+        <button class="${(d.quarto?.posPoster || "centro") === "centro" ? "on" : ""}" data-act="quarto-pos" data-campo="posPoster" data-val="centro">Centro</button>
+        <button class="${(d.quarto?.posPoster || "centro") === "direita" ? "on" : ""}" data-act="quarto-pos" data-campo="posPoster" data-val="direita">Direita</button>
+      </div>
+    </div>
+    <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+      <span class="label" style="font-size:13px">Onde fica o bichinho:</span>
+      <div class="seg" role="group">
+        <button class="${(d.quarto?.posPet || "cama") === "cama" ? "on" : ""}" data-act="quarto-pos" data-campo="posPet" data-val="cama">Na cama</button>
+        <button class="${(d.quarto?.posPet || "cama") === "tapete" ? "on" : ""}" data-act="quarto-pos" data-campo="posPet" data-val="tapete">No tapete</button>
+        <button class="${(d.quarto?.posPet || "cama") === "chao" ? "on" : ""}" data-act="quarto-pos" data-campo="posPet" data-val="chao">Perto da estante</button>
+      </div>
+    </div>
+  </div>
   ${Object.entries(LUGARES_QUARTO)
     .map(([slot, lugar]) => {
       const atual = (d.quarto || {})[slot] ?? QUARTO_PADRAO[slot];
@@ -500,11 +519,25 @@ ACOES_EXTRAS["pet-tocar"] = () => {
     q_pet_cachorro: "O cãozinho caramelo abanou o rabinho e te deu uma lambidinha carinhosa!",
     q_pet_morcego: "O morceguinho bateu as asinhas de alegria!",
     q_pet_planta: "Você borrifou uma aguinha na monstera. Folhas bem hidratadas!",
-    q_pet_hamster: "O hamster deu duas voltas na rodinha e pegou uma semente!"
+    q_pet_hamster: "O hamster deu duas voltas na rodinha e pegou uma semente!",
+    q_pet_calopsita: "A calopsita assobiou uma musiquinha feliz e abaixou a crista pra carinho!",
+    q_pet_coelho: "O coelhinho mexeu o narizinho rápido e encostou a patinha em você!",
+    q_pet_aquario: "O peixinho dourado nadou até a borda e soltou três bolhinhas!",
+    q_pet_raposa: "A raposinha aconchegou o focinho no rabo felpudo e dormiu quentinha!"
   };
   const msg = falas[pet.id] || `Você fez um carinho no seu ${esc(pet.nome.toLowerCase())}!`;
   react("happy", msg, 3200);
   toast(msg, false, "happy");
+};
+
+ACOES_EXTRAS["quarto-pos"] = b => {
+  const campo = b.dataset.campo;
+  const val = b.dataset.val;
+  const d = S.leitura.decor;
+  d.quarto = { ...QUARTO_PADRAO, ...(d.quarto || {}) };
+  d.quarto[campo] = val;
+  commit();
+  toast("Posição atualizada!", true);
 };
 // comprar ou usar móvel, parede e enfeite
 ACOES_EXTRAS.decor = b => {
