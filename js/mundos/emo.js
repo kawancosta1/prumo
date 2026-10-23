@@ -845,8 +845,16 @@ ITEMS.push(
     slot: "string",
     name: "Fio de corrente",
     price: 60,
-    svg: () =>
-      `<line x1="60" y1="-40" x2="60" y2="19" stroke="#8C8A96" stroke-width="3.2" stroke-dasharray="3.4 1.8"/>`
+    // Elos de verdade (um de frente, um de lado), em vez de traços retos que viravam quadradinhos ao balançar
+    svg: () => {
+      let elos = "";
+      for (let i = 0, y = -40; y < 19; i++, y += 3.3)
+        elos +=
+          i % 2
+            ? `<rect x="59.4" y="${(y - 0.6).toFixed(1)}" width="1.2" height="4.5" rx=".6" fill="#6E6C78"/>`
+            : `<ellipse cx="60" cy="${(y + 1.6).toFixed(1)}" rx="1.7" ry="2.35" fill="none" stroke="#8C8A96" stroke-width="1.1"/><path d="M58.9 ${(y + 0.6).toFixed(1)}q.4-.9 1.1-1" fill="none" stroke="#D6D4DE" stroke-width=".5" stroke-linecap="round"/>`;
+      return elos;
+    }
   },
 
   {

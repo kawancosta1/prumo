@@ -31,6 +31,8 @@ O site fica publicado no GitHub Pages: https://kawancosta1.github.io/prumo (a pa
 
 ## Como testar antes de enviar
 
+- Rode os testes: `cd testes && npm install && node rodar.js` (nomes globais repetidos, uso geral, entrada e feedback, no jsdom).
+  Eles também rodam sozinhos no GitHub a cada push (`.github/workflows/testes.yml`). Fluxo novo? Acrescente um teste em `testes/`.
 - Abra o `index.html` num navegador (ou Playwright/jsdom) e confira que não há erro no console.
 - Teste o fluxo mexido: boas-vindas, criar tarefa, marcar como feita, beber água, abrir a aba Prumi e a loja.
 - Rode o Prettier com a configuração do repositório: `npx prettier --write "js/**/*.js" "estilos/*.css"`.

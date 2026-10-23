@@ -54,7 +54,8 @@
 }
 @media (prefers-reduced-motion: reduce) {
   *,
-  *::before {
+  *::before,
+  *::after {
     transition: none !important;
     animation: none !important;
   }

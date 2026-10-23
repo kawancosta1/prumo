@@ -1,0 +1,10 @@
+{
+  "name": "prumo-testes",
+  "private": true,
+  "description": "Testes do Prumo (não fazem parte do site)",
+  "scripts": { "test": "node rodar.js" },
+  "devDependencies": {
+    "acorn": "^8.14.0",
+    "jsdom": "^24.1.3"
+  }
+}

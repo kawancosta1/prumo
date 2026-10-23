@@ -247,7 +247,14 @@ O código tem alguns nomes curtos herdados do protótipo:
 
 ---
 
-## 5. Formatação
+## 5. Testes
+
+Na pasta `testes/` (não fazem parte do site): `cd testes && npm install && node rodar.js`.
+- `globais.js`: acusa dois arquivos declarando o mesmo nome global (isso impediria o app de abrir).
+- `smoke.js`, `entrar.js`, `feedback.js`: abrem o Prumo num navegador falso (jsdom) e usam o app como uma pessoa.
+Também rodam no GitHub a cada push. Se aparecer um X vermelho no commit, algo quebrou.
+
+## 6. Formatação
 
 O código foi formatado com o [Prettier](https://prettier.io). A configuração está em `.prettierrc.json`.
 Se você usa VS Code, instale a extensão Prettier e ele formata sozinho ao salvar.

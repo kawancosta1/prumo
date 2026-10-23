@@ -3,6 +3,9 @@
 .prumi {
   display: block;
   overflow: visible;
+  shape-rendering: geometricPrecision; /* linhas lisas mesmo girando (corda sem serrilhado) */
+  --fase: 0s;
+  --pendulo: cubic-bezier(0.37, 0, 0.63, 1); /* vai e volta como um pêndulo de verdade */
 }
 .prumi * {
   transform-box: view-box;
@@ -78,8 +81,8 @@
   stroke-linecap: round;
 }
 .prumi .swing {
-  transform-origin: 60px -2px;
-  animation: psway 4.2s ease-in-out infinite;
+  transform-origin: 60px -6px; /* gira no ponto onde a corda sai do quadro */
+  animation: psway 4.2s var(--pendulo) infinite;
 }
 .prumi .eye {
   transform-box: fill-box;
@@ -163,7 +166,13 @@
   animation: none;
 }
 .m-focus .hop {
-  animation: pbreathe 3.2s ease-in-out infinite;
+  animation: pbreathe 3.6s linear infinite;
+}
+.m-idle .hop {
+  animation: pbreathe 4.4s linear infinite;
+}
+.m-sleepy .hop {
+  animation: pbreathe-fundo 6s linear infinite;
 }
 @keyframes psway {
   0%,
@@ -221,9 +230,39 @@
     transform: translateX(0.9px);
   }
 }
+/* Respiração: puxa o ar devagar, segura um instante e solta mais rápido. Cresce para cima, a partir da base. */
 @keyframes pbreathe {
-  50% {
-    transform: scale(1.03);
+  0% {
+    transform: scale(1, 1);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  42% {
+    transform: scale(1.012, 1.032);
+    animation-timing-function: linear;
+  }
+  52% {
+    transform: scale(1.013, 1.034);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.6, 1);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+@keyframes pbreathe-fundo {
+  0% {
+    transform: scale(1, 1);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  45% {
+    transform: scale(1.018, 1.045);
+    animation-timing-function: linear;
+  }
+  55% {
+    transform: scale(1.019, 1.047);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.6, 1);
+  }
+  100% {
+    transform: scale(1, 1);
   }
 }
 @keyframes parmr {
@@ -375,4 +414,18 @@
   background: var(--water);
   border-radius: 99px;
   transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Relógio comum: as animações contínuas usam --fase (definida em prumi(), js/mascote/desenho.js),
+   então continuam de onde estavam quando a tela é redesenhada. Animações que acabam (gole) ficam de fora. */
+.prumi .swing,
+.prumi .wave,
+.prumi .wave2,
+.prumi .eye,
+.prumi:not(.m-drink) .hop,
+.prumi .arm.r {
+  animation-delay: var(--fase);
+}
+.prumi.m-party .arm.l {
+  animation-delay: calc(var(--fase) + 0.45s);
 }

@@ -1,2 +1,4 @@
 .DS_Store
 node_modules/
+testes/node_modules/
+testes/package-lock.json
