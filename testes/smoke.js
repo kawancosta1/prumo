@@ -92,6 +92,10 @@ module.exports = async url => {
   const v2 = JSON.parse(ev("JSON.stringify(montarVitrine())"));
   ok(str(v2.status,20) && Object.keys(v2).every(k => chavesV.includes(k)), "vitrine com tudo escondido também passa");
 
+  // limpeza automática não apaga diário escrito
+  ev(`S.journal["2020-01-01"] = { note: "texto antigo", closed: true }; S.journal["2020-01-02"] = { note: "", closed: true }; prune();`);
+  ok(ev(`S.journal["2020-01-01"] && S.journal["2020-01-01"].note`) === "texto antigo" && !ev(`S.journal["2020-01-02"]`), "diário antigo com texto fica, dia vazio some");
+
   fechar();
   return erros;
 };

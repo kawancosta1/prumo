@@ -244,8 +244,11 @@ let ref = null,
 function prune() {
   const lim = addDays(today(), -150);
   S.sessions = S.sessions.filter(s => s.date >= lim);
-  for (const o of [S.water, S.habitLog, S.mealCheck, S.journal, S.carinho])
+  for (const o of [S.water, S.habitLog, S.mealCheck, S.carinho])
     for (const k of Object.keys(o)) if (k < lim) delete o[k];
+  // diário: o que a pessoa escreveu fica para sempre; só some o dia antigo sem texto
+  for (const [k, j] of Object.entries(S.journal))
+    if (k < lim && !(j && (j.note || "").trim())) delete S.journal[k];
   const pl = addDays(today(), -400);
   for (const k of Object.keys(S.paid)) if (k < pl) delete S.paid[k];
   for (const k of Object.keys(S.leitura.log)) if (k < pl) delete S.leitura.log[k]; // páginas por dia: guarda um ano
