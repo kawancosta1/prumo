@@ -125,6 +125,14 @@ module.exports = async url => {
   ev(`S.resumoVisto = mondayOf(today()); semanaDoResumo = () => null;`);
   ok(ev("resumoSemanaHTML()") === "", "resumo some depois de fechado");
 
+  // relato de erros: desligado por padrão, nada sai sem aceite
+  ok(ev("normalize({}).relatarErros") === false, "relato de erros começa desligado");
+  ev(`S.relatarErros = false; guardarErro("teste", location.origin + "/js/x.js?v=1", 3); enviarRelatos();`);
+  ok(ev("relatosPendentes.length") === 0, "sem aceite, erro não fica guardado para envio");
+  ev(`S.relatarErros = true; relatosEnviados.clear(); guardarErro("teste2", location.origin + "/js/x.js?v=1", 3);`);
+  ok(ev("relatosPendentes[0] && relatosPendentes[0].onde") === "js/x.js:3", "relato guarda só arquivo e linha, sem o endereço");
+  ev("S.relatarErros = false; relatosPendentes.length = 0;");
+
   fechar();
   return erros;
 };

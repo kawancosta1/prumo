@@ -232,6 +232,7 @@ function normalize(x) {
   b.sons = { chuva: b.sons.chuva !== false, pagina: b.sons.pagina !== false };
   if (!b.notif || typeof b.notif !== "object") b.notif = {};
   b.notif = { som: b.notif.som !== false, vibrar: b.notif.vibrar !== false };
+  b.relatarErros = b.relatarErros === true; // relato de erros só com aceite (js/relato-erros.js)
   if (typeof b.resumoVisto !== "string") b.resumoVisto = ""; // segunda-feira da última semana resumida (js/resumo-semana.js)
   if (!b.parceria || typeof b.parceria !== "object") b.parceria = { id: null, tipo: "namoro" };
   if (!Array.isArray(b.parceria.depoimentos)) b.parceria.depoimentos = [];
