@@ -2617,3 +2617,32 @@ button.top8-item {
 .uso-dados.cheio span {
   background: var(--danger, #c8102e);
 }
+
+/* compartilhar com o Prumo (js/atalhos.js) */
+.compartilhar {
+  position: fixed;
+  inset: 0;
+  z-index: 65;
+  display: grid;
+  place-items: end center;
+  padding: 16px;
+  background: rgb(0 0 0 / 0.35);
+}
+.compartilhar-cartao {
+  width: min(440px, 100%);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.25);
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+.compartilhar-cartao p {
+  margin: 8px 0 14px;
+  overflow-wrap: anywhere;
+  opacity: 0.85;
+}
+.compartilhar-cartao .row {
+  flex-wrap: wrap;
+  gap: 8px;
+}

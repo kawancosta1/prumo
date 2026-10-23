@@ -108,6 +108,17 @@ module.exports = async url => {
   await espera(50);
   ok(/Espaço usado/.test(w.document.getElementById("main").textContent) && ev("tamanhoDados") > 100, "Ajustes mostra o espaço usado pelos dados");
 
+  // atalhos do ícone e compartilhar
+  ev(`history.replaceState(null, "", location.pathname + "?acao=agua"); window.__antes = waterToday(); tratarAtalho();`);
+  ok(ev("waterToday() > __antes") && ev("location.search") === "", "atalho Beber água registra um copo e limpa o endereço");
+  ev(`history.replaceState(null, "", location.pathname + "?titulo=Duna&link=https%3A%2F%2Fwww.amazon.com.br%2Fduna"); tratarAtalho();`);
+  await espera(30);
+  const cx = w.document.querySelector(".compartilhar");
+  ok(cx && /Duna/.test(cx.textContent) && /Procurar livro/.test(cx.querySelector(".btn.primary").textContent), "compartilhar link de livro sugere procurar livro");
+  cx && cx.querySelector('[data-c="tarefa"]').dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+  await espera(30);
+  ok(ev(`tab === "hoje" && document.getElementById("q").value.includes("Duna")`), "virar tarefa preenche o campo de tarefa");
+
   fechar();
   return erros;
 };

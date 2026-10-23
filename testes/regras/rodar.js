@@ -1,6 +1,6 @@
 // Testa o firestore.rules no emulador do Firebase. Roda na Action antes de publicar as regras:
 // se algo aqui falhar, as regras novas não sobem (e ninguém fica trancado para fora).
-// Local: cd testes/regras && npm install && npm run testar   (precisa de Java)
+// Local: cd testes/regras && npm install && npm run testar   (precisa de Java; usa o firebase.json da raiz)
 const fs = require("fs");
 const path = require("path");
 const { initializeTestEnvironment, assertSucceeds, assertFails } = require("@firebase/rules-unit-testing");

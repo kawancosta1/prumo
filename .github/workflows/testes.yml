@@ -35,8 +35,7 @@ jobs:
       - name: Instalar
         run: npm install --prefix testes/regras
       - name: Testar as regras no emulador
-        working-directory: testes/regras
-        run: bash ../../.github/mostrar-erro.sh "Regras do Firestore" npx firebase emulators:exec --only firestore --project demo-prumo "node rodar.js"
+        run: bash .github/mostrar-erro.sh "Regras do Firestore" testes/regras/node_modules/.bin/firebase emulators:exec --only firestore --project demo-prumo "node testes/regras/rodar.js"
 
   publicar:
     needs: [testes, regras]
