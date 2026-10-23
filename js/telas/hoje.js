@@ -107,7 +107,7 @@ function viewHoje() {
   ${revDue.length ? `<section class="block"><h2 class="h2">Revisões de hoje <span class="count">${revDue.length}</span></h2><ul class="list">${revDue.map(reviewRow).join("")}</ul></section>` : ""}
   ${isToday && habitsToday.length ? `<section class="block"><h2 class="h2">Hábitos <span class="count">${habitsToday.filter(h => habitDone(h, t)).length}/${habitsToday.length}</span></h2><ul class="list">${habitsToday.map(h => habitRow(h, false)).join("")}</ul></section>` : ""}
   ${isToday ? `<section class="block"><h2 class="h2">Água</h2>${waterWidget(false)}</section>` : ""}
-  ${exams.length && isToday ? `<section class="block"><h2 class="h2">Próximas provas</h2><ul class="list">${exams.map(e => `<li><div class="item"><div class="main"><span class="title">${esc(e.title)}</span><span class="meta"><span class="chip" style="--c:${subjColor(e.subjectId)}">${esc(subjName(e.subjectId) || "Sem matéria")}</span><span>·</span><span>${fmtShort(e.date)}</span></span></div>${dueTag(diffDays(t, e.date))}</div></li>`).join("")}</ul></section>` : ""}
+  ${exams.length && isToday ? `<section class="block"><h2 class="h2">Próximas provas</h2><ul class="list">${exams.map(e => `<li><div class="item"><div class="main"><span class="title">${esc(e.title)}</span><span class="meta"><span class="chip" style="--c:${subjColor(e.subjectId)}">${esc(subjName(e.subjectId) || "Sem matéria")}</span><span>·</span><span>${fmtShort(e.date)}</span></span>${typeof planoHojeHTML === "function" ? planoHojeHTML(e) : ""}</div>${dueTag(diffDays(t, e.date))}</div></li>`).join("")}</ul></section>` : ""}
   ${
     isToday && !fresh
       ? `<section class="block diario"><h2 class="h2">${textoMundo("diario", "Fechar o dia")}</h2>

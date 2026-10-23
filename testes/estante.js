@@ -140,6 +140,46 @@ module.exports = async url => {
   ok(D.querySelectorAll(".carimbo.ok").length >= 10, "passaporte com carimbos dos livros lidos");
   ok(/livros lidos/.test(M()) && /Gênero favorito/.test(M()), "retrospectiva do ano");
 
+  /* ---------- estudo junto com a leitura ---------- */
+  ev(`S.subjects.push({ id: "calc", name: "Cálculo", color: "#2F6FD6" }); S.livros.push({ id: "ld", titulo: "Guidorizzi", autor: "H", paginas: 500, pagina: 20, contadas: 20, estante: "lendo", tags: [], citacoes: [], pago: {} }); tab = "estante"; estanteTab = "estante"; livroAberto = "ld"; render();`);
+  const sel = D.querySelector('select[data-change="livro-materia"][data-id="ld"]');
+  ok(!!sel, "detalhe do livro tem a matéria");
+  sel.value = "calc";
+  sel.dispatchEvent(new w.Event("change", { bubbles: true }));
+  ok(ev(`livro("ld").materiaId`) === "calc", "livro ligado a Cálculo");
+  ev(`tab = "estudos"; render();`);
+  ok(/Livros de estudo/.test(M()) && /Guidorizzi/.test(M()), "Estudos mostra os livros de estudo");
+  ev(`S.leitura.minutos = {}; S.sessions = []; iniciarSessao("ld"); (() => { const s = sessaoAtual(); s.inicio = Date.now() - 30 * 60000; salvarSessao(s); })(); encerrando = true; render();`);
+  D.getElementById("sessao-pagina").value = "40";
+  D.querySelector('form[data-form="sessao-fim"]').dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true }));
+  await espera(30);
+  ok(ev(`S.sessions.filter(s => s.subjectId === "calc" && s.livro === "ld").reduce((a, s) => a + s.min, 0)`) === 30 && ev("minutosLeitura()") === 0, "leitura do livro de estudo vira 30 min de Cálculo (sem contar duas vezes)");
+  // estudo vira páginas
+  const p0 = ev("S.leitura.saldo");
+  ev(`timer.subjectId = "calc"; timer.running = false; timer.acc = 12 * 60000; logTimer();`);
+  ok(ev("S.leitura.saldo") === p0 + 12, "12 min de foco rendem 12 páginas para decorar");
+  // plano de prova
+  ev(`S.exams.push({ id: "p1", title: "P1", subjectId: "calc", date: addDays(today(), 4) }); S.sessions = []; tab = "estudos"; render();`);
+  ok(!!D.querySelector('form[data-form="plano-prova"][data-id="p1"]'), "prova tem botão de planejar");
+  D.getElementById("pp-p1").value = "6";
+  D.querySelector('form[data-form="plano-prova"][data-id="p1"]').dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true }));
+  await espera(30);
+  ok(ev(`S.exams[0].plano.horas`) === 6 && ev(`planoDoDia(S.exams[0]).porDia`) === 90, "6h em 4 dias = 90 min por dia");
+  ev(`S.sessions.push({ id: "x1", subjectId: "calc", date: today(), min: 40 }); tab = "hoje"; render();`);
+  ok(/Estude hoje: <b>50 min<\/b>/.test(M()), "Hoje mostra quanto falta estudar para a prova");
+  // fichamento
+  ev(`tab = "estante"; estanteTab = "estante"; livroAberto = "ld"; render();`);
+  const p1 = ev("S.leitura.saldo");
+  D.getElementById("fc-cap-ld").value = "Cap. 3: Derivadas";
+  D.getElementById("fc-txt-ld").value = "Derivada é a taxa de variação instantânea. Regra da cadeia: derive a de fora e multiplique pela de dentro.";
+  D.querySelector('form[data-form="ficha-nova"]').dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true }));
+  await espera(30);
+  ok(ev(`livro("ld").fichas.length`) === 1 && ev("S.leitura.saldo") === p1 + 10, "ficha guardada vale +10 páginas");
+  const rev = ev(`S.reviews.find(r => r.fichaId)`);
+  ok(rev && rev.subjectId === "calc" && rev.due === ev("addDays(today(), 1)") && /Derivadas/.test(rev.topic), "ficha vira revisão espaçada para amanhã");
+  ev(`S.reviews.find(r => r.fichaId).due = today(); tab = "estudos"; render();`);
+  ok(/ver a ficha/.test(M()) && /taxa de variação/.test(M()), "revisão mostra o texto da ficha");
+
   fechar();
   return erros;
 };

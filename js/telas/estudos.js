@@ -76,6 +76,7 @@ function viewEstudos() {
       }
     )}</div>
   </section>
+  ${typeof livrosEstudoHTML === "function" ? livrosEstudoHTML() : ""}
   <section class="block">
     <h2 class="h2">Matérias <span class="count">nesta semana</span></h2>
     ${S.subjects.length ? `<div class="bars">${week.map(({ s, min }) => `<div class="hbar" style="--c:${s.color}"><div class="top"><span class="title">${esc(s.name)}</span><span class="row" style="gap:2px"><span class="mono muted">${fmtMin(min)}</span><button class="icon" style="width:28px;height:28px;flex-basis:28px" data-act="del" data-list="subjects" data-id="${s.id}" aria-label="Apagar matéria">${ICON.trash}</button></span></div><div class="track"><div class="fill" style="width:${Math.round((min / max) * 100)}%"></div></div></div>`).join("")}</div>` : ""}
@@ -104,6 +105,6 @@ function viewEstudos() {
       <input id="e-date" type="date" value="${addDays(t, 7)}" required aria-label="Data">
       <button class="btn" type="submit">Adicionar</button>
     </form>
-    ${exams.length ? `<ul class="list">${exams.map(e => `<li><div class="item"><div class="main"><span class="title">${esc(e.title)}</span><span class="meta"><span class="chip" style="--c:${subjColor(e.subjectId)}">${esc(subjName(e.subjectId) || "Sem matéria")}</span><span>·</span><span>${fmtLong(e.date)}</span></span></div>${dueTag(diffDays(t, e.date))}${calLink({ title: (subjName(e.subjectId) ? subjName(e.subjectId) + ": " : "") + e.title, date: e.date })}<button class="icon" data-act="del" data-list="exams" data-id="${e.id}" aria-label="Apagar">${ICON.trash}</button></div></li>`).join("")}</ul>` : `<div class="empty">Nenhuma prova marcada.</div>`}
+    ${exams.length ? `<ul class="list">${exams.map(e => `<li><div class="item"><div class="main"><span class="title">${esc(e.title)}</span><span class="meta"><span class="chip" style="--c:${subjColor(e.subjectId)}">${esc(subjName(e.subjectId) || "Sem matéria")}</span><span>·</span><span>${fmtLong(e.date)}</span></span></div>${dueTag(diffDays(t, e.date))}${calLink({ title: (subjName(e.subjectId) ? subjName(e.subjectId) + ": " : "") + e.title, date: e.date })}<button class="icon" data-act="del" data-list="exams" data-id="${e.id}" aria-label="Apagar">${ICON.trash}</button></div>${typeof planoProvaHTML === "function" ? planoProvaHTML(e) : ""}</li>`).join("")}</ul>` : `<div class="empty">Nenhuma prova marcada.</div>`}
   </section>`;
 }

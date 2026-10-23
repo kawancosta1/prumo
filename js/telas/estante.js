@@ -171,6 +171,7 @@ function detalheLivroHTML(l) {
       )
       .join("")}</div>
     ${typeof generosHTML === "function" ? generosHTML(l) : ""}
+    ${typeof materiaLivroHTML === "function" ? materiaLivroHTML(l) : ""}
     ${
       l.estante !== "quero"
         ? `<form class="row" data-form="livro-pagina" data-id="${l.id}"><label class="note" for="lp-${l.id}">Estou na página</label><input id="lp-${l.id}" type="number" min="0" max="${l.paginas || 5000}" value="${l.pagina}" style="width:90px"><button class="btn small primary" type="submit">Salvar</button></form>
@@ -184,7 +185,7 @@ function detalheLivroHTML(l) {
     </div>
     <span class="note">${l.inicio ? `Começou em ${fmtShort(l.inicio)}` : ""}${l.fim ? ` · terminou em ${fmtShort(l.fim)} (${Math.max(1, diffDays(l.inicio || l.fim, l.fim) + 1)} dias)` : ""}</span>
     <div class="row"><button class="btn small ghost" data-act="livro-abrir" data-id="${l.id}">Fechar</button><button class="btn small ghost danger" data-act="livro-del" data-id="${l.id}">Tirar da estante</button></div>
-  </div>`;
+  ${typeof fichasHTML === "function" ? fichasHTML(l) : ""}</div>`;
 }
 
 function adicionarHTML() {

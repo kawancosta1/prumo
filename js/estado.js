@@ -128,6 +128,7 @@ function normalize(x) {
   for (const k of Object.keys(b.water)) if (!Array.isArray(b.water[k])) delete b.water[k];
   if (!(b.waterGoal > 0)) b.waterGoal = 3500;
   if (!Array.isArray(b.cups) || b.cups.length !== 4) b.cups = [200, 300, 500, 750];
+  b.exams.forEach(e => delete e.editandoPlano);
   b.tasks.forEach(t => {
     t.prio = t.prio || 0;
     t.repeat = t.repeat || "";

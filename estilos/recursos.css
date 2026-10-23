@@ -2301,3 +2301,65 @@ button.top8-item {
   padding-left: 18px;
   font-size: 14px;
 }
+
+/* ===================== estudo junto com a leitura (js/leitura-estudo.js) ===================== */
+.materia-livro {
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.plano-prova,
+.plano-form {
+  padding: 0 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.plano-form {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.plano-prova .olink {
+  align-self: flex-start;
+  padding: 2px 0;
+}
+.plano-prova.pronto .progress span {
+  background: var(--ok, #2fb344);
+}
+.plano-hoje {
+  display: block;
+  font-size: 12.5px;
+}
+.fichamento form {
+  margin: 8px 0;
+}
+.fichas {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fichas li {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--sunken);
+}
+.fichas p,
+.ficha-rev p {
+  margin: 4px 0;
+  white-space: pre-wrap;
+  font-size: 14px;
+}
+.fichas small {
+  color: var(--muted);
+  margin-right: 8px;
+}
+.ficha-rev summary {
+  font-size: 12.5px;
+  color: var(--accent);
+  cursor: pointer;
+}
