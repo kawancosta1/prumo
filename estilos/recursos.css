@@ -2109,3 +2109,195 @@ button.top8-item {
 .previsao {
   font-size: 12.5px;
 }
+
+/* ===================== metas e recompensas (js/leitura-metas.js) ===================== */
+.generos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.missoes,
+.desafio-mes,
+.marco,
+.mapa-ano,
+.passaporte,
+.retro {
+  margin-bottom: 14px;
+}
+.lista-missoes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.missao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.missao-txt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.missao-txt small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.missao.paga .missao-txt b {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.missao.pronta {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: 10px;
+  padding: 6px 8px;
+  margin: -6px -8px;
+}
+.bau {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--sunken);
+  font-size: 13.5px;
+}
+.bau span {
+  flex: 1;
+}
+.bau.pronto {
+  background: color-mix(in srgb, #e8c24a 25%, var(--surface));
+}
+.desafio-mes b {
+  font-family: var(--f-display);
+  font-size: 19px;
+}
+.desafio-mes.feito {
+  border-color: var(--ok, #2fb344);
+}
+.selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.selo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px dashed var(--accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--accent);
+  transform: rotate(-8deg);
+}
+.selo small {
+  font-size: 9px;
+  font-weight: 400;
+}
+.mapa-rolar {
+  padding-bottom: 4px;
+}
+.mapa-mes {
+  font-size: 6px;
+  fill: var(--muted);
+}
+.mapa-f-1 {
+  fill: transparent;
+}
+.mapa-f0 {
+  fill: var(--sunken);
+  background: var(--sunken);
+}
+.mapa-f1 {
+  fill: color-mix(in srgb, var(--accent) 30%, var(--surface));
+  background: color-mix(in srgb, var(--accent) 30%, var(--surface));
+}
+.mapa-f2 {
+  fill: color-mix(in srgb, var(--accent) 55%, var(--surface));
+  background: color-mix(in srgb, var(--accent) 55%, var(--surface));
+}
+.mapa-f3 {
+  fill: color-mix(in srgb, var(--accent) 80%, var(--surface));
+  background: color-mix(in srgb, var(--accent) 80%, var(--surface));
+}
+.mapa-f4 {
+  fill: var(--accent);
+  background: var(--accent);
+}
+.mapa-legenda {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  justify-content: flex-end;
+}
+.mapa-legenda i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.mapa-legenda small {
+  color: var(--muted);
+  font-size: 11px;
+  margin: 0 4px;
+}
+.carimbos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.carimbo {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1.5px dashed var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  opacity: 0.6;
+}
+.carimbo.ok {
+  border: 2px solid var(--c);
+  color: var(--c);
+  font-weight: 700;
+  opacity: 1;
+  transform: rotate(-3deg);
+}
+.carimbo.ok:nth-child(2n) {
+  transform: rotate(2deg);
+}
+.retro-numeros {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.retro-numeros li {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--sunken);
+}
+.retro-numeros b {
+  font-family: var(--f-display);
+  font-size: 22px;
+}
+.retro-numeros span {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.retro-destaques {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14px;
+}

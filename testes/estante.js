@@ -100,6 +100,46 @@ module.exports = async url => {
   campo.dispatchEvent(new w.Event("change", { bubbles: true }));
   ok(ev("S.leitura.meta.paginas") === 30, "ajustar a meta de páginas");
 
+  /* ---------- metas e recompensas ---------- */
+  ev(`S.livros.push({ id: "lg", titulo: "Livro G", autor: "Machado", paginas: 300, pagina: 10, contadas: 10, estante: "lendo", tags: [], citacoes: [], pago: {} }); livroAberto = "lg"; tab = "estante"; estanteTab = "estante"; render();`);
+  clicar('[data-act="livro-genero"][data-id="lg"][data-g="terror"]');
+  ok(ev(`livro("lg").tags.includes("terror")`), "marcar gênero no livro");
+  clicar('[data-act="livro-genero"][data-id="lg"][data-g="terror"]');
+  ok(!ev(`livro("lg").tags.includes("terror")`), "desmarcar gênero");
+  // muita atividade hoje: quase todas as missões ficam prontas
+  ev(`S.leitura.log[today()] = 600; S.leitura.minutos[today()] = 200; S.leitura.sessoesDia = { [today()]: 5 }; for (let i = 0; i < 4; i++) S.sessions.push({ id: "s" + i, subjectId: "x", date: today(), min: 30 }); S.livros.push({ id: "lf", titulo: "Feito", autor: "A", paginas: 100, pagina: 100, contadas: 100, estante: "lido", fim: today(), tags: [], citacoes: [], pago: { fim: 1 } }); S.leitura.total = 400; estanteTab = "metas"; render();`);
+  ok(D.querySelectorAll(".lista-missoes .missao").length === 3, "três missões na semana");
+  const pronta = D.querySelector('[data-act="missao-pegar"]');
+  ok(!!pronta, "atividade deixa missão pronta para pegar");
+  if (pronta) {
+    const g0 = ev("S.coins"),
+      p0 = ev("S.leitura.saldo");
+    pronta.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    ok(ev("S.coins") >= g0 + 30 && ev("S.leitura.saldo") === p0 + 30, "missão dá 30 gotas e 30 páginas");
+    const id = pronta.dataset.id;
+    const g1 = ev("S.coins"),
+      p1 = ev("S.leitura.saldo");
+    ev(`ACOES_EXTRAS["missao-pegar"](document.body, ${JSON.stringify(id)})`);
+    ok(ev("S.coins") === g1 && ev("S.leitura.saldo") === p1, "a mesma missão não paga duas vezes");
+  }
+  ev(`estadoMissoes().pagas = missoesDaSemana().map(m => m.id); render();`);
+  const trofeus0 = ev("TROFEUS.filter(t => S.leitura.comprados.includes(t.id)).length");
+  clicar('[data-act="missao-bau"]');
+  ok(ev("estadoMissoes().bau") && ev("TROFEUS.filter(t => S.leitura.comprados.includes(t.id)).length") === trofeus0 + 1, "baú dá um troféu");
+  ev(`estanteTab = "decorar"; render();`);
+  ok(M().includes(ev("TROFEUS.find(t => S.leitura.comprados.includes(t.id)).nome")) && !M().includes(ev("TROFEUS.find(t => !S.leitura.comprados.includes(t.id)).nome")), "troféu ganho aparece em Decorar; os outros não");
+  // marcos de páginas
+  ev(`S.leitura.marcos = undefined; S.leitura.total = 400; conferirMarcos(); S.leitura.total = 520; conferirMarcos();`);
+  ok(ev("S.leitura.marcos") === 1 && ev("TROFEUS.filter(t => S.leitura.comprados.includes(t.id)).length") === trofeus0 + 2, "marco de 500 páginas dá surpresa");
+  // desafio do mês
+  ev(`S.livros.push({ id: "d1", titulo: "Curto", autor: "B", paginas: 150, ano: 1890, pagina: 150, contadas: 150, estante: "lido", fim: today(), tags: GENEROS.map(g => g[0]), citacoes: [], pago: { fim: 1 } }, { id: "d2", titulo: "Longo", autor: "B", paginas: 600, ano: 1890, pagina: 600, contadas: 600, estante: "lido", fim: today(), tags: GENEROS.map(g => g[0]), citacoes: [], pago: { fim: 1 } }); S.leitura.selos = [];`);
+  const g2 = ev("S.coins");
+  ev(`estanteTab = "metas"; render();`);
+  ok(ev("S.leitura.selos.length") === 1 && ev("S.coins") === g2 + 40 && /Feito! Selo garantido/.test(M()), "desafio do mês dá selo e 40 gotas");
+  ok(D.querySelectorAll(".mapa-ano rect").length >= 365 && D.querySelectorAll(".mapa-ano .mapa-f4").length >= 1, "mapa do ano com todos os dias");
+  ok(D.querySelectorAll(".carimbo.ok").length >= 10, "passaporte com carimbos dos livros lidos");
+  ok(/livros lidos/.test(M()) && /Gênero favorito/.test(M()), "retrospectiva do ano");
+
   fechar();
   return erros;
 };

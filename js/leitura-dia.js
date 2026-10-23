@@ -247,6 +247,8 @@ FORMS_EXTRAS["sessao-fim"] = () => {
   const ganho = l && nova >= 0 ? irParaPagina(l, nova) : 0;
   const gotas = min >= 5 ? earn(Math.min(30, Math.floor(min / 5) * 2)) : 0;
   L.sessoes = (L.sessoes || 0) + 1;
+  if (!L.sessoesDia || typeof L.sessoesDia !== "object") L.sessoesDia = {};
+  if (min >= 1) L.sessoesDia[today()] = (L.sessoesDia[today()] || 0) + 1;
   const partes = [];
   if (min >= 1) partes.push(`<b>${min} min</b> de leitura`);
   if (ganho) partes.push(`<b>${ganho} páginas</b>`);

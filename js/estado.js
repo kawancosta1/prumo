@@ -249,6 +249,7 @@ function prune() {
   for (const k of Object.keys(S.paid)) if (k < pl) delete S.paid[k];
   for (const k of Object.keys(S.leitura.log)) if (k < pl) delete S.leitura.log[k]; // páginas por dia: guarda um ano
   for (const k of Object.keys(S.leitura.minutos || {})) if (k < pl) delete S.leitura.minutos[k];
+  for (const k of Object.keys(S.leitura.sessoesDia || {})) if (k < lim) delete S.leitura.sessoesDia[k];
   const tl = addDays(today(), -45);
   S.tasks = S.tasks.filter(t => !(t.done && t.date < tl));
   S.events = S.events.filter(e => e.date >= tl);

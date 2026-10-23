@@ -62,6 +62,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/sons.js` | Sons dos mundos, gerados com WebAudio. Emo: chuva no foco e virar página. Roqueiro: plateia no foco, palhetada ao concluir tarefa, acorde do Star Power e riff secreto (dá pra desligar) |
 | `js/leitura.js` | Estante de leitura (estilo Skoob): livros, progresso, notas, metas, moeda "páginas", conquistas de leitura, busca na Open Library e no Google Books e leitor de código de barras |
 | `js/leitura-dia.js` | Leitura no dia a dia: **sessão de leitura** com cronômetro, Prumi de óculos e sons ambiente (biblioteca, café, chuva, lareira), **meta do dia** (páginas ou minutos, anel no cartão do Prumi), **sequência** de dias lendo ou estudando com **escudos**, e previsão de término dos livros |
+| `js/leitura-metas.js` | Metas e recompensas (Estante → Metas): **missões da semana** com baú de troféu, **desafio do mês** com selo, **marcos** a cada 500 páginas, **mapa do ano**, **passaporte** de carimbos, **retrospectiva** e os **gêneros** dos livros (chips no detalhe). Troféus são enfeites que só se ganham (`premio: true`) |
 | `js/estante-enfeites.js` | Móveis, paredes e enfeites da estante (comprados com páginas; alguns só aparecem num mundo) |
 | `js/telas/estante.js` | Aba Estante: desenho da estante, Lendo agora, Adicionar, Livros, Metas e Decorar |
 | `js/firebase-config.js` | A configuração do Firebase (enquanto for `null`, o app fica só no aparelho) |

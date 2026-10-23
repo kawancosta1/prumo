@@ -170,6 +170,7 @@ function detalheLivroHTML(l) {
           `<button class="chipbtn" data-act="livro-estante" data-id="${l.id}" data-e="${k}" aria-pressed="${l.estante === k}">${n}</button>`
       )
       .join("")}</div>
+    ${typeof generosHTML === "function" ? generosHTML(l) : ""}
     ${
       l.estante !== "quero"
         ? `<form class="row" data-form="livro-pagina" data-id="${l.id}"><label class="note" for="lp-${l.id}">Estou na página</label><input id="lp-${l.id}" type="number" min="0" max="${l.paginas || 5000}" value="${l.pagina}" style="width:90px"><button class="btn small primary" type="submit">Salvar</button></form>
@@ -331,7 +332,9 @@ function decorarHTML() {
         .join("")}</div>`;
     })
     .join("")}
-  <h3 class="h3">Enfeites da estante</h3><div class="shop">${ENFEITES.filter(doMundo)
+  <h3 class="h3">Enfeites da estante</h3><div class="shop">${ENFEITES.filter(
+    e => doMundo(e) && (!e.premio || temDecor(e))
+  )
     .map(e =>
       botao(e, "enfeite", d.enfeites.includes(e.id)).replace(
         '<span class="sname">',
@@ -355,7 +358,10 @@ function viewEstante() {
   } else if (estanteTab === "adicionar") corpo = adicionarHTML();
   else if (estanteTab === "livros") corpo = prateleirasHTML();
   else if (estanteTab === "metas")
-    corpo = (typeof metaAjustesHTML === "function" ? metaAjustesHTML() : "") + metasHTML();
+    corpo =
+      (typeof metaAjustesHTML === "function" ? metaAjustesHTML() : "") +
+      (typeof recompensasHTML === "function" ? recompensasHTML() : "") +
+      metasHTML();
   else corpo = decorarHTML();
   return `
   <section class="block"><h1 class="h1">Estante<small>${livrosEm("lido").length} lidos · ${lendo.length} lendo · ${S.leitura.saldo} páginas para decorar</small></h1>
