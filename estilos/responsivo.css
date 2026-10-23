@@ -27,6 +27,8 @@
   nav.tabs button {
     font-size: 11px;
     padding: 6px 2px;
+    min-width: 0;
+    white-space: nowrap;
   }
   nav.tabs button svg {
     display: block;
@@ -39,6 +41,15 @@
   }
   .detail {
     padding-left: 12px;
+  }
+}
+@media (max-width: 379px) {
+  nav.tabs {
+    gap: 2px;
+  }
+  nav.tabs button {
+    font-size: 10px;
+    letter-spacing: -0.02em;
   }
 }
 @media (prefers-reduced-motion: reduce) {

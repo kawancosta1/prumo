@@ -12,7 +12,8 @@ const VIEWS = {
   estante: viewEstante,
   amigos: viewAmigos,
   avisos: viewAvisos,
-  ajustes: viewAjustes
+  ajustes: viewAjustes,
+  feedback: viewFeedback
 };
 
 let lastProg = 0,

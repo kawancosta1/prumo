@@ -64,6 +64,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/firebase-config.js` | A configuração do Firebase (enquanto for `null`, o app fica só no aparelho) |
 | `js/conta.js` | Conta pelo Firebase (Google ou email): login, nome de usuário (@) e o bloco Conta em Ajustes. As regras do banco estão em `firestore.rules` |
 | `js/telas/entrar.js` | Tela de entrada ao abrir o app: entrar com Google, criar conta e entrar com email e senha (confirmação por link no email), esqueci a senha e continuar sem conta (`S.semConta`). Para ter conta: 18 anos ou mais e aceite da política e dos dados de saúde (`S.consentimento`). Mudou a política? Troque `POLITICA_VERSAO` e todos aceitam de novo |
+| `js/telas/feedback.js` | Aba Feedback: ideia, problema ou elogio vai para prumi.prumo@gmail.com com o assunto FEEDBACK, pelo FormSubmit (formsubmit.co). Sem internet, abre o app de email preenchido |
 | `privacidade.html` | Política de privacidade (LGPD). Contato: prumi.prumo@gmail.com |
 | `js/amigos.js` | Amigos (com a conta Google): pedidos, vitrine (o que amigos veem), caixa de avisos (recados, depoimentos, mimos, par, visitas), bloqueio, visto por último, convite por link e QR, apagar conta |
 | `js/telas/amigos.js` | Telas de Amigos (lista, perfil do amigo, privacidade) e Avisos (o sininho do topo) |

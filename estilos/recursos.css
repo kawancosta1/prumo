@@ -1815,3 +1815,48 @@ button.top8-item {
   gap: 4px;
   border-left: 4px solid var(--warn);
 }
+
+/* aba Feedback (js/telas/feedback.js) */
+.feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.feedback form {
+  gap: 12px;
+}
+.feedback textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+.fb-hero {
+  display: flex;
+  justify-content: center;
+}
+.fb-tipos {
+  align-self: flex-start;
+  flex-wrap: wrap;
+}
+.fb-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.fb-check input {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  margin: 1px 0 0;
+  flex: none;
+  accent-color: var(--accent);
+}
+.fb-mel {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
