@@ -34,6 +34,7 @@ const servidor = http.createServer((req, res) => {
     ["Os outros 13 mundos", () => require("./mundos-novos")(url)],
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
+    ["Pets", () => require("./pets")(url)],
     ["Leitura com amigos", () => require("./juntos")(url)],
     ["Mudança de endereço", () => require("./mudanca")(url)],
     ["Carteiro dos lembretes", () => require("./carteiro")()]

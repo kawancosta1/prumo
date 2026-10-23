@@ -171,6 +171,9 @@ function addWater(ml) {
   (S.water[d] || (S.water[d] = [])).push({ t: nowHM(), ml });
   const tot = waterToday();
   fx.waterFrom = before;
+  document.dispatchEvent(
+    new CustomEvent("prumo:agua", { detail: { ml, meta: tot >= S.waterGoal && before < S.waterGoal } })
+  );
   const pd = paidDay(d);
   if (tot >= S.waterGoal && before < S.waterGoal) {
     fx.big = true;
@@ -424,6 +427,7 @@ document.addEventListener("click", e => {
             S.stats.tasks++;
             x.paid = earn((x.prio === 3 ? 8 : 5) + (eraAtrasada ? 2 : 0), b); // guarda o que ganhou para devolver se desmarcar
             ganchoMundo("aoConcluir", x, b); // ex.: enche a barra do Star Power no rock
+            document.dispatchEvent(new CustomEvent("prumo:concluiu", { detail: { id: x.id } })); // pets (js/pets-passeio.js)
           }
           if (eraAtrasada) {
             react(

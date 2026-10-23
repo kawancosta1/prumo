@@ -75,7 +75,7 @@ module.exports = async url => {
   const v = JSON.parse(ev("JSON.stringify(montarVitrine())"));
   const pf = ev(`(() => { const p = montarPerfil(); const { nome, usuario, codigo, persona, equip } = p; return JSON.stringify({ nome, usuario, codigo, persona, equip, atualizado: Date.now() }); })()`);
   const p = JSON.parse(pf);
-  const chavesV = ["nome","usuario","persona","equip","parceiro","tipo","mimo","visto","nivel","sobre","visitas","layout","comunidades","top8","depoAceitos","status","ouvindo","subnick","humor","agua","livroAtual","estante","fotolog","mixtape","ingressos","semana"];
+  const chavesV = ["nome","usuario","persona","equip","parceiro","tipo","mimo","visto","nivel","sobre","visitas","layout","comunidades","top8","depoAceitos","status","ouvindo","subnick","humor","agua","livroAtual","estante","fotolog","mixtape","ingressos","semana","pet"];
   const str = (x, n) => typeof x === "string" && x.length <= n;
   const num = x => typeof x === "number";
   const opt = (d, k, f) => !(k in d) || f(d[k]);

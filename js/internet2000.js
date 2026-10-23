@@ -138,7 +138,8 @@ function tirarFotolog() {
     eq: { ...S.equip },
     mood: ["cry", "sad", "upset"].includes(h.nivel.rosto) ? "sad" : pick(["happy", "idle", "party"]),
     agua: Math.round(Math.min(1, waterToday() / S.waterGoal) * 100) / 100,
-    legenda
+    legenda,
+    pet: typeof petParaVitrine === "function" ? petParaVitrine() : null // o pet sai na foto junto
   };
   S.fotolog = [foto, ...S.fotolog].slice(0, 40);
   return foto;
@@ -151,7 +152,7 @@ function fotoHTML(f, grande) {
     .reverse()
     .join(".")
     .replace(/\.(\d\d)(\d\d)$/, ".$2");
-  return `<figure class="fotolog-foto ${grande ? "grande" : ""}"><div class="fl-quadro"><div class="fl-angulo">${prumi({ mood: f.mood, fill: f.agua, size: 120, eq: f.eq, p: f.p, armR: "M99 69Q113 52 109 30" })}</div><span class="fl-flash"></span><span class="fl-data">${data}</span></div>${grande ? `<figcaption>${esc(f.legenda)}</figcaption>` : ""}</figure>`;
+  return `<figure class="fotolog-foto ${grande ? "grande" : ""}"><div class="fl-quadro"><div class="fl-angulo">${prumi({ mood: f.mood, fill: f.agua, size: 120, eq: f.eq, p: f.p, armR: "M99 69Q113 52 109 30" })}${f.pet && typeof petSVG === "function" && typeof limparPetPublico === "function" && limparPetPublico(f.pet) ? `<span class="fl-pet">${petSVG(limparPetPublico(f.pet), { pose: "feliz", tam: 54 })}</span>` : ""}</div><span class="fl-flash"></span><span class="fl-data">${data}</span></div>${grande ? `<figcaption>${esc(f.legenda)}</figcaption>` : ""}</figure>`;
 }
 
 function fotologHTML() {

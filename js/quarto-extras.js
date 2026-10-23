@@ -979,10 +979,28 @@ quartoSVG = function (d = minhaEstante()) {
     <g class="q-pet-slot" ${d.meu ? 'data-act="pet-tocar"' : ""} style="cursor:pointer">${em("pet")}</g>
     ${em("luz")}
     <svg x="${W - largE - 6}" y="${chaoY + 6 - altE}" width="${largE}" height="${altE}" viewBox="0 0 360 ${altEst}">${est.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "")}</svg>
-    ${em("movel")}${presentes}${bagunca}
+    ${em("movel")}${presentes}${bagunca}${caminhaPet(d, chaoY)}
     <g class="prumi-leitor" ${d.meu ? 'data-act="prumi-leitor"' : ""}>${leitor}${livroNaMao}</g>
   </svg>`;
 };
+
+/** O pet de verdade (js/pets.js) na caminha, com a plaquinha do nome. */
+function caminhaPet(d, chaoY) {
+  const pet = d.meu ? (typeof petAtivo === "function" ? petAtivo() : null) : d.pet;
+  if (!pet || typeof petSVG !== "function") return "";
+  const dorme = typeof dormindoAgora === "function" && dormindoAgora();
+  const x = 64,
+    y = chaoY + 6;
+  return `<g class="caminha-pet" transform="translate(${x} ${y})"><title>${esc(pet.nome)}</title><ellipse cx="26" cy="40" rx="26" ry="8" fill="#000" opacity=".12"/><path d="M2 30Q2 18 26 18Q50 18 50 30V36Q50 44 26 44Q2 44 2 36Z" fill="#8D6E63" stroke="var(--ink)" stroke-width="1.2"/><ellipse cx="26" cy="30" rx="20" ry="7" fill="#FFCCBC"/><svg x="4" y="-4" width="44" height="41" viewBox="-4 -8 54 50">${petSVG(
+    pet,
+    { pose: dorme ? "dormindo" : "sentado", tam: 44 }
+  )
+    .replace(/^<svg[^>]*>/, "")
+    .replace(
+      /<\/svg>$/,
+      ""
+    )}</svg><rect x="14" y="38" width="24" height="7" rx="2" fill="#FFF8E1" stroke="#8D6E63" stroke-width=".6"/><text x="26" y="43.4" text-anchor="middle" font-size="4.6" fill="#5D4037">${esc(pet.nome.slice(0, 10))}</text></g>`;
+}
 
 /* ===================== ações ===================== */
 ACOES_EXTRAS["estrela-cadente"] = () => {

@@ -465,6 +465,10 @@ function montarVitrine() {
     };
   }
   if (pv.fotolog) v.fotolog = S.fotolog.slice(0, 9);
+  if (typeof petParaVitrine === "function") {
+    const pet = petParaVitrine();
+    if (pet) v.pet = pet;
+  }
   // Emo: a fita montada; Roqueiro: os ingressos da coleção (js/mundos/*-extras.js)
   const fita = S.emo && S.emo.mixtape;
   if (fita && fita.faixas && fita.faixas.length)
@@ -724,8 +728,10 @@ function limparVitrine(v) {
           eq: equipOk(f && f.eq),
           mood: humorOk(f && f.mood),
           agua: numero(f && f.agua, 1),
-          legenda: texto(f && f.legenda, 120)
+          legenda: texto(f && f.legenda, 120),
+          pet: typeof limparPetPublico === "function" ? limparPetPublico(f && f.pet) : null
         }))
-      : []
+      : [],
+    pet: typeof limparPetPublico === "function" ? limparPetPublico(v.pet) : null
   };
 }

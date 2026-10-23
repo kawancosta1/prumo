@@ -64,6 +64,7 @@ const par = (a, b) => (a < b ? `${a}_${b}` : `${b}_${a}`);
     assertFails(setDoc(doc(ana, "amizades", par("ana", "bia")), { uids: ["ana", "bia"], de: "ana", estado: "aceita" }))
   );
   await caso("vitrine válida grava", () => assertSucceeds(setDoc(doc(ana, "vitrines/ana"), vitrine({ nome: "Ana", usuario: "ana", semana: { paginas: 3 } }))));
+  await caso("vitrine com pet grava", () => assertSucceeds(setDoc(doc(ana, "vitrines/ana"), vitrine({ nome: "Ana", usuario: "ana", pet: { especie: "gato", cor: "preto", nome: "Paçoca" } }))));
   await caso("vitrine com campo estranho é barrada", () => assertFails(setDoc(doc(ana, "vitrines/ana"), vitrine({ senha: "x" }))));
   await caso("amigo lê a vitrine", () => assertSucceeds(getDoc(doc(leo, "vitrines/ana"))));
   await caso("quem não é amigo não lê a vitrine", () => assertFails(getDoc(doc(bia, "vitrines/ana"))));

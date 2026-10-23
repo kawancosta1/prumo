@@ -55,13 +55,14 @@ function perfilAmigoHTML(uid) {
       <span class="note">Até ${MIMOS_DIA} por dia pra cada amigo. ${mimosHoje(uid) ? `Hoje você já mandou ${mimosHoje(uid)}.` : ""}</span>
     </div>
 
+    ${v.pet && typeof petSVG === "function" ? `<div class="ms-bloco pet-amigo"><span class="ms-titulo">Pet</span><div class="row">${petSVG(v.pet, { pose: "feliz", tam: 70 })}<span><b>${esc(v.pet.nome)}</b><br><span class="note">${esc(ESPECIES_PET[v.pet.especie].nome)} ${esc(PERSONALIDADES_PET[v.pet.personalidade].nome.toLowerCase())}</span></span></div></div>` : ""}
     ${v.sobre ? `<div class="ms-bloco"><span class="ms-titulo">Sobre</span><p class="sobre">${esc(v.sobre)}</p></div>` : ""}
 
     ${
       v.estante
         ? `<div class="ms-bloco"><span class="ms-titulo">Estante (${v.estante.totalLidos} lidos)</span>
         ${v.livroAtual ? `<span><b>Lendo agora:</b> ${esc(v.livroAtual.titulo)}${v.livroAtual.autor ? ` · ${esc(v.livroAtual.autor)}` : ""} · ${v.livroAtual.progresso}%</span>` : ""}
-        <div class="estante-quadro">${casaSVG({ lidos: v.estante.lidos, lendo: v.estante.lendo, decor: v.estante.decor, equip: v.equip, persona: v.persona, meu: false })}</div>
+        <div class="estante-quadro">${casaSVG({ lidos: v.estante.lidos, lendo: v.estante.lendo, decor: v.estante.decor, equip: v.equip, persona: v.persona, meu: false, pet: v.pet })}</div>
         ${v.estante.lidos.length ? `<details class="more"><summary>Livros que leu</summary><ul class="list livros">${v.estante.lidos.map(l => `<li><div class="item">${capaHTML(l, 34)}<span class="main"><span class="title">${esc(l.titulo)}</span><span class="meta">${esc(l.autor || "")}</span>${l.nota ? notaHTML(l, false) : ""}</span></div></li>`).join("")}</ul></details>` : ""}
       </div>`
         : ""

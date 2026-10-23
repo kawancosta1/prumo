@@ -90,6 +90,8 @@ function viewPrumi() {
         return `<button class="sitem ${on ? "on" : ""} ${tryPal === v.id ? "trying" : ""}" data-act="tvar" data-id="${v.id}"><span class="swatch" style="background:${base[0]}"><i style="background:${a}"></i><i class="w" style="background:${w}"></i></span><span class="sname">${esc(v.name)}</span>${foot}</button>`;
       })
       .join("")}</div>`;
+  } else if (prumiTab === "pet") {
+    body = petPainelHTML(); // js/pets.js
   } else if (prumiTab === "perfil") {
     body = perfilHTML(); // js/telas/perfil.js
   } else if (prumiTab === "conquistas") {
@@ -137,6 +139,7 @@ function viewPrumi() {
     ${tp ? `<div class="trybar"><span>Provando o tema <b>${esc(tp.name)}</b></span><div class="row"><button class="btn small ghost" data-act="untry">Voltar</button><button class="btn small primary" data-act="buytvar" data-id="${tp.id}" ${S.coins < tp.price ? "disabled" : ""}>${S.coins < tp.price ? `Faltam ${tp.price - S.coins} gotas` : `Comprar por ${tp.price}`}</button></div></div>` : ""}
     <div class="seg wide" role="group">${[
       ["visual", "Visual"],
+      ["pet", "Pet"],
       ["temas", "Temas"],
       ["perfil", "Perfil"],
       ["conquistas", "Conquistas"],

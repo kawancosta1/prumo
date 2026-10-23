@@ -48,7 +48,7 @@ service cloud.firestore {
     function vitrineValida(d) {
       return d.keys().hasOnly(['nome', 'usuario', 'persona', 'equip', 'parceiro', 'tipo', 'mimo', 'visto',
           'nivel', 'sobre', 'visitas', 'layout', 'comunidades', 'top8', 'depoAceitos', 'status', 'ouvindo',
-          'subnick', 'humor', 'agua', 'livroAtual', 'estante', 'fotolog', 'mixtape', 'ingressos', 'semana'])
+          'subnick', 'humor', 'agua', 'livroAtual', 'estante', 'fotolog', 'mixtape', 'ingressos', 'semana', 'pet'])
         && d.nome is string && d.nome.size() <= 60
         && d.usuario is string && d.usuario.size() <= 21
         && d.persona is string && d.persona.size() <= 30
@@ -65,7 +65,8 @@ service cloud.firestore {
         && (!('fotolog' in d) || (d.fotolog is list && d.fotolog.size() <= 9))
         && (!('mixtape' in d) || (d.mixtape is map && d.mixtape.faixas is list && d.mixtape.faixas.size() <= 10))
         && (!('ingressos' in d) || (d.ingressos is map && d.ingressos.ultimos is list && d.ingressos.ultimos.size() <= 6))
-        && (!('semana' in d) || d.semana is map);
+        && (!('semana' in d) || d.semana is map)
+        && (!('pet' in d) || (d.pet is map && d.pet.size() <= 6));
     }
 
     // Perfil público mínimo (nome, @, código, mundo, roupas): para achar a pessoa e mandar pedido
