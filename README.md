@@ -74,6 +74,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `sw.js`, `manifest.webmanifest`, `icones/` | O app instalável: guarda o Prumo no aparelho (troque `VERSAO` no `sw.js` para forçar uma atualização geral) |
 | `js/capas.js` | Capas desenhadas com título estilizado (6 estilos) para livros sem foto |
 | `js/quarto.js` | Quarto de leitura: chão, janela, pôster, cama, tapete e luz comprados com páginas, com a estante dentro |
+| `js/casa.js` | Casa da leitura: cômodos além do quarto (sala, cozinha, quintal com céu pela hora, varanda, escritório, sótão, cripta no emo, estúdio no rock e a biblioteca secreta com 1.000 páginas). Comprados com páginas, com opções de cor grátis. Dados em `S.leitura.decor.casa` |
 | `js/telas/*.js` | Uma função por aba (`viewHoje`, `viewEstudos`...) |
 | `js/telas/perfil.js` | Perfil estilo MySpace na aba Prumi: subnick, música, Top 8 e recados |
 | `js/render.js` | `render()`: desenha a aba atual |

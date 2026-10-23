@@ -661,6 +661,10 @@ function limparVitrine(v) {
             movel: texto(dec.movel, 30),
             fundo: texto(dec.fundo, 30),
             enfeites: Array.isArray(dec.enfeites) ? dec.enfeites.filter(e => ENFEITE[e]).slice(0, 30) : [],
+            casa:
+              typeof limparCasa === "function"
+                ? limparCasa(dec.casa)
+                : { comodo: "quarto", tem: ["quarto"], opcoes: {} },
             quarto: Object.fromEntries(
               Object.keys(LUGARES_QUARTO).map(slot => {
                 const id = dec.quarto && dec.quarto[slot];

@@ -347,7 +347,7 @@ function viewEstante() {
   const aberto = livroAberto && livro(livroAberto);
   let corpo = "";
   if (estanteTab === "estante") {
-    corpo = `<div class="estante-quadro">${quartoSVG()}</div>
+    corpo = `<div class="estante-quadro">${casaSVG()}</div>${casaEscolhaHTML()}
       ${aberto && estanteTab === "estante" ? detalheLivroHTML(aberto) : ""}
       <h2 class="h2">Lendo agora <span class="count">${lendo.length}</span></h2>
       ${lendo.length ? `<ul class="list">${lendo.map(cartaoLendoHTML).join("")}</ul>` : `<div class="empty">${textoMundo("vazioLeitura", "Nenhum livro aberto.")} <button class="btn small primary" data-act="estante-tab" data-t="adicionar">Adicionar um livro</button></div>`}`;

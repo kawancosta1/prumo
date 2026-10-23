@@ -1898,3 +1898,99 @@ button.top8-item {
   height: 1px;
   opacity: 0;
 }
+
+/* ===================== casa da leitura (js/casa.js) ===================== */
+.casa-comodos {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 2px 4px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+.comodo {
+  flex: none;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 104px;
+  padding: 9px 11px;
+  border-radius: 12px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+}
+.comodo.on {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.comodo.fechado b {
+  color: var(--muted);
+}
+.casa-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0 14px;
+}
+.casa-opcoes .row {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.casa-opcoes .seg {
+  flex-wrap: wrap;
+}
+.casa-cor {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: -1px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+/* animações pequenas dos cômodos */
+.casa-svg .pisca-casa {
+  animation: pisca-casa 3s ease-in-out infinite;
+}
+@keyframes pisca-casa {
+  50% {
+    opacity: 0.2;
+  }
+}
+.casa-svg .vapor-casa {
+  animation: vapor-casa 2.4s ease-out infinite;
+}
+@keyframes vapor-casa {
+  from {
+    transform: translateY(2px);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+}
+.casa-svg .chama-casa {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: chama-casa 0.9s ease-in-out infinite alternate;
+}
+@keyframes chama-casa {
+  to {
+    transform: scale(0.85, 1.12) rotate(3deg);
+  }
+}
+.casa-svg .lampada-casa {
+  animation: pisca-casa 6s ease-in-out infinite;
+}
