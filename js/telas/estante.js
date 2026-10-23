@@ -172,6 +172,8 @@ function detalheLivroHTML(l) {
       .join("")}</div>
     ${typeof generosHTML === "function" ? generosHTML(l) : ""}
     ${typeof materiaLivroHTML === "function" ? materiaLivroHTML(l) : ""}
+    ${typeof emprestimoHTML === "function" ? emprestimoHTML(l) : ""}
+    ${typeof recomendarHTML === "function" ? recomendarHTML(l) : ""}
     ${
       l.estante !== "quero"
         ? `<form class="row" data-form="livro-pagina" data-id="${l.id}"><label class="note" for="lp-${l.id}">Estou na página</label><input id="lp-${l.id}" type="number" min="0" max="${l.paginas || 5000}" value="${l.pagina}" style="width:90px"><button class="btn small primary" type="submit">Salvar</button></form>
@@ -358,6 +360,7 @@ function viewEstante() {
       ${lendo.length ? `<ul class="list">${lendo.map(cartaoLendoHTML).join("")}</ul>` : `<div class="empty">${textoMundo("vazioLeitura", "Nenhum livro aberto.")} <button class="btn small primary" data-act="estante-tab" data-t="adicionar">Adicionar um livro</button></div>`}`;
   } else if (estanteTab === "adicionar") corpo = adicionarHTML();
   else if (estanteTab === "livros") corpo = prateleirasHTML();
+  else if (estanteTab === "juntos") corpo = typeof juntosHTML === "function" ? juntosHTML() : "";
   else if (estanteTab === "metas")
     corpo =
       (typeof metaAjustesHTML === "function" ? metaAjustesHTML() : "") +
@@ -371,6 +374,7 @@ function viewEstante() {
       ["adicionar", "Adicionar"],
       ["livros", "Livros"],
       ["metas", "Metas"],
+      ["juntos", "Juntos"],
       ["decorar", "Decorar"]
     ]
       .map(

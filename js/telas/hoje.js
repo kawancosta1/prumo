@@ -91,6 +91,7 @@ function viewHoje() {
     </form>
     ${listHtml ? `<ul class="list">${listHtml}</ul>` : fresh ? `<div class="empty"><strong>Seu dia começa aqui.</strong>Escreva uma tarefa acima. Data, horário, área (#estudo, #dieta, #social) e prioridade (!1, !2, !3) são entendidos sozinhos. O ícone azul cria o lembrete no Google Agenda, que aparece no Samsung se a conta Google estiver sincronizada.<button class="btn small" data-act="sample">Ver com exemplos</button></div>` : `<div class="empty">${isToday ? textoMundo("vazioHoje", "Nada marcado para hoje.") : "Nada marcado para este dia."}</div>`}
   </section>
+  ${isToday && typeof emprestimoHojeHTML === "function" ? emprestimoHojeHTML() : ""}
   ${overdue.length ? `<section class="block"><h2 class="h2">${textoMundo("atrasadas", "Atrasadas")} <span class="row" style="gap:6px"><span class="count">${overdue.length}</span><button class="btn small" data-act="rollover">${textoMundo("trazerTudo", "Trazer tudo para hoje")}</button></span></h2><ul class="list">${overdue.map(x => taskRow(x, { showDate: true })).join("")}</ul></section>` : ""}
   ${bdays.length ? `<section class="block"><h2 class="h2">Aniversários chegando</h2><ul class="list">${bdays.map(({ p, d }) => `<li class="a-social"><div class="item"><span class="slot">${ICON.cake}</span><div class="main"><span class="title">${esc(p.name)}</span><span class="meta">${fmtLong(d)}</span></div>${dueTag(diffDays(t, d))}</div></li>`).join("")}</ul></section>` : ""}
   ${

@@ -331,7 +331,9 @@ function receberItem(i) {
     depoimento: `<b>${quem}</b> escreveu um depoimento pra você`,
     par: `<b>${quem}</b> quer ser seu par (${i.texto === "amizade" ? "amizade" : "namoro"})`,
     mimo: `<b>${quem}</b> ${MIMO_TEXTO[i.mimo] || "te mandou um mimo"}!`,
-    mixtape: `<b>${quem}</b> te mandou uma mixtape`
+    mixtape: `<b>${quem}</b> te mandou uma mixtape`,
+    livro: `<b>${quem}</b> te recomendou um livro`,
+    clube: `<b>${quem}</b> te chamou para um clube do livro`
   };
   const msg = textos[i.tipo] || `Novidade de <b>${quem}</b>`;
   if (i.tipo === "mimo") {
@@ -462,6 +464,7 @@ function montarVitrine() {
   const fita = S.emo && S.emo.mixtape;
   if (fita && fita.faixas && fita.faixas.length)
     v.mixtape = { nome: fita.nome || "", faixas: fita.faixas.slice(0, 10) };
+  if (typeof minhaSemana === "function") v.semana = minhaSemana(); // corrida da semana e leitura em dupla
   const ing = S.rock && S.rock.ingressos;
   if (ing && ing.length) v.ingressos = { total: ing.length, ultimos: ing.slice(0, 6) };
   return v;
@@ -698,6 +701,14 @@ function limparVitrine(v) {
               palco: texto(i && i.palco, 40),
               cor: /^#[0-9a-f]{6}$/i.test(i && i.cor) ? i.cor : "#E0312F"
             }))
+          }
+        : null,
+    semana:
+      v.semana && typeof v.semana === "object" && /^\d{4}-\d\d-\d\d$/.test(v.semana.seg)
+        ? {
+            seg: v.semana.seg,
+            paginas: numero(v.semana.paginas, 1e5),
+            minutos: numero(v.semana.minutos, 1e5)
           }
         : null,
     fotolog: Array.isArray(v.fotolog)

@@ -193,6 +193,11 @@ function viewAvisos() {
     if (i.tipo === "depoimento") return `${quem} escreveu um depoimento pra você<p>${esc(i.texto)}</p>`;
     if (i.tipo === "mimo") return `${quem} ${esc(MIMO_TEXTO[i.mimo] || "te mandou um mimo")}`;
     if (i.tipo === "par") return `${quem} quer ser seu ${i.texto === "amizade" ? "melhor amigo" : "par"}`;
+    if (i.tipo === "livro") {
+      const [titulo, ...resto] = String(i.texto || "").split("\n");
+      return `${quem} te recomendou <b>${esc(titulo)}</b>${resto.length ? `<p>${esc(resto.join(" "))}</p>` : ""}`;
+    }
+    if (i.tipo === "clube") return `${quem} te chamou para o clube do livro <b>${esc(i.texto)}</b>`;
     if (i.tipo === "mixtape") {
       const [nomeFita, ...faixas] = String(i.texto || "").split("\n");
       return `${quem} te mandou uma mixtape: <b>${esc(nomeFita || "Mixtape")}</b><ol class="faixas">${faixas
@@ -207,6 +212,10 @@ function viewAvisos() {
       return `<div class="row"><button class="btn small primary" data-act="depo-caixa" data-id="${esc(i.id)}" data-ok="1">Aprovar</button><button class="btn small ghost" data-act="depo-caixa" data-id="${esc(i.id)}" data-ok="0">Recusar</button></div>`;
     if (i.tipo === "par" && S.parceria.id !== i.de)
       return `<div class="row"><button class="btn small primary" data-act="par-aceitar" data-id="${esc(i.id)}">Aceitar</button></div>`;
+    if (i.tipo === "livro")
+      return `<div class="row"><button class="btn small primary" data-act="rec-guardar" data-id="${esc(i.id)}">Pôr em Quero ler</button></div>`;
+    if (i.tipo === "clube")
+      return `<div class="row"><button class="btn small primary" data-act="ir-juntos">Ver o clube</button></div>`;
     if (i.tipo === "recado" && ehAmigo(i.de))
       return `<div class="row"><button class="btn small ghost" data-act="amigo-abrir" data-id="${esc(i.de)}">Responder</button></div>`;
     return "";

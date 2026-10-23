@@ -48,7 +48,7 @@ service cloud.firestore {
     function vitrineValida(d) {
       return d.keys().hasOnly(['nome', 'usuario', 'persona', 'equip', 'parceiro', 'tipo', 'mimo', 'visto',
           'nivel', 'sobre', 'visitas', 'layout', 'comunidades', 'top8', 'depoAceitos', 'status', 'ouvindo',
-          'subnick', 'humor', 'agua', 'livroAtual', 'estante', 'fotolog', 'mixtape', 'ingressos'])
+          'subnick', 'humor', 'agua', 'livroAtual', 'estante', 'fotolog', 'mixtape', 'ingressos', 'semana'])
         && d.nome is string && d.nome.size() <= 60
         && d.usuario is string && d.usuario.size() <= 21
         && d.persona is string && d.persona.size() <= 30
@@ -64,7 +64,8 @@ service cloud.firestore {
         && d.depoAceitos is list && d.depoAceitos.size() <= 20
         && (!('fotolog' in d) || (d.fotolog is list && d.fotolog.size() <= 9))
         && (!('mixtape' in d) || (d.mixtape is map && d.mixtape.faixas is list && d.mixtape.faixas.size() <= 10))
-        && (!('ingressos' in d) || (d.ingressos is map && d.ingressos.ultimos is list && d.ingressos.ultimos.size() <= 6));
+        && (!('ingressos' in d) || (d.ingressos is map && d.ingressos.ultimos is list && d.ingressos.ultimos.size() <= 6))
+        && (!('semana' in d) || d.semana is map);
     }
 
     // Perfil público mínimo (nome, @, código, mundo, roupas): para achar a pessoa e mandar pedido
@@ -122,10 +123,56 @@ service cloud.firestore {
       allow read, update, delete: if souEu(uid);
       allow create: if somosAmigos(uid)
         && request.resource.data.de == request.auth.uid
-        && request.resource.data.tipo in ['recado', 'depoimento', 'mimo', 'par', 'visita', 'mixtape']
+        && request.resource.data.tipo in ['recado', 'depoimento', 'mimo', 'par', 'visita', 'mixtape', 'livro', 'clube']
         && request.resource.data.texto is string
         && request.resource.data.texto.size() <= 600
         && request.resource.data.visto == false;
+    }
+
+    // Clube do livro: só quem é membro vê. Só o dono adiciona gente; os outros só podem sair.
+    function clubeValido(d) {
+      return d.keys().hasOnly(['nome', 'livro', 'membros', 'dono', 'criado'])
+        && d.nome is string && d.nome.size() <= 40
+        && d.livro is map
+        && d.membros is list && d.membros.size() <= 12
+        && d.dono is string;
+    }
+    function membroDoClube(id) {
+      return logado() && request.auth.uid in get(/databases/$(database)/documents/clubes/$(id)).data.membros;
+    }
+    match /clubes/{id} {
+      allow read: if logado() && request.auth.uid in resource.data.membros;
+      allow create: if logado()
+        && request.resource.data.dono == request.auth.uid
+        && request.auth.uid in request.resource.data.membros
+        && clubeValido(request.resource.data);
+      allow update: if logado()
+        && request.auth.uid in resource.data.membros
+        && request.resource.data.dono == resource.data.dono
+        && clubeValido(request.resource.data)
+        && (request.auth.uid == resource.data.dono
+            || request.resource.data.membros.toSet().difference(resource.data.membros.toSet()).size() == 0);
+      allow delete: if logado() && resource.data.dono == request.auth.uid;
+
+      // progresso de cada membro no livro
+      match /membros/{uid} {
+        allow read: if membroDoClube(id);
+        allow create, update: if souEu(uid) && membroDoClube(id)
+          && request.resource.data.keys().hasOnly(['pagina', 'nome', 'em'])
+          && request.resource.data.pagina is number
+          && request.resource.data.nome is string && request.resource.data.nome.size() <= 60;
+        allow delete: if souEu(uid);
+      }
+      // comentários por página (o app esconde os que estão depois da sua página)
+      match /comentarios/{c} {
+        allow read: if membroDoClube(id);
+        allow create: if membroDoClube(id)
+          && request.resource.data.keys().hasOnly(['de', 'deNome', 'pagina', 'texto', 'em'])
+          && request.resource.data.de == request.auth.uid
+          && request.resource.data.texto is string && request.resource.data.texto.size() <= 500
+          && request.resource.data.pagina is number;
+        allow delete: if logado() && resource.data.de == request.auth.uid;
+      }
     }
 
     // Tudo o que não está listado acima fica fechado
