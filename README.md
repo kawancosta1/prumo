@@ -60,6 +60,7 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/parceria.js` | Parceria: código, dupla abraçada, poses e mimos |
 | `js/internet2000.js` | Internet dos anos 2000 no perfil: status de MSN e "Ouvindo:", depoimentos com aprovação, comunidades (selos por conquista), contador de visitas, fundos do perfil e o Fotolog do dia |
 | `js/sons.js` | Sons dos mundos, gerados com WebAudio. Emo: chuva no foco e virar página. Roqueiro: plateia no foco, palhetada ao concluir tarefa, acorde do Star Power e riff secreto (dá pra desligar) |
+| `js/notificacoes.js` | Avisos dentro do app: sons próprios (aviso, lembrete, conquista), banner no topo estilo celular e vibração. Liga e desliga em Ajustes, Notificações |
 | `js/leitura.js` | Estante de leitura (estilo Skoob): livros, progresso, notas, metas, moeda "páginas", conquistas de leitura, busca na Open Library e no Google Books e leitor de código de barras |
 | `js/leitura-dia.js` | Leitura no dia a dia: **sessão de leitura** com cronômetro, Prumi de óculos e sons ambiente (biblioteca, café, chuva, lareira), **meta do dia** (páginas ou minutos, anel no cartão do Prumi), **sequência** de dias lendo ou estudando com **escudos**, e previsão de término dos livros |
 | `js/leitura-metas.js` | Metas e recompensas (Estante → Metas): **missões da semana** com baú de troféu, **desafio do mês** com selo, **marcos** a cada 500 páginas, **mapa do ano**, **passaporte** de carimbos, **retrospectiva** e os **gêneros** dos livros (chips no detalhe). Troféus são enfeites que só se ganham (`premio: true`) |
@@ -71,12 +72,17 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/conta.js` | Conta pelo Firebase (Google ou email): login, nome de usuário (@) e o bloco Conta em Ajustes. As regras do banco estão em `firestore.rules` |
 | `js/mudanca.js` | Mudança de endereço: no site antigo (GitHub Pages) mostra a faixa "O Prumo mudou de endereço" e leva os dados no `#` do link; no novo, recebe só se o aparelho ainda não tiver dados ali |
 | `firebase.json` | Publicação no Firebase Hosting: arquivos que sobem, cache e cabeçalhos de segurança (CSP). A Action publica o site e as regras a cada push na `main` |
+| `js/atalhos.js` | Atalhos do ícone do app (água, tarefa, foco, estante) e "Compartilhar com o Prumo" (vira tarefa ou livro). Definidos no `manifest.webmanifest` |
+| `js/resumo-semana.js` | Resumo da semana no Hoje (domingo à noite, segunda e terça) e imagem PNG para compartilhar |
+| `js/relato-erros.js` | Relato de erros opcional (Ajustes, Seus dados): manda só a mensagem técnica para a coleção `erros` |
+| `.github/carimbar.sh` | Na publicação, põe `?v=<commit>` em todo js e css e no `sw.js`: o app fica guardado inteiro no aparelho e cada versão nova substitui a velha |
 | `js/telas/entrar.js` | Tela de entrada ao abrir o app: entrar com Google, criar conta e entrar com email e senha (confirmação por link no email), esqueci a senha e continuar sem conta (`S.semConta`). Para ter conta: 18 anos ou mais e aceite da política e dos dados de saúde (`S.consentimento`). Mudou a política? Troque `POLITICA_VERSAO` e todos aceitam de novo |
 | `js/telas/feedback.js` | Aba Feedback: ideia, problema ou elogio vai para prumi.prumo@gmail.com com o assunto FEEDBACK, pelo FormSubmit (formsubmit.co). Sem internet, abre o app de email preenchido |
 | `privacidade.html` | Política de privacidade (LGPD). Contato: prumi.prumo@gmail.com |
 | `js/amigos.js` | Amigos (com a conta Google): pedidos, vitrine (o que amigos veem), caixa de avisos (recados, depoimentos, mimos, par, visitas), bloqueio, visto por último, convite por link e QR, apagar conta |
 | `js/telas/amigos.js` | Telas de Amigos (lista, perfil do amigo, privacidade) e Avisos (o sininho do topo) |
 | `js/pwa.js` | Prumo instalável no celular (service worker `sw.js`) e avisos do sistema |
+| `js/lembretes.js` | Lembretes com o app fechado: calcula os próximos avisos (água, tarefas e hábitos com horário, véspera de prova) e guarda em `lembretes/{uid}`. Quem manda é a Action agendada `.github/workflows/lembretes.yml` (`.github/lembretes/enviar.js`). Precisa de `FIREBASE_VAPID_CHAVE` em `js/firebase-config.js` |
 | `sw.js`, `manifest.webmanifest`, `icones/` | O app instalável: guarda o Prumo no aparelho (troque `VERSAO` no `sw.js` para forçar uma atualização geral) |
 | `js/capas.js` | Capas desenhadas com título estilizado (6 estilos) para livros sem foto |
 | `js/quarto.js` | Quarto de leitura: chão, janela, pôster, cama, tapete e luz comprados com páginas, com a estante dentro |
@@ -263,8 +269,13 @@ O código tem alguns nomes curtos herdados do protótipo:
 
 Na pasta `testes/` (não fazem parte do site): `cd testes && npm install && node rodar.js`.
 - `globais.js`: acusa dois arquivos declarando o mesmo nome global (isso impediria o app de abrir).
-- `smoke.js`, `entrar.js`, `feedback.js`: abrem o Prumo num navegador falso (jsdom) e usam o app como uma pessoa.
-Também rodam no GitHub a cada push. Se aparecer um X vermelho no commit, algo quebrou.
+- `smoke.js`, `entrar.js`, `feedback.js` e os outros: abrem o Prumo num navegador falso (jsdom) e usam o app como uma pessoa.
+- `carteiro.js`: testa o envio dos lembretes com um Firebase de mentira.
+- `regras/`: testa o `firestore.rules` no emulador do Firebase (precisa de Java): `cd testes/regras && npm install && npm run testar`.
+- `no-ar/`: depois de publicar, abre o site de verdade num Chromium e confere abas, proteção (CSP), cache e erros.
+
+No GitHub, a cada push na `main`: testes do app e das regras → publica site e regras → confere o site no ar.
+Se aparecer um X vermelho no commit, algo quebrou, e o motivo aparece no resumo da execução.
 
 ## 6. Formatação
 

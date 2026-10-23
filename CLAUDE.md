@@ -43,7 +43,11 @@ O endereço antigo (https://kawancosta1.github.io/prumo, GitHub Pages) continua 
 - `firebase.json` define o que sobe, o cache e os cabeçalhos de segurança (CSP). Script novo de outro site?
   Acrescente o domínio na CSP, senão o navegador bloqueia. Não use `onclick=`/`onload=` no HTML (a CSP bloqueia scripts inline).
 - A Action usa o segredo `FIREBASE_SERVICE_ACCOUNT` do GitHub. Sem ele, os testes rodam mas nada é publicado.
-- Mexeu em `firestore.rules`? Vai sozinho no push. Não precisa colar no console.
+- Mexeu em `firestore.rules`? Vai sozinho no push, depois de passar nos testes de `testes/regras/rodar.js`
+  (acrescente casos lá para coleção nova).
+- Não precisa trocar `?v=` à mão para o site no ar: a publicação carimba tudo com o commit (`.github/carimbar.sh`).
+- O repositório é público: logs das Actions nunca podem mostrar dados de usuário.
+- Avisos para a pessoa: use `notificar({ titulo, texto, tipo, mood, aba })` (banner + som), não `alert`.
 
 ## Estilo
 
