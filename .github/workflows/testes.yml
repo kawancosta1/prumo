@@ -40,17 +40,16 @@ jobs:
             printf '%s' "$CHAVE" > "$RUNNER_TEMP/chave.json"
             echo "tem=sim" >> "$GITHUB_OUTPUT"
           fi
-      - name: Publicar site e regras
+      - name: Publicar o site
         if: steps.chave.outputs.tem == 'sim'
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/chave.json
-        run: |
-          set -o pipefail
-          if ! npx --yes firebase-tools@15 deploy --only hosting,firestore:rules --project prumo-66d76 --non-interactive 2>&1 | tee "$RUNNER_TEMP/publicar.log"; then
-            # mostra o fim do log como aviso (aparece no resumo da execução)
-            echo "::error title=Falha ao publicar::$(grep -v '^\s*$' "$RUNNER_TEMP/publicar.log" | tail -n 25 | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')"
-            exit 1
-          fi
+        run: bash .github/publicar.sh hosting
+      - name: Publicar as regras do Firestore
+        if: always() && steps.chave.outputs.tem == 'sim'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/chave.json
+        run: bash .github/publicar.sh firestore:rules
       - name: Apagar a chave
         if: always()
         run: rm -f "$RUNNER_TEMP/chave.json"
