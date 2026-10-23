@@ -77,6 +77,7 @@ const blank = () => ({
   fotolog: [], // fotos do Fotolog, uma por dia fechado
   sons: { chuva: true, pagina: true }, // sons do clima no emo (js/sons.js)
   notif: { som: true, vibrar: true }, // som e vibração dos avisos (js/notificacoes.js)
+  lembretes: { ligado: false, agua: true, tarefas: true, habitos: true, provas: true, tokens: [] }, // lembretes com o app fechado (js/lembretes.js)
   noites: [], // dias em que o app foi usado depois das 22h
   rock: { energia: 0, starAte: 0, usos: 0 }, // Star Power do mundo Roqueiro (js/mundos/rock-efeitos.js)
   emo: { cartas: [], cadeado: null, mixtape: { nome: "", faixas: [] } }, // cartas, cadeado do diário e mixtape (js/mundos/emo-extras.js)
@@ -232,6 +233,17 @@ function normalize(x) {
   b.sons = { chuva: b.sons.chuva !== false, pagina: b.sons.pagina !== false };
   if (!b.notif || typeof b.notif !== "object") b.notif = {};
   b.notif = { som: b.notif.som !== false, vibrar: b.notif.vibrar !== false };
+  if (!b.lembretes || typeof b.lembretes !== "object") b.lembretes = {};
+  b.lembretes = {
+    ligado: b.lembretes.ligado === true,
+    agua: b.lembretes.agua !== false,
+    tarefas: b.lembretes.tarefas !== false,
+    habitos: b.lembretes.habitos !== false,
+    provas: b.lembretes.provas !== false,
+    tokens: Array.isArray(b.lembretes.tokens)
+      ? b.lembretes.tokens.filter(t => typeof t === "string").slice(0, 5)
+      : []
+  };
   b.relatarErros = b.relatarErros === true; // relato de erros só com aceite (js/relato-erros.js)
   if (typeof b.resumoVisto !== "string") b.resumoVisto = ""; // segunda-feira da última semana resumida (js/resumo-semana.js)
   if (!b.parceria || typeof b.parceria !== "object") b.parceria = { id: null, tipo: "namoro" };

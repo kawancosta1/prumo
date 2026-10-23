@@ -133,6 +133,19 @@ module.exports = async url => {
   ok(ev("relatosPendentes[0] && relatosPendentes[0].onde") === "js/x.js:3", "relato guarda só arquivo e linha, sem o endereço");
   ev("S.relatarErros = false; relatosPendentes.length = 0;");
 
+  // lembretes com o app fechado: cálculo dos próximos avisos
+  ev(`S.lembretes = { ligado: true, agua: true, tarefas: true, habitos: true, provas: true, tokens: [] };
+    S.wake = "07:00"; S.sleep = "23:00"; S.water = {};
+    S.tasks.push({ id: "lt1", title: "Ligar pro dentista", date: addDays(today(), 1), time: "10:30", done: false, sub: [] });
+    S.exams.push({ id: "lp1", title: "Cálculo 1", subjectId: "", date: addDays(today(), 2) });
+    window.__L = proximosLembretes(new Date(today() + "T00:00:00").getTime());`);
+  ok(ev(`__L.some(i => i.tag.startsWith("agua-") && i.titulo === "Hora da água")`), "lembretes de água calculados");
+  ok(ev(`__L.some(i => i.tag === "tarefa-lt1-" + addDays(today(), 1) && i.corpo === "Ligar pro dentista")`), "lembrete da tarefa com horário");
+  ok(ev(`__L.some(i => i.tag === "prova-lp1")`), "lembrete na véspera da prova");
+  ok(ev(`__L.every((i, k) => !k || __L[k - 1].em <= i.em) && __L.length <= 60`), "lembretes em ordem e limitados");
+  ok(ev(`(S.water[today()] = [{ t: "10:00", ml: S.waterGoal }], !proximosLembretes(new Date(today() + "T00:00:00").getTime()).some(i => i.tag.startsWith("agua-" + today())))`), "meta de água batida tira os lembretes de hoje");
+  ev(`S.lembretes.ligado = false;`);
+
   fechar();
   return erros;
 };

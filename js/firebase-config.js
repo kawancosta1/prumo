@@ -21,3 +21,11 @@ const FIREBASE_CONFIG = {
   colar aqui a "chave do site" e, depois de uns dias funcionando, clicar em "Aplicar" no Firestore.
 */
 const FIREBASE_APPCHECK_CHAVE = null;
+
+/*
+  Lembretes com o app fechado (js/lembretes.js). Desligado enquanto for null.
+  Para ligar: Console do Firebase → Configurações do projeto → Cloud Messaging →
+  "Certificados push da Web" → Gerar par de chaves → colar aqui a chave (começa com "B").
+  Essa chave é pública, pode ficar no site.
+*/
+const FIREBASE_VAPID_CHAVE = null;

@@ -1,0 +1,29 @@
+# Carteiro dos lembretes com o app fechado: a cada 10 minutos manda os lembretes que venceram.
+# Usa a mesma chave da publicação (segredo FIREBASE_SERVICE_ACCOUNT), que precisa dos papéis
+# "Usuário do Cloud Datastore" e "Administrador da API Firebase Cloud Messaging".
+# O GitHub pode atrasar alguns minutos as execuções agendadas.
+name: Lembretes
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+concurrency: lembretes
+jobs:
+  carteiro:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CHAVE: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Instalar
+        run: npm install --prefix .github/lembretes --no-audit --no-fund
+      - name: Entregar os lembretes
+        run: |
+          if [ -z "$CHAVE" ]; then echo "Sem chave, nada a fazer."; exit 0; fi
+          trap 'rm -f "$RUNNER_TEMP/chave.json"' EXIT
+          printf '%s' "$CHAVE" > "$RUNNER_TEMP/chave.json"
+          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/chave.json" node .github/lembretes/enviar.js

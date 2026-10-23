@@ -1,0 +1,8 @@
+{
+  "name": "prumo-carteiro",
+  "private": true,
+  "description": "Manda os lembretes que venceram (roda na Action agendada .github/workflows/lembretes.yml)",
+  "dependencies": {
+    "firebase-admin": "^14.0.0"
+  }
+}

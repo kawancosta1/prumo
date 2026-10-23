@@ -128,14 +128,46 @@ self.addEventListener("fetch", e => {
   );
 });
 
-// Tocar na notificação abre (ou traz pra frente) o Prumo
+// Lembrete com o app fechado (Firebase Cloud Messaging, mandado pela Action agendada).
+// Com o Prumo aberto na tela, passa para a página mostrar o banner com som; senão, notificação do sistema.
+self.addEventListener("push", e => {
+  let p = {};
+  try {
+    p = e.data ? e.data.json() : {};
+  } catch (erro) {}
+  const d = p.data || p.notification || p;
+  const titulo = String(d.titulo || d.title || "Prumo").slice(0, 80);
+  const corpo = String(d.corpo || d.body || "").slice(0, 200);
+  const aba = /^[a-z]{2,12}$/.test(d.aba || "") ? d.aba : "hoje";
+  e.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(janelas => {
+      const visivel = janelas.find(j => j.visibilityState === "visible");
+      if (visivel) return visivel.postMessage({ tipo: "lembrete", titulo, corpo, aba });
+      return self.registration.showNotification(titulo, {
+        body: corpo,
+        icon: "icones/icone-192.png",
+        badge: "icones/icone-192.png",
+        tag: String(d.tag || "prumo").slice(0, 60),
+        renotify: true,
+        vibrate: [20, 80, 20],
+        data: { aba }
+      });
+    })
+  );
+});
+
+// Tocar na notificação abre (ou traz pra frente) o Prumo, na aba certa
 self.addEventListener("notificationclick", e => {
   e.notification.close();
+  const aba = (e.notification.data && e.notification.data.aba) || "avisos";
   e.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(janelas => {
       const aberta = janelas.find(j => "focus" in j);
-      if (aberta) return aberta.focus();
-      return self.clients.openWindow("./#avisos");
+      if (aberta) {
+        if ("navigate" in aberta) aberta.navigate("./#" + aba).catch(() => {});
+        return aberta.focus();
+      }
+      return self.clients.openWindow("./#" + aba);
     })
   );
 });

@@ -231,6 +231,7 @@ function notificacoesAjustesHTML() {
     <h2 class="h2">Notificações</h2>
     <div class="setbox">
       <div class="setrow"><div class="lbl"><b>Som dos avisos</b><span class="note">Um toque macio quando chega algo, na hora de um lembrete e nas conquistas.</span></div><div class="row" style="gap:6px"><button class="btn small ghost" data-act="ouvir-aviso" aria-label="Ouvir o som dos avisos">Ouvir</button><button class="btn small ${S.notif.som ? "" : "ghost"}" data-act="notif" data-s="som" aria-pressed="${S.notif.som}">${S.notif.som ? "Ligado" : "Desligado"}</button></div></div>
+      ${typeof lembretesAjustesHTML === "function" ? lembretesAjustesHTML() : ""}
       <div class="setrow"><div class="lbl"><b>Vibrar</b><span class="note">Uma vibração curtinha junto com o aviso (Android).</span></div><button class="btn small ${S.notif.vibrar ? "" : "ghost"}" data-act="notif" data-s="vibrar" aria-pressed="${S.notif.vibrar}">${S.notif.vibrar ? "Ligado" : "Desligado"}</button></div>
     </div>
   </section>`;
