@@ -17,7 +17,7 @@ async function abrir(url) {
   });
   class SoLocal extends ResourceLoader {
     fetch(u, o) {
-      if (!u.startsWith(url)) return Promise.reject(new Error("bloqueado " + u));
+      if (!u.startsWith(url.split("#")[0])) return Promise.reject(new Error("bloqueado " + u));
       return super.fetch(u, o);
     }
   }

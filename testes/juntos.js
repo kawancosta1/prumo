@@ -45,7 +45,8 @@ module.exports = async url => {
         get: async () => snapDoc(p),
         onSnapshot: cb => { const f = () => cb(snapDoc(p)); __db.ouvintes.push(f); f(); return () => (__db.ouvintes = __db.ouvintes.filter(x => x !== f)); }
       }),
-      runTransaction: async () => {}
+      runTransaction: async () => {},
+      batch: () => ({ update() {}, set() {}, delete() {}, commit: async () => {} })
     };
     fb = { auth: {}, db: banco }; contaUsuario = { email: "eu@x.com", emailVerified: true }; meuId = "eu";
     S.onboarded = true; S.name = "Kawan"; S.consentimento = { versao: POLITICA_VERSAO, em: Date.now() };

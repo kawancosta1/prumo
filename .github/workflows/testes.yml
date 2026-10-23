@@ -1,4 +1,5 @@
 # Roda os testes do Prumo a cada push na main. Se algo quebrar, aparece um X vermelho no commit.
+# Se os testes passarem, publica o site e as regras do Firestore no Firebase.
 name: Testes
 on:
   push:
@@ -16,3 +17,34 @@ jobs:
         run: npm install --prefix testes
       - name: Testar
         run: node testes/rodar.js
+
+  publicar:
+    needs: testes
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency: publicar
+    env:
+      CHAVE: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Conferir a chave
+        id: chave
+        run: |
+          if [ -z "$CHAVE" ]; then
+            echo "::warning::Falta o segredo FIREBASE_SERVICE_ACCOUNT. O site não foi publicado no Firebase."
+            echo "tem=nao" >> "$GITHUB_OUTPUT"
+          else
+            printf '%s' "$CHAVE" > "$RUNNER_TEMP/chave.json"
+            echo "tem=sim" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Publicar site e regras
+        if: steps.chave.outputs.tem == 'sim'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/chave.json
+        run: npx --yes firebase-tools@15 deploy --only hosting,firestore:rules --project prumo-66d76 --non-interactive
+      - name: Apagar a chave
+        if: always()
+        run: rm -f "$RUNNER_TEMP/chave.json"

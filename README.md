@@ -5,7 +5,7 @@ Este é o código do Prumo, organizado para você mexer na mão.
 Para rodar no seu computador, abra o `index.html` no navegador.
 
 > No computador, os dados ficam salvos só naquele navegador (aparece "Só neste aparelho").
-> A sincronização entre aparelhos e a parceria funcionam no Artifact do Claude ou, no GitHub Pages, com a conta Google (Firebase) ligada em `js/firebase-config.js`.
+> A sincronização entre aparelhos e a parceria funcionam no Artifact do Claude ou, no site (Firebase Hosting, https://prumo-66d76.web.app), com a conta Google (Firebase) ligada em `js/firebase-config.js`.
 
 ---
 
@@ -69,6 +69,8 @@ A **ordem dos scripts no `index.html` importa**: cada arquivo pode usar o que ve
 | `js/telas/estante.js` | Aba Estante: desenho da estante, Lendo agora, Adicionar, Livros, Metas e Decorar |
 | `js/firebase-config.js` | A configuração do Firebase (enquanto for `null`, o app fica só no aparelho) |
 | `js/conta.js` | Conta pelo Firebase (Google ou email): login, nome de usuário (@) e o bloco Conta em Ajustes. As regras do banco estão em `firestore.rules` |
+| `js/mudanca.js` | Mudança de endereço: no site antigo (GitHub Pages) mostra a faixa "O Prumo mudou de endereço" e leva os dados no `#` do link; no novo, recebe só se o aparelho ainda não tiver dados ali |
+| `firebase.json` | Publicação no Firebase Hosting: arquivos que sobem, cache e cabeçalhos de segurança (CSP). A Action publica o site e as regras a cada push na `main` |
 | `js/telas/entrar.js` | Tela de entrada ao abrir o app: entrar com Google, criar conta e entrar com email e senha (confirmação por link no email), esqueci a senha e continuar sem conta (`S.semConta`). Para ter conta: 18 anos ou mais e aceite da política e dos dados de saúde (`S.consentimento`). Mudou a política? Troque `POLITICA_VERSAO` e todos aceitam de novo |
 | `js/telas/feedback.js` | Aba Feedback: ideia, problema ou elogio vai para prumi.prumo@gmail.com com o assunto FEEDBACK, pelo FormSubmit (formsubmit.co). Sem internet, abre o app de email preenchido |
 | `privacidade.html` | Política de privacidade (LGPD). Contato: prumi.prumo@gmail.com |

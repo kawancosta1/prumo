@@ -32,7 +32,8 @@ const servidor = http.createServer((req, res) => {
     ["Feedback", () => require("./feedback")(url)],
     ["Mundos Roqueiro e Emo", () => require("./mundos")(url)],
     ["Estante", () => require("./estante")(url)],
-    ["Leitura com amigos", () => require("./juntos")(url)]
+    ["Leitura com amigos", () => require("./juntos")(url)],
+    ["Mudança de endereço", () => require("./mudanca")(url)]
   ];
   let falhas = 0;
   for (const [nome, rodar] of suites) {

@@ -3,6 +3,15 @@
 */
 "use strict";
 
+/* fontes dos mundos: baixam como "print" (não travam a tela) e valem para tudo quando chegam */
+{
+  const f = document.getElementById("fontes-mundos");
+  if (f) {
+    if (f.sheet) f.media = "all";
+    else f.addEventListener("load", () => (f.media = "all"));
+  }
+}
+
 /* início */
 try {
   const c = JSON.parse(lsGet(LS_KEY) || "null");

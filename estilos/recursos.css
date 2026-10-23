@@ -2493,3 +2493,29 @@ button.top8-item {
   font: inherit;
   color: var(--ink);
 }
+
+/* ===================== mudança de endereço (só no endereço antigo) ===================== */
+.mudanca {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  z-index: 60;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 16px;
+  border-radius: 14px;
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+  font-size: 14px;
+}
+.mudanca span {
+  flex: 1;
+}
+.mudanca .btn {
+  flex: none;
+}
