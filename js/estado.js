@@ -273,14 +273,29 @@ let ref = null,
   Não depende do relógio dos aparelhos: a versão da nuvem é reconhecida pelo número dela (updatedAt), não por ser maior.
 */
 const LS_BASE = "prumo-base";
-let base = null, // { state, updatedAt }
+let base = null, // { state, updatedAt, linha, enviado }
   sujo = false;
 try {
   const b = JSON.parse(lsGet(LS_BASE) || "null");
   if (b && b.state && typeof b.updatedAt === "number") base = b;
 } catch (e) {}
-function guardarBase(state, versao) {
-  base = { state: JSON.parse(JSON.stringify(state)), updatedAt: versao };
+/*
+  linha: os últimos números de versão que a nuvem teve, em ordem. Cada envio leva a linha que ele conhecia + o número novo.
+  enviado: a última versão que ESTE aparelho mandou e a nuvem confirmou.
+  Se chega uma versão cuja linha não tem o "enviado" daqui, quem mandou não viu a nossa mudança
+  (ex.: celular ficou sem internet, mexeu, e voltou depois). Aí junta em vez de aceitar por cima.
+*/
+function guardarBase(state, versao, linha, enviado) {
+  base = {
+    state: JSON.parse(JSON.stringify(state)),
+    updatedAt: versao,
+    linha: Array.isArray(linha)
+      ? linha.slice(-40)
+      : base && base.updatedAt === versao
+        ? base.linha || []
+        : [versao],
+    enviado: enviado !== undefined ? enviado : base ? base.enviado || 0 : 0
+  };
   lsSet(LS_BASE, JSON.stringify(base));
 }
 
@@ -433,15 +448,19 @@ function commit() {
 }
 
 let nuvemVista = false; // só manda pra nuvem depois de ver o que já está lá (senão um aparelho atrasado apaga o resto)
+let tentarDeNovo = null;
 function push() {
-  if (!nuvemVista) return;
-  const body = { state: JSON.parse(JSON.stringify(S)), updatedAt };
+  if (!nuvemVista || !ref) return;
+  clearTimeout(tentarDeNovo);
+  const linha = [...((base && base.linha) || []), updatedAt].slice(-40);
+  const body = { state: JSON.parse(JSON.stringify(S)), updatedAt, linha };
   lastPushed = updatedAt;
+  setSync(navigator.onLine === false ? "err" : "salvando");
   writing = writing
     .then(() => ref.set(body))
     .then(
       () => {
-        guardarBase(body.state, body.updatedAt);
+        guardarBase(body.state, body.updatedAt, body.linha, body.updatedAt);
         if (updatedAt === body.updatedAt) {
           sujo = false;
           lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt, sujo }));
@@ -451,6 +470,11 @@ function push() {
       e => {
         const grande = e && e.code === "invalid-argument";
         setSync(grande || (e && e.code === "invalid_argument") ? "local" : "err");
+        // falhou sem ser por tamanho: tenta de novo daqui a pouco (e assim que a internet voltar)
+        if (!grande) {
+          lastPushed = 0;
+          tentarDeNovo = setTimeout(() => sujo && push(), 20000);
+        }
         if (grande && typeof notificar === "function")
           notificar({
             titulo: "Não deu pra salvar na conta",
@@ -471,15 +495,18 @@ function markReady() {
 function setSync(mode) {
   if (mode === "local") setTimeout(markReady, 0);
   const el = document.getElementById("sync");
-  el.className = "sync " + (mode === "ok" ? "ok" : mode === "local" ? "local" : "");
+  el.className =
+    "sync " + (mode === "ok" ? "ok" : mode === "local" ? "local" : mode === "salvando" ? "salvando" : "");
   el.querySelector("span").textContent =
-    mode === "ok"
-      ? "Sincronizado"
-      : mode === "local"
-        ? "Só neste aparelho"
-        : mode === "err"
-          ? "Sem conexão"
-          : "Carregando…";
+    mode === "salvando"
+      ? "Salvando…"
+      : mode === "ok"
+        ? "Sincronizado"
+        : mode === "local"
+          ? "Só neste aparelho"
+          : mode === "err"
+            ? "Sem conexão"
+            : "Carregando…";
   el.title =
     mode === "ok"
       ? "Seus dados estão salvos na sua conta e aparecem no celular e no PC"
@@ -487,7 +514,9 @@ function setSync(mode) {
         ? contaConfigurada()
           ? "Os dados estão só neste navegador. Entre com Google em Ajustes para salvar na nuvem."
           : "Os dados estão salvos só neste navegador"
-        : "";
+        : mode === "err"
+          ? "Sem internet agora. O que você mudar fica salvo aqui e vai pra conta quando a internet voltar."
+          : "";
 }
 
 /*
@@ -547,51 +576,54 @@ function ligarBanco(db, uid, caminho) {
 /** Uma versão da nuvem chegou: decide se usa, se junta ou se manda a daqui. */
 function receberDaNuvem(d) {
   const versao = d.updatedAt || 0;
+  const linha = Array.isArray(d.linha) ? d.linha : null;
   if (base && versao === base.updatedAt) {
     // nada novo na nuvem
     if (sujo && updatedAt !== lastPushed) push();
     return;
   }
   if (versao === updatedAt && !sujo) {
-    guardarBase(d.state, versao); // já é igual ao daqui
+    guardarBase(d.state, versao, linha); // já é igual ao daqui
     return;
   }
   const remoto = JSON.parse(JSON.stringify(d.state));
-  if (!sujo) {
+  // quem mandou não viu o último envio daqui? (linha da nuvem sem o nosso número)
+  const passouPorCima = !!(base && base.enviado && linha && !linha.includes(base.enviado));
+  if (!sujo && !passouPorCima) {
     // só a nuvem mudou: usa a da nuvem
     S = normalize(remoto);
     updatedAt = versao;
-    guardarBase(remoto, versao);
+    guardarBase(remoto, versao, linha);
     lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt, sujo }));
     applyTheme();
     softRender();
     return;
   }
-  if (!base) {
-    // primeira vez com a sincronização nova: sem base, junta tudo (nada some); no que for diferente, vale o mais novo
-    const novoAqui = updatedAt >= versao;
-    const local = JSON.parse(JSON.stringify(S));
-    S = normalize(novoAqui ? mesclar(undefined, local, remoto) : mesclar(undefined, remoto, local));
-    guardarBase(remoto, versao);
-    updatedAt = Math.max(Date.now(), versao + 1, updatedAt + 1);
-    sujo = true;
-    lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt, sujo }));
-    applyTheme();
-    softRender();
-    push();
-    return;
-  }
-  // os dois lados mudaram: junta
-  const junto = mesclar(JSON.parse(JSON.stringify(base.state)), JSON.parse(JSON.stringify(S)), remoto);
+  if (typeof guardarVersao === "function") guardarVersao("antes de juntar com outro aparelho");
+  const local = JSON.parse(JSON.stringify(S));
+  let junto;
+  if (!base || passouPorCima) {
+    // sem base comum confiável: junta tudo (nada some); no que for diferente, vale o mais novo
+    const novoAqui = sujo && updatedAt >= versao;
+    junto = novoAqui ? mesclar(undefined, local, remoto) : mesclar(undefined, remoto, local);
+  } else junto = mesclar(JSON.parse(JSON.stringify(base.state)), local, remoto); // os dois lados mudaram: junta
   S = normalize(junto);
-  guardarBase(remoto, versao);
+  guardarBase(remoto, versao, linha || [versao]);
   updatedAt = Math.max(Date.now(), versao + 1, updatedAt + 1);
   sujo = true;
   lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt, sujo }));
   applyTheme();
   softRender();
   push();
+  if (passouPorCima && typeof toast === "function")
+    toast("Juntei as mudanças do seu outro aparelho com as daqui.", false, "happy");
 }
+
+// a internet voltou: manda o que ficou pendente
+addEventListener("online", () => {
+  if (sujo && ref && updatedAt !== lastPushed) push();
+});
+addEventListener("offline", () => ref && setSync("err"));
 
 const hasData = () =>
   S.tasks.length ||

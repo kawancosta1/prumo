@@ -2,7 +2,7 @@
 const { abrir } = require("./ambiente");
 
 module.exports = async url => {
-  const { ev, erros, ok, espera, fechar } = await abrir(url);
+  const { w, ev, erros, ok, espera, fechar } = await abrir(url);
   const t = (id, title, extra = "") =>
     `{ id: "${id}", title: "${title}", area: "geral", date: today(), done: false, prio: 0, sub: []${extra} }`;
 
@@ -96,6 +96,49 @@ module.exports = async url => {
     `sujo = false; receberDaNuvem({ updatedAt: 9000, state: { ...JSON.parse(JSON.stringify(base.state)), waterGoal: 3100 } })`
   );
   ok(ev("S.waterGoal") === 3100 && !ev("sujo"), "sem mudança aqui: pega a da nuvem direto");
+
+  // celular ficou sem internet, mexeu e voltou: a versão dele chega sem ter visto o nosso último envio
+  ev(`window.__enviados = []; sujo = false; S.tasks = [${t("p1", "Do PC")}]; persist();`);
+  await espera(700);
+  await espera(30);
+  const meuEnvio = ev("base.enviado");
+  ok(
+    meuEnvio &&
+      ev("__enviados.length") >= 1 &&
+      ev("__enviados[__enviados.length - 1].linha.includes(base.enviado)"),
+    "cada envio leva a linha de versões"
+  );
+  ev(
+    `receberDaNuvem({ updatedAt: base.updatedAt + 50, linha: [1, 2, 3], state: { ...JSON.parse(JSON.stringify(S)), tasks: [${t("c1", "Do celular offline")}] } })`
+  );
+  await espera(30);
+  ok(
+    ev(`S.tasks.map(t => t.id).sort().join(",")`) === "c1,p1",
+    "versão que não viu a nossa: junta em vez de apagar a tarefa daqui"
+  );
+
+  // falhou ao mandar: tenta de novo quando a internet volta
+  ev(
+    `window.__falhas = 0; ref = { set: async b => { if (__falhas++ < 1) throw { code: "unavailable" }; __enviados.push(b); } }; window.__antes = __enviados.length; S.tasks.push(${t("x1", "Sem rede")}); persist();`
+  );
+  await espera(800);
+  ok(ev("sujo") === true, "falhou: continua marcado como pendente");
+  w.dispatchEvent(new w.Event("online"));
+  await espera(50);
+  ok(ev("__enviados.length > __antes") && !ev("sujo"), "internet voltou: manda sozinho");
+
+  // voltar no tempo
+  await ev(`guardarVersao("teste")`);
+  await espera(50);
+  ok(ev("lerVersoes().length") >= 1, "guarda uma cópia compactada");
+  const qtd = ev("S.tasks.length");
+  ev(`S.tasks = []; persist(); tab = "ajustes"; render();`);
+  const bt = () => w.document.querySelector('[data-act="versao-restaurar"]');
+  ok(!!bt(), "aparece em Ajustes");
+  bt().dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+  bt().dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+  await espera(80);
+  ok(ev("S.tasks.length") === qtd, "restaurar traz os dados de volta");
 
   fechar();
   return erros;

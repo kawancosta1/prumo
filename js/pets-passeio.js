@@ -730,12 +730,33 @@ document.addEventListener("click", ev => {
   andarAte(a, Math.max(4, Math.min(larguraTela() - PET_TAM - 4, ev.clientX - PET_TAM / 2)));
 });
 // saiu no meio do foco: quando volta, o pet bate na tela
-let saiuNoFoco = false;
+let saiuNoFoco = false,
+  saiuEm = 0;
+/** Voltou depois de um tempão: o pet vem correndo te receber. */
+function petRecebe() {
+  const a = passeio.agentes.get(petsDados().ativo);
+  if (!a || a.escondido || a.preso || dormindoAgora()) return;
+  a.ancora = null;
+  andarAte(
+    a,
+    larguraTela() / 2 - PET_TAM / 2,
+    chaoPasseio(),
+    () => {
+      somDoPet(a.pet);
+      reagir(a, a.pet.personalidade === "dramatico" ? "girando" : "pulando", 1400);
+      setTimeout(() => reagir(a, "feliz", 1600), 1400);
+      toast(`${a.pet.nome} tava com saudade!`, false, "happy");
+    },
+    { vel: 2.5, pose: a.pet.especie === "coala" ? "andando" : "correndo" }
+  );
+}
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     saiuNoFoco = typeof timer !== "undefined" && timer.running;
+    saiuEm = Date.now();
     return;
   }
+  if (!saiuNoFoco && saiuEm && Date.now() - saiuEm > 2 * 36e5) setTimeout(petRecebe, 800);
   if (!saiuNoFoco) return;
   saiuNoFoco = false;
   const a = passeio.agentes.get(petsDados().ativo);

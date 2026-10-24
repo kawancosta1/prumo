@@ -58,6 +58,7 @@ function viewAjustes() {
       ${relatoErrosAjustesHTML()}
       <div class="setrow"><div class="lbl"><b>Fazer backup</b><span class="note">Baixa um arquivo .json com tudo.</span></div><button class="btn small" data-act="export">Baixar backup</button></div>
       <div class="setrow"><div class="lbl"><b>Restaurar backup</b><span class="note">Substitui os dados atuais pelos do arquivo. Dá para desfazer logo depois.</span></div><button class="btn small" data-act="import">Escolher arquivo</button></div>
+      ${typeof versoesAjustesHTML === "function" ? versoesAjustesHTML() : ""}
       <div class="setrow"><div class="lbl"><b>Apagar tudo</b><span class="note">Remove todas as tarefas, matérias, registros e listas.</span></div><button class="btn small danger" data-act="wipe">${wipeArmed ? "Toque de novo para confirmar" : "Apagar tudo"}</button></div>
     </div>
     <textarea id="exportbox" hidden readonly aria-label="Backup em texto"></textarea>
