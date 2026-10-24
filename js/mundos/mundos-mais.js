@@ -32,7 +32,9 @@ const maisTemas = (m, lista) => {
 };
 /** Junta roupinhas novas sem repetir nome que o mundo já tem. */
 const maisItens = (...novos) =>
-  ITEMS.push(...novos.filter(n => !ITEMS.some(i => i.p === n.p && norm(i.name) === norm(n.name))));
+  ITEMS.push(
+    ...novos.filter(n => !ITEMS.some(i => i.id === n.id || (i.p === n.p && norm(i.name) === norm(n.name))))
+  );
 const maisFalas = (m, f) => Object.assign(PERSONAS[m], f);
 
 /* =============== SERTANEJO =============== */
@@ -1844,7 +1846,7 @@ if (PERSONAS.vovo)
         `<path d="M0 84L60 140L120 84" fill="#F8BBD0" ${O}/>${[20, 40, 60, 80, 100].map(x => `<circle cx="${x}" cy="${100 + Math.abs(60 - x) * -0.4 + 20}" r="3" fill="#fff" opacity=".7"/>`).join("")}` +
         topHem
     ),
-    itemMundo("vovo", "vovo_agulhas", "hand", "Agulhas de tricô com novelo", 90, (x, y) =>
+    itemMundo("vovo", "vovo_agulhas_novelo", "hand", "Agulhas de tricô com novelo", 90, (x, y) =>
       H(
         x,
         y,
