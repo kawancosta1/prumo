@@ -7,7 +7,15 @@ const fs = require("fs");
 const path = require("path");
 
 const RAIZ = path.join(__dirname, "..");
-const TIPOS = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".webmanifest": "application/manifest+json", ".svg": "image/svg+xml" };
+const TIPOS = {
+  ".html": "text/html",
+  ".js": "text/javascript",
+  ".css": "text/css",
+  ".json": "application/json",
+  ".png": "image/png",
+  ".webmanifest": "application/manifest+json",
+  ".svg": "image/svg+xml"
+};
 
 // servidor simples com os arquivos do repositório
 const servidor = http.createServer((req, res) => {
@@ -37,6 +45,7 @@ const servidor = http.createServer((req, res) => {
     ["Pets", () => require("./pets")(url)],
     ["Sincronia", () => require("./sincronia")(url)],
     ["Novidades", () => require("./novidades")(url)],
+    ["Pets: interações", () => require("./pets-interacao")(url)],
     ["Leitura com amigos", () => require("./juntos")(url)],
     ["Mudança de endereço", () => require("./mudanca")(url)],
     ["Carteiro dos lembretes", () => require("./carteiro")()]

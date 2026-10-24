@@ -661,3 +661,109 @@
     animation: none !important;
   }
 }
+
+/* ===================== interações (js/pets-interacao.js) ===================== */
+.pet-agente .olho {
+  translate: var(--olho-x, 0) var(--olho-y, 0);
+  transition: translate 0.15s ease-out;
+}
+.pet-combo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #e91e63;
+  font-weight: 900;
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
+  animation: combo-sobe 0.9s ease-out forwards;
+}
+@keyframes combo-sobe {
+  from {
+    transform: translateY(0) scale(0.6);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-34px) scale(1.2);
+    opacity: 0;
+  }
+}
+.pet-menu {
+  position: fixed;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 34px rgb(0 0 0 / 0.22);
+  animation: fala-pet 0.18s ease-out;
+}
+.pet-menu b {
+  padding: 4px 8px 6px;
+  font-size: 13px;
+}
+.pet-menu button {
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.pet-menu button:hover,
+.pet-menu button:focus-visible {
+  background: var(--sunken);
+}
+.pet-petisco {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 10px;
+  border-radius: 40%;
+  background: radial-gradient(circle at 30% 30%, #ffe0b2, #d9963f);
+  box-shadow: 0 2px 3px rgb(0 0 0 / 0.25);
+}
+.pet-pote.agua {
+  background: linear-gradient(#4fc3f7 0 35%, #0288d1 35%);
+  box-shadow: inset 0 3px 0 #b3e5fc;
+}
+.pet-presente {
+  position: absolute;
+  right: -6px;
+  top: 14px;
+  width: 14px;
+  height: 13px;
+  background:
+    linear-gradient(90deg, transparent 5px, #ffd54f 5px 9px, transparent 9px),
+    linear-gradient(transparent 5px, #ffd54f 5px 8px, transparent 8px), #e53935;
+  border-radius: 2px;
+  animation: presente-pula 1s ease-in-out infinite;
+}
+@keyframes presente-pula {
+  50% {
+    transform: translateY(-3px) rotate(-6deg);
+  }
+}
+.jeitos-brincar ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pet-agente .olho {
+    transition: none;
+  }
+  .pet-combo,
+  .pet-presente {
+    animation: none !important;
+  }
+}
