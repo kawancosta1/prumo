@@ -87,6 +87,54 @@ const ESPECIES_PET = {
     som: "yip",
     sonho: "estrela",
     comida: "frutinhas"
+  },
+  vaca: {
+    nome: "Vaquinha",
+    cores: [
+      ["malhada", "#FAFAFA"],
+      ["caramelo", "#C98B4B"],
+      ["rosa", "#F8BBD0"]
+    ],
+    som: "muu",
+    sonho: "capim",
+    comida: "capim fresquinho",
+    especial: {
+      id: "sininho",
+      nome: "Tocar o sininho",
+      desc: "Ela dança no ritmo do sininho. Pasta pelo chão das páginas e toca o sino quando você conclui tarefa."
+    }
+  },
+  boi: {
+    nome: "Boizinho",
+    cores: [
+      ["marrom", "#8D5A3B"],
+      ["preto", "#3E2723"],
+      ["branco", "#EEE8E0"]
+    ],
+    som: "muuu",
+    sonho: "capim",
+    comida: "capim com milho",
+    especial: {
+      id: "bumba",
+      nome: "Dança do boi-bumbá",
+      desc: "Faz a festa do boi-bumbá com chuva vermelha e azul. Sai correndo pela tela quando você conclui tarefa."
+    }
+  },
+  coala: {
+    nome: "Coalinha",
+    cores: [
+      ["cinza", "#A7A9AC"],
+      ["prateado", "#CFD8DC"],
+      ["marrom", "#9C8A7A"]
+    ],
+    som: "grr",
+    sonho: "folha",
+    comida: "folhas de eucalipto",
+    especial: {
+      id: "abraco",
+      nome: "Abraço apertado",
+      desc: "Te dá um abraço na tela. Dorme o dobro e se pendura na lateral dos cards."
+    }
   }
 };
 // cores raras: só na época (js/quarto-extras.js, EPOCAS)
@@ -257,6 +305,28 @@ function momentoPet(x, t, pose = "feliz") {
   x.momentos.push({ t, em: today(), pose });
 }
 
+/** Carinho vale gota: +1 por carinho, até 10 por dia (somando todos os pets). */
+const GOTAS_CARINHO_DIA = 10;
+function gotaDoCarinho(el) {
+  const p = petsDados();
+  if (!p.carinhoGotas || p.carinhoGotas.dia !== today()) p.carinhoGotas = { dia: today(), n: 0 };
+  if (p.carinhoGotas.n >= GOTAS_CARINHO_DIA) return false;
+  p.carinhoGotas.n++;
+  earn(1, el);
+  const n = document.getElementById("coinsn");
+  if (n) n.textContent = S.coins;
+  if (p.carinhoGotas.n === GOTAS_CARINHO_DIA)
+    toast("Carinho de hoje já rendeu 10 gotas. Mas pode continuar, ele adora!");
+  return true;
+}
+/** Um carinho completo (painel, passeio ou segurando o pet). */
+function fazerCarinho(x, el, vezes = 1) {
+  x.carinhos[today()] = (x.carinhos[today()] || 0) + vezes;
+  cuidou(x);
+  gotaDoCarinho(el);
+  persist();
+}
+
 /* ===================== desenho ===================== */
 /** Sprite do pet (de lado, olhando pra direita). pose: parado, andando, sentado, dormindo, pulando, comendo, feliz, triste... */
 function petSVG(x, { pose = "parado", tam = 48, visitante = false } = {}) {
@@ -267,7 +337,7 @@ function petSVG(x, { pose = "parado", tam = 48, visitante = false } = {}) {
   const dorme = pose === "dormindo" || pose === "fingindo";
   const olho = dorme
     ? `<path d="M35 16q2 1.6 4 0" stroke="#212121" stroke-width="1" fill="none"/>`
-    : `<circle cx="37" cy="15.5" r="1.5" fill="#212121"/><circle cx="37.5" cy="15" r=".5" fill="#fff"/>`;
+    : `<g class="olho"><circle cx="37" cy="15.5" r="1.5" fill="#212121"/><circle cx="37.5" cy="15" r=".5" fill="#fff"/></g>`;
   let orelhas = "",
     cauda = "",
     extra = "",
@@ -304,6 +374,39 @@ function petSVG(x, { pose = "parado", tam = 48, visitante = false } = {}) {
     orelhas = `<path d="M27 12l1-9l6 6zM35 10l5-7l1 9z" fill="${c}" ${tinta}/>`;
     cauda = `<path class="cauda" d="M10 26q-12 0-8-14q6 4 10 10z" fill="${c}" ${tinta}/><path d="M3 13q2 2 4 2" stroke="#FAFAFA" stroke-width="3" stroke-linecap="round"/>`;
     extra = `<path d="M37 21q4 1 6-3q-2 4-6 3z" fill="#FAFAFA"/><circle cx="42.5" cy="18" r="1.2" fill="#212121"/>`;
+  } else if (e === "vaca" || e === "boi") {
+    const boi = e === "boi";
+    const mancha = boi
+      ? "rgba(0,0,0,.18)"
+      : x.cor === "caramelo"
+        ? "#FAFAFA"
+        : x.cor === "rosa"
+          ? "#A1887F"
+          : "#37474F";
+    corpo = `<ellipse cx="22" cy="25.5" rx="14.5" ry="9.4" fill="${c}" ${tinta}/>${
+      boi
+        ? `<ellipse cx="25" cy="17.6" rx="6" ry="3.6" fill="${c}" ${tinta}/><path d="M20 19.5q5 2 10 0" stroke="${c}" stroke-width="2.4"/>`
+        : `<ellipse cx="16" cy="23" rx="4.6" ry="3.4" fill="${mancha}"/><ellipse cx="26" cy="28" rx="3.6" ry="2.6" fill="${mancha}"/><ellipse cx="11.5" cy="28.5" rx="2.2" ry="1.8" fill="${mancha}"/><ellipse cx="20" cy="33.4" rx="3" ry="1.8" fill="#F48FB1" ${tinta}/>`
+    }`;
+    cabeca = `<ellipse cx="34.5" cy="16.5" rx="7.4" ry="8" fill="${c}" ${tinta}/>${boi ? `<path d="M31 10q4-2 7 0l-1 4q-2.6-1-5 0z" fill="rgba(0,0,0,.14)"/>` : ""}`;
+    orelhas = `<ellipse cx="27.6" cy="13" rx="3.6" ry="1.8" fill="${c}" ${tinta} transform="rotate(-24 27.6 13)"/>${
+      boi
+        ? `<path d="M30 10q-5-1-6-7M38.5 9q3-3 2-8" stroke="#EFE6D2" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M24.4 3.4l-.6-1.4M40.6 1.4l.2-1.4" stroke="#5D4037" stroke-width="2.4" stroke-linecap="round"/>`
+        : `<path d="M30.6 9.6q-1-3 .6-4.4M37.6 9q1.6-2.6 .2-4.2" stroke="#EFE6D2" stroke-width="2.2" fill="none" stroke-linecap="round"/>`
+    }`;
+    cauda = `<path class="cauda" d="M8 22q-4 3-3 10" stroke="${c}" stroke-width="1.6" fill="none"/><ellipse class="cauda" cx="5" cy="32.5" rx="1.6" ry="2.4" fill="${boi ? "#3E2723" : mancha}"/>`;
+    extra = `<ellipse cx="40" cy="20.6" rx="4.8" ry="3.4" fill="#F8BBD0" ${tinta}/><circle cx="39" cy="20" r=".7" fill="#AD1457"/><circle cx="42" cy="20" r=".7" fill="#AD1457"/>${
+      boi
+        ? `<circle cx="40.6" cy="23.4" r="1.7" fill="none" stroke="#FFC107" stroke-width=".9"/>`
+        : x.acess.coleira
+          ? ""
+          : `<path d="M29 22.6q4 2.6 8 0" stroke="#8D6E63" stroke-width="1.4" fill="none"/><path class="sino" d="M31.6 24h2.8l.6 3h-4z" fill="#FFC107" stroke="#B7892B" stroke-width=".5"/>`
+    }`;
+  } else if (e === "coala") {
+    corpo = `<ellipse cx="22" cy="26" rx="12" ry="9" fill="${c}" ${tinta}/><ellipse cx="25" cy="28" rx="6" ry="5" fill="#ECEFF1" opacity=".75"/>`;
+    cabeca = `<circle cx="33" cy="16.5" r="9.4" fill="${c}" ${tinta}/>`;
+    orelhas = `<circle cx="25.4" cy="9.6" r="5.2" fill="${c}" ${tinta}/><circle cx="25.4" cy="9.6" r="3" fill="#ECEFF1"/><circle cx="39.6" cy="8" r="4.6" fill="${c}" ${tinta}/><circle cx="39.6" cy="8" r="2.6" fill="#ECEFF1"/>`;
+    extra = `<ellipse cx="41.4" cy="18.6" rx="2.6" ry="3.4" fill="#37474F"/><ellipse cx="40.8" cy="17.4" rx=".8" ry="1" fill="#90A4AE"/>`;
   }
   const passaro = e === "papagaio" || e === "morcego";
   const pernas = passaro
@@ -318,9 +421,11 @@ function petSVG(x, { pose = "parado", tam = 48, visitante = false } = {}) {
   const boca =
     pose === "triste"
       ? `<path d="M38 21q1.4-1.4 3 0" stroke="#212121" stroke-width=".8" fill="none"/>`
-      : pose === "comendo"
+      : pose === "comendo" || pose === "pastando"
         ? `<ellipse cx="39.5" cy="21" rx="1.6" ry="1.2" fill="#C62828"/>`
-        : `<path d="M38 20.5q1.4 1.4 3 0" stroke="#212121" stroke-width=".8" fill="none"/>`;
+        : pose === "bocejando"
+          ? `<ellipse cx="39.6" cy="21.4" rx="1.8" ry="2.4" fill="#5D1F1F"/><ellipse cx="39.6" cy="22.6" rx="1" ry=".8" fill="#F06292"/>`
+          : `<path d="M38 20.5q1.4 1.4 3 0" stroke="#212121" stroke-width=".8" fill="none"/>`;
   const acess = acessoriosSVG(x);
   const zz =
     pose === "dormindo"
@@ -346,9 +451,19 @@ function petSVG(x, { pose = "parado", tam = 48, visitante = false } = {}) {
           ? `<path d="M30 9l4-11l4 11z" fill="#E91E63" stroke="var(--ink, #222)" stroke-width=".6"/><circle cx="34" cy="-2" r="1.6" fill="#FFD54F"/>`
           : pose === "batendo"
             ? `<path d="M44 20l5-3M44 24l6 0M44 28l5 3" stroke="var(--ink, #222)" stroke-width="1" stroke-linecap="round"/>`
-            : "";
+            : pose === "pastando"
+              ? `<path class="capim" d="M42 39l-1-7M44 39l1-8M46 39l2-6M40 39l-2-5" stroke="#43A047" stroke-width="1.4" stroke-linecap="round"/>`
+              : pose === "correndo"
+                ? `<g class="poeira"><circle cx="4" cy="36" r="2.6" fill="#BCAAA4" opacity=".6"/><circle cx="-1" cy="33" r="1.8" fill="#BCAAA4" opacity=".45"/></g>`
+                : pose === "sininho"
+                  ? `<path class="nota-pet" d="M44 4v6a1.8 1.5 0 1 1-1-1.4V4h3v1.8h-2z" fill="var(--ink, #222)"/><path class="nota-pet n2" d="M2 8v5a1.6 1.3 0 1 1-1-1.2V8h2.6v1.6H2z" fill="var(--ink, #222)"/>`
+                  : pose === "bocejando"
+                    ? `<text x="44" y="8" font-size="6" fill="var(--ink, #222)" font-weight="700" class="zz">a</text>`
+                    : pose === "abracando"
+                      ? `<ellipse cx="40" cy="27" rx="3" ry="2.2" fill="${c}" ${tinta}/><ellipse cx="36" cy="29" rx="3" ry="2.2" fill="${c}" ${tinta}/>`
+                      : "";
   const coracao =
-    pose === "feliz"
+    pose === "feliz" || pose === "abracando" || pose === "ronronando"
       ? `<path class="coracao-pet" d="M40 4q-3-4-5 0q-2 3 5 7q7-4 5-7q-2-4-5 0z" fill="#E91E63"/>`
       : "";
   const placa = visitante
@@ -469,8 +584,32 @@ function somDoPet(x, vol = 1) {
       [1100, 0],
       [1500, 0.06],
       [900, 0.14]
+    ],
+    muu: [
+      [210, 0],
+      [250, 0.18],
+      [170, 0.7]
+    ],
+    muuu: [
+      [140, 0],
+      [165, 0.22],
+      [110, 0.9]
+    ],
+    grr: [
+      [130, 0],
+      [190, 0.1],
+      [120, 0.32]
     ]
   }[tipo] || [[600, 0]];
+  // bichos grandes: som mais grave e encorpado (dente de serra com filtro)
+  if (tipo === "muu" || tipo === "muuu" || tipo === "grr") {
+    o.type = "sawtooth";
+    const f = ctx.createBiquadFilter();
+    f.type = "lowpass";
+    f.frequency.value = tipo === "grr" ? 500 : 750;
+    f.connect(s);
+    o.saidaFiltro = f;
+  }
   curvas.forEach(([f, dt], i) =>
     i ? o.frequency.exponentialRampToValueAtTime(f, t + dt) : o.frequency.setValueAtTime(f, t)
   );
@@ -479,7 +618,7 @@ function somDoPet(x, vol = 1) {
   g.gain.setValueAtTime(0.0001, t);
   g.gain.exponentialRampToValueAtTime(1, t + 0.02);
   g.gain.exponentialRampToValueAtTime(0.0001, fim);
-  o.connect(g).connect(s);
+  o.connect(g).connect(o.saidaFiltro || s);
   o.start(t);
   o.stop(fim + 0.05);
 }
@@ -505,22 +644,27 @@ function petPainelHTML() {
     const livre = !t.ach || S.ach[t.ach];
     return `<button class="chip-bt" data-act="pet-truque" data-id="${t.id}" ${livre ? "" : "disabled"} title="${livre ? "" : "Libera com a conquista " + esc((ACH[t.ach] || {}).name || "")}">${livre ? "" : ICON.lock + " "}${t.nome}</button>`;
   }).join("");
+  const prova =
+    acessPrevia && acessPrevia.pet === x.id ? ACESSORIOS_PET.find(a => a.id === acessPrevia.id) : null;
   const loja = ["coleira", "chapeu", "roupa"]
-    .map(
-      slot =>
-        `<div class="pet-loja-linha"><b>${{ coleira: "Coleira", chapeu: "Chapéu", roupa: "Roupinha" }[slot]}</b><div class="row">${ACESSORIOS_PET.filter(
-          a => a.slot === slot
-        )
-          .map(a => {
-            const tem = p.donos.includes(a.id),
-              usando = x.acess[slot] === a.id;
-            return `<button class="chip-bt" data-act="pet-acess" data-id="${a.id}" aria-pressed="${usando}">${esc(a.nome)}${tem ? "" : ` · ${a.preco} gotas`}</button>`;
-          })
-          .join(
-            ""
-          )}${x.acess[slot] ? `<button class="chip-bt" data-act="pet-tirar" data-id="${slot}">Tirar</button>` : ""}</div></div>`
-    )
+    .map(slot => {
+      const itens = ACESSORIOS_PET.filter(a => a.slot === slot)
+        .map(a => {
+          const tem = p.donos.includes(a.id),
+            usando = x.acess[slot] === a.id,
+            provando = prova && prova.id === a.id;
+          return `<button class="chip-bt ${provando ? "provando" : ""}" data-act="pet-acess" data-id="${a.id}" aria-pressed="${usando || provando}">${esc(a.nome)}${tem ? (usando ? " ✓" : "") : ` · ${a.preco} gotas`}</button>`;
+        })
+        .join("");
+      const comprar =
+        prova && prova.slot === slot
+          ? `<div class="pet-comprar">${petSVG({ ...x, acess: { ...x.acess, [prova.slot]: prova.id } }, { pose: "feliz", tam: 46 })}<span>Provando <b>${esc(prova.nome)}</b></span><button class="btn small ghost" data-act="pet-acess-desistir">Tirar</button><button class="btn small primary" data-act="pet-acess-comprar" data-id="${prova.id}" ${S.coins < prova.preco ? "disabled" : ""}>${S.coins < prova.preco ? `Faltam ${prova.preco - S.coins} gotas` : `Comprar por ${prova.preco}`}</button></div>`
+          : "";
+      return `<div class="pet-loja-linha"><b>${{ coleira: "Coleira", chapeu: "Chapéu", roupa: "Roupinha" }[slot]}</b><div class="row">${itens}${x.acess[slot] ? `<button class="chip-bt" data-act="pet-tirar" data-id="${slot}">Tirar</button>` : ""}</div>${comprar}</div>`;
+    })
     .join("");
+  const visto = prova ? { ...x, acess: { ...x.acess, [prova.slot]: prova.id } } : x;
+  const esp = ESPECIES_PET[x.especie].especial;
   const momentos = x.momentos
     .slice()
     .reverse()
@@ -532,7 +676,7 @@ function petPainelHTML() {
     .join("");
   return `<div class="pet-painel">
     ${p.lista.length > 1 ? `<div class="row pet-abas">${p.lista.map(y => `<button class="chip-bt" data-act="pet-abrir" data-id="${y.id}" aria-pressed="${y.id === x.id}">${esc(y.nome)}</button>`).join("")}</div>` : ""}
-    <div class="pet-palco"><button class="pet-grande" data-act="pet-carinho" aria-label="Fazer carinho em ${esc(x.nome)}">${petSVG(x, { pose, tam: 150 })}</button>
+    <div class="pet-palco"><button class="pet-grande" data-act="pet-carinho" aria-label="Fazer carinho em ${esc(x.nome)}">${petSVG(visto, { pose, tam: 150 })}</button>
       <div class="pet-info"><b class="pet-nome">${esc(x.nome)}</b><span class="note">${ESPECIES_PET[x.especie].nome} ${fase} · ${PERSONALIDADES_PET[x.personalidade].nome.toLowerCase()} · ${diffDays(x.adotado, today())} dias com você</span>
       ${barra("Barriga", fome, fome < 30 ? "var(--danger)" : "#FFB300")}${barra("Felicidade", humor, "#E91E63")}
       ${tristinho(x) ? `<span class="note">${esc(x.nome)} tá tristinho. Um carinho e comida resolvem.</span>` : dormindoAgora() ? `<span class="note">Shhh, ${esc(x.nome)} tá dormindo. Sonhando com ${ESPECIES_PET[x.especie].sonho}.</span>` : ""}
@@ -540,6 +684,8 @@ function petPainelHTML() {
     <div class="cm-botoes"><button class="btn small primary" data-act="pet-comida">Dar comida (5 gotas)</button><button class="btn small" data-act="pet-carinho">Carinho</button><button class="btn small" data-act="pet-bolinha">Jogar bolinha</button><button class="btn small" data-act="pet-petisco">Petisco especial (15)</button>
       <button class="btn small ghost" data-act="pet-banho" ${x.banho === today() ? "disabled" : ""}>${x.banho === today() ? "Banho tomado" : "Dar banho (+2)"}</button><button class="btn small ghost" data-act="pet-soneca" ${x.soneca === today() ? "disabled" : ""}>${x.soneca === today() ? "Soneca feita" : "Soneca (+2)"}</button>
       <button class="btn small ghost" data-act="pet-esconde" ${p.esconde && p.esconde.dia === today() ? "disabled" : ""}>Esconde-esconde</button></div>
+    <span class="note">Carinho vale gota: +1 por carinho, até ${GOTAS_CARINHO_DIA} por dia (hoje: ${p.carinhoGotas && p.carinhoGotas.dia === today() ? p.carinhoGotas.n : 0}). Segure o pet pra ele ronronar e arraste pra levar pra onde quiser.</span>
+    ${esp ? `<div class="pet-especial"><div><b>Só ${ESPECIES_PET[x.especie].nome.toLowerCase()} faz</b><span class="note">${esc(esp.desc)}</span></div><button class="btn small primary" data-act="pet-especial">${esc(esp.nome)}${x.especialDia === today() ? "" : " (+3)"}</button></div>` : ""}
     <h3 class="h3">Diário de ${esc(x.nome)}</h3><p class="pet-diario">${esc(x.diario[today()])}</p>
     <h3 class="h3">Caminhada da semana</h3><div class="pet-caminhada"><span class="note">Cada tarefa feita é um passo. Destino: <b>${esc(DESTINOS_CAMINHADA[c.destino])}</b> (${Math.min(c.passos, PASSOS_SEMANA)}/${PASSOS_SEMANA} passos)</span><div class="cm-barra"><span style="width:${Math.min(100, (c.passos / PASSOS_SEMANA) * 100)}%"></span></div>${c.chegou ? `<span class="note">Chegaram! O cartão postal está no álbum.</span>` : ""}</div>
     <h3 class="h3">Truques</h3><div class="row pet-truques">${truques}</div>
@@ -640,7 +786,7 @@ FORMS_EXTRAS.adotar = () => {
   adocao = { especie: "gato", cor: "", nome: "", personalidade: "curioso" };
   notificar({
     titulo: `Bem-vindo, ${nome}!`,
-    texto: "Ele já está passeando pelas páginas. Cuida bem!",
+    texto: "Já está passeando pelas páginas. Cuida bem!",
     tipo: "conquista",
     mood: "party"
   });
@@ -666,8 +812,8 @@ ACOES_EXTRAS["pet-passeio"] = () => {
 };
 
 const petDoPainel = () => petPorId(petSel) || petAtivo();
-function reagirPet(x, pose, ms = 1600) {
-  if (typeof passeioReagir === "function") passeioReagir(x.id, pose, ms);
+function reagirPet(x, pose, ms = 1600, soPainel = false) {
+  if (!soPainel && typeof passeioReagir === "function") passeioReagir(x.id, pose, ms);
   const grande = document.querySelector(".pet-grande");
   if (grande) {
     grande.innerHTML = petSVG(x, { pose, tam: 150 });
@@ -675,14 +821,12 @@ function reagirPet(x, pose, ms = 1600) {
     reagirPet.t = setTimeout(() => softRender(), ms);
   }
 }
-ACOES_EXTRAS["pet-carinho"] = () => {
+ACOES_EXTRAS["pet-carinho"] = b => {
   const x = petDoPainel();
   if (!x) return;
-  x.carinhos[today()] = (x.carinhos[today()] || 0) + 1;
-  cuidou(x);
+  fazerCarinho(x, b);
   somDoPet(x);
   reagirPet(x, "feliz");
-  persist();
   if (x.personalidade === "dramatico" && x.carinhos[today()] === 1)
     react("happy", `${esc(x.nome)} desmaiou de tanto amor. Já voltou.`, 2600);
 };
@@ -694,7 +838,8 @@ ACOES_EXTRAS["pet-comida"] = () => {
   S.coins -= 5;
   x.comeuEm = Date.now();
   cuidou(x);
-  reagirPet(x, "comendo", 1800);
+  reagirPet(x, "comendo", 1800, true);
+  if (typeof passeioComer === "function") passeioComer(x.id); // o potinho aparece e ele vai comer
   momentoPet(x, "Primeira refeição", "comendo");
   persist();
   toast(`Nhac! ${x.nome} comeu ${ESPECIES_PET[x.especie].comida}.`);
@@ -753,21 +898,91 @@ ACOES_EXTRAS["pet-truque"] = (b, id) => {
   somDoPet(x);
   reagirPet(x, t.pose, 1800);
 };
+// acessório: o que já é seu veste na hora; o que não é, prova primeiro e compra ali mesmo, embaixo da linha
+let acessPrevia = null; // { pet, id }
 ACOES_EXTRAS["pet-acess"] = (b, id) => {
   const x = petDoPainel(),
     a = ACESSORIOS_PET.find(k => k.id === id);
   if (!x || !a) return;
   const p = petsDados();
   if (!p.donos.includes(id)) {
-    if (S.coins < a.preco) return toast(`Faltam ${a.preco - S.coins} gotas.`, false, "worried");
-    S.coins -= a.preco;
-    p.donos.push(id);
-    toast(`${a.nome} comprado!`);
+    acessPrevia = acessPrevia && acessPrevia.id === id && acessPrevia.pet === x.id ? null : { pet: x.id, id };
+    return render();
   }
-  x.acess[a.slot] = id;
+  acessPrevia = null;
+  if (x.acess[a.slot] === id) delete x.acess[a.slot];
+  else x.acess[a.slot] = id;
   commit();
   if (typeof passeioAtualizar === "function") passeioAtualizar();
 };
+ACOES_EXTRAS["pet-acess-desistir"] = () => ((acessPrevia = null), render());
+ACOES_EXTRAS["pet-acess-comprar"] = (b, id) => {
+  const x = petDoPainel(),
+    a = ACESSORIOS_PET.find(k => k.id === id);
+  if (!x || !a) return;
+  const p = petsDados();
+  if (!p.donos.includes(id)) {
+    if (S.coins < a.preco) return toast(`Faltam ${a.preco - S.coins} gotas.`, false, "worried");
+    earn(-a.preco, b);
+    p.donos.push(id);
+    toast(`${a.nome} é de ${x.nome}!`, false, "party");
+  }
+  acessPrevia = null;
+  x.acess[a.slot] = id;
+  somDoPet(x);
+  commit();
+  reagirPet(x, "feliz", 1400);
+  if (typeof passeioAtualizar === "function") passeioAtualizar();
+};
+/* interação que só a espécie faz (vaca: sininho, boi: boi-bumbá, coala: abraço) */
+ACOES_EXTRAS["pet-especial"] = b => {
+  const x = petDoPainel();
+  const esp = x && ESPECIES_PET[x.especie].especial;
+  if (!esp) return;
+  if (x.especialDia !== today()) {
+    x.especialDia = today();
+    earn(3, b);
+  }
+  cuidou(x);
+  momentoPet(x, esp.nome, esp.id === "abraco" ? "abracando" : esp.id === "sininho" ? "sininho" : "dancando");
+  if (esp.id === "sininho") {
+    tocarSininho();
+    reagirPet(x, "sininho", 2400);
+    toast(`Blém blém! ${x.nome} tá dançando no ritmo do sininho.`);
+  } else if (esp.id === "bumba") {
+    somDoPet(x);
+    reagirPet(x, "dancando", 3000);
+    const lado = new Date().getDate() % 2 ? ["#D32F2F", "#FF5252"] : ["#1565C0", "#42A5F5"];
+    if (typeof chuvaMundo === "function")
+      chuvaMundo({
+        movimento: "cair",
+        n: 26,
+        tam: [10, 18],
+        dur: [1.6, 2.6],
+        cores: [...lado, "#FFD54F"],
+        formas: [
+          `<path d="M12 2L14 10L22 12L14 14L12 22L10 14L2 12L10 10Z" fill="currentColor"/>`,
+          `<circle cx="12" cy="12" r="8" fill="currentColor"/>`
+        ]
+      });
+    toast(`Ê, boi! ${x.nome} fez a festa do boi-bumbá.`);
+  } else {
+    somDoPet(x, 0.7);
+    reagirPet(x, "abracando", 2600, true);
+    if (typeof passeioAbraco === "function") passeioAbraco(x.id);
+    toast(`${x.nome} te deu um abraço bem apertado.`);
+  }
+  commit();
+};
+function tocarSininho() {
+  if (!S.notif.som || typeof pegarAudio !== "function" || typeof sino !== "function") return;
+  const ctx = pegarAudio();
+  if (!ctx) return;
+  const saida = typeof saidaMundo === "function" ? saidaMundo(ctx, 0.8) : ctx.destination;
+  [0, 0.28, 0.56].forEach((dt, i) =>
+    sino(ctx, saida, ctx.currentTime + 0.02 + dt, i === 1 ? 640 : 560, 0.7, 0.1, [1, 1.48, 2.2])
+  );
+}
 ACOES_EXTRAS["pet-tirar"] = (b, slot) => {
   const x = petDoPainel();
   if (!x) return;

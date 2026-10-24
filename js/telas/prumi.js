@@ -57,7 +57,10 @@ function viewPrumi() {
                 ? `<span class="tag lock">${ICON.lock} Lendário</span>`
                 : `<span class="tag price ${S.coins < i.price ? "short" : ""}">${DROP}${i.price}</span>`;
         const selo = i.evento ? `<span class="selo-evento">${esc(EVENTOS[i.evento].nome)}</span>` : "";
-        return `<button class="sitem ${st} ${i.ach ? "legend" : ""} ${i.evento ? "do-evento" : ""} ${tryItem === i.id ? "trying" : ""}" data-act="item" data-id="${i.id}" aria-label="${esc(i.name)}">${selo}${prumi({ mood: "idle", fill: 0, size: 62, eq: e2 })}<span class="sname">${esc(i.name)}</span>${foot}</button>`;
+        const card = `<button class="sitem ${st} ${i.ach ? "legend" : ""} ${i.evento ? "do-evento" : ""} ${tryItem === i.id ? "trying" : ""}" data-act="item" data-id="${i.id}" aria-label="${esc(i.name)}">${selo}${prumi({ mood: "idle", fill: 0, size: 62, eq: e2 })}<span class="sname">${esc(i.name)}</span>${foot}</button>`;
+        return tryItem === i.id
+          ? `<div class="sitem-caixa">${card}${botaoComprar("buy", i.id, i.price)}</div>`
+          : card;
       })
       .join("")}</div>
     ${S.equip[slotSel] ? `<div><button class="btn small ghost" data-act="unequip" data-s="${slotSel}">Tirar ${esc(ITEM[S.equip[slotSel]].name.toLowerCase())}</button></div>` : ""}`;
@@ -87,7 +90,10 @@ function viewPrumi() {
             : v.ach
               ? `<span class="tag lock">${ICON.lock} Lendário</span>`
               : `<span class="tag price ${S.coins < v.price ? "short" : ""}">${DROP}${v.price}</span>`;
-        return `<button class="sitem ${on ? "on" : ""} ${tryPal === v.id ? "trying" : ""}" data-act="tvar" data-id="${v.id}"><span class="swatch" style="background:${base[0]}"><i style="background:${a}"></i><i class="w" style="background:${w}"></i></span><span class="sname">${esc(v.name)}</span>${foot}</button>`;
+        const card = `<button class="sitem ${on ? "on" : ""} ${tryPal === v.id ? "trying" : ""}" data-act="tvar" data-id="${v.id}"><span class="swatch" style="background:${base[0]}"><i style="background:${a}"></i><i class="w" style="background:${w}"></i></span><span class="sname">${esc(v.name)}</span>${foot}</button>`;
+        return tryPal === v.id
+          ? `<div class="sitem-caixa">${card}${botaoComprar("buytvar", v.id, v.price)}</div>`
+          : card;
       })
       .join("")}</div>`;
   } else if (prumiTab === "pet") {
@@ -135,8 +141,6 @@ function viewPrumi() {
         <span class="bal">${DROP}<b class="mono">${S.coins}</b> gotas</span>
       </div>
     </div>
-    ${ti ? `<div class="trybar"><span>Provando: <b>${esc(ti.name)}</b></span><div class="row"><button class="btn small ghost" data-act="untry">Tirar</button><button class="btn small primary" data-act="buy" data-id="${ti.id}" ${S.coins < ti.price ? "disabled" : ""}>${S.coins < ti.price ? `Faltam ${ti.price - S.coins} gotas` : `Comprar por ${ti.price}`}</button></div></div>` : ""}
-    ${tp ? `<div class="trybar"><span>Provando o tema <b>${esc(tp.name)}</b></span><div class="row"><button class="btn small ghost" data-act="untry">Voltar</button><button class="btn small primary" data-act="buytvar" data-id="${tp.id}" ${S.coins < tp.price ? "disabled" : ""}>${S.coins < tp.price ? `Faltam ${tp.price - S.coins} gotas` : `Comprar por ${tp.price}`}</button></div></div>` : ""}
     <div class="seg wide" role="group">${[
       ["visual", "Visual"],
       ["pet", "Pet"],
@@ -151,5 +155,16 @@ function viewPrumi() {
   <section class="block">${body}</section>
   <section class="block"><details class="more"><summary>Como ganhar gotas</summary><div class="earnlist">
     <span>Concluir tarefa <b>+5</b> (prioridade alta <b>+8</b>)</span><span>Marcar hábito <b>+5</b></span><span>Bater a meta de água <b>+20</b></span>
-    <span>Revisão espaçada <b>+8</b></span><span>Foco: <b>+2</b> a cada 5 min</span><span>Fechar o dia <b>+10</b></span><span>Falar com alguém <b>+3</b></span><span>${textoMundo("diaPerfeito", "Dia perfeito")} <b>+25</b></span><span>Conquistas dão bônus e itens exclusivos</span></div></details></section>`;
+    <span>Revisão espaçada <b>+8</b></span><span>Foco: <b>+2</b> a cada 5 min</span><span>Fechar o dia <b>+10</b></span><span>Falar com alguém <b>+3</b></span><span>${textoMundo("diaPerfeito", "Dia perfeito")} <b>+25</b></span><span>Carinho no pet <b>+1</b> (até 10 por dia)</span><span>Conquistas dão bônus e itens exclusivos</span></div></details></section>
+  ${
+    ti && (prumiTab === "visual" || prumiTab === "pet")
+      ? `<div class="trybar flutua" role="region" aria-label="Provando item">${prumi({ mood: "happy", fill: 0, size: 40, eq })}<span>Provando <b>${esc(ti.name)}</b></span><div class="row"><button class="btn small ghost" data-act="untry">Tirar</button>${botaoComprar("buy", ti.id, ti.price)}</div></div>`
+      : ""
+  }
+  ${tp ? `<div class="trybar flutua" role="region" aria-label="Provando tema"><span>Provando o tema <b>${esc(tp.name)}</b></span><div class="row"><button class="btn small ghost" data-act="untry">Voltar</button>${botaoComprar("buytvar", tp.id, tp.price)}</div></div>` : ""}`;
+}
+/** Botão de comprar que aparece embaixo do item escolhido e na barrinha que fica presa embaixo da tela. */
+function botaoComprar(acao, id, preco) {
+  const falta = preco - S.coins;
+  return `<button class="btn small primary comprar-agora" data-act="${acao}" data-id="${esc(id)}" ${falta > 0 ? "disabled" : ""}>${falta > 0 ? `Faltam ${falta} gotas` : `Comprar ${DROP}${preco}`}</button>`;
 }

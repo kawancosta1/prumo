@@ -7,7 +7,11 @@
   - pula quando você conclui tarefa, dança quando bate a meta de água, comemora conquistas;
   - pede atenção quando você fica muito tempo sem beber água e traz na boca uma tarefa esquecida;
   - brinca de bolinha, de esconde-esconde (se esconde em outra aba) e encontra os outros pets;
-  - de vez em quando o pet de um amigo vem visitar.
+  - de vez em quando o pet de um amigo vem visitar;
+  - dá pra arrastar (ele fica pendurado e cai no chão ou em cima de um card) e segurar parado pra ele ronronar;
+  - come no potinho quando você dá comida; boceja, se espreguiça e pisca;
+  - cada espécie tem seu jeito: vaca pasta e toca o sininho, boi sai correndo, coala se pendura nos cards e dorme muito.
+  Ao rolar a página, quem estava em cima de um card desce pro chão (não fica "grudado" no card subindo junto).
   Respeita "Passear pelas páginas" (Ajustes do pet) e prefers-reduced-motion (fica parado num canto).
 */
 "use strict";
@@ -58,6 +62,7 @@ function criarAgente(pet, visitante) {
     ev.stopPropagation();
     tocarAgente(a);
   });
+  ligarArraste(a);
   camadaPasseio().appendChild(el);
   desenharAgente(a);
   posicionar(a, false);
@@ -75,7 +80,7 @@ function posicionar(a, animar = true, dur = 0) {
   a.el.style.transition = animar ? `transform ${dur.toFixed(2)}s linear` : "none";
   a.el.style.transform = `translate(${Math.round(a.x)}px, ${Math.round(a.y)}px)`;
 }
-function andarAte(a, x, y = chaoPasseio(), depois) {
+function andarAte(a, x, y = chaoPasseio(), depois, op = {}) {
   if (RM) {
     a.x = x;
     a.y = y;
@@ -83,11 +88,11 @@ function andarAte(a, x, y = chaoPasseio(), depois) {
     return depois && depois();
   }
   const pers = PERSONALIDADES_PET[a.pet.personalidade] || PERSONALIDADES_PET.curioso;
-  const vel = 60 * pers.vel * (tristinho(a.pet) ? 0.5 : 1); // px por segundo
+  const vel = 60 * pers.vel * (op.vel || 1) * (tristinho(a.pet) ? 0.5 : 1); // px por segundo
   const dist = Math.hypot(x - a.x, y - a.y);
   const dur = Math.max(0.3, dist / vel);
   a.dir = x >= a.x ? 1 : -1;
-  desenharAgente(a, "andando");
+  desenharAgente(a, op.pose || "andando");
   a.x = x;
   a.y = y;
   posicionar(a, true, dur);
@@ -106,6 +111,8 @@ function reagir(a, pose, ms = 1600) {
 }
 
 /** Um card visível pra subir em cima (o topo dele vira o chão do pet). */
+let ultimoScroll = 0;
+const rolouAgora = () => Date.now() - ultimoScroll < 2500;
 function cardParaSubir() {
   const cards = [...document.querySelectorAll("#main .block, #main .item, #main .cartao-mundo")].filter(
     el => {
@@ -118,12 +125,14 @@ function cardParaSubir() {
 function subirNoCard(a) {
   const card = cardParaSubir();
   if (!card) return false;
-  const r = card.getBoundingClientRect();
-  const x = Math.max(r.left, Math.min(r.right - PET_TAM, r.left + Math.random() * (r.width - PET_TAM)));
+  const r0 = card.getBoundingClientRect();
+  const dx = Math.max(0, Math.min(r0.width - PET_TAM, Math.random() * (r0.width - PET_TAM)));
   andarAte(a, a.x, chaoPasseio(), () => {
-    // pulo até o card
-    a.ancora = { el: card, dx: x - r.left };
-    a.x = x;
+    // pulo até o card (posição medida de novo: a página pode ter rolado no caminho)
+    const r = card.getBoundingClientRect();
+    if (rolouAgora() || !document.body.contains(card) || r.top < 70 || r.top > chaoPasseio() - 60) return;
+    a.ancora = { el: card, dx };
+    a.x = r.left + dx;
     a.y = r.top - PET_TAM * 0.8;
     desenharAgente(a, "pulando");
     posicionar(a, true, 0.45);
@@ -143,9 +152,16 @@ function seguirAncora(a) {
   if (!a.ancora) return;
   if (!document.body.contains(a.ancora.el)) return descer(a);
   const r = a.ancora.el.getBoundingClientRect();
+  if (a.ancora.lado) {
+    // coala pendurado na lateral do card
+    if (r.top < 40 || r.top > chaoPasseio() - 40) return descer(a);
+    a.x = r.left - PET_TAM * 0.42;
+    a.y = r.top + 8;
+    return posicionar(a, false);
+  }
   if (r.top < 40 || r.top > chaoPasseio() - 20) return descer(a);
   a.x = r.left + a.ancora.dx;
-  a.y = r.top - PET_TAM * 0.8;
+  a.y = r.top - PET_TAM * 0.8 + (a.ancora.alto || 0);
   posicionar(a, false);
 }
 
@@ -172,8 +188,8 @@ function decidir(a) {
     a.balao = "";
     desenharAgente(a, "parado");
   }
-  // foco: deita do lado do cronômetro
-  if (!a.visitante && typeof timer !== "undefined" && timer.running && tab === "estudos") {
+  // foco: deita do lado do cronômetro (coala abraça o cronômetro)
+  if (!a.visitante && !rolouAgora() && typeof timer !== "undefined" && timer.running && tab === "estudos") {
     const relogio = document.getElementById("clock");
     if (relogio) {
       const r = relogio.getBoundingClientRect();
@@ -181,7 +197,7 @@ function decidir(a) {
         a.ancora = { el: relogio, dx: r.width + 6 };
         a.x = r.right + 6;
         a.y = r.top - PET_TAM * 0.3;
-        desenharAgente(a, "deitado");
+        desenharAgente(a, pet.especie === "coala" ? "abracando" : "deitado");
         posicionar(a, true, 0.5);
         a.ocupadoAte = Date.now() + 15000;
         return;
@@ -195,13 +211,68 @@ function decidir(a) {
     return;
   }
   if (a.ancora && Math.random() < 0.5) return descer(a);
+  if (a.ancora) return reagir(a, Math.random() < 0.5 ? "sentado" : "parado", 3000);
   const r = Math.random();
-  if (r < pers.sono * 0.5) return reagir(a, "deitado", 5000 + Math.random() * 6000);
-  if (r < pers.sono * 0.5 + pers.curioso * 0.5 && subirNoCard(a)) return;
+  const sono = pers.sono * (pet.especie === "coala" ? 2.2 : 1);
+  // jeitos de cada espécie
+  if (pet.especie === "vaca" && r < 0.18) return pastar(a);
+  if (pet.especie === "boi" && r < 0.12) return corrida(a);
+  if (pet.especie === "coala" && r < 0.16 && !rolouAgora() && pendurarNoCard(a)) return;
+  // na aba Prumi: senta do lado do Prumi
+  if (tab === "prumi" && r > 0.85 && !rolouAgora() && sentarNoPrumi(a)) return;
+  if (r < sono * 0.5) return reagir(a, "deitado", 5000 + Math.random() * 6000);
+  if (r < sono * 0.5 + 0.06) return reagir(a, Math.random() < 0.5 ? "bocejando" : "espreguicando", 1800);
+  if (r < sono * 0.5 + 0.06 + pers.curioso * 0.5 && !rolouAgora() && subirNoCard(a)) return;
   if (r < 0.75) return andarAte(a, 8 + Math.random() * (W - PET_TAM - 16));
   if (r < 0.88) return reagir(a, "sentado", 3000 + Math.random() * 4000);
   if (pet.personalidade === "agitado") return reagir(a, "pulando", 900);
   reagir(a, "parado", 2000);
+}
+
+/* ---------- jeitos de cada espécie ---------- */
+function pastar(a) {
+  andarAte(a, 8 + Math.random() * (larguraTela() - PET_TAM - 16), chaoPasseio(), () => {
+    reagir(a, "pastando", 4500);
+    if (Math.random() < 0.3) somDoPet(a.pet, 0.5);
+  });
+}
+function corrida(a) {
+  const W = larguraTela();
+  const alvo = a.x < W / 2 ? W - PET_TAM - 8 : 8;
+  a.ancora = null;
+  andarAte(a, alvo, chaoPasseio(), () => reagir(a, "parado", 1200), { pose: "correndo", vel: 4 });
+}
+function pendurarNoCard(a) {
+  const card = cardParaSubir();
+  if (!card) return false;
+  const r = card.getBoundingClientRect();
+  if (r.left < PET_TAM * 0.5) return false;
+  andarAte(a, Math.max(0, r.left - PET_TAM * 0.42), chaoPasseio(), () => {
+    const r2 = card.getBoundingClientRect();
+    if (rolouAgora() || r2.top < 70 || r2.top > chaoPasseio() - 60) return;
+    a.ancora = { el: card, lado: true };
+    a.x = r2.left - PET_TAM * 0.42;
+    a.y = r2.top + 8;
+    desenharAgente(a, Math.random() < 0.5 ? "abracando" : "dormindo");
+    posicionar(a, true, 0.8);
+    a.ocupadoAte = Date.now() + 8000 + Math.random() * 8000;
+  });
+  return true;
+}
+function sentarNoPrumi(a) {
+  const palco = document.querySelector("#main .stage .mslot");
+  if (!palco) return false;
+  const r = palco.getBoundingClientRect();
+  if (r.top < 60 || r.bottom > chaoPasseio()) return false;
+  const dx = r.width - PET_TAM * 0.3;
+  a.ancora = { el: palco, dx, alto: r.height - PET_TAM * 0.05 }; // senta na base do Prumi, do lado direito
+  a.x = r.left + dx;
+  a.y = r.top - PET_TAM * 0.8 + a.ancora.alto;
+  desenharAgente(a, "pulando");
+  posicionar(a, true, 0.5);
+  setTimeout(() => desenharAgente(a, "sentado"), 500);
+  a.ocupadoAte = Date.now() + 7000;
+  return true;
 }
 function sonhoSVG(pet) {
   const s = {
@@ -211,6 +282,8 @@ function sonhoSVG(pet) {
     semente: `<ellipse cx="8" cy="8" rx="5" ry="3" fill="#D7CCC8" transform="rotate(-30 8 8)"/>`,
     lua: `<circle cx="8" cy="8" r="5" fill="#FFF59D"/><circle cx="10" cy="6.6" r="4.2" fill="#fff"/>`,
     nota: `<path d="M9 2v8a2.4 2 0 1 1-1.4-1.8V2h4v2.4H9z" fill="#424242"/>`,
+    capim: `<path d="M4 15l-1-8M8 15V4M12 15l2-9M6 15l-3-5M10 15l3-5" stroke="#43A047" stroke-width="1.6" stroke-linecap="round"/>`,
+    folha: `<path d="M3 13Q3 3 14 2Q13 13 3 13z" fill="#66BB6A"/><path d="M3 13L11 5" stroke="#2E7D32" stroke-width=".8"/>`,
     estrela: `<path d="M8 1l2 4.6 5 .5-3.8 3.4 1.1 4.9L8 11.8l-4.3 2.6 1.1-4.9L1 6.1l5-.5z" fill="#FFD54F"/>`
   }[ESPECIES_PET[pet.especie].sonho];
   return `<svg viewBox="0 0 16 16" width="18" height="18">${s || ""}</svg>`;
@@ -218,6 +291,7 @@ function sonhoSVG(pet) {
 
 /* ---------- toque no pet ---------- */
 function tocarAgente(a) {
+  if (a.ignorarClique) return;
   if (a.visitante) {
     reagir(a, "feliz", 1500);
     toast(`Você fez carinho no pet de ${a.pet.dono}!`);
@@ -238,11 +312,165 @@ function tocarAgente(a) {
     toast(`Shhh... ${a.pet.nome} tá sonhando.`);
     return;
   }
-  a.pet.carinhos[today()] = (a.pet.carinhos[today()] || 0) + 1;
-  cuidou(a.pet);
-  persist();
+  fazerCarinho(a.pet, a.el);
   somDoPet(a.pet, 0.8);
   reagir(a, "feliz", 1500);
+}
+
+/* ---------- arrastar e segurar ---------- */
+/** Para o pet onde ele está agora (no meio de uma caminhada a posição da tela é diferente de a.x). */
+function congelar(a) {
+  try {
+    const t = getComputedStyle(a.el).transform;
+    if (t && t !== "none" && typeof DOMMatrix === "function") {
+      const m = new DOMMatrix(t);
+      a.x = m.m41;
+      a.y = m.m42;
+    }
+  } catch (e) {}
+  clearTimeout(a.fimAndar);
+  clearTimeout(a.fimReacao);
+  posicionar(a, false);
+}
+function ligarArraste(a) {
+  const el = a.el;
+  el.addEventListener("pointerdown", ev => {
+    if (a.visitante || a.escondido || (ev.button && ev.button > 0)) return;
+    ev.stopPropagation();
+    const ini = { x: ev.clientX, y: ev.clientY };
+    let modo = null;
+    let ox = ev.clientX - a.x,
+      oy = ev.clientY - a.y;
+    try {
+      el.setPointerCapture(ev.pointerId);
+    } catch (e) {}
+    const segurar = setTimeout(() => {
+      if (modo || a.pose === "dormindo") return;
+      modo = "segura";
+      a.preso = true;
+      congelar(a);
+      desenharAgente(a, "ronronando");
+      somDoPet(a.pet, 0.5);
+      fazerCarinho(a.pet, el);
+      a.ronrona = setInterval(() => {
+        fazerCarinho(a.pet, el);
+        if (Math.random() < 0.4) somDoPet(a.pet, 0.4);
+      }, 1600);
+    }, 450);
+    const mover = e => {
+      if (!modo && Math.hypot(e.clientX - ini.x, e.clientY - ini.y) > 8) {
+        modo = "arrasta";
+        clearTimeout(segurar);
+        a.preso = true;
+        a.ancora = null;
+        a.balao = "";
+        congelar(a);
+        ox = e.clientX - a.x;
+        oy = e.clientY - a.y;
+        desenharAgente(a, "segurado");
+      }
+      if (modo !== "arrasta") return;
+      a.dir = e.clientX >= a.x + ox ? 1 : -1;
+      a.el.classList.toggle("vira", a.dir < 0);
+      a.x = Math.max(0, Math.min(larguraTela() - PET_TAM, e.clientX - ox));
+      a.y = Math.max(0, Math.min(chaoPasseio(), e.clientY - oy));
+      posicionar(a, false);
+    };
+    const soltar = () => {
+      clearTimeout(segurar);
+      clearInterval(a.ronrona);
+      el.removeEventListener("pointermove", mover);
+      el.removeEventListener("pointerup", soltar);
+      el.removeEventListener("pointercancel", soltar);
+      if (!modo) return; // foi só um toque: o clique faz carinho
+      a.ignorarClique = true;
+      setTimeout(() => (a.ignorarClique = false), 60);
+      a.preso = false;
+      if (modo === "segura") return reagir(a, "feliz", 1200);
+      soltarPet(a);
+    };
+    el.addEventListener("pointermove", mover);
+    el.addEventListener("pointerup", soltar);
+    el.addEventListener("pointercancel", soltar);
+  });
+}
+/** Soltou no ar: cai no card que estiver embaixo (e fica em cima dele) ou no chão. */
+function soltarPet(a) {
+  const meio = a.x + PET_TAM / 2;
+  const card = [...document.querySelectorAll("#main .block, #main .item, #main .cartao-mundo")].find(el => {
+    const r = el.getBoundingClientRect();
+    return (
+      meio > r.left &&
+      meio < r.right &&
+      r.top > a.y + PET_TAM * 0.4 &&
+      r.top > 70 &&
+      r.top < chaoPasseio() - 40
+    );
+  });
+  const chao = chaoPasseio();
+  let y = chao;
+  if (card) {
+    const r = card.getBoundingClientRect();
+    a.ancora = { el: card, dx: a.x - r.left };
+    y = r.top - PET_TAM * 0.8;
+  }
+  const dur = RM ? 0 : Math.min(0.7, Math.max(0.2, Math.sqrt(Math.max(0, y - a.y) / 900)));
+  a.y = y;
+  desenharAgente(a, "pulando");
+  a.el.style.transition = dur ? `transform ${dur.toFixed(2)}s cubic-bezier(.55,0,1,.45)` : "none";
+  a.el.style.transform = `translate(${Math.round(a.x)}px, ${Math.round(a.y)}px)`;
+  a.ocupadoAte = Date.now() + dur * 1000 + 2500;
+  clearTimeout(a.fimReacao);
+  a.fimReacao = setTimeout(() => desenharAgente(a, card ? "sentado" : "parado"), dur * 1000 + 300);
+}
+
+/* ---------- potinho de comida e abraço ---------- */
+function passeioComer(id) {
+  const a = passeio.agentes.get(id);
+  if (!a || a.escondido || a.pose === "dormindo") return;
+  const W = larguraTela(),
+    chao = chaoPasseio();
+  const pote = document.createElement("span");
+  pote.className = "pet-pote";
+  const bx = Math.max(10, Math.min(W - 40, a.x + (a.x < W / 2 ? 90 : -70)));
+  pote.style.transform = `translate(${Math.round(bx)}px, ${Math.round(chao + PET_TAM * 0.62)}px)`;
+  camadaPasseio().appendChild(pote);
+  a.ancora = null;
+  a.preso = true;
+  const lado = bx > a.x ? -PET_TAM + 6 : 22;
+  andarAte(
+    a,
+    bx + lado,
+    chao,
+    () => {
+      a.dir = bx > a.x ? 1 : -1;
+      reagir(a, "comendo", 2600);
+      setTimeout(() => {
+        a.preso = false;
+        pote.classList.add("vazio");
+        setTimeout(() => pote.remove(), 700);
+        reagir(a, "feliz", 1200);
+      }, 2600);
+    },
+    { vel: 1.8 }
+  );
+}
+function passeioAbraco(id) {
+  const a = passeio.agentes.get(id);
+  if (!a || a.escondido) return;
+  a.ancora = null;
+  a.preso = true;
+  congelar(a);
+  a.x = larguraTela() / 2 - PET_TAM / 2;
+  a.y = innerHeight * 0.38;
+  desenharAgente(a, "abracando");
+  posicionar(a, true, 0.4);
+  a.el.classList.add("na-tela");
+  setTimeout(() => {
+    a.el.classList.remove("na-tela");
+    a.preso = false;
+    descer(a);
+  }, 2600);
 }
 
 /* ---------- bolinha ---------- */
@@ -342,10 +570,8 @@ function passeioAtualizar() {
       if (tab === p.esconde.aba) {
         const card = cardParaSubir();
         if (card) {
-          const r = card.getBoundingClientRect();
-          a.x = r.right - PET_TAM * 0.55;
-          a.y = r.top + 6;
-          posicionar(a, false);
+          a.ancora = { el: card, escondido: true };
+          seguirEscondido(a);
         }
       }
     } else {
@@ -363,6 +589,14 @@ function passeioAtualizar() {
 }
 window.passeioAtualizar = passeioAtualizar;
 
+/** Escondido atrás de um card: acompanha o card quando a página rola. */
+function seguirEscondido(a) {
+  if (!a.ancora || !document.body.contains(a.ancora.el)) return;
+  const r = a.ancora.el.getBoundingClientRect();
+  a.x = r.right - PET_TAM * 0.55;
+  a.y = r.top + 6;
+  posicionar(a, false);
+}
 function passeioReagir(id, pose, ms) {
   const a = passeio.agentes.get(id);
   if (a && !a.escondido) reagir(a, pose, ms);
@@ -374,7 +608,7 @@ let ultimoPedidoAgua = 0,
 function cicloPasseio() {
   if (document.hidden) return;
   const agentes = [...passeio.agentes.values()].filter(a => !a.escondido && !a.el.hidden);
-  agentes.forEach(a => (a.ancora ? seguirAncora(a) : null));
+  agentes.forEach(a => (a.ancora && !a.preso ? seguirAncora(a) : null));
   agentes.forEach(decidir);
   // dois pets perto: brincam
   for (let i = 0; i < agentes.length; i++)
@@ -446,16 +680,21 @@ function visitaDeAmigo() {
 /* ---------- eventos do app ---------- */
 document.addEventListener("prumo:concluiu", () => {
   petTarefaConcluida();
-  for (const a of passeio.agentes.values())
-    if (!a.escondido && a.pose !== "dormindo")
-      reagir(a, a.pet.personalidade === "dramatico" ? "girando" : "pulando", 1000);
+  for (const a of passeio.agentes.values()) {
+    if (a.escondido || a.pose === "dormindo" || a.preso) continue;
+    if (a.pet.especie === "vaca") {
+      if (typeof tocarSininho === "function") tocarSininho();
+      reagir(a, "sininho", 1800);
+    } else if (a.pet.especie === "boi") corrida(a);
+    else reagir(a, a.pet.personalidade === "dramatico" ? "girando" : "pulando", 1000);
+  }
 });
 document.addEventListener("prumo:agua", ev => {
   for (const a of passeio.agentes.values())
     if (!a.escondido && a.pose !== "dormindo")
       reagir(
         a,
-        ev.detail && ev.detail.meta ? "dancando" : "comendo",
+        ev.detail && ev.detail.meta ? (a.pet.especie === "vaca" ? "sininho" : "dancando") : "comendo",
         ev.detail && ev.detail.meta ? 2400 : 1200
       );
 });
@@ -475,8 +714,8 @@ document.addEventListener("click", ev => {
   });
 });
 
-// tocar num lugar vazio: o pet vai até lá
-document.addEventListener("pointerdown", ev => {
+// tocar num lugar vazio: o pet vai até lá (clique, não pointerdown: no celular o pointerdown dispara ao rolar a página)
+document.addEventListener("click", ev => {
   if (
     !passeio.agentes.size ||
     ev.target.closest(
@@ -484,6 +723,7 @@ document.addEventListener("pointerdown", ev => {
     )
   )
     return;
+  if (rolouAgora() || (getSelection && String(getSelection()).length)) return;
   const a = passeio.agentes.get(petsDados().ativo) || [...passeio.agentes.values()][0];
   if (!a || a.escondido || a.pose === "dormindo" || a.preso) return;
   a.ancora = null;
@@ -514,9 +754,19 @@ document.addEventListener("visibilitychange", () => {
     descer(a);
   }, 2600);
 });
-addEventListener("scroll", () => passeio.agentes.forEach(a => a.ancora && seguirAncora(a)), {
-  passive: true
-});
+// rolou a página (a janela ou qualquer caixa com rolagem): quem estava em cima de card desce pro chão
+addEventListener(
+  "scroll",
+  ev => {
+    if (ev.target && ev.target.closest && ev.target.closest("#pets-passeio")) return;
+    ultimoScroll = Date.now();
+    passeio.agentes.forEach(a => {
+      if (a.escondido) return seguirEscondido(a);
+      if (a.ancora && !a.preso) descer(a);
+    });
+  },
+  { passive: true, capture: true }
+);
 addEventListener("resize", () =>
   passeio.agentes.forEach(a => !a.ancora && ((a.y = chaoPasseio()), posicionar(a, false)))
 );

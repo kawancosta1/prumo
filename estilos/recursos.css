@@ -2724,3 +2724,60 @@ button.top8-item {
   border-color: var(--accent);
   color: #fff;
 }
+
+/* loja: comprar direto embaixo do item escolhido e barrinha presa embaixo da tela */
+.sitem-caixa {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.sitem-caixa > .sitem {
+  flex: 1;
+}
+.comprar-agora {
+  justify-content: center;
+  gap: 4px;
+  animation: drop 0.25s ease-out;
+}
+.comprar-agora .drop {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+.trybar.flutua {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 40;
+  width: min(560px, calc(100% - 24px));
+  border-style: solid;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 6px 8px;
+  animation: barra-sobe 0.3s ease-out;
+}
+@keyframes barra-sobe {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px);
+  }
+}
+.trybar.flutua > span {
+  flex: 1;
+  min-width: 0;
+}
+.trybar.flutua .prumi {
+  flex: none;
+}
+@media (max-width: 699px) {
+  .trybar.flutua {
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .comprar-agora,
+  .trybar.flutua {
+    animation: none;
+  }
+}

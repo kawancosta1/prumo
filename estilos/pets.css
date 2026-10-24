@@ -20,6 +20,12 @@
   cursor: pointer;
   will-change: transform;
   -webkit-tap-highlight-color: transparent;
+  touch-action: none; /* arrastar o pet não rola a página */
+  user-select: none;
+  -webkit-user-select: none;
+}
+.pet-agente:active {
+  cursor: grabbing;
 }
 .pet-agente svg {
   display: block;
@@ -283,6 +289,184 @@
   }
 }
 
+/* piscar */
+.pet-svg .olho {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: piscar-pet 5s infinite;
+}
+.pet-agente:nth-child(2) .olho {
+  animation-delay: 1.7s;
+}
+.pet-agente:nth-child(3) .olho {
+  animation-delay: 3.1s;
+}
+@keyframes piscar-pet {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.1);
+  }
+}
+/* bocejar e espreguiçar */
+.pose-bocejando .pet-corpo {
+  transform-origin: bottom center;
+  animation: bocejo-pet 1.8s ease-in-out;
+}
+@keyframes bocejo-pet {
+  40%,
+  70% {
+    transform: scale(1.04, 1.06) translateY(-1px);
+  }
+}
+.pose-espreguicando .pet-corpo {
+  transform-origin: bottom right;
+  animation: espreguica-pet 1.6s ease-in-out;
+}
+@keyframes espreguica-pet {
+  40%,
+  70% {
+    transform: scaleX(1.14) rotate(7deg);
+  }
+}
+/* pastar: cabeça baixa no capim */
+.pose-pastando .pet-corpo {
+  transform-origin: bottom left;
+  animation: pastar-pet 0.9s ease-in-out infinite alternate;
+}
+@keyframes pastar-pet {
+  from {
+    transform: rotate(6deg) translateY(2px);
+  }
+  to {
+    transform: rotate(9deg) translateY(2.6px);
+  }
+}
+.pet-svg .capim {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: capim 1.2s ease-in-out infinite alternate;
+}
+@keyframes capim {
+  to {
+    transform: skewX(8deg);
+  }
+}
+/* correr (boi) */
+.pose-correndo .perna {
+  transform-origin: top center;
+  animation: perna 0.14s ease-in-out infinite alternate;
+}
+.pose-correndo .perna.p2,
+.pose-correndo .perna.p4 {
+  animation-direction: alternate-reverse;
+}
+.pose-correndo .pet-corpo {
+  transform-origin: bottom center;
+  animation: bob 0.14s ease-in-out infinite alternate;
+  transform: rotate(4deg);
+}
+.pet-svg .poeira {
+  animation: poeira 0.4s ease-out infinite;
+}
+@keyframes poeira {
+  to {
+    transform: translateX(-5px) scale(1.4);
+    opacity: 0;
+  }
+}
+/* sininho (vaca) */
+.pose-sininho .pet-corpo {
+  transform-origin: bottom center;
+  animation: dancar-pet 0.35s ease-in-out infinite alternate;
+}
+.pet-svg .sino {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+.pose-sininho .sino,
+.pose-andando .sino {
+  animation: sino-balanca 0.35s ease-in-out infinite alternate;
+}
+@keyframes sino-balanca {
+  from {
+    transform: rotate(-18deg);
+  }
+  to {
+    transform: rotate(18deg);
+  }
+}
+.pet-svg .nota-pet {
+  animation: coracao-sobe 1.2s ease-out infinite;
+}
+.pet-svg .nota-pet.n2 {
+  animation-delay: 0.5s;
+}
+/* abraço (coala) e ronronar */
+.pose-abracando .pet-corpo {
+  transform-origin: bottom center;
+  animation: abraco-pet 1.2s ease-in-out infinite;
+}
+@keyframes abraco-pet {
+  50% {
+    transform: scale(1.05, 0.96);
+  }
+}
+.pose-ronronando .pet-corpo {
+  animation: ronrona 0.12s linear infinite alternate;
+}
+@keyframes ronrona {
+  to {
+    transform: translateX(0.5px);
+  }
+}
+.pose-ronronando .olho {
+  animation: none;
+  transform: scaleY(0.25);
+}
+/* pendurado na mão */
+.pose-segurado .pet-corpo {
+  transform-origin: top center;
+  animation: pendurado 0.9s ease-in-out infinite alternate;
+}
+.pose-segurado .perna {
+  transform-origin: top center;
+  transform: scaleY(1.25);
+}
+@keyframes pendurado {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+/* potinho de comida */
+.pet-pote {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 26px;
+  height: 12px;
+  border-radius: 3px 3px 12px 12px;
+  background: linear-gradient(#e53935 0 30%, #c62828 30%);
+  box-shadow: inset 0 3px 0 #8d6e63;
+  animation: pote-chega 0.3s ease-out;
+  transition: opacity 0.6s;
+}
+.pet-pote.vazio {
+  opacity: 0;
+}
+@keyframes pote-chega {
+  from {
+    opacity: 0;
+    margin-top: -14px;
+  }
+}
+
 /* ===================== painel (aba Prumi → Pet) ===================== */
 .pet-painel,
 .pet-adocao {
@@ -353,6 +537,39 @@
 .pet-loja-linha .row {
   flex-wrap: wrap;
   gap: 6px;
+}
+.pet-comprar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  border: 1px dashed var(--accent);
+  border-radius: 12px;
+  font-size: 13px;
+  animation: drop 0.25s ease-out;
+}
+.pet-comprar span {
+  flex: 1;
+  min-width: 120px;
+}
+.chip-bt.provando {
+  border-style: dashed;
+  border-color: var(--accent);
+}
+.pet-especial {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.pet-especial > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 .pet-album {
   display: grid;
@@ -439,6 +656,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pet-svg *,
+  .pet-pote,
   .pet-balao {
     animation: none !important;
   }
