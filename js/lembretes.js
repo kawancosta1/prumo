@@ -132,9 +132,9 @@ function agendarSyncLembretes() {
 // a cada mudança salva (beber água, concluir tarefa...) e de hora em hora (a janela anda)
 {
   const persistAntes = persist;
-  persist = function () {
-    persistAntes();
-    agendarSyncLembretes();
+  persist = function (silencioso) {
+    persistAntes(silencioso);
+    if (silencioso !== true) agendarSyncLembretes();
   };
   setInterval(agendarSyncLembretes, 36e5);
 }

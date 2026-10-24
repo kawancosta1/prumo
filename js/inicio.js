@@ -18,6 +18,7 @@ try {
   if (c && c.state) {
     S = normalize(c.state);
     updatedAt = c.updatedAt || 0;
+    sujo = c.sujo === true || (c.sujo === undefined && (!base || base.updatedAt !== updatedAt)); // mudanças ainda não mandadas
   }
 } catch (e) {}
 

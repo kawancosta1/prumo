@@ -834,7 +834,7 @@ function conferirAniversarioPet() {
         });
         bigConfetti();
       }, 2500);
-      persist();
+      persist(true);
     }
   }
 }

@@ -874,7 +874,7 @@ function conferirBagunca() {
   }
   if (e.ultimaVisita !== today()) {
     e.ultimaVisita = today();
-    persist();
+    persist(true); // automático: não disputa com a nuvem na abertura
   }
 }
 document.addEventListener("DOMContentLoaded", conferirBagunca);

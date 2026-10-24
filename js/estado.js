@@ -73,6 +73,8 @@ const blank = () => ({
   paid: {},
   stats: { tasks: 0, water: 0, focus: 0, reviews: 0, talked: 0, perfect: 0, closed: 0 },
   carinho: {},
+  relatarErros: false,
+  resumoVisto: "",
   perfil: perfilPadrao(), // perfil estilo MySpace/Orkut/MSN
   fotolog: [], // fotos do Fotolog, uma por dia fechado
   sons: { chuva: true, pagina: true }, // sons do clima no emo (js/sons.js)
@@ -262,6 +264,83 @@ let ref = null,
   saveTimer = null,
   lastPushed = 0;
 
+/*
+  Sincronização que junta mudanças (em vez de "o mais novo apaga o outro"):
+  - base: a última versão que este aparelho e a nuvem tinham iguais (fica em localStorage, "prumo-base").
+  - sujo: este aparelho mudou algo desde a base e ainda não mandou.
+  Quando chega uma versão nova da nuvem e este aparelho também mudou, junta as duas com mesclar(base, aqui, nuvem):
+  o que só um lado mudou fica; listas com id (tarefas, livros, hábitos...) juntam item por item, inclusive apagados.
+  Não depende do relógio dos aparelhos: a versão da nuvem é reconhecida pelo número dela (updatedAt), não por ser maior.
+*/
+const LS_BASE = "prumo-base";
+let base = null, // { state, updatedAt }
+  sujo = false;
+try {
+  const b = JSON.parse(lsGet(LS_BASE) || "null");
+  if (b && b.state && typeof b.updatedAt === "number") base = b;
+} catch (e) {}
+function guardarBase(state, versao) {
+  base = { state: JSON.parse(JSON.stringify(state)), updatedAt: versao };
+  lsSet(LS_BASE, JSON.stringify(base));
+}
+
+const iguais = (a, b) => a === b || JSON.stringify(a) === JSON.stringify(b);
+const objetoSimples = x => x && typeof x === "object" && !Array.isArray(x);
+const listaComId = x =>
+  Array.isArray(x) &&
+  x.length > 0 &&
+  x.every(i => objetoSimples(i) && (typeof i.id === "string" || typeof i.id === "number"));
+/** Junta três versões: b (base comum), l (este aparelho) e r (nuvem). */
+function mesclar(b, l, r) {
+  if (iguais(l, r)) return l;
+  if (iguais(l, b)) return r; // só a nuvem mudou
+  if (iguais(r, b)) return l; // só aqui mudou
+  // os dois mudaram
+  if (
+    (listaComId(l) || l?.length === 0) &&
+    (listaComId(r) || r?.length === 0) &&
+    (b === undefined || Array.isArray(b))
+  ) {
+    const porId = lista => new Map((lista || []).filter(objetoSimples).map(i => [String(i.id), i]));
+    const B = porId(b),
+      L = porId(l),
+      R = porId(r);
+    const ordem = [...R.keys(), ...[...L.keys()].filter(k => !R.has(k))];
+    const saida = [];
+    for (const id of ordem) {
+      const bi = B.get(id),
+        li = L.get(id),
+        ri = R.get(id);
+      if (li && ri) saida.push(mesclar(bi, li, ri));
+      else if (li && !ri) {
+        if (!bi || !iguais(bi, li)) saida.push(li); // novo aqui (ou mudou aqui e foi apagado lá: fica)
+      } else if (ri && !li) {
+        if (!bi || !iguais(bi, ri)) saida.push(ri); // novo lá (ou mudou lá e foi apagado aqui: fica)
+      }
+    }
+    return saida;
+  }
+  if (objetoSimples(l) && objetoSimples(r)) {
+    const bb = objetoSimples(b) ? b : {};
+    const saida = {};
+    for (const k of new Set([...Object.keys(l), ...Object.keys(r)])) {
+      const temL = k in l,
+        temR = k in r,
+        temB = k in bb;
+      if (temL && temR) saida[k] = mesclar(bb[k], l[k], r[k]);
+      else if (temL) {
+        if (!temB || !iguais(bb[k], l[k])) saida[k] = l[k]; // novo aqui
+      } else if (temR) {
+        if (!temB || !iguais(bb[k], r[k])) saida[k] = r[k]; // novo lá
+      }
+    }
+    return saida;
+  }
+  const vazio = x => x === "" || x === null || x === undefined;
+  if (vazio(l) && !vazio(r)) return r; // um lado em branco e o outro preenchido: fica o preenchido (nome, @...)
+  return l; // valor simples mudado nos dois: fica o deste aparelho (a mudança mais recente que a pessoa vê)
+}
+
 function prune() {
   const lim = addDays(today(), -150);
   S.sessions = S.sessions.filter(s => s.date >= lim);
@@ -281,11 +360,20 @@ function prune() {
   S.reviews = S.reviews.filter(r => !(r.done && r.last && r.last < lim));
 }
 
-function persist() {
+/**
+ * Salva. silencioso = mudança automática do app (não da pessoa): fica no aparelho e vai junto
+ * na próxima mudança de verdade, sem disputar com a nuvem na abertura do app.
+ */
+function persist(silencioso) {
+  if (silencioso === true) {
+    lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt, sujo }));
+    return;
+  }
   if (typeof publicarPerfil === "function") publicarPerfil();
-  updatedAt = Date.now();
+  updatedAt = Math.max(Date.now(), (base ? base.updatedAt : 0) + 1, updatedAt + 1);
+  sujo = true;
   prune();
-  const texto = JSON.stringify({ state: S, updatedAt });
+  const texto = JSON.stringify({ state: S, updatedAt, sujo });
   lsSet(LS_KEY, texto);
   tamanhoDados = texto.length;
   avisarTamanho();
@@ -344,13 +432,22 @@ function commit() {
   }
 }
 
+let nuvemVista = false; // só manda pra nuvem depois de ver o que já está lá (senão um aparelho atrasado apaga o resto)
 function push() {
+  if (!nuvemVista) return;
   const body = { state: JSON.parse(JSON.stringify(S)), updatedAt };
   lastPushed = updatedAt;
   writing = writing
     .then(() => ref.set(body))
     .then(
-      () => setSync("ok"),
+      () => {
+        guardarBase(body.state, body.updatedAt);
+        if (updatedAt === body.updatedAt) {
+          sujo = false;
+          lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt, sujo }));
+        }
+        setSync("ok");
+      },
       e => {
         const grande = e && e.code === "invalid-argument";
         setSync(grande || (e && e.code === "invalid_argument") ? "local" : "err");
@@ -424,6 +521,7 @@ function ligarBanco(db, uid, caminho) {
   ref.onSnapshot(
     snap => {
       if (snap.metadata && snap.metadata.hasPendingWrites) return;
+      nuvemVista = true;
       if (!snap.exists) {
         if (hasData()) push();
         setSync("ok");
@@ -436,15 +534,7 @@ function ligarBanco(db, uid, caminho) {
         markReady();
         return;
       }
-      if ((d.updatedAt || 0) > updatedAt) {
-        S = normalize(JSON.parse(JSON.stringify(d.state)));
-        updatedAt = d.updatedAt;
-        lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt }));
-        applyTheme();
-        softRender();
-      } else if (updatedAt > (d.updatedAt || 0) && updatedAt !== lastPushed) {
-        push();
-      }
+      receberDaNuvem(d);
       markReady();
     },
     () => {
@@ -452,6 +542,55 @@ function ligarBanco(db, uid, caminho) {
       markReady();
     }
   );
+}
+
+/** Uma versão da nuvem chegou: decide se usa, se junta ou se manda a daqui. */
+function receberDaNuvem(d) {
+  const versao = d.updatedAt || 0;
+  if (base && versao === base.updatedAt) {
+    // nada novo na nuvem
+    if (sujo && updatedAt !== lastPushed) push();
+    return;
+  }
+  if (versao === updatedAt && !sujo) {
+    guardarBase(d.state, versao); // já é igual ao daqui
+    return;
+  }
+  const remoto = JSON.parse(JSON.stringify(d.state));
+  if (!sujo) {
+    // só a nuvem mudou: usa a da nuvem
+    S = normalize(remoto);
+    updatedAt = versao;
+    guardarBase(remoto, versao);
+    lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt, sujo }));
+    applyTheme();
+    softRender();
+    return;
+  }
+  if (!base) {
+    // primeira vez com a sincronização nova: sem base, junta tudo (nada some); no que for diferente, vale o mais novo
+    const novoAqui = updatedAt >= versao;
+    const local = JSON.parse(JSON.stringify(S));
+    S = normalize(novoAqui ? mesclar(undefined, local, remoto) : mesclar(undefined, remoto, local));
+    guardarBase(remoto, versao);
+    updatedAt = Math.max(Date.now(), versao + 1, updatedAt + 1);
+    sujo = true;
+    lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt, sujo }));
+    applyTheme();
+    softRender();
+    push();
+    return;
+  }
+  // os dois lados mudaram: junta
+  const junto = mesclar(JSON.parse(JSON.stringify(base.state)), JSON.parse(JSON.stringify(S)), remoto);
+  S = normalize(junto);
+  guardarBase(remoto, versao);
+  updatedAt = Math.max(Date.now(), versao + 1, updatedAt + 1);
+  sujo = true;
+  lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt, sujo }));
+  applyTheme();
+  softRender();
+  push();
 }
 
 const hasData = () =>

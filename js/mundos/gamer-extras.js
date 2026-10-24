@@ -188,7 +188,7 @@ MUNDO_FX.gamer = {
     if (waterToday() >= S.waterGoal && !d.aguaDias.includes(today())) {
       d.aguaDias.push(today());
       baterNoBoss(10, "meta de água");
-      setTimeout(persist, 0);
+      setTimeout(() => persist(true), 0);
     }
     return cartaoMundo(
       "cm-boss",

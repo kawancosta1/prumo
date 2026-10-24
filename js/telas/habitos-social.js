@@ -123,7 +123,9 @@ function personRow(p, t) {
 
   const metaItems = [];
   if (n === null) {
-    metaItems.push(`<span class="${p.every ? "due soon" : ""}" style="${p.every ? "padding:1px 6px" : ""}">Sem registro de contato</span>`);
+    metaItems.push(
+      `<span class="${p.every ? "due soon" : ""}" style="${p.every ? "padding:1px 6px" : ""}">Sem registro de contato</span>`
+    );
   } else if (n === 0) {
     metaItems.push(`<span>Falou hoje</span>`);
   } else {

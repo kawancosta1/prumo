@@ -929,11 +929,12 @@ function quartoSVG(d = minhaEstante()) {
     direita: { x: 154, y: 34 }
   }[posPoster] || { x: 120, y: 30 };
 
-  const petCoord = {
-    cama: temCama ? { x: 104, y: chaoY - 48 } : { x: 76, y: chaoY - 36 },
-    tapete: { x: 80, y: chaoY + 12 },
-    chao: { x: 154, y: chaoY + 12 }
-  }[posPet] || (temCama ? { x: 104, y: chaoY - 48 } : { x: 76, y: chaoY - 36 });
+  const petCoord =
+    {
+      cama: temCama ? { x: 104, y: chaoY - 48 } : { x: 76, y: chaoY - 36 },
+      tapete: { x: 80, y: chaoY + 12 },
+      chao: { x: 154, y: chaoY + 12 }
+    }[posPet] || (temCama ? { x: 104, y: chaoY - 48 } : { x: 76, y: chaoY - 36 });
 
   const leitor = prumi({
     mood: lendo ? "focus" : "happy",

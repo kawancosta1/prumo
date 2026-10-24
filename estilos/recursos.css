@@ -1476,7 +1476,8 @@ form[data-form="depoimento"] {
   background: repeating-conic-gradient(#141416 0 25%, #f2f2f2 0 50%) 0 0 / 22px 22px;
 }
 .perfil-ms[data-layout="oncinha"] {
-  background: radial-gradient(ellipse 7px 5px at 25% 30%, #3a2416 55%, transparent 60%),
+  background:
+    radial-gradient(ellipse 7px 5px at 25% 30%, #3a2416 55%, transparent 60%),
     radial-gradient(ellipse 6px 8px at 70% 65%, #3a2416 55%, transparent 60%),
     radial-gradient(ellipse 9px 6px at 25% 30%, #8a5a2a 70%, transparent 74%),
     radial-gradient(ellipse 8px 10px at 70% 65%, #8a5a2a 70%, transparent 74%), #e2b878;
@@ -1490,7 +1491,8 @@ form[data-form="depoimento"] {
     #141a33;
 }
 .perfil-ms[data-layout="coracoes"] {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M10 15l-5-4.6a3 3 0 0 1 5-3.2 3 3 0 0 1 5 3.2z' fill='%23FF4FB0'/%3E%3Cpath d='M27 33l-4-3.7a2.4 2.4 0 0 1 4-2.6 2.4 2.4 0 0 1 4 2.6z' fill='%23C8102E'/%3E%3C/svg%3E"),
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M10 15l-5-4.6a3 3 0 0 1 5-3.2 3 3 0 0 1 5 3.2z' fill='%23FF4FB0'/%3E%3Cpath d='M27 33l-4-3.7a2.4 2.4 0 0 1 4-2.6 2.4 2.4 0 0 1 4 2.6z' fill='%23C8102E'/%3E%3C/svg%3E"),
     color-mix(in srgb, #ff8fcb 22%, var(--bg));
 }
 .perfil-ms[data-layout="xadrez"] .ms-topo,

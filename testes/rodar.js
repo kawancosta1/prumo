@@ -35,6 +35,7 @@ const servidor = http.createServer((req, res) => {
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
     ["Pets", () => require("./pets")(url)],
+    ["Sincronia", () => require("./sincronia")(url)],
     ["Leitura com amigos", () => require("./juntos")(url)],
     ["Mudança de endereço", () => require("./mudanca")(url)],
     ["Carteiro dos lembretes", () => require("./carteiro")()]
