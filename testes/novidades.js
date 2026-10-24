@@ -42,7 +42,7 @@ module.exports = async url => {
   // revisão da semana (domingo)
   ok(
     ev(
-      `[5, 6].includes((new Date().getDay() + 6) % 7) ? !!revisaoPendente() || !!S.organizar.revisao : revisaoPendente() === null`
+      `[6, 0].includes((new Date().getDay() + 6) % 7) ? !!revisaoPendente() || !!S.organizar.revisao : revisaoPendente() === null`
     ),
     "revisão da semana só no domingo e na segunda"
   );
