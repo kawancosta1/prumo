@@ -1,0 +1,450 @@
+/* Organizar (js/organizar.js), hábitos e água (js/habitos-mais.js), busca e app (js/app-mais.js),
+   amigos (js/social-mais.js) e pets (js/pets-evolucao.js) */
+
+/* ---------- Hoje: planejar, revisão, reta final ---------- */
+.plano-chamar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  cursor: pointer;
+  border: 1px dashed var(--accent);
+  font: inherit;
+  color: var(--ink);
+}
+.plano-dia,
+.revisao-semana {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.plano-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-left: 2px solid var(--accent-soft, var(--line));
+  padding-left: 12px;
+}
+.plano-lista li {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 14px;
+}
+.plano-lista li.fixa .plano-titulo {
+  font-weight: 700;
+}
+.plano-lista li.tarde {
+  opacity: 0.55;
+}
+.plano-titulo {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.revisao-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.revisao-lista li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+.revisao-lista .row {
+  gap: 4px;
+}
+.reta-final {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.reta-final .col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  min-width: 0;
+}
+.reta-num {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  background: var(--accent);
+  color: var(--bg);
+  line-height: 1;
+}
+.reta-num b {
+  font-size: 24px;
+}
+.reta-num span {
+  font-size: 11px;
+}
+
+/* ---------- hábitos: folga ---------- */
+.heat i.folga {
+  background: color-mix(in srgb, #4fc3f7 35%, var(--sunken));
+  position: relative;
+}
+.heat i.folga::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.8;
+}
+.folga-row {
+  margin-top: 10px;
+}
+
+/* ---------- água no mês ---------- */
+.agua-mes {
+  display: flex;
+  gap: 6px;
+}
+.agua-mes-dias {
+  display: grid;
+  grid-template-rows: repeat(7, 18px);
+  gap: 4px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.agua-mes-dias span {
+  display: flex;
+  align-items: center;
+}
+.agua-mes-grade {
+  display: grid;
+  grid-template-rows: repeat(7, 18px);
+  grid-auto-flow: column;
+  grid-auto-columns: 18px;
+  gap: 4px;
+}
+.agua-mes-grade i,
+.agua-mes-legenda i {
+  border-radius: 4px;
+  background: var(--sunken);
+}
+.agua-mes-grade i.fut {
+  background: transparent;
+}
+.agua-mes-grade i.hoje {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+.agua-mes i.n1,
+.agua-mes-legenda i.n1 {
+  background: color-mix(in srgb, var(--water) 25%, var(--sunken));
+}
+.agua-mes i.n2,
+.agua-mes-legenda i.n2 {
+  background: color-mix(in srgb, var(--water) 50%, var(--sunken));
+}
+.agua-mes i.n3,
+.agua-mes-legenda i.n3 {
+  background: color-mix(in srgb, var(--water) 75%, var(--sunken));
+}
+.agua-mes i.n4,
+.agua-mes-legenda i.n4 {
+  background: var(--water);
+}
+.agua-mes-legenda {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.agua-mes-legenda i {
+  width: 12px;
+  height: 12px;
+}
+
+/* ---------- busca ---------- */
+.busca-geral {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgb(0 0 0 / 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 10vh 12px 12px;
+  animation: busca-entra 0.18s ease-out;
+}
+@keyframes busca-entra {
+  from {
+    opacity: 0;
+  }
+}
+.busca-cartao {
+  width: min(560px, 100%);
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.3);
+  overflow: hidden;
+}
+.busca-campo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+}
+.busca-campo input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ink);
+  outline: none;
+  padding: 8px 0;
+}
+.busca-lista {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+}
+.busca-lista button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 10px;
+  text-align: left;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--ink);
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.busca-lista button:hover,
+.busca-lista button:focus-visible,
+.busca-lista button.sel {
+  background: var(--sunken);
+}
+.busca-lista .note {
+  grid-column: 2;
+}
+.busca-tipo {
+  grid-row: span 2;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  align-self: center;
+  min-width: 56px;
+}
+.busca-titulo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.busca-dica {
+  padding: 14px 10px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---------- Ajustes: volume ---------- */
+.volume-app {
+  width: 140px;
+  accent-color: var(--accent);
+}
+
+/* ---------- amigos: desafio, sala de foco, reações ---------- */
+.desafio-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+.desafio-lista {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+.desafio-lista li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.desafio-lista li.eu {
+  font-weight: 700;
+}
+.desafio-pos {
+  width: 22px;
+  text-align: center;
+}
+.desafio-lista .grow {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.foco-ponto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ok);
+  flex: none;
+  margin: 0 6px;
+  animation: salvando-pisca 1.2s ease-in-out infinite alternate;
+}
+.reacoes {
+  display: flex;
+  gap: 2px;
+}
+.reacao {
+  border: 0;
+  background: var(--sunken);
+  border-radius: 99px;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.reacao:active {
+  transform: scale(0.85);
+}
+.reacao-feita {
+  font-size: 20px;
+}
+
+/* ---------- pets: fala, truques novos, lembranças, nível ---------- */
+.pet-fala {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 30%;
+  width: max-content;
+  max-width: 160px;
+  padding: 6px 10px;
+  border-radius: 12px 12px 12px 3px;
+  background: var(--surface, #fff);
+  color: var(--ink);
+  font-size: 12.5px;
+  line-height: 1.25;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.16);
+  border: 1px solid var(--line);
+  animation: fala-pet 0.25s ease-out;
+  text-align: left;
+  pointer-events: none;
+}
+.pet-fala.esq {
+  left: auto;
+  right: 30%;
+  border-radius: 12px 12px 3px 12px;
+}
+@keyframes fala-pet {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.9);
+  }
+}
+.pose-acenando .perna.p4 {
+  transform-origin: top center;
+  animation: acenar 0.35s ease-in-out infinite alternate;
+}
+@keyframes acenar {
+  from {
+    transform: rotate(-60deg) translateY(-2px);
+  }
+  to {
+    transform: rotate(-100deg) translateY(-3px);
+  }
+}
+.pose-cambalhota .pet-corpo {
+  transform-origin: center;
+  animation: cambalhota 1s cubic-bezier(0.4, 0, 0.3, 1) infinite;
+}
+@keyframes cambalhota {
+  40% {
+    transform: translateY(-10px) rotate(-180deg);
+  }
+  80%,
+  100% {
+    transform: translateY(0) rotate(-360deg);
+  }
+}
+.pose-bananeira .pet-corpo {
+  transform-origin: center;
+  transform: rotate(180deg) translateY(4px);
+  animation: bananeira 0.6s ease-in-out infinite alternate;
+}
+@keyframes bananeira {
+  to {
+    transform: rotate(172deg) translateY(4px);
+  }
+}
+.pose-posando .pet-corpo {
+  transform-origin: bottom center;
+  transform: rotate(-6deg) scale(1.04);
+}
+.pose-posando .olho {
+  animation: none;
+  transform: scaleY(0.2);
+}
+.pet-nivel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.pet-truques small {
+  opacity: 0.7;
+}
+.pet-lembrancas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pet-lembranca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: 12px;
+  background: var(--sunken);
+  font-size: 11px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .busca-geral,
+  .foco-ponto,
+  .pet-fala,
+  .pose-acenando .perna,
+  .pose-cambalhota .pet-corpo,
+  .pose-bananeira .pet-corpo {
+    animation: none !important;
+  }
+}

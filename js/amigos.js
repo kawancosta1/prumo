@@ -333,7 +333,11 @@ function receberItem(i) {
     mimo: `<b>${quem}</b> ${MIMO_TEXTO[i.mimo] || "te mandou um mimo"}!`,
     mixtape: `<b>${quem}</b> te mandou uma mixtape`,
     livro: `<b>${quem}</b> te recomendou um livro`,
-    clube: `<b>${quem}</b> te chamou para um clube do livro`
+    clube: `<b>${quem}</b> te chamou para um clube do livro`,
+    reacao:
+      i.reacao === "foco"
+        ? `<b>${quem}</b> focou junto com você`
+        : `<b>${quem}</b> reagiu ${(typeof REACOES === "object" && REACOES[i.reacao]) || "👏"} à sua conquista`
   };
   const msg = textos[i.tipo] || `Novidade de <b>${quem}</b>`;
   if (i.tipo === "mimo") {
@@ -717,7 +721,8 @@ function limparVitrine(v) {
         ? {
             seg: v.semana.seg,
             paginas: numero(v.semana.paginas, 1e5),
-            minutos: numero(v.semana.minutos, 1e5)
+            minutos: numero(v.semana.minutos, 1e5),
+            ...(typeof limparSemanaExtra === "function" ? limparSemanaExtra(v.semana) : {})
           }
         : null,
     fotolog: Array.isArray(v.fotolog)

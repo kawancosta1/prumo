@@ -194,7 +194,11 @@ const TRUQUES_PET = [
   { id: "rolar", nome: "Rolar", pose: "rolando", ach: "ritmo" },
   { id: "dancar", nome: "Dançar", pose: "dancando", ach: "dia_perfeito" },
   { id: "fingir", nome: "Fingir de morto", pose: "fingindo", ach: "foco10" },
-  { id: "girar", nome: "Girar", pose: "girando", ach: "semana_agua" }
+  { id: "girar", nome: "Girar", pose: "girando", ach: "semana_agua" },
+  { id: "acenar", nome: "Acenar", pose: "acenando", dias: 7 },
+  { id: "cambalhota", nome: "Cambalhota", pose: "cambalhota", dias: 14 },
+  { id: "bananeira", nome: "Plantar bananeira", pose: "bananeira", dias: 21 },
+  { id: "posar", nome: "Fazer pose de foto", pose: "posando", dias: 30 }
 ];
 const DESTINOS_CAMINHADA = [
   "Praça do bairro",
@@ -280,10 +284,29 @@ const dormindoAgora = () => {
   return dorme > acorda ? h >= dorme || h < acorda : h >= dorme && h < acorda;
 };
 
+/** Truque liberado: pela conquista (ach) ou pelos dias de cuidado (dias). */
+const truqueLivre = (x, t) =>
+  (!t.ach || !!S.ach[t.ach]) && (!t.dias || new Set(x.cuidados || []).size >= t.dias);
 function cuidou(x) {
   if (!x.cuidados.includes(today())) {
     const antes = fasePet(x);
     x.cuidados.push(today());
+    // aprende truque sozinho com os dias de cuidado
+    const n = new Set(x.cuidados).size;
+    const novo = TRUQUES_PET.find(t => t.dias === n && !x.truques.includes(t.id));
+    if (novo) {
+      x.truques.push(novo.id);
+      momentoPet(x, `Aprendeu sozinho: ${novo.nome.toLowerCase()}`, novo.pose);
+      setTimeout(() => {
+        notificar({
+          titulo: `${x.nome} aprendeu um truque!`,
+          texto: `${n} dias de cuidado e ${x.nome} aprendeu ${novo.nome.toLowerCase()} sozinho.`,
+          tipo: "conquista",
+          mood: "party"
+        });
+        if (typeof passeioReagir === "function") passeioReagir(x.id, novo.pose, 2200);
+      }, 900);
+    }
     const depois = fasePet(x);
     if (antes !== depois) {
       momentoPet(x, depois === "jovem" ? "Virou jovem" : "Virou adulto", "feliz");
@@ -515,6 +538,10 @@ function pingenteMundo(x, y) {
 /** Um toque do mundo quando o pet está sem chapéu (franjinha no emo, bandana no rock...). */
 function estiloMundoPet(x) {
   if (x.acess.chapeu) return "";
+  if (typeof fantasiaPetSVG === "function") {
+    const f = fantasiaPetSVG(x);
+    if (f) return f; // fantasia da época no lugar do toque do mundo
+  }
   return (
     {
       emo: `<path d="M29 10q8-2 12 5q-6-2-9 1q-1-3-3-6z" fill="#212121"/>`,
@@ -641,9 +668,14 @@ function petPainelHTML() {
   const barra = (rot, v, cor) =>
     `<div class="pet-barra"><span>${rot}</span><div class="cm-barra"><span style="width:${v}%;background:${cor}"></span></div></div>`;
   const truques = TRUQUES_PET.map(t => {
-    const livre = !t.ach || S.ach[t.ach];
-    return `<button class="chip-bt" data-act="pet-truque" data-id="${t.id}" ${livre ? "" : "disabled"} title="${livre ? "" : "Libera com a conquista " + esc((ACH[t.ach] || {}).name || "")}">${livre ? "" : ICON.lock + " "}${t.nome}</button>`;
+    const livre = truqueLivre(x, t);
+    const dica = t.dias
+      ? `Aprende sozinho com ${t.dias} dias de cuidado`
+      : "Libera com a conquista " + esc((ACH[t.ach] || {}).name || "");
+    return `<button class="chip-bt" data-act="pet-truque" data-id="${t.id}" ${livre ? "" : "disabled"} title="${livre ? "" : dica}">${livre ? "" : ICON.lock + " "}${t.nome}${!livre && t.dias ? ` <small>${t.dias}d</small>` : ""}</button>`;
   }).join("");
+  const diasC = new Set(x.cuidados).size;
+  const prox = TRUQUES_PET.filter(t => t.dias && t.dias > diasC).sort((a, b) => a.dias - b.dias)[0];
   const prova =
     acessPrevia && acessPrevia.pet === x.id ? ACESSORIOS_PET.find(a => a.id === acessPrevia.id) : null;
   const loja = ["coleira", "chapeu", "roupa"]
@@ -688,11 +720,14 @@ function petPainelHTML() {
     ${esp ? `<div class="pet-especial"><div><b>Só ${ESPECIES_PET[x.especie].nome.toLowerCase()} faz</b><span class="note">${esc(esp.desc)}</span></div><button class="btn small primary" data-act="pet-especial">${esc(esp.nome)}${x.especialDia === today() ? "" : " (+3)"}</button></div>` : ""}
     <h3 class="h3">Diário de ${esc(x.nome)}</h3><p class="pet-diario">${esc(x.diario[today()])}</p>
     <h3 class="h3">Caminhada da semana</h3><div class="pet-caminhada"><span class="note">Cada tarefa feita é um passo. Destino: <b>${esc(DESTINOS_CAMINHADA[c.destino])}</b> (${Math.min(c.passos, PASSOS_SEMANA)}/${PASSOS_SEMANA} passos)</span><div class="cm-barra"><span style="width:${Math.min(100, (c.passos / PASSOS_SEMANA) * 100)}%"></span></div>${c.chegou ? `<span class="note">Chegaram! O cartão postal está no álbum.</span>` : ""}</div>
-    <h3 class="h3">Truques</h3><div class="row pet-truques">${truques}</div>
+    <h3 class="h3">Truques</h3><div class="pet-nivel"><span class="note"><b>${diasC}</b> ${diasC === 1 ? "dia" : "dias"} de cuidado${prox ? ` · aprende <b>${esc(prox.nome.toLowerCase())}</b> sozinho em ${prox.dias - diasC} ${prox.dias - diasC === 1 ? "dia" : "dias"}` : " · já sabe todos os truques"}</span>${prox ? `<div class="cm-barra"><span style="width:${Math.round((diasC / prox.dias) * 100)}%"></span></div>` : ""}</div><div class="row pet-truques">${truques}</div>
     <h3 class="h3">Acessórios</h3>${loja}
+    ${typeof ninhadaHTML === "function" ? ninhadaHTML() : ""}
+    ${typeof lembrancasHTML === "function" ? lembrancasHTML() : ""}
     <h3 class="h3">Álbum</h3><div class="pet-album">${momentos || `<span class="note">Os momentos especiais vão aparecendo aqui.</span>`}</div>
     <h3 class="h3">Ajustes do pet</h3>
     <div class="setbox"><div class="setrow"><div class="lbl"><b>Passear pelas páginas</b><span class="note">Anda pela tela, sobe nos cards e segue seu dedo.</span></div><button class="btn small ${p.passeio ? "" : "ghost"}" data-act="pet-passeio" aria-pressed="${p.passeio}">${p.passeio ? "Ligado" : "Desligado"}</button></div>
+    <div class="setrow"><div class="lbl"><b>Fantasia da época</b><span class="note">Abóbora no Halloween, gorro no Natal, chapéu de palha no São João, óculos nas férias (quando ele está sem chapéu).</span></div><button class="btn small ${p.fantasia !== false ? "" : "ghost"}" data-act="pet-fantasia" aria-pressed="${p.fantasia !== false}">${p.fantasia !== false ? "Ligado" : "Desligado"}</button></div>
     <div class="setrow"><div class="lbl"><b>Nome</b></div><input type="text" maxlength="20" value="${esc(x.nome)}" data-change="pet-nome" data-id="${x.id}" style="width:150px" aria-label="Nome do pet"></div>
     ${p.lista.length > 1 ? `<div class="setrow"><div class="lbl"><b>Pet que passeia primeiro</b></div><button class="btn small ${p.ativo === x.id ? "" : "ghost"}" data-act="pet-ativo" data-id="${x.id}">${p.ativo === x.id ? "É este" : "Escolher este"}</button></div>` : ""}
     ${p.lista.length < 3 ? `<div class="setrow"><div class="lbl"><b>Adotar mais um</b><span class="note">Até 3 pets. Eles brincam entre si.</span></div><button class="btn small" data-act="pet-adotar-outro">Adotar</button></div>` : ""}</div>
@@ -889,7 +924,7 @@ ACOES_EXTRAS["pet-soneca"] = () => {
 ACOES_EXTRAS["pet-truque"] = (b, id) => {
   const x = petDoPainel(),
     t = TRUQUES_PET.find(k => k.id === id);
-  if (!x || !t || (t.ach && !S.ach[t.ach])) return;
+  if (!x || !t || !truqueLivre(x, t)) return;
   if (!x.truques.includes(id)) {
     x.truques.push(id);
     momentoPet(x, `Aprendeu: ${t.nome.toLowerCase()}`, t.pose);

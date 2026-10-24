@@ -73,7 +73,8 @@ function desenharAgente(a, pose = a.pose) {
   a.el.innerHTML =
     petSVG(a.pet, { pose, tam: PET_TAM, visitante: a.visitante }) +
     (a.balao ? `<span class="pet-balao">${a.balao}</span>` : "") +
-    (a.carrega ? `<span class="pet-carrega" title="${esc(a.carrega)}"></span>` : "");
+    (a.carrega ? `<span class="pet-carrega" title="${esc(a.carrega)}"></span>` : "") +
+    (a.fala ? `<span class="pet-fala ${a.x > larguraTela() - 170 ? "esq" : ""}">${esc(a.fala)}</span>` : "");
   a.el.classList.toggle("vira", a.dir < 0);
 }
 function posicionar(a, animar = true, dur = 0) {
@@ -183,13 +184,10 @@ function decidir(a) {
     a.ocupadoAte = Date.now() + 20000;
     return;
   }
-  if (a.balao && a.pose !== "dormindo") a.balao = "";
-  if (a.pose === "dormindo") {
-    a.balao = "";
-    desenharAgente(a, "parado");
-  }
   // foco: deita do lado do cronômetro (coala abraça o cronômetro)
-  if (!a.visitante && !rolouAgora() && typeof timer !== "undefined" && timer.running && tab === "estudos") {
+  const focoRolando =
+    typeof timer !== "undefined" && timer.running && elapsed() < timer.goal * 60e3 && tab === "estudos";
+  if (!a.visitante && !rolouAgora() && focoRolando) {
     const relogio = document.getElementById("clock");
     if (relogio) {
       const r = relogio.getBoundingClientRect();
@@ -197,12 +195,19 @@ function decidir(a) {
         a.ancora = { el: relogio, dx: r.width + 6 };
         a.x = r.right + 6;
         a.y = r.top - PET_TAM * 0.3;
-        desenharAgente(a, pet.especie === "coala" ? "abracando" : "deitado");
+        // dorme do lado do cronômetro até o foco acabar (js/pets-evolucao.js acorda ele)
+        if (pet.especie !== "coala") a.balao = sonhoSVG(pet);
+        desenharAgente(a, pet.especie === "coala" ? "abracando" : "dormindo");
         posicionar(a, true, 0.5);
         a.ocupadoAte = Date.now() + 15000;
         return;
       }
     }
+  }
+  if (a.balao && a.pose !== "dormindo") a.balao = "";
+  if (a.pose === "dormindo") {
+    a.balao = "";
+    desenharAgente(a, "parado");
   }
   // estante: lendo do lado
   if (!a.visitante && tab === "estante" && Math.random() < 0.5) {
@@ -671,10 +676,10 @@ function visitaDeAmigo() {
   passeio.visita = a;
   andarAte(a, larguraTela() * 0.6);
   toast(`${pet.nome}, o pet de ${pet.dono}, veio visitar!`);
-  setTimeout(
-    () => andarAte(a, larguraTela() + PET_TAM, chaoPasseio(), () => ((passeio.visita = null), a.el.remove())),
-    60000
-  );
+  setTimeout(() => {
+    if (typeof deixarLembranca === "function") deixarLembranca(pet, a); // deixa um presentinho antes de ir
+    andarAte(a, larguraTela() + PET_TAM, chaoPasseio(), () => ((passeio.visita = null), a.el.remove()));
+  }, 60000);
 }
 
 /* ---------- eventos do app ---------- */

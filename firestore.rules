@@ -124,7 +124,7 @@ service cloud.firestore {
       allow read, update, delete: if souEu(uid);
       allow create: if somosAmigos(uid)
         && request.resource.data.de == request.auth.uid
-        && request.resource.data.tipo in ['recado', 'depoimento', 'mimo', 'par', 'visita', 'mixtape', 'livro', 'clube']
+        && request.resource.data.tipo in ['recado', 'depoimento', 'mimo', 'par', 'visita', 'mixtape', 'livro', 'clube', 'reacao']
         && request.resource.data.texto is string
         && request.resource.data.texto.size() <= 600
         && request.resource.data.visto == false;

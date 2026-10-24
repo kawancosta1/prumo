@@ -41,6 +41,7 @@ function viewDieta() {
       <div class="links" style="margin-top:10px">${remindTimes.map(h => calBtn({ title: "Beber água", date: t, time: h, dur: 5, recur: "RRULE:FREQ=DAILY", details: `Meta: ${fmtML(S.waterGoal)} por dia` }, h)).join("")}</div>
     </details>
   </section>
+  ${typeof aguaMesHTML === "function" ? aguaMesHTML() : ""}
   <section class="block">
     <h2 class="h2">Cardápio da semana</h2>
     <div class="days">${DIAS_CURTO.map((d, i) => `<button class="day" data-act="mealday" data-i="${i}" aria-pressed="${i === mealDay}"><span>${i === todayIdx ? "hoje" : ""}</span><b style="font-size:14px">${d}</b></button>`).join("")}</div>

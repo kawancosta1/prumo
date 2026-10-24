@@ -34,6 +34,7 @@ function taskDetail(x) {
     <div class="field"><span class="label">Subtarefas</span>
       ${x.sub.length ? `<ul class="subs">${x.sub.map(s => `<li class="${s.done ? "done" : ""}"><button class="check" data-act="subtoggle" data-id="${x.id}" data-sid="${s.id}" aria-pressed="${!!s.done}" aria-label="Concluir subtarefa">${ICON.check}</button><span class="title" style="flex:1">${esc(s.t)}</span><button class="icon" style="width:28px;height:28px;flex-basis:28px" data-act="subdel" data-id="${x.id}" data-sid="${s.id}" aria-label="Apagar subtarefa">${ICON.x}</button></li>`).join("")}</ul>` : ""}
       <form class="subform" data-form="sub" data-id="${x.id}"><input type="text" id="sub-${x.id}" placeholder="Quebrar em um passo menor…" autocomplete="off" required><button class="btn small" type="submit">Adicionar</button></form>
+      ${typeof passosPara === "function" ? `<button class="olink" data-act="quebrar-passos" data-id="${x.id}">Quebrar em passos pra mim</button>` : ""}
     </div>
     <div class="row">
       <input type="date" id="td-${x.id}" data-change="tdate" data-id="${x.id}" value="${x.date}" aria-label="Data">
@@ -120,6 +121,7 @@ function habitRow(h, full) {
     st = habitStreak(h);
   let heat = "";
   if (full) {
+    const folgas = typeof folgasDoHabito === "function" ? folgasDoHabito(h) : new Set();
     const start = addDays(mondayOf(t), -77);
     for (let i = 0; i < 84; i++) {
       const d = addDays(start, i);
@@ -132,7 +134,9 @@ function habitRow(h, full) {
               ? "off"
               : h.created && d < h.created
                 ? "off"
-                : "miss";
+                : folgas.has(d)
+                  ? "folga"
+                  : "miss";
       heat += `<i class="${cls}" title="${fmtShort(d)}"></i>`;
     }
   }

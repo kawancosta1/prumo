@@ -83,6 +83,8 @@ const blank = () => ({
   noites: [], // dias em que o app foi usado depois das 22h
   rock: { energia: 0, starAte: 0, usos: 0 }, // Star Power do mundo Roqueiro (js/mundos/rock-efeitos.js)
   pets: {}, // bichinhos adotados (js/pets.js)
+  organizar: {}, // revisão da semana (js/organizar.js)
+  habitosFolga: {}, // dias de folga dos hábitos: { habitId: [dias] } (js/habitos-mais.js)
   mundos: {}, // dados dos outros mundos: roça do sertanejo, boss do gamer... (js/mundos/*-extras.js)
   emo: { cartas: [], cadeado: null, mixtape: { nome: "", faixas: [] } }, // cartas, cadeado do diário e mixtape (js/mundos/emo-extras.js)
   livros: [], // Estante de leitura (js/leitura.js)

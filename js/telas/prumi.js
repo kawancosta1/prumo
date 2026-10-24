@@ -69,11 +69,14 @@ function viewPrumi() {
       dk = isDark() ? 1 : 0;
     body = `<div class="card"><span class="label">Aparência</span><div class="seg" role="group">${[
       ["auto", "Automático"],
+      ["hora", "Pela hora"],
       ["light", "Claro"],
       ["dark", "Escuro"]
     ]
       .map(([k, l]) => `<button data-act="mode" data-m="${k}" aria-pressed="${S.mode === k}">${l}</button>`)
-      .join("")}</div><span class="note">Automático segue o tema do seu aparelho.</span></div>
+      .join(
+        ""
+      )}</div><span class="note">${S.mode === "hora" ? "Pela hora: claro de dia, escuro das 18h às 6h." : "Automático segue o tema do seu aparelho."}</span></div>
     <span class="note">Temas do mundo <b>${esc(P0.name)}</b>. A água do Prumi muda com o tema.</span>
     <div class="shop pal">${th.vars
       .map(v => {

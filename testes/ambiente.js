@@ -13,7 +13,11 @@ async function abrir(url) {
   vc.on("jsdomError", e => {
     const m = String(e.message || e);
     if (/Could not load (link|script|img)|Could not parse CSS|Not implemented/.test(m)) return; // fontes, CDN, canvas
-    erros.push("jsdomError: " + m.slice(0, 300) + (e.detail ? " :: " + String(e.detail.stack || e.detail).slice(0, 400) : ""));
+    erros.push(
+      "jsdomError: " +
+        m.slice(0, 300) +
+        (e.detail ? " :: " + String(e.detail.stack || e.detail).slice(0, 400) : "")
+    );
   });
   class SoLocal extends ResourceLoader {
     fetch(u, o) {
@@ -27,7 +31,14 @@ async function abrir(url) {
     pretendToBeVisual: true,
     virtualConsole: vc,
     beforeParse(w) {
-      w.matchMedia = q => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} });
+      w.matchMedia = q => ({
+        matches: false,
+        media: q,
+        addEventListener() {},
+        removeEventListener() {},
+        addListener() {},
+        removeListener() {}
+      });
       w.HTMLCanvasElement.prototype.getContext = () => null;
       w.Element.prototype.animate = () => ({ finished: Promise.resolve(), cancel() {} });
       w.scrollTo = () => {};
@@ -35,10 +46,27 @@ async function abrir(url) {
   });
   const w = dom.window;
   w.addEventListener("error", e => erros.push("window error: " + e.message));
-  const ev = s => w.eval(s);
-  for (let i = 0; i < 100 && !(ev("typeof checkAch") === "function" && ev("typeof appReady") !== "undefined" && w.document.readyState === "complete"); i++)
+  const ev = s => {
+    try {
+      return w.eval(s);
+    } catch (e) {
+      if (process.env.PILHA) console.log(e.stack);
+      throw e;
+    }
+  };
+  for (
+    let i = 0;
+    i < 100 &&
+    !(
+      ev("typeof checkAch") === "function" &&
+      ev("typeof appReady") !== "undefined" &&
+      w.document.readyState === "complete"
+    );
+    i++
+  )
     await espera(200);
-  if (ev("typeof checkAch") !== "function") throw new Error("o app não terminou de carregar (algum script travou ou deu erro)");
+  if (ev("typeof checkAch") !== "function")
+    throw new Error("o app não terminou de carregar (algum script travou ou deu erro)");
   await espera(1500);
   const ok = (cond, msg) => {
     if (!cond) erros.push("FALHOU: " + msg);

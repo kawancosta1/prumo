@@ -41,7 +41,7 @@ function viewSocial() {
       <div class="row" style="justify-content:space-between">${wdPicker("h-days", [0, 1, 2, 3, 4, 5, 6])}<button class="btn" type="submit">${textoMundo("adicionarHabito", "Adicionar hábito")}</button></div>
     </form>
     ${sugestoesHabitosHTML()}
-    ${S.habits.length ? `<ul class="list">${S.habits.map(h => habitRow(h, true)).join("")}</ul><span class="note">O quadriculado mostra as últimas 12 semanas. O ícone de agenda cria um lembrete que se repete nos dias escolhidos.</span>` : `<div class="empty">${textoMundo("vazioHabitos", "Nenhum hábito ainda. Comece com um ou dois. Hábitos pequenos e diários pegam mais fácil.")}</div>`}
+    ${S.habits.length ? `<ul class="list">${S.habits.map(h => habitRow(h, true)).join("")}</ul><span class="note">O quadriculado mostra as últimas 12 semanas. O ícone de agenda cria um lembrete que se repete nos dias escolhidos.</span>${typeof folgaHabitosHTML === "function" ? folgaHabitosHTML() : ""}` : `<div class="empty">${textoMundo("vazioHabitos", "Nenhum hábito ainda. Comece com um ou dois. Hábitos pequenos e diários pegam mais fácil.")}</div>`}
   </section>
   <section class="block">
     <h2 class="h2">Compromissos</h2>

@@ -155,6 +155,7 @@ function viewAmigos() {
         : ""
     }
   </section>
+  ${typeof socialMaisHTML === "function" ? socialMaisHTML(amigos) : ""}
   <section class="block"><h2 class="h2">Seus amigos</h2>
     ${amigos.length ? `<ul class="list">${amigos.map(a => linhaAmigoHTML(a.uid)).join("")}</ul>` : `<div class="empty">Nenhum amigo ainda. Mande seu link de convite pra alguém!</div>`}
   </section>
@@ -200,6 +201,10 @@ function viewAvisos() {
       return `${quem} te recomendou <b>${esc(titulo)}</b>${resto.length ? `<p>${esc(resto.join(" "))}</p>` : ""}`;
     }
     if (i.tipo === "clube") return `${quem} te chamou para o clube do livro <b>${esc(i.texto)}</b>`;
+    if (i.tipo === "reacao")
+      return i.reacao === "foco"
+        ? `${quem} focou junto com você`
+        : `${quem} reagiu ${(typeof REACOES === "object" && REACOES[i.reacao]) || "👏"} à sua conquista <b>${esc(i.texto)}</b>`;
     if (i.tipo === "mixtape") {
       const [nomeFita, ...faixas] = String(i.texto || "").split("\n");
       return `${quem} te mandou uma mixtape: <b>${esc(nomeFita || "Mixtape")}</b><ol class="faixas">${faixas
