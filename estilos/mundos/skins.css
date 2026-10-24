@@ -479,8 +479,11 @@ html[data-skin][data-mundo="otaku"] {
   --sk-sombra: 0 4px 0 color-mix(in srgb, var(--accent) 35%, transparent);
   --sk-btn-raio: 999px;
   --sk-check-raio: 50%;
-  --sk-btn: linear-gradient(180deg, #ff8fb8, #e0457f);
-  --sk-barra: repeating-linear-gradient(-45deg, #ff7aa8 0 8px, #ffb3cf 8px 16px);
+  --sk-barra: repeating-linear-gradient(
+    -45deg,
+    var(--accent) 0 8px,
+    color-mix(in srgb, var(--accent) 45%, #fff) 8px 16px
+  );
   --sk-barra-vel: 1.2s;
   --sk-faixa-h: 9px;
   --sk-heat-raio: 50% 50% 50% 50% / 60% 60% 40% 40%;
@@ -530,10 +533,9 @@ html[data-skin][data-mundo="zen"] {
   --sk-marca-d: inline-block;
   --sk-raio: 20px;
   --sk-sombra: 0 2px 12px rgb(80 100 70 / 0.08);
-  --sk-btn: linear-gradient(180deg, #8db57a, #5e7f4e);
   --sk-btn-raio: 999px;
   --sk-check-raio: 50%;
-  --sk-barra: repeating-linear-gradient(90deg, #8db57a 0 22px, #6b8e5a 22px 24px);
+  --sk-barra: repeating-linear-gradient(90deg, var(--accent) 0 22px, var(--sk-escuro) 22px 24px);
   --sk-faixa-h: 11px;
   --sk-heat-raio: 50%;
   --sk-marca-gira: 180deg;
@@ -558,10 +560,13 @@ html[data-skin][data-mundo="coach"] {
   --sk-marca-d: inline-block;
   --sk-raio: 10px;
   --sk-sombra: 0 3px 0 color-mix(in srgb, var(--accent) 45%, transparent);
-  --sk-btn: linear-gradient(180deg, #ff7a1a, #d84315);
   --sk-btn-caixa: uppercase;
   --sk-btn-esp: 0.08em;
-  --sk-barra: repeating-linear-gradient(-60deg, #ff7a1a 0 10px, #ffb74d 10px 14px);
+  --sk-barra: repeating-linear-gradient(
+    -60deg,
+    var(--accent) 0 10px,
+    color-mix(in srgb, var(--accent) 50%, #fff) 10px 14px
+  );
   --sk-barra-vel: 0.8s;
   --sk-faixa-h: 12px;
   --sk-faixa-cor: #111;
@@ -580,11 +585,12 @@ html[data-skin][data-mundo="vovo"] {
   --sk-raio: 16px;
   --sk-borda-estilo: dashed;
   --sk-borda-larg: 1.5px;
-  --sk-btn: linear-gradient(180deg, #e57399, #b5527a);
   --sk-btn-raio: 14px;
-  --sk-barra:
-    repeating-linear-gradient(90deg, #e57399 0 6px, #f8bbd0 6px 12px),
-    repeating-linear-gradient(0deg, transparent 0 6px, rgb(255 255 255 / 0.35) 6px 12px);
+  --sk-barra: repeating-linear-gradient(
+    90deg,
+    var(--accent) 0 6px,
+    color-mix(in srgb, var(--accent) 40%, #fff) 6px 12px
+  );
   --sk-faixa-h: 12px;
   --sk-heat-raio: 50%;
   --sk-diario:
