@@ -119,6 +119,8 @@ function applyTheme(personaOverride, varOverride) {
     dark = isDark(),
     k = dark ? 1 : 0;
   document.documentElement.dataset.mundo = pid; // permite CSS próprio de cada mundo
+  // roupagem genérica (estilos/mundos/skins.css) para os mundos sem arquivo de CSS só deles
+  document.documentElement.toggleAttribute("data-skin", pid !== "emo" && pid !== "rock");
   themePreview = varOverride ? { p: pid, v: varOverride } : personaOverride ? { p: pid, v: "base" } : null;
   const v = themeVar(pid),
     wo = waterOf(pid);

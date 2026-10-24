@@ -614,6 +614,24 @@ const KITS_MUNDO = [
       "Cadeira de balanço",
       `<path d="M12 6v26M32 6v26" stroke="#8D6E63" stroke-width="3"/><path d="M12 8h20M12 14h20" stroke="#8D6E63" stroke-width="2"/><path d="M8 30h28" stroke="#6D4C41" stroke-width="3"/><path d="M6 44Q22 36 38 44" stroke="#6D4C41" stroke-width="3" fill="none"/><path d="M12 32v10M32 32v10" stroke="#8D6E63" stroke-width="2.4"/><rect x="14" y="24" width="16" height="6" rx="2" fill="#E57373"/>`
     ]
+  },
+  {
+    mundo: "feiticeiro",
+    nome: "Torre do mago",
+    teto: ["Estrelas penduradas", MOTIVO.estrela, ["#FFE082", "#90CAF9", "#E1BEE7"]],
+    movel: [
+      "Estante de grimórios",
+      `<rect x="6" y="4" width="32" height="40" rx="2" fill="#4E342E" stroke="var(--ink)" stroke-width="1.4"/><path d="M6 18h32M6 32h32" stroke="#3E2723" stroke-width="2"/>${[8, 13, 18, 23, 28].map((x, i) => `<rect x="${x}" y="${7 + (i % 2)}" width="4" height="${10 - (i % 2)}" fill="${["#283593", "#7A1F2B", "#B8862B", "#2E7D32"][i % 4]}"/><rect x="${x + 1}" y="${21 + (i % 2)}" width="4" height="${10 - (i % 2)}" fill="${["#7A1F2B", "#B8862B", "#283593", "#2E7D32"][i % 4]}"/>`).join("")}<circle class="luzinha" cx="30" cy="38" r="3" fill="#80DEEA"/>`
+    ]
+  },
+  {
+    mundo: "bruxo",
+    nome: "Cabana da bruxa",
+    teto: ["Ervas secando", MOTIVO.abobora, ["#7CB342", "#FB8C00", "#9575CD"]],
+    movel: [
+      "Caldeirão no canto",
+      `<path d="M8 44l-3 4M36 44l3 4" stroke="#37474F" stroke-width="2.4"/><path d="M6 22H38Q40 46 22 46Q4 46 6 22Z" fill="#263238" stroke="var(--ink)" stroke-width="1.4"/><rect x="3" y="18" width="38" height="6" rx="3" fill="#37474F"/><ellipse cx="22" cy="20" rx="16" ry="2.6" fill="#76FF03"/><circle class="luzinha" cx="16" cy="14" r="2.4" fill="#9CCC65"/><circle class="luzinha" style="--d:.6s" cx="26" cy="10" r="1.8" fill="#CE93D8"/>`
+    ]
   }
 ];
 KITS_MUNDO.forEach(k => {

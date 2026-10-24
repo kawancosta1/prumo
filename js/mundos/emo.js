@@ -64,7 +64,8 @@ PERSONAS.emo = {
 THEMES.emo = {
   font: '"Pirata One"',
   ds: 1.08,
-  L: ["#E9E5EB", "#FFFFFF", "#141016", "#A3102A", "#5B2E7A", "#F6F3F8"],
+  // claro "mais emo": papel cinza de caderno rabiscado, tinta preta, vermelho sangue e lágrimas roxas
+  L: ["#E4E0E6", "#FBFAFC", "#0E0A10", "#C0002F", "#3D1E52", "#F4F0F6", "#0E0A10"],
   D: ["#0B090D", "#161219", "#EDE6EE", "#E0314F", "#8A55B5", "#D6CEDD", "#141016"],
   pat: ["bat", "heartb"],
   water: { name: "Lágrimas", spd: 4.8, amp: 3, part: "tear" },

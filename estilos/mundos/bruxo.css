@@ -1,0 +1,107 @@
+/* Mundo Bruxo: o que vai além da roupagem de skins.css (caldeirão, bolhas, gosma e sub-temas) */
+
+html[data-mundo="bruxo"] .h1 {
+  transform: rotate(-1deg);
+}
+html[data-mundo="bruxo"] .h2 {
+  letter-spacing: 0.02em;
+}
+/* gosma escorrendo da faixa do cartão: anda devagar */
+html[data-mundo="bruxo"] :is(.herobox, .stage)::before {
+  animation: gosmaAnda 14s linear infinite;
+}
+@keyframes gosmaAnda {
+  to {
+    -webkit-mask-position: 100px 0;
+    mask-position: 100px 0;
+  }
+}
+/* caldeirão do dia (js/mundos/bruxo-extras.js) */
+.caldeirao-dia {
+  width: 150px;
+  display: block;
+  margin: 0 auto;
+}
+.caldeirao-dia .bolhas-caldeirao circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bolhaCaldeirao 1.8s ease-in infinite;
+}
+@keyframes bolhaCaldeirao {
+  0% {
+    transform: translateY(6px) scale(0.4);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-16px) scale(1.1);
+    opacity: 0;
+  }
+}
+.caldeirao-dia .fogo-caldeirao {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: fogoCaldeirao 0.5s ease-in-out infinite alternate;
+}
+@keyframes fogoCaldeirao {
+  to {
+    transform: scaleY(1.25);
+  }
+}
+.prateleira-pocoes {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px 4px;
+  border-bottom: 4px solid #6d4c41;
+  border-radius: 4px;
+  width: fit-content;
+}
+.horta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+}
+.horta .erva {
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: color-mix(in srgb, #7cb342 16%, transparent);
+}
+/* bolhas que sobem nas roupas do Prumi (poção, caldeirão) */
+.prumi .bolha-sobe {
+  animation: bolhaSobe 1.6s ease-in infinite;
+}
+@keyframes bolhaSobe {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+}
+/* sub-temas */
+html[data-mundo="bruxo"][data-variante="caldeirao"] .progress span {
+  box-shadow: 0 0 14px #76ff03 !important;
+}
+html[data-mundo="bruxo"][data-variante="lua"] :is(.herobox, .stage) {
+  box-shadow: 0 0 26px color-mix(in srgb, #ff5252 22%, transparent);
+}
+html[data-mundo="bruxo"][data-variante="abobora"] .h1::before {
+  content: "🎃 ";
+}
+html[data-mundo="bruxo"][data-variante="ervas"] .bubble {
+  font-family: "Caveat", cursive;
+  font-size: 1.15em;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-mundo="bruxo"] :is(.herobox, .stage)::before,
+  .caldeirao-dia *,
+  .prumi .bolha-sobe {
+    animation: none !important;
+  }
+}

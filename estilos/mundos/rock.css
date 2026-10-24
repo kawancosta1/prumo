@@ -20,7 +20,8 @@ html[data-mundo="rock"] body::after {
   inset: 0;
   z-index: -2;
   pointer-events: none;
-  background: conic-gradient(
+  background:
+    conic-gradient(
       from 170deg at 18% -10%,
       transparent 0 4deg,
       color-mix(in srgb, var(--accent) 14%, transparent) 6deg 14deg,
@@ -51,7 +52,8 @@ html[data-mundo="rock"] .wrap {
   position: absolute;
   top: 0;
   height: var(--alvo);
-  background: repeating-linear-gradient(
+  background:
+    repeating-linear-gradient(
       90deg,
       transparent 0 calc(20% - 1px),
       color-mix(in srgb, #fff 30%, transparent) calc(20% - 1px) 20%
@@ -312,7 +314,8 @@ html.star-power[data-mundo="rock"] .herobox {
   }
 }
 html.star-power[data-mundo="rock"] body::after {
-  background: conic-gradient(
+  background:
+    conic-gradient(
       from 170deg at 18% -10%,
       transparent 0 4deg,
       color-mix(in srgb, var(--star) 22%, transparent) 6deg 14deg,
@@ -373,11 +376,8 @@ html[data-mundo="rock"] .list > li:nth-child(5n) .check {
   --c: var(--laranja);
 }
 html[data-mundo="rock"] .list > li .check[aria-pressed="true"] {
-  background: radial-gradient(
-      ellipse 40% 26% at 50% 34%,
-      color-mix(in srgb, #fff 60%, transparent),
-      transparent 70%
-    ),
+  background:
+    radial-gradient(ellipse 40% 26% at 50% 34%, color-mix(in srgb, #fff 60%, transparent), transparent 70%),
     var(--c);
 }
 /* Nota estrela: tarefa de prioridade alta brilha (enche mais o Star Power) */
@@ -444,11 +444,8 @@ html[data-mundo="rock"] li.atrasada .check {
 
 /* ---------- Botão principal: placa de metal com rebites ---------- */
 html[data-mundo="rock"] .btn.primary {
-  background: radial-gradient(
-      circle at 7px 50%,
-      color-mix(in srgb, #fff 55%, transparent) 1.6px,
-      transparent 2.2px
-    ),
+  background:
+    radial-gradient(circle at 7px 50%, color-mix(in srgb, #fff 55%, transparent) 1.6px, transparent 2.2px),
     radial-gradient(
       circle at calc(100% - 7px) 50%,
       color-mix(in srgb, #fff 55%, transparent) 1.6px,
@@ -625,7 +622,8 @@ html[data-variante="heroi"][data-mundo="rock"] body::before {
   z-index: -1;
   pointer-events: none;
   clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
-  background: repeating-linear-gradient(
+  background:
+    repeating-linear-gradient(
       90deg,
       transparent 0 calc(20% - 1px),
       color-mix(in srgb, var(--ink) 18%, transparent) calc(20% - 1px) 20%
@@ -676,17 +674,13 @@ html[data-variante="punk"][data-mundo="rock"] .card {
 
 /* Grunge 90: textura de chiado e listra de flanela no topo do cartão */
 html[data-variante="grunge"][data-mundo="rock"] .herobox::before {
-  background: repeating-linear-gradient(
-      90deg,
-      #3f5a2a 0 10px,
-      #141416 10px 12px,
-      #5a6b3a 12px 22px,
-      #141416 22px 24px
-    ),
+  background:
+    repeating-linear-gradient(90deg, #3f5a2a 0 10px, #141416 10px 12px, #5a6b3a 12px 22px, #141416 22px 24px),
     #3f5a2a;
 }
 html[data-variante="grunge"][data-mundo="rock"] body::after {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='r'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23r)' opacity='.07'/%3E%3C/svg%3E"),
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='r'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23r)' opacity='.07'/%3E%3C/svg%3E"),
     radial-gradient(120% 80% at 50% 0, transparent 60%, color-mix(in srgb, #000 18%, transparent) 100%);
 }
 

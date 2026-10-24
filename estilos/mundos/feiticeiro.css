@@ -1,0 +1,127 @@
+/* Mundo Feiticeiro: o que vai além da roupagem de skins.css (círculo mágico, constelação, sub-temas) */
+
+/* título com brilho dourado */
+html[data-mundo="feiticeiro"] .h1 {
+  letter-spacing: 0.02em;
+}
+html[data-mundo="feiticeiro"][data-theme="dark"] .h1 {
+  text-shadow: 0 0 18px color-mix(in srgb, #e8c55a 45%, transparent);
+}
+html[data-mundo="feiticeiro"] .h2 {
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+}
+/* círculo mágico na troca de aba (js/mundos/feiticeiro-extras.js) */
+#circulo-magico {
+  position: fixed;
+  left: 50%;
+  top: 45%;
+  width: min(80vw, 360px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  z-index: 1;
+  pointer-events: none;
+  color: color-mix(in srgb, var(--accent) 70%, #e8c55a);
+  animation: circuloAparece 1.8s ease-out forwards;
+}
+#circulo-magico svg {
+  width: 100%;
+  height: 100%;
+  animation: circuloGira 1.8s linear;
+}
+#circulo-magico .cm-runas {
+  font-family: serif;
+}
+@keyframes circuloAparece {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  25% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+@keyframes circuloGira {
+  to {
+    transform: rotate(90deg);
+  }
+}
+/* constelação do dia */
+.constelacao {
+  width: 100%;
+  max-width: 360px;
+  color: var(--ink);
+  display: block;
+  margin: 4px auto 0;
+}
+.constelacao .estrela-acesa {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: estrelaAcende 2.4s ease-in-out infinite;
+}
+@keyframes estrelaAcende {
+  50% {
+    opacity: 0.6;
+    transform: scale(0.85);
+  }
+}
+.feitico-dia {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed #c9a646;
+  background: color-mix(in srgb, #e8c55a 10%, transparent);
+}
+.feitico-dia b {
+  width: 100%;
+}
+.feitico-dia .note {
+  flex: 1;
+}
+/* sub-tema Grimório antigo: papel de pergaminho */
+html[data-mundo="feiticeiro"][data-variante="grimorio"] body {
+  background-color: var(--bg);
+}
+html[data-mundo="feiticeiro"][data-variante="grimorio"] :is(.card, ul.list, .herobox, .stage, .setbox) {
+  background-image: radial-gradient(
+    120% 120% at 0 0,
+    transparent 60%,
+    color-mix(in srgb, #8c5a1e 10%, transparent)
+  );
+}
+/* Viagem astral: cartões com brilho roxo */
+html[data-mundo="feiticeiro"][data-variante="astral"] :is(.herobox, .stage) {
+  box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+/* Mago do gelo: geada nos cantos */
+html[data-mundo="feiticeiro"][data-variante="gelo"] :is(.card, ul.list, .herobox) {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, #b3e5fc 30%, transparent) 0 12px,
+    transparent 30px
+  );
+}
+/* Mago do fogo: brasa subindo no título */
+html[data-mundo="feiticeiro"][data-variante="fogo"] .h1 {
+  text-shadow: 0 0 14px color-mix(in srgb, #ff7043 45%, transparent);
+}
+/* Academia: faixa vinho e dourado no topo */
+html[data-mundo="feiticeiro"][data-variante="academia"] header.top {
+  border-bottom: 4px double #c9a646;
+}
+@media (prefers-reduced-motion: reduce) {
+  #circulo-magico {
+    display: none;
+  }
+  .constelacao .estrela-acesa {
+    animation: none;
+  }
+}

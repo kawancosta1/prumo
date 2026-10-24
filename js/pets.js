@@ -550,7 +550,9 @@ function estiloMundoPet(x) {
       zen: `<circle cx="29" cy="9" r="2" fill="#F48FB1"/><circle cx="29" cy="9" r=".8" fill="#FFF59D"/>`,
       otaku: `<path d="M30 9l-3-2v4zM30 9l3-2v4z" fill="#F06292"/>`,
       programador: `<path d="M27 15q7-12 14 0" stroke="#37474F" stroke-width="1.4" fill="none"/>`,
-      sertanejo: `<path d="M27 11q7-6 14 0z" fill="#9C6A35"/><path d="M24 11.5h20" stroke="#9C6A35" stroke-width="1.6" stroke-linecap="round"/>`
+      sertanejo: `<path d="M27 11q7-6 14 0z" fill="#9C6A35"/><path d="M24 11.5h20" stroke="#9C6A35" stroke-width="1.6" stroke-linecap="round"/>`,
+      feiticeiro: `<path d="M27 11q7 -3 14 0q-4 -1 -6 -9q-4 5 -8 9z" fill="#283593"/><path d="M33 3l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="#FFE082"/>`,
+      bruxo: `<path d="M26 11.5q8 -3 16 0q-5 -1 -6 -6q-1 -5 4 -6q-8 -1 -10 6q-1 4 -4 6z" fill="#2E1A47"/><path d="M28 10.6q6 -2 12 0" stroke="#7CB342" stroke-width="1.2"/>`
     }[S.persona] || ""
   );
 }

@@ -1,0 +1,661 @@
+/*
+  Roupagem dos mundos (todos menos emo e rock, que têm arquivo próprio).
+  O motor abaixo usa variáveis --sk-*; cada mundo só define as suas (desenhos em SVG, cores e formas).
+  Liga com html[data-skin] (js/temas.js). Os sub-temas de cada mundo trocam cores, fonte e o padrão do fundo.
+  Gerado a partir de desenhos simples; para mudar um mundo, edite as variáveis dele aqui embaixo.
+*/
+html[data-skin] {
+  --sk-escuro: color-mix(in srgb, var(--accent) 68%, #000);
+  scrollbar-color: var(--sk-escuro) transparent;
+}
+html[data-skin] ::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+/* fundo: desenhos do mundo passando bem devagar */
+html[data-skin] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: var(--sk-fundo, none) 0 0 / var(--sk-fundo-tam, 320px 320px) repeat;
+  opacity: var(--sk-fundo-op, 0.5);
+  animation: skFundo var(--sk-fundo-vel, 140s) linear infinite;
+}
+html[data-skin][data-theme="dark"] body::after {
+  filter: invert(1);
+  opacity: var(--sk-fundo-op-escuro, 0.35);
+}
+@keyframes skFundo {
+  to {
+    background-position: -320px -640px;
+  }
+}
+/* marca do mundo do lado do nome Prumo */
+html[data-skin] .brand::after {
+  content: "";
+  display: var(--sk-marca-d, none);
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  background: var(--sk-marca) center / contain no-repeat;
+  animation: skMarca 3.6s ease-in-out infinite;
+}
+@keyframes skMarca {
+  50% {
+    transform: translateY(-2px) rotate(var(--sk-marca-gira, 8deg));
+  }
+}
+/* cartões */
+html[data-skin] :is(.card, ul.list, .setbox, .herobox, .stage, .shop .sitem) {
+  border-radius: var(--sk-raio, var(--r));
+  box-shadow: var(--sk-sombra, none);
+  border-width: var(--sk-borda-larg, 1px);
+  border-style: var(--sk-borda-estilo, solid);
+}
+/* faixa de cima do cartão do Prumi e do palco (o "sangue" do emo, em cada mundo vira outra coisa) */
+html[data-skin] :is(.herobox, .stage) {
+  position: relative;
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--line));
+}
+html[data-skin] :is(.herobox, .stage)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: var(--sk-faixa-h, 0px);
+  z-index: 1;
+  pointer-events: none;
+  background: var(--sk-faixa-cor, var(--accent));
+  -webkit-mask: var(--sk-faixa) 0 0 / auto 100% repeat-x;
+  mask: var(--sk-faixa) 0 0 / auto 100% repeat-x;
+  border-radius: var(--sk-raio, var(--r)) var(--sk-raio, var(--r)) 0 0;
+  animation: skFaixa var(--sk-faixa-vel, 0s) linear infinite;
+}
+@keyframes skFaixa {
+  to {
+    -webkit-mask-position: 120px 0;
+    mask-position: 120px 0;
+  }
+}
+/* aba ativa: enfeite embaixo */
+html[data-skin] nav.tabs .ind {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent),
+    0 2px 10px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+html[data-skin] nav.tabs .ind::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 16px;
+  height: 12px;
+  transform: translateX(-50%);
+  background: var(--sk-ind, none) center / contain no-repeat;
+}
+/* caixinha de concluir: forma e enfeite quando feita */
+html[data-skin] .check {
+  position: relative;
+  border-radius: var(--sk-check-raio, 7px);
+}
+html[data-skin] .check[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  right: -9px;
+  top: -9px;
+  width: 15px;
+  height: 15px;
+  background: var(--sk-check, none) center / contain no-repeat;
+  animation: skCheck 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+@keyframes skCheck {
+  from {
+    transform: scale(0) rotate(-40deg);
+  }
+}
+/* concluiu: brilho com a cor do mundo e um estouro do desenho do mundo */
+html[data-skin] li.just-done {
+  position: relative;
+  animation: skFeito 0.9s ease-out;
+}
+html[data-skin] li.just-done::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+  background: var(--sk-feito, var(--sk-check, none)) center / contain no-repeat;
+  pointer-events: none;
+  animation: skEstouro 0.9s ease-out forwards;
+  z-index: 2;
+}
+@keyframes skFeito {
+  0% {
+    background: color-mix(in srgb, var(--accent) 28%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+@keyframes skEstouro {
+  0% {
+    transform: scale(0.2) rotate(0);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.6) rotate(25deg) translateY(-14px);
+    opacity: 0;
+  }
+}
+html[data-skin] li.done .title {
+  text-decoration-color: var(--accent);
+  text-decoration-style: var(--sk-risco, solid);
+  text-decoration-thickness: 2px;
+}
+/* atrasada: o "fantasminha" de cada mundo */
+html[data-skin] li.atrasada {
+  position: relative;
+}
+html[data-skin] li.atrasada::after {
+  content: "";
+  position: absolute;
+  right: 44px;
+  top: 6px;
+  width: 18px;
+  height: 18px;
+  background: var(--sk-atrasada, none) center / contain no-repeat;
+  opacity: 0.75;
+  pointer-events: none;
+  animation: skAtrasada 2.6s ease-in-out infinite;
+}
+@keyframes skAtrasada {
+  50% {
+    transform: translateY(-3px) rotate(-8deg);
+  }
+}
+/* botão principal */
+html[data-skin] .btn.primary {
+  background: var(--sk-btn, linear-gradient(180deg, var(--accent), var(--sk-escuro)));
+  border-color: var(--sk-escuro);
+  border-radius: var(--sk-btn-raio, 10px);
+  box-shadow: var(--sk-btn-sombra, none);
+  text-transform: var(--sk-btn-caixa, none);
+  letter-spacing: var(--sk-btn-esp, normal);
+}
+html[data-skin] .btn.primary:active {
+  transform: translate(var(--sk-btn-aperta, 0), var(--sk-btn-aperta, 0)) scale(0.97);
+}
+/* barras de progresso */
+html[data-skin] .progress span,
+html[data-skin] .humor .hbarra span {
+  background: var(--sk-barra, linear-gradient(90deg, var(--sk-escuro), var(--accent))) !important;
+  background-size: var(--sk-barra-tam, auto) !important;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 35%, transparent);
+  animation: skBarra var(--sk-barra-vel, 0s) linear infinite;
+}
+@keyframes skBarra {
+  to {
+    background-position: 40px 0;
+  }
+}
+/* dia escolhido */
+html[data-skin] .day[aria-pressed="true"] {
+  background: var(--sk-dia, var(--accent));
+  border-color: var(--sk-escuro);
+  color: var(--on-accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: var(--sk-dia-raio, 12px);
+}
+/* balão e avisos */
+html[data-skin] .bubble {
+  border: var(--sk-balao, 1px solid color-mix(in srgb, var(--accent) 30%, transparent));
+  border-radius: var(--sk-balao-raio, 16px);
+  font-family: var(--sk-balao-fonte, inherit);
+}
+html[data-skin] .toast {
+  border-left: 4px solid var(--accent);
+}
+/* itens lendários */
+html[data-skin] .sitem.legend {
+  background: linear-gradient(
+    160deg,
+    var(--surface) 55%,
+    color-mix(in srgb, var(--accent) 18%, var(--surface))
+  );
+}
+html[data-skin] .sitem:hover {
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+/* hábitos: forma do quadradinho feito */
+html[data-skin] .heat i.on {
+  border-radius: var(--sk-heat-raio, 3px);
+  transform: var(--sk-heat-gira, none);
+}
+/* diário */
+html[data-skin] .diario .card,
+html[data-skin] .diario textarea {
+  background: var(--sk-diario, var(--surface));
+  font-family: var(--sk-diario-fonte, inherit);
+}
+/* cronômetro rodando: brilho */
+html[data-skin] .timerrow.rodando .clock {
+  text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+/* sublinhado do título da aba */
+html[data-skin] .h1 {
+  position: relative;
+}
+html[data-skin] .block > .h1::after {
+  content: "";
+  display: var(--sk-sub-d, none);
+  height: 8px;
+  margin-top: 4px;
+  width: min(220px, 70%);
+  background: var(--sk-sub, none) 0 0 / auto 100% repeat-x;
+  opacity: 0.7;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-skin] body::after,
+  html[data-skin] .brand::after,
+  html[data-skin] li.atrasada::after,
+  html[data-skin] :is(.herobox, .stage)::before,
+  html[data-skin] .progress span {
+    animation: none !important;
+  }
+  html[data-skin] li.just-done::before {
+    display: none;
+  }
+}
+
+/* ---------------- sertanejo ---------------- */
+html[data-skin][data-mundo="sertanejo"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='none' stroke='%235D3A1A' stroke-width='2.4' stroke-linecap='round' opacity='.55'%3E%3Cpath d='M30 40a14 14 0 1 1 20 0'/%3E%3Ccircle cx='31' cy='42' r='1.6' fill='%235D3A1A'/%3E%3Ccircle cx='49' cy='42' r='1.6' fill='%235D3A1A'/%3E%3Cpath d='M210 70l6 12 13 2-10 9 3 13-12-7-12 7 3-13-10-9 13-2z'/%3E%3Cpath d='M120 200q10-30 0-60M120 170q-12-4-16 4M120 160q12-4 16 4M120 150q-12-4-16 4'/%3E%3Cpath d='M250 250q20-10 40 0'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 14' width='60' height='14'%3E%3Cpath d='M0 0H60V5H56L54 14L52 5H44L42 12L40 5H32L30 14L28 5H20L18 12L16 5H8L6 14L4 5H0Z' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M3 2a9 9 0 1 0 14 0' fill='none' stroke='%238B5A2B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M10 1l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L1.4 7.3l6-.7z' fill='%23E2B547' stroke='%237A4E1E' stroke-width='1'/%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cg fill='none' stroke='%238B6B3D' stroke-width='1.4'%3E%3Ccircle cx='10' cy='10' r='7'/%3E%3Cpath d='M4 8q6-4 12 2M5 13q5-6 10 0M8 4q4 6 0 12'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M5 3a8 8 0 1 0 10 0' fill='none' stroke='%238B5A2B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 10px;
+  --sk-risco: double;
+  --sk-barra: repeating-linear-gradient(90deg, #8b5a2b 0 10px, #a0703a 10px 12px);
+  --sk-btn: linear-gradient(180deg, #a0703a, #6b4421);
+  --sk-heat-raio: 50% 50% 30% 30%;
+  --sk-balao: 2px dashed color-mix(in srgb, var(--accent) 50%, transparent);
+  --sk-diario:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 22px,
+      color-mix(in srgb, #8b5a2b 18%, transparent) 22px 23px
+    ),
+    var(--surface);
+  --sk-faixa-h: 12px;
+}
+
+/* ---------------- cleanboy ---------------- */
+html[data-skin][data-mundo="cleanboy"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='none' stroke='%237FA7C9' stroke-width='1.6' opacity='.6'%3E%3Ccircle cx='50' cy='60' r='14'/%3E%3Ccircle cx='44' cy='54' r='3' fill='%23fff'/%3E%3Ccircle cx='230' cy='200' r='9'/%3E%3Ccircle cx='260' cy='90' r='5'/%3E%3Cpath d='M150 140l3 9 9 3-9 3-3 9-3-9-9-3 9-3z' fill='%23C9DCEC' stroke='none'/%3E%3Cpath d='M80 250l2 6 6 2-6 2-2 6-2-6-6-2 6-2z' fill='%23C9DCEC' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 6' width='40' height='6'%3E%3Cpath d='M0 0H40V3Q30 3 30 4Q20 3 20 3Q10 3 10 4Q0 3 0 3Z' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16' width='20' height='16'%3E%3Cpath d='M10 1l2 5 5 2-5 2-2 5-2-5-5-2 5-2z' fill='%236FA8DC'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M10 1l2.4 6.6L19 10l-6.6 2.4L10 19l-2.4-6.6L1 10l6.6-2.4z' fill='%239FD3F5' stroke='%234B8CC2' stroke-width='.8'/%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cg fill='%23B8C4CE'%3E%3Ccircle cx='8' cy='11' r='5'/%3E%3Ccircle cx='13' cy='9' r='4'/%3E%3Ccircle cx='12' cy='14' r='3'/%3E%3C/g%3E%3Ccircle cx='7' cy='10' r='.9' fill='%23556'/%3E%3Ccircle cx='10' cy='10' r='.9' fill='%23556'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M10 1l2.4 6.6L19 10l-6.6 2.4L10 19l-2.4-6.6L1 10l6.6-2.4z' fill='%236FA8DC'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 22px;
+  --sk-sombra: 0 6px 20px rgb(60 100 140 / 0.1);
+  --sk-borda-larg: 1px;
+  --sk-check-raio: 50%;
+  --sk-btn-raio: 999px;
+  --sk-barra: linear-gradient(90deg, #9fd3f5, #c9b8f5, #f5c6e0);
+  --sk-barra-tam: 200% 100%;
+  --sk-barra-vel: 4s;
+  --sk-heat-raio: 50%;
+  --sk-balao-raio: 22px;
+  --sk-faixa-h: 5px;
+  --sk-dia-raio: 999px;
+}
+
+/* ---------------- rapper ---------------- */
+html[data-skin][data-mundo="rapper"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='none' stroke='%23222' stroke-width='2' opacity='.5'%3E%3Crect x='40' y='30' width='16' height='30' rx='8'/%3E%3Cpath d='M48 60v14M38 74h20'/%3E%3Ccircle cx='220' cy='80' r='26'/%3E%3Ccircle cx='220' cy='80' r='6'/%3E%3Cpath d='M110 220l10-14 10 10 10-16 10 16 10-10 10 14z'/%3E%3Cpath d='M250 240l20 20M270 240l-20 20'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 14' width='50' height='14'%3E%3Cpath d='M0 0H50V4Q47 4 47 10Q47 13 45 13Q43 13 43 10Q43 4 30 4Q26 4 26 7Q26 9 24.5 9Q23 9 23 7Q23 4 10 4Q7 4 7 12Q7 14 5 14Q3 14 3 12Q3 4 0 4Z' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M2 12L4 3l4 5 2-6 2 6 4-5 2 9z' fill='%23E2B547' stroke='%237A5A10' stroke-width='.8'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Crect x='6' y='1' width='8' height='12' rx='4' fill='%23333'/%3E%3Cpath d='M10 13v4M6 18h8' stroke='%23333' stroke-width='1.6'/%3E%3Cpath d='M7 5h6M7 8h6' stroke='%23888' stroke-width='.8'/%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Crect x='2' y='5' width='16' height='10' rx='1.5' fill='%23444'/%3E%3Ccircle cx='7' cy='10' r='2' fill='%23ddd'/%3E%3Ccircle cx='13' cy='10' r='2' fill='%23ddd'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M2 16L4 4l4 6 2-8 2 8 4-6 2 12z' fill='%23E2B547' stroke='%237A5A10' stroke-width='1'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 8px;
+  --sk-sombra: 4px 4px 0 rgb(0 0 0 / 0.85);
+  --sk-borda-larg: 2px;
+  --sk-btn: linear-gradient(180deg, #f3d36b, #b8862b);
+  --sk-btn-sombra: 3px 3px 0 #000;
+  --sk-btn-aperta: 2px;
+  --sk-btn-caixa: uppercase;
+  --sk-btn-esp: 0.06em;
+  --sk-barra: repeating-linear-gradient(90deg, #e2b547 0 8px, #8c6a1c 8px 10px);
+  --sk-faixa-h: 14px;
+  --sk-faixa-cor: #111;
+}
+
+/* ---------------- trapper ---------------- */
+html[data-skin][data-mundo="trapper"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='none' stroke='%235B2A86' stroke-width='1.8' opacity='.55'%3E%3Cpath d='M50 40l14 0 8 10-15 18-15-18z'/%3E%3Cpath d='M43 50h29M57 40l-3 10 3 18 3-18-3-10'/%3E%3Cpath d='M230 120q-10-20 6-34q-2 12 8 16q4-10 0-18q22 14 10 36q-10 10-24 0z'/%3E%3Cpath d='M120 240l10 0 6 7-11 13-11-13z'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 15' width='44' height='15'%3E%3Cpath d='M0 0H44V4Q40 4 40 11Q40 15 37.5 15Q35 15 35 11Q35 4 26 4Q23 4 23 8Q23 10 21.5 10Q20 10 20 8Q20 4 10 4Q8 4 8 7Q8 9 6.5 9Q5 9 5 7Q5 4 0 4Z' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M4 2h12l3 4-9 8-9-8z' fill='%23B388FF' stroke='%234A148C' stroke-width='.9'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M4 4h12l3 4-9 10-9-10z' fill='%23CE93D8' stroke='%234A148C' stroke-width='1'/%3E%3Cpath d='M1 8h18M10 4l-2 4 2 10 2-10z' stroke='%234A148C' stroke-width='.6' fill='none'/%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M10 2q-6 6-4 11a4 4 0 0 0 8 0q2-5-4-11z' fill='%239C4DCC'/%3E%3Cpath d='M10 9q-2 2-1 4' stroke='%23E1BEE7' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M4 4h12l3 4-9 10-9-10z' fill='%23B388FF' stroke='%234A148C' stroke-width='1'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 14px;
+  --sk-sombra:
+    0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent),
+    0 8px 24px color-mix(in srgb, var(--accent) 18%, transparent);
+  --sk-btn: linear-gradient(135deg, #7b1fa2, #e040fb, #7b1fa2);
+  --sk-barra: linear-gradient(90deg, #7b1fa2, #e040fb, #40c4ff, #7b1fa2);
+  --sk-barra-tam: 200% 100%;
+  --sk-barra-vel: 3s;
+  --sk-faixa-h: 15px;
+  --sk-heat-raio: 2px;
+  --sk-heat-gira: rotate(45deg) scale(0.8);
+  --sk-risco: wavy;
+}
+
+/* ---------------- pagodeiro ---------------- */
+html[data-skin][data-mundo="pagodeiro"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='none' stroke='%232E7D32' stroke-width='2' opacity='.5'%3E%3Ccircle cx='60' cy='60' r='22'/%3E%3Ccircle cx='60' cy='60' r='16' stroke-dasharray='3 4'/%3E%3Cpath d='M200 60l40 60M196 64q-10-6-6-14q8-2 12 6'/%3E%3Cpath d='M100 220v-30l20-4v30'/%3E%3Cellipse cx='96' cy='222' rx='5' ry='4'/%3E%3Cellipse cx='116' cy='218' rx='5' ry='4'/%3E%3Cpath d='M240 230l6 12 13 2-10 9 3 13-12-7-12 7 3-13-10-9 13-2z'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' width='24' height='12'%3E%3Cpath d='M0 0H24V6L18 12L12 6L6 12L0 6Z' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Ccircle cx='10' cy='7' r='6' fill='%23FDD835' stroke='%232E7D32' stroke-width='1.6'/%3E%3Ccircle cx='10' cy='7' r='2' fill='%232E7D32'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='8' fill='%23FFF59D' stroke='%232E7D32' stroke-width='1.6'/%3E%3Cg fill='%239E9E9E'%3E%3Ccircle cx='10' cy='3' r='1.4'/%3E%3Ccircle cx='17' cy='10' r='1.4'/%3E%3Ccircle cx='10' cy='17' r='1.4'/%3E%3Ccircle cx='3' cy='10' r='1.4'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M4 16V6l10-2v10' fill='none' stroke='%232E7D32' stroke-width='1.6'/%3E%3Cellipse cx='4' cy='16' rx='3' ry='2.2' fill='%232E7D32'/%3E%3Cellipse cx='14' cy='14' rx='3' ry='2.2' fill='%232E7D32'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='8' fill='%23FDD835' stroke='%232E7D32' stroke-width='1.8'/%3E%3Ccircle cx='10' cy='10' r='3' fill='%232E7D32'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 16px;
+  --sk-barra: repeating-linear-gradient(90deg, #2e7d32 0 10px, #fdd835 10px 20px);
+  --sk-barra-vel: 1.6s;
+  --sk-faixa-h: 10px;
+  --sk-heat-raio: 50%;
+  --sk-btn: linear-gradient(180deg, #43a047, #1b5e20);
+  --sk-balao: 2px solid color-mix(in srgb, #fdd835 60%, transparent);
+}
+
+/* ---------------- funkeiro ---------------- */
+html[data-skin][data-mundo="funkeiro"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='none' stroke='%23111' stroke-width='2' opacity='.5'%3E%3Crect x='30' y='30' width='40' height='56' rx='4'/%3E%3Ccircle cx='50' cy='52' r='12'/%3E%3Ccircle cx='50' cy='52' r='4'/%3E%3Ccircle cx='50' cy='76' r='5'/%3E%3Cpath d='M220 60l-14 26h12l-8 24 22-32h-12l8-18z'/%3E%3Cpath d='M100 230h8v-20h8v28h8v-14h8v24h8v-34h8v20'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 14' width='40' height='14'%3E%3Cpath d='M0 0H40V4H37V12H34V4H31V8H28V4H25V14H22V4H19V9H16V4H13V11H10V4H7V7H4V4H0Z' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M11 1L4 9h5l-2 5 8-8h-5l2-5z' fill='%23FFEA00' stroke='%23000' stroke-width='.8'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M12 1L4 11h6l-2 8 9-11h-6l3-7z' fill='%23FFEA00' stroke='%23111' stroke-width='1'/%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Crect x='4' y='3' width='12' height='15' rx='2' fill='%23333'/%3E%3Ccircle cx='10' cy='9' r='3.4' fill='%23666'/%3E%3Ccircle cx='10' cy='15' r='1.6' fill='%23666'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M12 1L4 11h6l-2 8 9-11h-6l3-7z' fill='%23FFEA00' stroke='%23111' stroke-width='1.2'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 12px;
+  --sk-sombra:
+    0 0 0 2px color-mix(in srgb, var(--accent) 50%, transparent),
+    0 0 18px color-mix(in srgb, var(--accent) 25%, transparent);
+  --sk-btn: linear-gradient(90deg, #ff1744, #ff9100, #ffea00);
+  --sk-btn-caixa: uppercase;
+  --sk-btn-esp: 0.08em;
+  --sk-barra: linear-gradient(90deg, #ff1744, #ff9100, #ffea00, #00e676, #2979ff, #d500f9, #ff1744);
+  --sk-barra-tam: 300% 100%;
+  --sk-barra-vel: 2s;
+  --sk-faixa-h: 14px;
+  --sk-faixa-vel: 3s;
+}
+
+/* ---------------- forrozeiro ---------------- */
+html[data-skin][data-mundo="forrozeiro"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='none' stroke='%238D4B16' stroke-width='2' opacity='.5'%3E%3Cpath d='M20 30l20 0-10 16z M60 34l20 0-10 16z M100 30l20 0-10 16z' stroke-linejoin='round'/%3E%3Cpath d='M10 30q60 10 120 0'/%3E%3Cpath d='M230 90v60M230 110h-14v-14M230 120h14v-18'/%3E%3Ccircle cx='80' cy='230' r='18'/%3E%3Cpath d='M80 205v-6M80 261v-6M55 230h-6M111 230h-6'/%3E%3Cpath d='M240 240l8 0 4 6-8 10-8-10z'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 13' width='30' height='13'%3E%3Cpath d='M0 0H30V2H28L22 13L16 2H14L8 13L2 2H0Z' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M3 2h14l-7 11z' fill='%23E53935' stroke='%237A1A10' stroke-width='.8'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M10 1l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L1.4 7.3l6-.7z' fill='%23C77A35' stroke='%235A2E0E' stroke-width='1'/%3E%3Ccircle cx='10' cy='10' r='2' fill='%23FDD835'/%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M10 18V4M10 9H5V5M10 12h5V7' stroke='%2343A047' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M3 3h14l-7 13z' fill='%23E53935' stroke='%237A1A10' stroke-width='1'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 14px;
+  --sk-faixa-h: 13px;
+  --sk-faixa-cor: linear-gradient(90deg, #e53935 0 25%, #fdd835 25% 50%, #1e88e5 50% 75%, #43a047 75%);
+  --sk-barra: repeating-linear-gradient(
+    90deg,
+    #e53935 0 8px,
+    #fdd835 8px 16px,
+    #1e88e5 16px 24px,
+    #43a047 24px 32px
+  );
+  --sk-barra-vel: 2.5s;
+  --sk-btn: linear-gradient(180deg, #e07a2e, #a3480e);
+  --sk-diario:
+    radial-gradient(circle at 10px 10px, color-mix(in srgb, #e53935 12%, transparent) 3px, transparent 4px) 0
+      0 / 22px 22px,
+    var(--surface);
+  --sk-heat-raio: 50% 50% 50% 0;
+}
+
+/* ---------------- gamer ---------------- */
+html[data-skin][data-mundo="gamer"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='%23222' opacity='.45'%3E%3Cpath d='M40 40h8v8h8v-8h8v8h8v16h-8v8h-8v8h-8v-8h-8v-8h-8v-16h8z'/%3E%3Crect x='220' y='60' width='40' height='24' rx='8'/%3E%3Crect x='228' y='68' width='4' height='10' fill='%23fff'/%3E%3Crect x='225' y='71' width='10' height='4' fill='%23fff'/%3E%3Ccircle cx='250' cy='70' r='2.4' fill='%23fff'/%3E%3Ccircle cx='254' cy='76' r='2.4' fill='%23fff'/%3E%3Crect x='110' y='220' width='16' height='16'/%3E%3Crect x='114' y='224' width='8' height='8' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 12' width='32' height='12'%3E%3Cpath d='M0 0H32V4H28V8H24V12H20V8H16V4H12V8H8V12H4V8H0Z' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16' width='20' height='16'%3E%3Cpath d='M8 2h4v4h4v4h-4v4H8v-4H4V6h4z' fill='%2300E5FF'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Crect x='5' y='2' width='10' height='16' rx='0' fill='%23FFD54F'/%3E%3Crect x='3' y='4' width='14' height='12' fill='%23FFD54F'/%3E%3Crect x='8' y='5' width='4' height='10' fill='%23F9A825'/%3E%3C/svg%3E");
+  --sk-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40'%3E%3Ctext x='20' y='26' font-family='monospace' font-weight='900' font-size='16' text-anchor='middle' fill='%2300E5FF' stroke='%23000' stroke-width='1'%3E%2B1%3C/text%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M4 18V8a6 6 0 0 1 12 0v10l-2-2-2 2-2-2-2 2-2-2z' fill='%239E9E9E'/%3E%3Crect x='6' y='7' width='3' height='3' fill='%23fff'/%3E%3Crect x='11' y='7' width='3' height='3' fill='%23fff'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M4 4h4v4h4V4h4v4h2v6h-2v2h-2v2h-4v-2H8v-2H6v-2H4z' fill='%23FF4081'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 4px;
+  --sk-sombra: 4px 4px 0 color-mix(in srgb, var(--ink) 80%, transparent);
+  --sk-borda-larg: 2px;
+  --sk-check-raio: 2px;
+  --sk-btn-raio: 2px;
+  --sk-btn-sombra: 3px 3px 0 #000;
+  --sk-btn-aperta: 2px;
+  --sk-btn-caixa: uppercase;
+  --sk-barra: repeating-linear-gradient(90deg, #00e676 0 12px, transparent 12px 15px);
+  --sk-faixa-h: 12px;
+  --sk-heat-raio: 0;
+  --sk-dia-raio: 4px;
+  --sk-balao: 2px solid var(--ink);
+  --sk-balao-raio: 4px;
+  --sk-balao-fonte: "VT323", monospace;
+}
+
+/* ---------------- otaku ---------------- */
+html[data-skin][data-mundo="otaku"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg opacity='.55'%3E%3Cg fill='%23F48FB1'%3E%3Cpath d='M50 30q8 6 4 14q-2 4-2 6q0-2-2-6q-4-8 0-14z' transform='rotate(-20 50 40)'/%3E%3Cpath d='M250 120q8 6 4 14q-2 4-2 6q0-2-2-6q-4-8 0-14z' transform='rotate(30 250 130)'/%3E%3Cpath d='M140 250q8 6 4 14q-2 4-2 6q0-2-2-6q-4-8 0-14z'/%3E%3C/g%3E%3Cg fill='%23CE93D8'%3E%3Cpath d='M200 40l3 8 8 3-8 3-3 8-3-8-8-3 8-3z'/%3E%3Cpath d='M60 200l2 5 5 2-5 2-2 5-2-5-5-2 5-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 9' width='36' height='9'%3E%3Cpath d='M0 0H36V3Q33 3 32 6L30 3L28 9L26 3Q22 3 21 5L18 3L15 8L13 3Q8 3 7 6L5 3L3 7L1 3H0Z' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M10 13l-6-6a3.5 3.5 0 0 1 6-3 3.5 3.5 0 0 1 6 3z' fill='%23FF4F9A'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M10 18l-7.5-7.5a4.5 4.5 0 0 1 7.5-4.8 4.5 4.5 0 0 1 7.5 4.8z' fill='%23FF7AA8' stroke='%23C2185B' stroke-width='1'/%3E%3Ccircle cx='7' cy='8' r='1.4' fill='%23fff'/%3E%3C/svg%3E");
+  --sk-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40'%3E%3Cg transform='rotate(-10 20 20)'%3E%3Cpath d='M20 2l4 10 11-3-7 9 9 7-11 1 1 11-7-8-7 8 1-11-11-1 9-7-7-9 11 3z' fill='%23FFF176' stroke='%23000' stroke-width='1.2'/%3E%3Ctext x='20' y='24' font-size='8' font-weight='900' text-anchor='middle' font-family='sans-serif'%3E%21%21%3C/text%3E%3C/g%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M10 2q7 9 4 14a4 4 0 0 1-8 0q-3-5 4-14z' fill='%2381D4FA' stroke='%230277BD' stroke-width='1'/%3E%3Cpath d='M8 12q0 3 2 4' stroke='%23fff' stroke-width='1.2' fill='none'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cg fill='%23FF7AA8'%3E%3Cellipse cx='10' cy='5' rx='3' ry='4.5'/%3E%3Cellipse cx='10' cy='5' rx='3' ry='4.5' transform='rotate(72 10 10)'/%3E%3Cellipse cx='10' cy='5' rx='3' ry='4.5' transform='rotate(144 10 10)'/%3E%3Cellipse cx='10' cy='5' rx='3' ry='4.5' transform='rotate(216 10 10)'/%3E%3Cellipse cx='10' cy='5' rx='3' ry='4.5' transform='rotate(288 10 10)'/%3E%3C/g%3E%3Ccircle cx='10' cy='10' r='2' fill='%23FFD54F'/%3E%3C/svg%3E");
+  --sk-sub: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 8' width='40' height='8'%3E%3Cpath d='M0 4q5-4 10 0t10 0t10 0t10 0' stroke='%23FF7AA8' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 18px;
+  --sk-sombra: 0 4px 0 color-mix(in srgb, var(--accent) 35%, transparent);
+  --sk-btn-raio: 999px;
+  --sk-check-raio: 50%;
+  --sk-btn: linear-gradient(180deg, #ff8fb8, #e0457f);
+  --sk-barra: repeating-linear-gradient(-45deg, #ff7aa8 0 8px, #ffb3cf 8px 16px);
+  --sk-barra-vel: 1.2s;
+  --sk-faixa-h: 9px;
+  --sk-heat-raio: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  --sk-balao: 2.5px solid var(--ink);
+  --sk-balao-raio: 20px 20px 20px 6px;
+  --sk-diario:
+    radial-gradient(color-mix(in srgb, var(--accent) 14%, transparent) 1.2px, transparent 1.6px) 0 0 / 8px 8px,
+    var(--surface);
+  --sk-sub-d: block;
+}
+
+/* ---------------- programador ---------------- */
+html[data-skin][data-mundo="programador"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='%232E7D32' opacity='.5' font-family='monospace' font-weight='700'%3E%3Ctext x='30' y='50' font-size='26'%3E%7B %7D%3C/text%3E%3Ctext x='200' y='90' font-size='22'%3E%26lt;/%26gt;%3C/text%3E%3Ctext x='90' y='210' font-size='20'%3E01%3C/text%3E%3Ctext x='230' y='250' font-size='24'%3E;%3C/text%3E%3Ctext x='40' y='290' font-size='18'%3E=%26gt;%3C/text%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 8' width='16' height='8'%3E%3Crect x='0' y='0' width='16' height='3' fill='%23000'/%3E%3Crect x='0' y='3' width='6' height='5' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M4 3l6 4-6 4' stroke='%2340C463' stroke-width='2.4' fill='none'/%3E%3Cpath d='M12 12h5' stroke='%2340C463' stroke-width='2.4'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Crect x='1' y='1' width='18' height='18' rx='3' fill='%230D1117' stroke='%2340C463' stroke-width='1.4'/%3E%3Cpath d='M5 10l3 3 7-7' stroke='%2340C463' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  --sk-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40'%3E%3Ctext x='20' y='25' font-family='monospace' font-weight='900' font-size='11' text-anchor='middle' fill='%2340C463'%3E200 OK%3C/text%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cellipse cx='10' cy='12' rx='4.5' ry='5.5' fill='%23E53935'/%3E%3Ccircle cx='10' cy='5.6' r='2.6' fill='%23B71C1C'/%3E%3Cpath d='M5 9H2M5 13H2M15 9h3M15 13h3M6 16l-2 2M14 16l2 2M10 7v10' stroke='%23B71C1C' stroke-width='1'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M6 5L1 10l5 5M14 5l5 5-5 5' stroke='%2340C463' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 6px;
+  --sk-borda-larg: 1px;
+  --sk-btn: #238636;
+  --sk-btn-raio: 6px;
+  --sk-barra: repeating-linear-gradient(90deg, #40c463 0 9px, #216e39 9px 10px);
+  --sk-faixa-h: 8px;
+  --sk-heat-raio: 2px;
+  --sk-dia-raio: 6px;
+  --sk-balao: 1px solid color-mix(in srgb, #40c463 60%, transparent);
+  --sk-balao-fonte: "VT323", ui-monospace, monospace;
+  --sk-risco: solid;
+  --sk-diario:
+    linear-gradient(90deg, color-mix(in srgb, #40c463 10%, transparent) 0 34px, transparent 34px),
+    var(--surface);
+  --sk-diario-fonte: ui-monospace, "VT323", monospace;
+}
+
+/* ---------------- zen ---------------- */
+html[data-skin][data-mundo="zen"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='none' stroke='%236B8E5A' stroke-width='1.8' opacity='.45'%3E%3Cpath d='M60 40a26 26 0 1 0 22 12' stroke-linecap='round' stroke-width='4'/%3E%3Cpath d='M220 80q-20-20 0-40q20 20 0 40zM220 80v14'/%3E%3Cpath d='M80 240q20-12 40 0q-20 12-40 0z'/%3E%3Cpath d='M200 230q16-8 30 0'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 11' width='40' height='11'%3E%3Cpath d='M0 0H40V6A10 10 0 0 0 20 6A10 10 0 0 0 0 6Z' fill='%23000'/%3E%3Cpath d='M4 6A6 6 0 0 1 16 6M24 6A6 6 0 0 1 36 6' fill='none' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M10 13q-8-6 0-12q8 6 0 12z' fill='%237CB342'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cg fill='%23F8BBD0' stroke='%23AD1457' stroke-width='.6'%3E%3Cpath d='M10 16q-6-4-6-10q6 2 6 10z'/%3E%3Cpath d='M10 16q6-4 6-10q-6 2-6 10z'/%3E%3Cpath d='M10 16q-3-6 0-13q3 7 0 13z'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M4 14q2-10 12-10q0 10-12 10z' fill='%23C5A572'/%3E%3Cpath d='M4 14l9-7' stroke='%238D6E63' stroke-width='.8'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='7' fill='none' stroke='%235D7A4E' stroke-width='2.4' stroke-dasharray='36 8' stroke-linecap='round'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 20px;
+  --sk-sombra: 0 2px 12px rgb(80 100 70 / 0.08);
+  --sk-btn: linear-gradient(180deg, #8db57a, #5e7f4e);
+  --sk-btn-raio: 999px;
+  --sk-check-raio: 50%;
+  --sk-barra: repeating-linear-gradient(90deg, #8db57a 0 22px, #6b8e5a 22px 24px);
+  --sk-faixa-h: 11px;
+  --sk-heat-raio: 50%;
+  --sk-marca-gira: 180deg;
+  --sk-diario:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 26px,
+      color-mix(in srgb, #6b8e5a 14%, transparent) 26px 27px
+    ),
+    var(--surface);
+}
+
+/* ---------------- coach ---------------- */
+html[data-skin][data-mundo="coach"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='none' stroke='%23E65100' stroke-width='2.4' opacity='.45'%3E%3Cpath d='M30 50h8M38 40v20M38 50h30M68 40v20M68 50h8'/%3E%3Cpath d='M220 40h30v14a15 15 0 0 1-30 0zM235 69v12M225 81h20M220 46h-8a8 8 0 0 0 8 10M250 46h8a8 8 0 0 1-8 10'/%3E%3Cpath d='M80 240l30-30M110 210h-14M110 210v14'/%3E%3Cpath d='M200 250h50M240 240l10 10-10 10'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 12' width='16' height='12'%3E%3Crect width='16' height='6' fill='%23000'/%3E%3Crect x='0' y='6' width='8' height='6' fill='%23000' opacity='.0'/%3E%3Crect x='8' y='6' width='8' height='6' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M5 2h10v4a5 5 0 0 1-10 0zM10 11v2M7 13h6' fill='%23FFC107' stroke='%23B26A00' stroke-width='1'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Ccircle cx='10' cy='12' r='6.5' fill='%23FFC107' stroke='%23B26A00' stroke-width='1.2'/%3E%3Cpath d='M6 1l4 6 4-6' stroke='%23E53935' stroke-width='2.4' fill='none'/%3E%3Ctext x='10' y='15' font-size='7' font-weight='900' text-anchor='middle' fill='%23B26A00'%3E1%3C/text%3E%3C/svg%3E");
+  --sk-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40'%3E%3Ctext x='20' y='25' font-family='Anton, Impact, sans-serif' font-weight='900' font-size='12' text-anchor='middle' fill='%23E65100' stroke='%23fff' stroke-width='.6'%3EBORA%21%3C/text%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Ccircle cx='10' cy='11' r='7' fill='%23fff' stroke='%23E53935' stroke-width='1.6'/%3E%3Cpath d='M10 7v4l3 2' stroke='%23333' stroke-width='1.4' fill='none'/%3E%3Cpath d='M3 4l3-2M17 4l-3-2' stroke='%23E53935' stroke-width='1.6'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M3 15l5-6 3 3 6-8' stroke='%23E65100' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3Cpath d='M12 4h5v5' stroke='%23E65100' stroke-width='2.6' fill='none'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 10px;
+  --sk-sombra: 0 3px 0 color-mix(in srgb, var(--accent) 45%, transparent);
+  --sk-btn: linear-gradient(180deg, #ff7a1a, #d84315);
+  --sk-btn-caixa: uppercase;
+  --sk-btn-esp: 0.08em;
+  --sk-barra: repeating-linear-gradient(-60deg, #ff7a1a 0 10px, #ffb74d 10px 14px);
+  --sk-barra-vel: 0.8s;
+  --sk-faixa-h: 12px;
+  --sk-faixa-cor: #111;
+  --sk-heat-raio: 2px;
+}
+
+/* ---------------- vovo ---------------- */
+html[data-skin][data-mundo="vovo"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg fill='none' stroke='%23B5527A' stroke-width='1.8' opacity='.45'%3E%3Ccircle cx='50' cy='50' r='6'/%3E%3Ccircle cx='50' cy='38' r='6'/%3E%3Ccircle cx='50' cy='62' r='6'/%3E%3Ccircle cx='38' cy='50' r='6'/%3E%3Ccircle cx='62' cy='50' r='6'/%3E%3Ccircle cx='230' cy='100' r='18'/%3E%3Cpath d='M214 92q16 6 32-4M216 108q14-8 28 4M244 112l14 14'/%3E%3Cpath d='M100 240q-12-12 0-20q8-4 10 6q2-10 10-6q12 8 0 20l-10 10z'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 12' width='20' height='12'%3E%3Cpath d='M0 0H20V2A10 10 0 0 1 0 2Z' fill='%23000'/%3E%3Ccircle cx='10' cy='5' r='1.6' fill='%23fff'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M10 13l-6-6a3.5 3.5 0 0 1 6-3 3.5 3.5 0 0 1 6 3z' fill='%23E57399'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cg fill='%23F8BBD0' stroke='%23B5527A' stroke-width='.8'%3E%3Ccircle cx='10' cy='4.5' r='3.5'/%3E%3Ccircle cx='15.5' cy='10' r='3.5'/%3E%3Ccircle cx='10' cy='15.5' r='3.5'/%3E%3Ccircle cx='4.5' cy='10' r='3.5'/%3E%3C/g%3E%3Ccircle cx='10' cy='10' r='2.6' fill='%23FFD54F'/%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Ccircle cx='10' cy='11' r='6' fill='%2390CAF9'/%3E%3Cpath d='M5 9q5 3 10-2M5 13q5-3 10 1' stroke='%231E88E5' fill='none' stroke-width='.9'/%3E%3Cpath d='M14 6l4-4' stroke='%238D6E63' stroke-width='1.2'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M10 17l-7-7a4 4 0 0 1 7-4 4 4 0 0 1 7 4z' fill='%23E57399'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 16px;
+  --sk-borda-estilo: dashed;
+  --sk-borda-larg: 1.5px;
+  --sk-btn: linear-gradient(180deg, #e57399, #b5527a);
+  --sk-btn-raio: 14px;
+  --sk-barra:
+    repeating-linear-gradient(90deg, #e57399 0 6px, #f8bbd0 6px 12px),
+    repeating-linear-gradient(0deg, transparent 0 6px, rgb(255 255 255 / 0.35) 6px 12px);
+  --sk-faixa-h: 12px;
+  --sk-heat-raio: 50%;
+  --sk-diario:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 24px,
+      color-mix(in srgb, #1e88e5 18%, transparent) 24px 25px
+    ),
+    var(--surface);
+  --sk-diario-fonte: "Caveat", cursive;
+  --sk-balao: 1.5px dashed color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+/* ---------------- feiticeiro ---------------- */
+html[data-skin][data-mundo="feiticeiro"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg opacity='.6'%3E%3Cg fill='%23C9A646'%3E%3Cpath d='M40 30l2.6 7 7 2.6-7 2.6L40 49l-2.6-6.8-7-2.6 7-2.6z'/%3E%3Cpath d='M260 200l2 5 5 2-5 2-2 5-2-5-5-2 5-2z'/%3E%3Ccircle cx='150' cy='60' r='1.6'/%3E%3Ccircle cx='90' cy='150' r='1.4'/%3E%3Ccircle cx='280' cy='70' r='1.6'/%3E%3C/g%3E%3Cg fill='none' stroke='%235C6BC0' stroke-width='1.4'%3E%3Ccircle cx='200' cy='110' r='22'/%3E%3Ccircle cx='200' cy='110' r='15'/%3E%3Cpath d='M200 88v44M178 110h44M185 95l30 30M215 95l-30 30'/%3E%3Cpath d='M60 240a20 20 0 1 0 14-30a16 16 0 1 1-14 30z' fill='%23C9A646' stroke='none'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 13' width='48' height='13'%3E%3Cpath d='M0 0H48V5H0Z' fill='%23000'/%3E%3Cg fill='%23000'%3E%3Ccircle cx='6' cy='9' r='2'/%3E%3Cpath d='M14 6l3 6h-6z'/%3E%3Crect x='22' y='6' width='4' height='5'/%3E%3Cpath d='M34 6l2 3-2 3-2-3z'/%3E%3Ccircle cx='44' cy='9' r='1.4'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16' width='20' height='16'%3E%3Cpath d='M10 1l2 5 5 1.5-4 3 1.5 5-4.5-3-4.5 3 1.5-5-4-3 5-1.5z' fill='%23E8C55A' stroke='%237A5A10' stroke-width='.6'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='8' fill='%231A237E' stroke='%23E8C55A' stroke-width='1.4'/%3E%3Ccircle cx='10' cy='10' r='4.5' fill='none' stroke='%2390CAF9' stroke-width='1'/%3E%3Cpath d='M10 2v16M2 10h16' stroke='%23E8C55A' stroke-width='.6'/%3E%3C/svg%3E");
+  --sk-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40'%3E%3Cg fill='none' stroke='%2390CAF9' stroke-width='1.4'%3E%3Ccircle cx='20' cy='20' r='16'/%3E%3Ccircle cx='20' cy='20' r='10'/%3E%3Cpath d='M20 4l6 26-15-17h18L14 30z' stroke='%23E8C55A'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M5 2h10M5 18h10M6 2q0 6 4 8q-4 2-4 8M14 2q0 6-4 8q4 2 4 8' stroke='%238D6E63' stroke-width='1.4' fill='none'/%3E%3Cpath d='M8 16q2-3 4 0z' fill='%23E8C55A'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M3 18L13 3' stroke='%236D4C41' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M14 1l1.2 2.8 2.8 1.2-2.8 1.2L14 9l-1.2-2.8L10 5l2.8-1.2z' fill='%23E8C55A'/%3E%3C/svg%3E");
+  --sk-sub: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 8' width='40' height='8'%3E%3Cpath d='M0 4h40' stroke='%23C9A646' stroke-width='1.2'/%3E%3Cpath d='M18 4l2-3 2 3-2 3z' fill='%23C9A646'/%3E%3Ccircle cx='6' cy='4' r='1.2' fill='%23C9A646'/%3E%3Ccircle cx='34' cy='4' r='1.2' fill='%23C9A646'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 12px;
+  --sk-sombra:
+    0 0 0 1px color-mix(in srgb, #c9a646 45%, transparent),
+    0 6px 22px color-mix(in srgb, var(--accent) 16%, transparent);
+  --sk-btn: linear-gradient(180deg, color-mix(in srgb, var(--accent) 85%, #fff), var(--sk-escuro));
+  --sk-btn-sombra: 0 0 0 1px #c9a646, 0 0 14px color-mix(in srgb, var(--accent) 40%, transparent);
+  --sk-barra: linear-gradient(90deg, #3949ab, #7986cb, #e8c55a, #7986cb, #3949ab);
+  --sk-barra-tam: 200% 100%;
+  --sk-barra-vel: 3s;
+  --sk-faixa-h: 13px;
+  --sk-faixa-cor: #c9a646;
+  --sk-check-raio: 50%;
+  --sk-heat-raio: 50%;
+  --sk-balao: 1.5px solid #c9a646;
+  --sk-diario: linear-gradient(180deg, #f3e5c0, #e9d6a6);
+  --sk-diario-fonte: "Cormorant Garamond", serif;
+  --sk-sub-d: block;
+  --sk-marca-gira: -12deg;
+}
+
+/* ---------------- bruxo ---------------- */
+html[data-skin][data-mundo="bruxo"] {
+  --sk-fundo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' width='320' height='320'%3E%3Cg opacity='.55'%3E%3Cg fill='none' stroke='%234E7A2A' stroke-width='1.8'%3E%3Cpath d='M40 60q0-20 20-20t20 20q0 16-20 16t-20-16z'/%3E%3Cpath d='M36 48h48'/%3E%3Cpath d='M50 36q2-8 6-4M64 34q4-8 8-2' stroke='%237CB342'/%3E%3C/g%3E%3Cg fill='%237B1FA2'%3E%3Cpath d='M220 50a16 16 0 1 0 10 28a13 13 0 1 1-10-28z'/%3E%3C/g%3E%3Cg fill='none' stroke='%236A1B9A' stroke-width='1.6'%3E%3Cpath d='M120 220h20v8l6 20h-32l6-20z'/%3E%3Cpath d='M126 236q4 4 8 0'/%3E%3C/g%3E%3Cg fill='%239CCC65'%3E%3Ccircle cx='250' cy='240' r='4'/%3E%3Ccircle cx='260' cy='226' r='2.6'/%3E%3Ccircle cx='244' cy='218' r='1.8'/%3E%3C/g%3E%3Cpath d='M70 180q0-10 10-10t10 10z M78 180v10h4v-10' fill='%23C62828'/%3E%3Cg fill='%23fff'%3E%3Ccircle cx='76' cy='175' r='1.2'/%3E%3Ccircle cx='84' cy='176' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --sk-faixa: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 15' width='50' height='15'%3E%3Cpath d='M0 0H50V4Q46 4 45 9Q44 15 41 15Q38 15 38 10Q37 4 28 4Q24 4 24 7Q23 11 21 11Q19 11 19 7Q18 4 10 4Q7 4 6 8Q5 12 3 12Q1 12 1 8Q0 4 0 4Z' fill='%23000'/%3E%3C/svg%3E");
+  --sk-ind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14' width='20' height='14'%3E%3Cpath d='M12 1a7 7 0 1 0 5 11a5.6 5.6 0 1 1-5-11z' fill='%23B388FF'/%3E%3C/svg%3E");
+  --sk-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M7 3h6v3l3 9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3l3-9z' fill='%2376FF03' fill-opacity='.85' stroke='%232E1A47' stroke-width='1.2'/%3E%3Ccircle cx='9' cy='13' r='1.2' fill='%23fff'/%3E%3Ccircle cx='12' cy='11' r='.8' fill='%23fff'/%3E%3C/svg%3E");
+  --sk-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40'%3E%3Cg fill='%239CCC65'%3E%3Ccircle cx='14' cy='26' r='5'/%3E%3Ccircle cx='24' cy='18' r='4'/%3E%3Ccircle cx='20' cy='8' r='2.6'/%3E%3Ccircle cx='30' cy='28' r='2'/%3E%3C/g%3E%3Cg fill='%23CE93D8'%3E%3Ccircle cx='10' cy='14' r='2.4'/%3E%3Ccircle cx='30' cy='10' r='1.8'/%3E%3C/g%3E%3C/svg%3E");
+  --sk-atrasada: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cg fill='none' stroke='%23555' stroke-width='.9'%3E%3Cpath d='M10 10L1 3M10 10l9-7M10 10L1 17M10 10l9 7M10 10V1M10 10v9M10 10H1M10 10h9'/%3E%3Cpath d='M5 5q5 3 10 0q-3 5 0 10q-5-3-10 0q3-5 0-10z'/%3E%3C/g%3E%3Ccircle cx='14' cy='6' r='2' fill='%23222'/%3E%3C/svg%3E");
+  --sk-marca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20'%3E%3Cpath d='M4 17q-2-6 3-8l-1-6 6 4 5-2-2 6q4 4 0 8z' fill='%231B1B1B'/%3E%3Ccircle cx='8' cy='12' r='1.2' fill='%23C6FF00'/%3E%3Ccircle cx='12' cy='12' r='1.2' fill='%23C6FF00'/%3E%3C/svg%3E");
+  --sk-sub: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 8' width='40' height='8'%3E%3Cpath d='M0 3h40' stroke='%237CB342' stroke-width='2'/%3E%3Cpath d='M8 3q0 4 1 5q1-1 1-5M28 3q0 3 1 4q1-1 1-4' fill='%237CB342'/%3E%3C/svg%3E");
+  --sk-marca-d: inline-block;
+  --sk-raio: 14px;
+  --sk-sombra: 0 0 0 1px color-mix(in srgb, #7cb342 35%, transparent), 0 8px 22px rgb(40 0 60 / 0.14);
+  --sk-btn: linear-gradient(180deg, color-mix(in srgb, var(--accent) 85%, #fff), var(--sk-escuro));
+  --sk-btn-sombra: 0 0 12px color-mix(in srgb, #76ff03 25%, transparent);
+  --sk-barra:
+    radial-gradient(circle at 6px 50%, rgb(255 255 255 / 0.55) 2px, transparent 3px) 0 0 / 18px 100%,
+    linear-gradient(90deg, #33691e, #76ff03);
+  --sk-barra-vel: 1.4s;
+  --sk-faixa-h: 15px;
+  --sk-faixa-cor: #7cb342;
+  --sk-check-raio: 40% 40% 50% 50%;
+  --sk-heat-raio: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  --sk-risco: wavy;
+  --sk-balao: 1.5px solid color-mix(in srgb, #7cb342 55%, transparent);
+  --sk-diario: linear-gradient(180deg, color-mix(in srgb, #7cb342 8%, var(--surface)), var(--surface));
+  --sk-diario-fonte: "Griffy", "Caveat", cursive;
+  --sk-sub-d: block;
+  --sk-marca-gira: 0deg;
+}
