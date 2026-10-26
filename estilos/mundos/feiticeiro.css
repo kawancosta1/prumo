@@ -391,6 +391,46 @@ html[data-mundo="feiticeiro"] .tarefa-petrificada::after {
   opacity: 0.8;
 }
 
+/* 49. Coruja-correio animada */
+.feit-coruja-correio {
+  position: fixed;
+  top: 15%;
+  left: -50px;
+  z-index: 9999;
+  pointer-events: none;
+  animation: corujaVoa 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes corujaVoa {
+  0% {
+    transform: translate(0, 0) scale(0.7);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(100vw + 60px), 40px) scale(1);
+    opacity: 0;
+  }
+}
+
+/* 50. Pet levitando */
+.feit-pet-levitando {
+  animation: petLevita 1.5s ease-in-out infinite alternate !important;
+  filter: drop-shadow(0 8px 12px rgba(139, 92, 246, 0.5));
+}
+@keyframes petLevita {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-14px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #circulo-magico {
     display: none;
@@ -401,6 +441,8 @@ html[data-mundo="feiticeiro"] .tarefa-petrificada::after {
   .feit-vela-flutua,
   .feitico-animo-brilho,
   .feit-modal-pergaminho .feit-pergaminho-desenrola,
+  .feit-coruja-correio,
+  .feit-pet-levitando,
   html[data-mundo="feiticeiro"][data-variante="astral"] body {
     animation: none;
   }

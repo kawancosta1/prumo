@@ -50,6 +50,7 @@ const servidor = http.createServer((req, res) => {
     ["Feiticeiro: Lote 2 (Itens 11 a 20)", () => require("./feiticeiro-lote2")(url)],
     ["Feiticeiro: Lote 3 (Itens 21 a 30)", () => require("./feiticeiro-lote3")(url)],
     ["Feiticeiro: Lote 4 (Itens 31 a 40)", () => require("./feiticeiro-lote4")(url)],
+    ["Feiticeiro: Lote 5 (Itens 41 a 50)", () => require("./feiticeiro-lote5")(url)],
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
     ["Quarto por Mundo", () => require("./quarto-mundos")(url)],

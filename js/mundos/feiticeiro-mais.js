@@ -977,3 +977,202 @@ if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.feiticeiro) {
     return base + enfeiteSeloCeraSVG() + velasCabecalhoSVG(feitas, total);
   };
 }
+
+/* =========================================================
+   FEITICEIRO: LOTE 5 (ITENS 41 A 50)
+   ========================================================= */
+
+/* 41. Som de varinha (brilho subindo) ao abrir o app */
+function somVarinhaAbrir(ctx, saida, t = 0) {
+  if (!ctx || !saida) return;
+  [1046.5, 1318.5, 1567.98, 2093.0, 2637.0].forEach((freq, idx) => {
+    tocarTom(ctx, saida, t + idx * 0.05, freq, 0.4, "sine", 0.05, 0.01);
+  });
+}
+if (typeof SONS_MUNDO !== "undefined" && SONS_MUNDO.feiticeiro) {
+  SONS_MUNDO.feiticeiro.abrir = somVarinhaAbrir;
+}
+
+/* 42. Gongo místico ao subir de título */
+function somGongoMistico(ctx, saida, t = 0) {
+  if (!ctx || !saida) return;
+  tocarTom(ctx, saida, t, 110, 3.2, "sine", 0.12, 0.4);
+  tocarTom(ctx, saida, t + 0.02, 220, 2.5, "triangle", 0.08, 0.2);
+  tocarTom(ctx, saida, t + 0.05, 440, 1.8, "sine", 0.04, 0.1);
+}
+
+/* 43. Conquistas do mundo Feiticeiro */
+const ACHS_FEITICEIRO = [
+  {
+    id: "feit_primeira_constelacao",
+    nome: "Primeira constelação",
+    desc: "Completou uma constelação inteira no céu.",
+    goal: 1,
+    cur: () => (dadosFeit().ceu.mapa || []).length
+  },
+  {
+    id: "feit_torre_10_andares",
+    nome: "Torre de 10 andares",
+    desc: "Evoluiu a torre até alcançar 10 andares.",
+    goal: 10,
+    cur: () => Math.floor((dadosFeit().feiticos || 0) / 10) + 1
+  },
+  {
+    id: "feit_grimorio_completo",
+    nome: "Grimório completo",
+    desc: "Lançou 120 feitiços nas artes arcanas.",
+    goal: 120,
+    cur: () => dadosFeit().feiticos || 0
+  }
+];
+
+function checarConquistasFeiticeiro() {
+  const d = dadosFeit();
+  if (!Array.isArray(d.conquistas)) d.conquistas = [];
+  ACHS_FEITICEIRO.forEach(ach => {
+    if (!d.conquistas.includes(ach.id) && ach.cur() >= ach.goal) {
+      d.conquistas.push(ach.id);
+      commit();
+      if (typeof notificar === "function") {
+        notificar({
+          titulo: "Conquista Arcana Desbloqueada! ✦",
+          texto: `${ach.nome}: ${ach.desc}`,
+          tipo: "conquista",
+          mood: "party"
+        });
+      }
+    }
+  });
+  return d.conquistas;
+}
+
+/* 44. Varinhas colecionáveis por madeira e núcleo */
+const MADEIRAS_VARINHA = ["Sabugueiro", "Carvalho Antigo", "Ébano Puro", "Cerejeira", "Freixo Sagrado"];
+const NUCLEOS_VARINHA = [
+  "Fibra de Coração de Dragão",
+  "Pena de Fênix",
+  "Pelo de Unicórnio",
+  "Pó de Estrela Cadente"
+];
+
+function forjarVarinhaFeiticeiro() {
+  const d = dadosFeit();
+  if (!Array.isArray(d.varinhasColecao)) d.varinhasColecao = [];
+  const madeira = MADEIRAS_VARINHA[Math.floor(Math.random() * MADEIRAS_VARINHA.length)];
+  const nucleo = NUCLEOS_VARINHA[Math.floor(Math.random() * NUCLEOS_VARINHA.length)];
+  const comp = 25 + Math.floor(Math.random() * 10);
+  const varinha = { id: "var_" + Date.now(), madeira, nucleo, comp: `${comp} cm`, data: today() };
+  d.varinhasColecao.unshift(varinha);
+  if (d.varinhasColecao.length > 6) d.varinhasColecao.pop();
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Varinha Forjada! ✨",
+      texto: `${madeira} com ${nucleo} (${comp} cm).`,
+      tipo: "conquista",
+      mood: "happy"
+    });
+  }
+  return varinha;
+}
+
+ACOES_EXTRAS["feit-forjar-varinha"] = () => {
+  forjarVarinhaFeiticeiro();
+  render();
+};
+
+/* 46. Cartões de constelação para o perfil */
+function cartoesConstelacaoPerfil() {
+  const d = dadosFeit();
+  const mapa = d.ceu.mapa || [];
+  return mapa.map(idx => {
+    const nome = CONSTELACOES[idx % CONSTELACOES.length];
+    return {
+      idx,
+      nome,
+      svg: constelacaoSVG(idx, 7)
+    };
+  });
+}
+
+/* 47. Duelo amistoso entre amigos */
+function dueloAmistosoFeiticeiro(amigoNome = "Mago Convidado") {
+  const feitosHoje =
+    (typeof S !== "undefined" &&
+      Array.isArray(S.tasks) &&
+      S.tasks.filter(t => t.done && t.date === today()).length) ||
+    0;
+  const feitosAmigo = Math.floor(Math.random() * 4) + 1;
+  const vencedor = feitosHoje >= feitosAmigo ? "Você" : amigoNome;
+  return {
+    amigo: amigoNome,
+    voceFeitos: feitosHoje,
+    amigoFeitos: feitosAmigo,
+    vencedor,
+    empate: feitosHoje === feitosAmigo
+  };
+}
+
+/* 48. Biblioteca compartilhada com amigos */
+function bibliotecaCompartilhadaHTML() {
+  const meusLivros =
+    (typeof S !== "undefined" && Array.isArray(S.livros) && S.livros.filter(l => l.estante === "lido")) || [];
+  let lista = meusLivros.map(l => ({
+    titulo: l.titulo || "Tomo Antigo",
+    dono: (typeof S !== "undefined" && S.name) || "Você"
+  }));
+  if (typeof S !== "undefined" && Array.isArray(S.friends) && S.friends.length) {
+    S.friends.forEach(f => {
+      if (Array.isArray(f.livrosLidos)) {
+        f.livrosLidos.forEach(t => lista.push({ titulo: t, dono: f.nome || "Amigo" }));
+      }
+    });
+  } else {
+    lista.push({ titulo: "Crônicas de Arcádia", dono: "Mestre Elion" });
+    lista.push({ titulo: "Astrologia dos Antigos", dono: "Aluna Lyra" });
+  }
+  return `<div class="feit-biblio-compartilhada" style="display:flex;gap:6px;flex-wrap:wrap">
+    ${lista
+      .slice(0, 8)
+      .map(
+        b =>
+          `<div class="card sub sunken" style="padding:4px 8px;font-size:11px">📖 <b>${esc(b.titulo)}</b><br><span class="note">${esc(b.dono)}</span></div>`
+      )
+      .join("")}
+  </div>`;
+}
+
+/* 49. Coruja-correio animada entregando mimos */
+function animarCorujaCorreio() {
+  if (RM) return;
+  const coruja = document.createElement("div");
+  coruja.className = "feit-coruja-correio";
+  coruja.innerHTML = `<svg viewBox="0 0 40 32" width="40" height="32">
+    <path d="M4 14Q14 2 26 10Q38 18 36 28Q22 28 4 14Z" fill="#8D6E63"/>
+    <circle cx="28" cy="14" r="5" fill="#FFE082"/>
+    <circle cx="28" cy="14" r="2" fill="#212121"/>
+    <rect x="30" y="16" width="8" height="4" rx="1" fill="#FEF08A" stroke="#B45309" stroke-width="0.8"/>
+  </svg>`;
+  document.body.appendChild(coruja);
+  setTimeout(() => coruja.remove(), 2500);
+}
+
+/* 50. Pet aprende o truque "levitar" */
+function truquePetLevitar() {
+  const petEl = document.querySelector(".pet-box, .pet-canvas, #pet");
+  if (petEl) {
+    petEl.classList.add("feit-pet-levitando");
+    setTimeout(() => petEl.classList.remove("feit-pet-levitando"), 3000);
+  }
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Truque: Levitar! 🔮",
+      texto: "Seu familiar está flutuando suavemente pelo ar.",
+      tipo: "sucesso",
+      mood: "party"
+    });
+  }
+}
+ACOES_EXTRAS["feit-pet-levitar"] = () => {
+  truquePetLevitar();
+};

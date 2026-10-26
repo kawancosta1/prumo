@@ -644,5 +644,34 @@ ITEMS.push(
     price: 160,
     svg: () =>
       `<g transform="translate(15 125)"><rect x="-9" y="-10" width="18" height="18" rx="4" fill="#78909C" stroke="var(--ink)" stroke-width="1.2"/><rect x="-5" y="-4" width="3" height="3" fill="#80DEEA"/><rect x="2" y="-4" width="3" height="3" fill="#80DEEA"/><path d="M-6 3h12" stroke="#37474F" stroke-width="1.4"/></g>`
+  },
+  {
+    id: "feit_manto_galaxia",
+    p: "feiticeiro",
+    slot: "top",
+    name: "Manto de galáxia",
+    price: 220,
+    svg: () =>
+      topBase("#0B071A") +
+      `<path d="M20 90Q60 120 100 90L92 150H28Z" fill="#311B92" opacity=".7"/>` +
+      `<circle cx="40" cy="110" r="14" fill="#7C4DFF" opacity=".35" class="brilhinho"/>` +
+      `<circle cx="78" cy="126" r="16" fill="#00E5FF" opacity=".25" class="brilhinho"/>` +
+      estrelaFeit(32, 102, 3, "#FFF59D") +
+      estrelaFeit(84, 116, 2.5, "#80D8FF") +
+      estrelaFeit(54, 134, 3.4, "#E1BEE7") +
+      topHem
+  },
+  {
+    id: "feit_coroa_cometas",
+    p: "feiticeiro",
+    slot: "hat",
+    name: "Coroa de cometas",
+    price: 190,
+    svg: () =>
+      `<path d="M24 44L32 18L44 32L60 10L76 32L88 18L96 44Z" fill="#CA8A04" ${O}/>` +
+      `<path d="M32 18L18 8" stroke="#FDE047" stroke-width="2" stroke-linecap="round"/>` +
+      `<path d="M60 10L60 -4" stroke="#FFF59D" stroke-width="2.4" stroke-linecap="round"/>` +
+      `<path d="M88 18L102 8" stroke="#FDE047" stroke-width="2" stroke-linecap="round"/>` +
+      `<circle cx="60" cy="38" r="4" fill="#67E8F9" class="brilhinho"/>`
   }
 );
