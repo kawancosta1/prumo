@@ -137,7 +137,8 @@ MUNDO_FX.otaku = {
     foco: "Arco de treinamento",
     tarefas: "Missões do episódio",
     adicionar: "Aceitar missão",
-    vazioHoje: "Episódio sem missões. Todo protagonista começa com uma.",
+    vazioHoje:
+      "Episódio filler! Hoje os heróis foram pra praia relaxar. Curta o descanso ou adicione uma missão!",
     atrasadas: "Missões do arco passado",
     fecharDia: "Encerrar o episódio",
     diaFechado: "Episódio encerrado. Continua...",

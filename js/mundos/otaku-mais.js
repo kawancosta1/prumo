@@ -836,19 +836,22 @@ function fichaOtakuBlocoHTML() {
     const gac = gachaOtakuHTML();
     const alb2 = album2OtakuHTML();
     const quiz = perguntaDoDiaHTML();
+    const tor = torneioOtakuHTML();
+    const pos = cenaPosCreditosOtakuHTML();
     const rankHTML = cartaoMundo(
       "cm-rank-foco",
       "Rank de Poder no Foco",
       `${rk.rank} (${rk.poder} de poder)`,
       `<span class="note">A cada 25 min de foco você sobe de rank ninja! Tempo hoje: <b>${rk.min} min</b>.</span>`
     );
-    return ab + vil + epHTML + alb2 + gac + quiz + rankHTML + riv + rec + prox;
+    return ab + vil + epHTML + alb2 + gac + quiz + tor + rankHTML + riv + rec + prox + pos;
   };
 
   const concluirAntesLote1 = MUNDO_FX.otaku.aoConcluir;
   MUNDO_FX.otaku.aoConcluir = (x, el) => {
     concluirAntesLote1(x, el);
     verificarSenpaiNotou();
+    avancarTorneioOtaku(x);
     const d = dadosMundo("otaku");
     if (d.vilao && d.vilao.ativo && d.vilao.vidaAtual > 0 && x && x.date && x.date < today()) {
       d.vilao.vidaAtual = Math.max(0, d.vilao.vidaAtual - 1);
@@ -884,6 +887,8 @@ function fichaOtakuBlocoHTML() {
     const v = themeVar("otaku").id;
     if (v === "shonen") {
       cortinaDiagonalShonen();
+    } else if (v === "manga") {
+      viradaPaginaManga();
     }
   };
 
@@ -1255,3 +1260,170 @@ function album2OtakuHTML() {
     `<div class="album">${FIGURINHAS_ALBUM2.map(f => `<figure title="${d.album2.includes(f.id) ? f.nome : "Figurinha secreta"}">${figurinhaSVG(f, d.album2.includes(f.id))}</figure>`).join("")}</div><span class="note">Abra no gacha diário para completar a coleção e achar as raras brilhantes!</span>`
   );
 }
+
+/* ===================== Lote 4: Itens 31 a 40 ===================== */
+
+// 34. Arco de treinamento: hábito com 21 dias vira "técnica dominada"
+function tecnicaDominadaOtaku(nome) {
+  const prefixos = [
+    "Estilo Oculto: ",
+    "Técnica Suprema: ",
+    "Dança Espiritual: ",
+    "Arte Secreta: ",
+    "Punho de Aço: "
+  ];
+  let h = 0;
+  for (let i = 0; i < nome.length; i++) h = (h * 31 + nome.charCodeAt(i)) >>> 0;
+  return prefixos[h % prefixos.length] + nome;
+}
+
+// 35. Torneio da semana: suas 4 tarefas mais importantes viram chave de torneio
+function torneioOtakuAtual() {
+  const d = dadosMundo("otaku");
+  const sem = mondayOf(today());
+  if (!d.torneio || d.torneio.semana !== sem) {
+    const candidatas = (S.tasks || []).filter(t => !t.done).sort((a, b) => (b.prio || 0) - (a.prio || 0));
+    const padrao = ["Treino Físico Ninja", "Estudo de Jutsus", "Missão Secreta", "Meditação no Templo"];
+    const t4 = [];
+    for (let i = 0; i < 4; i++) {
+      if (candidatas[i]) {
+        t4.push({ id: candidatas[i].id, title: candidatas[i].title, feita: false });
+      } else {
+        t4.push({ id: "treino_" + i, title: padrao[i], feita: false });
+      }
+    }
+    d.torneio = {
+      semana: sem,
+      chave: t4,
+      final: [null, null],
+      campeao: null,
+      premiado: false
+    };
+  }
+  return d.torneio;
+}
+
+function avancarTorneioOtaku(x) {
+  if (!x) return;
+  const t = torneioOtakuAtual();
+  if (t.campeao) return;
+  for (let i = 0; i < 4; i++) {
+    if (t.chave[i].id === x.id || t.chave[i].title === x.title) {
+      t.chave[i].feita = true;
+    }
+  }
+  if (!t.final[0]) {
+    if (t.chave[0].feita) t.final[0] = t.chave[0];
+    else if (t.chave[1].feita) t.final[0] = t.chave[1];
+  }
+  if (!t.final[1]) {
+    if (t.chave[2].feita) t.final[1] = t.chave[2];
+    else if (t.chave[3].feita) t.final[1] = t.chave[3];
+  }
+  if (t.final[0] && t.final[1] && !t.campeao) {
+    if (x.id === t.final[0].id || x.title === t.final[0].title) {
+      t.campeao = t.final[0].title;
+    } else if (x.id === t.final[1].id || x.title === t.final[1].title) {
+      t.campeao = t.final[1].title;
+    }
+    if (t.campeao && !t.premiado) {
+      t.premiado = true;
+      premioMundo(10, `🏆 Campeão do Torneio da Semana! "${t.campeao}" venceu a chave! +10 gotas!`);
+    }
+  }
+}
+
+function torneioOtakuHTML() {
+  const t = torneioOtakuAtual();
+  const c = t.chave;
+  const s1 = `<div class="torneio-confronto ${c[0].feita ? "vencedor" : ""}"><span class="title">${esc(c[0].title)}</span><span>${c[0].feita ? "✓" : "vs"}</span><span class="title ${c[1].feita ? "vencedor" : ""}">${esc(c[1].title)}</span></div>`;
+  const s2 = `<div class="torneio-confronto ${c[2].feita ? "vencedor" : ""}"><span class="title">${esc(c[2].title)}</span><span>${c[2].feita ? "✓" : "vs"}</span><span class="title ${c[3].feita ? "vencedor" : ""}">${esc(c[3].title)}</span></div>`;
+  const fin0 = t.final[0] ? esc(t.final[0].title) : "Aguardando Semi 1";
+  const fin1 = t.final[1] ? esc(t.final[1].title) : "Aguardando Semi 2";
+  const fn = `<div class="torneio-confronto ${t.campeao ? "vencedor" : ""}"><span class="title">${fin0}</span><span>vs</span><span class="title">${fin1}</span></div>`;
+  const camp = t.campeao
+    ? `<div class="torneio-fase" style="color:var(--accent);margin-top:4px">🏆 Campeão: <b>${esc(t.campeao)}</b> (+10 gotas coletadas)</div>`
+    : `<span class="note">Conclua as tarefas da chave para avançar de fase e disputar a grande final!</span>`;
+
+  return cartaoMundo(
+    "cm-torneio",
+    "Torneio da Semana: Chave de Batalha",
+    t.campeao ? "Concluído" : "Em andamento",
+    `<div class="torneio-grid">
+      <span class="torneio-fase">Semifinais</span>
+      ${s1}
+      ${s2}
+      <span class="torneio-fase">Grande Final</span>
+      ${fn}
+      ${camp}
+    </div>`
+  );
+}
+
+// 36. Cena pós-créditos: depois de fechar o dia, texto escondido que aparece ao rolar
+function cenaPosCreditosOtakuHTML() {
+  const j = S.journal && S.journal[today()];
+  if (!j || !j.closed) return "";
+  const cenas = [
+    "Nas sombras de uma colina distante, uma silhueta misteriosa com capa esvoaçante observa o horizonte. 'Kawan sobreviveu a mais um dia... Mas o arco final ainda está por vir!'",
+    "Num laboratório subterrâneo, monitores piscam com gráficos de produtividade. 'Os dados dele continuam subindo... Preparem o próximo desafio!'",
+    "Do alto da torre sob a lua cheia, um guerreiro embainha sua katana. 'Ele completou todas as missões de hoje. Até amanhã, meu eterno rival...'",
+    "Em uma sala de chá secreta, o sensei sorri de olhos fechados. 'A disciplina é a espada mais afiada. Ele finalmente entendeu.'"
+  ];
+  let h = 0;
+  const dStr = today();
+  for (let i = 0; i < dStr.length; i++) h = (h * 31 + dStr.charCodeAt(i)) >>> 0;
+  const texto = cenas[h % cenas.length];
+  return `<div class="cena-pos-creditos">
+    <div style="font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">🎬 CENA PÓS-CRÉDITOS</div>
+    <span>${esc(texto)}</span>
+  </div>`;
+}
+
+// 37. Brilho "kira" no número de gotas quando ele sobe
+function efeitoKiraGotas() {
+  if (RM) return;
+  const el = document.getElementById("coins");
+  if (!el) return;
+  el.classList.remove("kira-otaku");
+  void el.offsetWidth;
+  el.classList.add("kira-otaku");
+  setTimeout(() => el.classList.remove("kira-otaku"), 900);
+}
+
+// 39. Virada de página tema mangá
+function viradaPaginaManga() {
+  if (RM) return;
+  if (document.getElementById("virada-manga-fx")) return;
+  const el = document.createElement("div");
+  el.id = "virada-manga-fx";
+  el.className = "virada-manga-fx";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 350);
+}
+
+// 40. Moldura de Level Up de anime
+function telaLevelUpAnime(lvl) {
+  if (document.getElementById("levelup-modal-anime")) return;
+  const modal = document.createElement("div");
+  modal.id = "levelup-modal-anime";
+  modal.className = "levelup-modal-anime";
+  modal.innerHTML = `
+    <div class="levelup-moldura">
+      <div class="levelup-kanji">覚醒</div>
+      <div class="levelup-titulo">LEVEL UP!</div>
+      <div class="levelup-sub">Prumi alcançou o <b>Nível ${lvl}</b>!</div>
+      <p class="levelup-desc" style="font-size:0.9em;margin:10px 0;opacity:0.85">Seu poder de luta aumentou! Mais energia liberada para as próximas missões.</p>
+      <button class="btn primary small" data-act="fechar-levelup-anime">Avançar!</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  setTimeout(() => {
+    if (modal.parentNode) modal.remove();
+  }, 6000);
+}
+
+ACOES_EXTRAS["fechar-levelup-anime"] = () => {
+  const m = document.getElementById("levelup-modal-anime");
+  if (m) m.remove();
+};

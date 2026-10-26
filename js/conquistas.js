@@ -227,8 +227,16 @@ function earn(n, el) {
   if (!n) return 0;
   const efeitoMundo = MUNDO_FX[S.persona];
   if (n > 0 && efeitoMundo && efeitoMundo.multiplicadorGotas) n = n * efeitoMundo.multiplicadorGotas();
+  const lvlAntes = levelOf(S.xp).lvl;
   S.coins = Math.max(0, S.coins + n);
   if (n > 0) S.xp += n;
+  const lvlDepois = levelOf(S.xp).lvl;
+  if (n > 0 && lvlDepois > lvlAntes && S.persona === "otaku" && typeof telaLevelUpAnime === "function") {
+    telaLevelUpAnime(lvlDepois);
+  }
+  if (n > 0 && S.persona === "otaku" && typeof efeitoKiraGotas === "function") {
+    efeitoKiraGotas();
+  }
   if (RM) return n;
   const pill = document.getElementById("coins");
   if (!pill) return n;
