@@ -78,7 +78,7 @@ function estanteSVG(d = minhaEstante(), opcoes = {}) {
       w: Math.max(10, Math.min(22, 7 + (l.paginas || 200) / 45)),
       h: Math.min(68, 44 + (l.paginas || 200) / 28)
     })),
-    ...decor.enfeites
+    ...(decor.enfeites || [])
       .map(id => ENFEITE[id])
       .filter(e => e && doMundoDele(e) && (!d.meu || temDecor(e)))
       .map(e => ({ tipo: "enfeite", e, w: e.w + 6 }))
@@ -319,7 +319,9 @@ function decorarHTML() {
   ${typeof kitsHTML === "function" ? kitsHTML() : ""}
   ${Object.entries(LUGARES_QUARTO)
     .map(([slot, lugar]) => {
-      const atual = (d.quarto || {})[slot] ?? QUARTO_PADRAO[slot];
+      const padrao =
+        typeof quartoPadraoDoMundo === "function" ? quartoPadraoDoMundo(S.persona) : QUARTO_PADRAO;
+      const atual = (d.quarto || {})[slot] ?? padrao[slot] ?? QUARTO_PADRAO[slot];
       const prev = i =>
         slot === "chao"
           ? `<svg class="swatch" viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice">${i.svg(60, 40)}</svg>`
@@ -494,7 +496,8 @@ ACOES_EXTRAS.quarto = b => {
   const slot = b.dataset.slot,
     id = b.dataset.id;
   const d = S.leitura.decor;
-  d.quarto = { ...QUARTO_PADRAO, ...(d.quarto || {}) };
+  const padrao = typeof quartoPadraoDoMundo === "function" ? quartoPadraoDoMundo(S.persona) : QUARTO_PADRAO;
+  d.quarto = { ...padrao, ...(d.quarto || {}) };
   if (!id) {
     d.quarto[slot] = ""; // pôster, tapete e pet podem ficar vazios
     return commit();

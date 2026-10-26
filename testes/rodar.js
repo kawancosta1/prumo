@@ -48,6 +48,7 @@ const servidor = http.createServer((req, res) => {
     ["Otaku: Lote 6 (Itens 51 a 60)", () => require("./otaku-lote6")(url)],
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
+    ["Quarto por Mundo", () => require("./quarto-mundos")(url)],
     ["Pets", () => require("./pets")(url)],
     ["Sincronia", () => require("./sincronia")(url)],
     ["Novidades", () => require("./novidades")(url)],

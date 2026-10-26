@@ -885,17 +885,29 @@ const QUARTO_PADRAO = {
   posPoster: "centro",
   posPet: "cama"
 };
+const QUARTO_PADRAO_MUNDO = {};
+function quartoPadraoDoMundo(p = (typeof S !== "undefined" && S.persona) || "zen") {
+  return { ...QUARTO_PADRAO, ...(QUARTO_PADRAO_MUNDO[p] || {}) };
+}
 const ITEM_QUARTO = Object.fromEntries(QUARTO.map(i => [i.id, i]));
 
 /** Desenha o quarto inteiro, com a estante dentro. d = minhaEstante() ou os dados da vitrine de um amigo. */
 function quartoSVG(d = minhaEstante()) {
   const decor = d.decor || {};
-  const q = { ...QUARTO_PADRAO, ...(decor.quarto || {}) };
+  const padrao = quartoPadraoDoMundo(d.persona);
+  const q = { ...padrao, ...(decor.quarto || {}) };
   const doMundoDele = x => !x.mundo || x.mundo === d.persona;
   const usar = slot => {
-    const i = ITEM_QUARTO[q[slot]];
-    if (i && i.slot === slot && doMundoDele(i) && (!d.meu || temDecor(i))) return i;
-    return QUARTO.find(x => x.slot === slot && x.id === QUARTO_PADRAO[slot]) || null;
+    const id = q[slot];
+    const i = ITEM_QUARTO[id];
+    if (i && i.slot === slot && doMundoDele(i) && (!d.meu || temDecor(i) || id === padrao[slot])) return i;
+    const defId = padrao[slot] || QUARTO_PADRAO[slot];
+    return (
+      ITEM_QUARTO[defId] ||
+      QUARTO.find(x => x.slot === slot && x.id === defId) ||
+      QUARTO.find(x => x.slot === slot && x.id === QUARTO_PADRAO[slot]) ||
+      null
+    );
   };
   const fundo = FUNDOS.find(f => f.id === decor.fundo && doMundoDele(f)) || FUNDOS[0];
 
