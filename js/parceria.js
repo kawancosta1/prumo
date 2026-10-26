@@ -365,6 +365,12 @@ const POSES_EXTRAS = [
     r: { x: 96, rot: -9, mood: "happy", semL: true },
     semCabelo: true,
     extra: FRANJA_DIVIDIDA
+  },
+  {
+    nome: "Parceiros de anime",
+    l: { x: 26, rot: -4, mood: "happy", semR: true },
+    r: { x: 94, rot: 4, mood: "party", semL: true },
+    extra: `<g class="dpop"><path d="M120 20l4 8l8 4l-8 4l-4 8l-4-8l-8-4l8-4z" fill="#FFF59D"/><circle cx="120" cy="32" r="2.5" fill="#FFD54F"/></g>`
   }
 ];
 POSES.namoro.push(...POSES_EXTRAS);

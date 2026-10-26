@@ -142,6 +142,39 @@ THEMES.otaku.vars.splice(
     part: "spark",
     wn: "Raspadinha de morango",
     pat: ["star", "petal"]
+  },
+  {
+    id: "isekai",
+    name: "Outro Mundo (Isekai)",
+    price: 150,
+    f: '"Cinzel", "serif"',
+    L: ["#F0F8FF", "#FFFFFF", "#1E2A38", "#5C6BC0", "#80CBC4", "#F7FAFC", "#1E2A38"],
+    D: ["#0B0E14", "#141923", "#ECEFF1", "#7986CB", "#4DB6AC", "#1D2330", "#141923"],
+    part: "spark",
+    wn: "Poção mágica azul",
+    pat: ["star", "spark"]
+  },
+  {
+    id: "sliceoflife",
+    name: "Slice of life",
+    price: 130,
+    f: '"Quicksand", sans-serif',
+    L: ["#FFFDF7", "#FFFFFF", "#2C2A29", "#8D6E63", "#D7CCC8", "#FAF7F2", "#2C2A29"],
+    D: ["#141210", "#1E1C1A", "#F5F5F0", "#A1887F", "#8D6E63", "#282522", "#1E1C1A"],
+    part: "petal",
+    wn: "Chá da tarde",
+    pat: ["petal", "heart"]
+  },
+  {
+    id: "idol",
+    name: "Palco de idol",
+    price: 160,
+    f: '"Fredoka", cursive',
+    L: ["#FFF0F8", "#FFFFFF", "#281224", "#FF4081", "#FF80AB", "#FFF8FC", "#281224"],
+    D: ["#160814", "#240E20", "#FFF0F8", "#FF4081", "#FF80AB", "#32162E", "#240E20"],
+    part: "heart",
+    wn: "Bebida energética",
+    pat: ["heart", "star"]
   }
 );
 
@@ -497,6 +530,67 @@ ITEMS.push(
         y,
         `<rect x="-10" y="-8" width="20" height="14" rx="2" fill="#FFF0F5" stroke="var(--ink)" stroke-width="1.2"/><path d="M-10 -8L0 0L10 -8" stroke="var(--ink)" stroke-width="1.2" fill="none"/><path d="M0 0l-3 4h6z" fill="#E91E63"/>`
       )
+  },
+  // Lote 3: Roupas lendárias e mascotes novos
+  {
+    id: "otaku_kimono_dourado",
+    p: "otaku",
+    slot: "top",
+    name: "Kimono dourado lendário",
+    price: 320,
+    svg: () =>
+      topBase("#FFD54F") +
+      `<path d="M36 86L60 120L84 86" stroke="#FFF59D" stroke-width="6" fill="none"/><rect x="0" y="122" width="120" height="10" fill="#FFA000"/><circle cx="60" cy="127" r="3.5" fill="#FFF59D" stroke="#E65100" stroke-width="0.8"/>`
+  },
+  {
+    id: "otaku_olhos_especiais",
+    p: "otaku",
+    slot: "face",
+    name: "Olhos da visão suprema",
+    price: 240,
+    svg: () =>
+      [47, 73]
+        .map(
+          x =>
+            `<circle cx="${x}" cy="64" r="7.5" fill="#E53935" stroke="var(--ink)" stroke-width="1.2"/><circle cx="${x}" cy="64" r="5" fill="none" stroke="#212121" stroke-width="0.8"/><circle cx="${x}" cy="64" r="2.2" fill="#212121"/><circle cx="${x - 2}" cy="62" r="1.4" fill="#fff"/>`
+        )
+        .join("")
+  },
+  {
+    id: "otaku_asas_anjodemonio",
+    p: "otaku",
+    slot: "back",
+    name: "Asas do eclipse",
+    price: 300,
+    svg: () =>
+      `<g class="dpop"><path d="M42 66Q10 40 2 12Q24 24 38 46Z" fill="#FFFFFF" stroke="var(--ink)" stroke-width="1.4"/><path d="M78 66Q110 40 118 12Q96 24 82 46Z" fill="#212121" stroke="var(--ink)" stroke-width="1.4"/></g>`
+  },
+  {
+    id: "otaku_pet_tanuki",
+    p: "otaku",
+    slot: "pet",
+    name: "Tanuki travesso",
+    price: 190,
+    svg: () =>
+      `<g transform="translate(16 128)"><path d="M-8 8Q-10 -4 0 -4Q10 -4 8 8Z" fill="#8D6E63" stroke="var(--ink)" stroke-width="1.1"/><circle cy="-8" r="6" fill="#8D6E63" stroke="var(--ink)" stroke-width="1.1"/><ellipse cx="0" cy="-6" rx="4" ry="2.5" fill="#D7CCC8"/><circle cx="-2" cy="-7" r="0.9" fill="#212121"/><circle cx="2" cy="-7" r="0.9" fill="#212121"/><ellipse cx="0" cy="-14" rx="8" ry="2.5" fill="#BCAAA4" stroke="var(--ink)" stroke-width="0.8"/><path d="M-1 -15q1 -4 3 0" fill="#4CAF50"/></g>`
+  },
+  {
+    id: "otaku_pet_minimecha",
+    p: "otaku",
+    slot: "pet",
+    name: "Mini-robô companheiro",
+    price: 190,
+    svg: () =>
+      `<g transform="translate(16 128)"><rect x="-7" y="-2" width="14" height="12" rx="2" fill="#ECEFF1" stroke="var(--ink)" stroke-width="1.1"/><rect x="-6" y="-12" width="12" height="9" rx="2" fill="#37474F" stroke="var(--ink)" stroke-width="1.1"/><circle cx="-2.5" cy="-8" r="1.4" fill="#00E5FF"/><circle cx="2.5" cy="-8" r="1.4" fill="#00E5FF"/><line x1="0" y1="-12" x2="0" y2="-15" stroke="var(--ink)" stroke-width="1.2"/><circle cx="0" cy="-16" r="1.2" fill="#FF5252"/></g>`
+  },
+  {
+    id: "otaku_pet_gatoespirito",
+    p: "otaku",
+    slot: "pet",
+    name: "Gatinho-espírito",
+    price: 200,
+    svg: () =>
+      `<g transform="translate(16 128)" opacity="0.9"><path d="M-8 6Q-8 -6 0 -6Q8 -6 8 6Q4 14 -2 12Q-6 12 -8 6Z" fill="#E0F7FA" stroke="var(--ink)" stroke-width="1"/><circle cy="-8" r="6" fill="#E0F7FA" stroke="var(--ink)" stroke-width="1"/><path d="M-5 -13l2 4M5 -13l-2 4" stroke="#4DD0E1" stroke-width="1"/><circle cx="-2" cy="-8" r="1" fill="#006064"/><circle cx="2" cy="-8" r="1" fill="#006064"/><path d="M4 8q4 4 1 8" stroke="#80DEEA" stroke-width="2" fill="none"/></g>`
   }
 );
 
@@ -739,13 +833,16 @@ function fichaOtakuBlocoHTML() {
     const rec = recapitulandoHTML();
     const prox = proximoEpisodioHTML();
     const rk = nivelPoderFoco();
+    const gac = gachaOtakuHTML();
+    const alb2 = album2OtakuHTML();
+    const quiz = perguntaDoDiaHTML();
     const rankHTML = cartaoMundo(
       "cm-rank-foco",
       "Rank de Poder no Foco",
       `${rk.rank} (${rk.poder} de poder)`,
       `<span class="note">A cada 25 min de foco você sobe de rank ninja! Tempo hoje: <b>${rk.min} min</b>.</span>`
     );
-    return ab + vil + epHTML + rankHTML + riv + rec + prox;
+    return ab + vil + epHTML + alb2 + gac + quiz + rankHTML + riv + rec + prox;
   };
 
   const concluirAntesLote1 = MUNDO_FX.otaku.aoConcluir;
@@ -945,3 +1042,216 @@ SONS_MUNDO.otaku.ambiente = ctx => {
     }
   };
 };
+
+/* ==========================================================================
+   OTAKU: LEVA 3 (Itens 21 a 30) - Coleção, Social e Quiz
+   ========================================================================== */
+
+// 21. Álbum 2: mais 12 figurinhas com raras brilhantes
+const FIGURINHAS_ALBUM2 = [
+  { id: "katana", nome: "Katana de madeira", cor: "#FFE082" },
+  { id: "shuriken", nome: "Shuriken veloz", cor: "#90A4AE" },
+  { id: "mecha_mini", nome: "Robô piloto", cor: "#80DEEA" },
+  { id: "torii", nome: "Portal sagrado", cor: "#EF5350" },
+  { id: "bento", nome: "Bentô saboroso", cor: "#A5D6A7" },
+  { id: "fuji", nome: "Monte eterno", cor: "#9FA8DA" },
+  { id: "carpa", nome: "Carpa da vitória", cor: "#FF8A65" },
+  { id: "mascara_raposa", nome: "Máscara de kitsune", cor: "#F48FB1" },
+  { id: "pergaminho", nome: "Pergaminho de treino", cor: "#D7CCC8" },
+  { id: "dragao_dourado", nome: "Dragão Dourado Ancestral", cor: "#FFD54F", rara: true },
+  { id: "fenix_celestial", nome: "Fênix Celestial", cor: "#FF7043", rara: true },
+  { id: "cristal_chakra", nome: "Cristal do Infinito", cor: "#CE93D8", rara: true }
+];
+
+const SIMBOLOS_ALBUM2 = {
+  katana: `<path d="M12 28L28 12" stroke="#8D6E63" stroke-width="3" stroke-linecap="round"/><path d="M10 30l3-3" stroke="#fff" stroke-width="2"/>`,
+  shuriken: `<path d="M20 8l3 8l8 3l-8 3l-3 8l-3-8l-8-3l8-3z" fill="#fff" stroke="#37474F" stroke-width="1"/><circle cx="20" cy="20" r="2.5" fill="#37474F"/>`,
+  mecha_mini: `<rect x="12" y="14" width="16" height="12" rx="2" fill="#fff" stroke="#263238" stroke-width="1.2"/><circle cx="16" cy="19" r="1.5" fill="#00E5FF"/><circle cx="24" cy="19" r="1.5" fill="#00E5FF"/>`,
+  torii: `<path d="M8 12h24M10 16h20M13 12v18M27 12v18" stroke="#C62828" stroke-width="2.2" stroke-linecap="round"/>`,
+  bento: `<rect x="10" y="14" width="20" height="14" rx="2" fill="#fff" stroke="#333" stroke-width="1"/><circle cx="15" cy="19" r="2" fill="#E53935"/><rect x="21" y="17" width="6" height="8" rx="1" fill="#4CAF50"/>`,
+  fuji: `<path d="M8 28L20 12L32 28Z" fill="#3F51B5"/><path d="M16 17.5L20 12L24 17.5L22 19L20 17.5L18 19Z" fill="#fff"/>`,
+  carpa: `<path d="M12 20q8-10 16 0q-8 10-16 0z" fill="#fff" stroke="#E64A19" stroke-width="1.4"/><circle cx="24" cy="19" r="1.2" fill="#333"/>`,
+  mascara_raposa: `<path d="M12 16l4-6l4 6h4l4-6l4 6q-8 14-20 0z" fill="#fff" stroke="#C62828" stroke-width="1"/><path d="M16 20l4 2M24 20l-4 2" stroke="#C62828" stroke-width="1"/>`,
+  pergaminho: `<rect x="14" y="10" width="12" height="20" rx="2" fill="#FFF9C4" stroke="#8D6E63" stroke-width="1.2"/><path d="M12 12v16M28 12v16" stroke="#8D6E63" stroke-width="2.5" stroke-linecap="round"/>`,
+  dragao_dourado: `<path d="M10 24q10-16 20 0q-10 6-20 0z" fill="#FFE082" stroke="#FF8F00" stroke-width="1.4"/><circle cx="25" cy="22" r="1.5" fill="#D84315"/><path d="M12 12l2 4l4 1l-3 3l1 4l-4-2l-4 2l1-4l-3-3l4-1z" fill="#FFD54F"/>`,
+  fenix_celestial: `<path d="M20 10q-8 8 -2 18q2-10 10-10q2 6 6 8q-2-8 -14-16z" fill="#FF8A65" stroke="#BF360C" stroke-width="1"/><circle cx="22" cy="14" r="1.2" fill="#fff"/>`,
+  cristal_chakra: `<path d="M20 8L28 16L20 32L12 16Z" fill="#E1BEE7" stroke="#7B1FA2" stroke-width="1.2"/><path d="M12 16H28" stroke="#fff" stroke-width="1"/>`
+};
+
+const figurinhaSVGAntes = figurinhaSVG;
+figurinhaSVG = function (f, tem) {
+  if (SIMBOLOS_ALBUM2[f.id]) {
+    const borda = f.rara ? "#FFD700" : tem ? "#fff" : "#B0BEC5";
+    const bg = tem ? f.cor : "#CFD8DC";
+    const brilho =
+      f.rara && tem
+        ? `<circle cx="32" cy="8" r="2.5" fill="#FFF59D" class="brilhinho"/><circle cx="8" cy="32" r="2" fill="#FFF59D" class="brilhinho"/>`
+        : "";
+    return `<svg viewBox="0 0 40 40" class="figurinha ${tem ? "tem" : ""} ${f.rara ? "rara" : ""}"><rect x="2" y="2" width="36" height="36" rx="6" fill="${bg}" stroke="${borda}" stroke-width="${f.rara ? "2.6" : "2"}"/>${tem ? SIMBOLOS_ALBUM2[f.id] + brilho : `<text x="20" y="26" text-anchor="middle" font-size="14" fill="#90A4AE" font-weight="700">?</text>`}</svg>`;
+  }
+  return figurinhaSVGAntes(f, tem);
+};
+
+// 22. Gacha diário
+function gachaOtakuHTML() {
+  const d = dadosMundo("otaku");
+  const gratis = d.gachaDia !== today();
+  const podeComprar = S.coins >= 20;
+  return cartaoMundo(
+    "cm-gacha",
+    "Gacha de Anime",
+    gratis ? "1 Tiro Grátis do Dia!" : "Máquina de Cápsulas",
+    `<p class="note">Gire a máquina de cápsulas para conseguir gotas, figurinhas dos álbuns ou roupas exclusivas!</p>
+     <div class="cm-botoes">
+       <button class="btn small primary" data-act="otaku-gacha" ${!gratis && !podeComprar ? "disabled" : ""}>
+         ${gratis ? "Girar Gacha Grátis" : "Girar Gacha (20 gotas)"}
+       </button>
+     </div>`
+  );
+}
+
+ACOES_EXTRAS["otaku-gacha"] = () => {
+  const d = dadosMundo("otaku");
+  const gratis = d.gachaDia !== today();
+  if (!gratis && S.coins < 20) {
+    toast("Gotas insuficientes para o gacha (custa 20 gotas).");
+    return;
+  }
+  if (!gratis) S.coins -= 20;
+  d.gachaDia = today();
+
+  if (!Array.isArray(d.album)) d.album = [];
+  if (!Array.isArray(d.album2)) d.album2 = [];
+
+  const rand = Math.random();
+  if (rand < 0.45) {
+    const gotas = pick([15, 25, 35, 50]);
+    premioMundo(gotas, `Cápsula de ouro! Você tirou <b>+${gotas} gotas</b>!`);
+  } else if (rand < 0.8) {
+    const pool = Math.random() < 0.5 ? FIGURINHAS : FIGURINHAS_ALBUM2;
+    const albumTarget = pool === FIGURINHAS ? d.album : d.album2;
+    const f = pick(pool);
+    if (!albumTarget.includes(f.id)) {
+      albumTarget.push(f.id);
+      premioMundo(10, `Cápsula premiada! Figurinha nova: <b>${f.nome}</b>! +10 gotas.`);
+    } else {
+      premioMundo(5, `Figurinha repetida no gacha: <b>${f.nome}</b>. +5 gotas de consolo!`);
+    }
+  } else {
+    const roupasOtaku = ITEMS.filter(i => i.p === "otaku" && !S.owned.includes(i.id) && !i.ach);
+    if (roupasOtaku.length) {
+      const r = pick(roupasOtaku);
+      S.owned.push(r.id);
+      premioMundo(0, `PRÊMIO ULTRA RARO NO GACHA! Você ganhou a roupa <b>${r.name}</b>!`);
+    } else {
+      premioMundo(40, "Cápsula lendária! Todas as roupas já obtidas: <b>+40 gotas</b>!");
+    }
+  }
+  MUNDO_FX.otaku.trocaAba();
+  commit();
+};
+
+// 29. Pergunta de anime do dia (sem marca), valendo gotas
+const PERGUNTAS_ANIME = [
+  {
+    q: "Qual é o poder secreto que todo protagonista desperta quando a música de abertura toca?",
+    opts: ["Poder da determinação absoluta", "Desejo irresistível de dormir", "Apenas fome de lámen"],
+    correta: 0
+  },
+  {
+    q: "Onde o protagonista de anime sempre se senta na sala de aula?",
+    opts: [
+      "Última carteira ao lado da janela",
+      "Primeira fila colado na lousa",
+      "Exatamente no meio da sala"
+    ],
+    correta: 0
+  },
+  {
+    q: "O que acontece ao correr para a escola com uma torrada na boca?",
+    opts: ["Tropeça no seu par predestinado", "Chega dez minutos adiantado", "A torrada cai no chão"],
+    correta: 0
+  },
+  {
+    q: "O que o rival misterioso faz antes de falar com você?",
+    opts: ["Ajusta os óculos com brilho branco", "Pede ajuda na lição de casa", "Te oferece um abraço"],
+    correta: 0
+  },
+  {
+    q: "Qual o melhor momento para desferir o ataque especial supremo?",
+    opts: [
+      "Gritando o nome do golpe com toda a força",
+      "Em silêncio absoluto",
+      "Mandando uma mensagem de áudio"
+    ],
+    correta: 0
+  },
+  {
+    q: "Quanto tempo dura uma contagem regressiva de 5 minutos no clímax da batalha?",
+    opts: ["Pelo menos dez episódios", "Exatamente cinco minutos", "Meio minuto"],
+    correta: 0
+  },
+  {
+    q: "O que todo mestre sábio e idoso faz antes de lutar a sério?",
+    opts: [
+      "Finge fraqueza até a hora certa",
+      "Mostra seu diploma da faculdade",
+      "Pede um tempo para respirar"
+    ],
+    correta: 0
+  }
+];
+
+function perguntaDoDiaHTML() {
+  const d = dadosMundo("otaku");
+  if (!d.quiz || d.quiz.dia !== today()) d.quiz = { dia: today(), respondido: false, acertou: false };
+  const idx = Math.abs(diffDays("2026-01-01", today())) % PERGUNTAS_ANIME.length;
+  const p = PERGUNTAS_ANIME[idx];
+
+  if (d.quiz.respondido) {
+    return cartaoMundo(
+      "cm-quiz-anime",
+      "Quiz de Anime do Dia",
+      d.quiz.acertou ? "Resposta correta! Sugoi!" : "Quase!",
+      `<span class="note">${d.quiz.acertou ? "Você acertou o trope de anime de hoje e ganhou <b>+5 gotas</b>! Volte amanhã para a próxima." : "Todo protagonista aprende com os erros. Amanhã tem um novo desafio!"}</span>`
+    );
+  }
+
+  return cartaoMundo(
+    "cm-quiz-anime",
+    "Quiz de Anime do Dia",
+    esc(p.q),
+    `<div class="quiz-opcoes">${p.opts
+      .map((op, i) => `<button class="btn small" data-act="otaku-quiz" data-opt="${i}">${esc(op)}</button>`)
+      .join("")}</div><span class="note">Acerte a pergunta de anime do dia para ganhar +5 gotas!</span>`
+  );
+}
+
+ACOES_EXTRAS["otaku-quiz"] = b => {
+  const d = dadosMundo("otaku");
+  if (!d.quiz || d.quiz.dia !== today()) d.quiz = { dia: today(), respondido: false, acertou: false };
+  if (d.quiz.respondido) return;
+  const idx = Math.abs(diffDays("2026-01-01", today())) % PERGUNTAS_ANIME.length;
+  const p = PERGUNTAS_ANIME[idx];
+  const opt = parseInt(b.dataset.opt, 10);
+  d.quiz.respondido = true;
+  if (opt === p.correta) {
+    d.quiz.acertou = true;
+    premioMundo(5, "Resposta correta! Digno de protagonista: <b>+5 gotas</b>!");
+  } else {
+    d.quiz.acertou = false;
+    react("sad", "Quase! Amanhã tem outra pergunta de anime.", 3000);
+  }
+  commit();
+};
+
+function album2OtakuHTML() {
+  const d = dadosMundo("otaku");
+  if (!Array.isArray(d.album2)) d.album2 = [];
+  return cartaoMundo(
+    "cm-album2",
+    "Álbum 2: Coleção Ninja",
+    `${d.album2.length}/12 figurinhas`,
+    `<div class="album">${FIGURINHAS_ALBUM2.map(f => `<figure title="${d.album2.includes(f.id) ? f.nome : "Figurinha secreta"}">${figurinhaSVG(f, d.album2.includes(f.id))}</figure>`).join("")}</div><span class="note">Abra no gacha diário para completar a coleção e achar as raras brilhantes!</span>`
+  );
+}

@@ -29,15 +29,18 @@ const COMENTARIOS_TAREFA = [
 function comentarioTarefa(pet, titulo) {
   const t = norm(titulo);
   const achado = COMENTARIOS_TAREFA.find(([re]) => re.test(t));
-  const som = {
-    miau: "Miau!",
-    au: "Au au!",
-    muu: "Muuu!",
-    muuu: "Muuuu!",
-    grr: "Hmm...",
-    rá: "Rá!",
-    yip: "Yip!"
-  }[ESPECIES_PET[pet.especie].som];
+  const som =
+    S.persona === "otaku"
+      ? "Nya~!"
+      : {
+          miau: "Miau!",
+          au: "Au au!",
+          muu: "Muuu!",
+          muuu: "Muuuu!",
+          grr: "Hmm...",
+          rá: "Rá!",
+          yip: "Yip!"
+        }[ESPECIES_PET[pet.especie].som];
   return achado ? pick(achado[1]) : `${som || "Oba!"} Mais uma pra lista.`;
 }
 /** Balãozinho de fala em cima do pet que está passeando. */

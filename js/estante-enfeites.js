@@ -391,6 +391,34 @@ const ENFEITES = [
     w: 20,
     svg: () =>
       `<rect x="-7" y="-4" width="14" height="4" fill="#6B4A30"/><path d="M0 -4V-9" stroke="#E8C24A" stroke-width="2.4"/><path d="M-7 -24H7Q7 -11 0 -9Q-7 -11 -7 -24Z" fill="#E8C24A" stroke="#B8975A"/><path d="M-7 -21Q-11 -21 -10 -16Q-9 -13 -6 -13M7 -21Q11 -21 10 -16Q9 -13 6 -13" fill="none" stroke="#E8C24A" stroke-width="1.6"/>`
+  },
+  // só no otaku
+  {
+    id: "figure_otaku",
+    nome: "Figure de anime",
+    preco: 80,
+    w: 18,
+    mundo: "otaku",
+    svg: () =>
+      `<rect x="-7" y="-2" width="14" height="2" rx="0.5" fill="#212121"/><path d="M-4 -2v-8h8v8z" fill="#3F51B5"/><circle cx="0" cy="-14" r="4.5" fill="#FFD54F"/><path d="M-3 -19l3 -4l3 4z" fill="#FF7043"/><path d="M4 -8l6 -4" stroke="#8D6E63" stroke-width="1.4"/>`
+  },
+  {
+    id: "prateleira_manga",
+    nome: "Coleção de mangás",
+    preco: 70,
+    w: 24,
+    mundo: "otaku",
+    svg: () =>
+      `<rect x="-11" y="-18" width="4" height="18" fill="#E53935"/><rect x="-7" y="-19" width="4" height="19" fill="#1E88E5"/><rect x="-3" y="-18" width="4" height="18" fill="#FDD835"/><rect x="1" y="-20" width="4" height="20" fill="#43A047"/><rect x="5" y="-18" width="4" height="18" fill="#8E24AA"/><path d="M-11 -2h20" stroke="#5D4037" stroke-width="1.2"/>`
+  },
+  {
+    id: "poster_otaku",
+    nome: "Pôster de protagonista",
+    preco: 60,
+    w: 20,
+    mundo: "otaku",
+    svg: () =>
+      `<rect x="-9" y="-22" width="18" height="22" rx="1" fill="#FFF" stroke="#212121" stroke-width="0.8"/><circle cx="0" cy="-13" r="5" fill="#FF4081"/><path d="M-4 -9l4 -4l4 4z" fill="#FFD54F"/>`
   }
 ];
 

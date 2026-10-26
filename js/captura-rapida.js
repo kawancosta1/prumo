@@ -105,7 +105,19 @@ function parsedPills(p, raw) {
   a.push(relDay(p.date).replace(/^./, c => c.toUpperCase()));
   if (p.time) a.push(p.time);
   if (p.area) a.push(AREAS[p.area]);
-  if (p.prio) a.push("Prioridade " + PRIO[p.prio].toLowerCase());
+  if (S.persona === "otaku") {
+    const rankNome =
+      p.prio === 3
+        ? "Missão Rank S"
+        : p.prio === 2
+          ? "Missão Rank A"
+          : p.prio === 1
+            ? "Missão Rank B"
+            : "Missão Rank C";
+    a.push(rankNome);
+  } else if (p.prio) {
+    a.push("Prioridade " + PRIO[p.prio].toLowerCase());
+  }
   if (p.repeat) a.push(REPEAT[p.repeat]);
   return a.map(x => `<span class="pill">${esc(x)}</span>`).join("");
 }

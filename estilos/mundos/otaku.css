@@ -472,12 +472,43 @@ html[data-mundo="otaku"][data-variante="neotoquio"] body::before {
   }
 }
 
+/* Lote 3: Coleção, Quiz e Raras */
+.quiz-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+}
+.quiz-opcoes button {
+  text-align: left;
+  justify-content: flex-start;
+  padding: 8px 12px;
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.figurinha.rara {
+  box-shadow: 0 0 10px #ffd700;
+  animation: pulsoRara 2s ease-in-out infinite alternate;
+}
+@keyframes pulsoRara {
+  from {
+    transform: scale(1);
+    box-shadow: 0 0 4px #ffd700;
+  }
+  to {
+    transform: scale(1.06);
+    box-shadow: 0 0 12px #ffb300;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #linhas-otaku,
   .sugoi-otaku,
   .letreiro-fim-anime,
   .cortina-shonen,
   .olhos-brilho-anime,
+  .figurinha.rara,
   html[data-mundo="otaku"][data-variante="neotoquio"] body::before,
   html[data-mundo="otaku"] .herobox::after,
   html[data-mundo="otaku"] .timerrow.rodando::before {

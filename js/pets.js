@@ -548,7 +548,7 @@ function estiloMundoPet(x) {
       rock: `<path d="M27 11q7-4 14 0l-1 2.4q-6-3-12 0z" fill="#E53935"/>`,
       gamer: `<path d="M27 15q7-12 14 0" stroke="#212121" stroke-width="1.4" fill="none"/><rect x="25.5" y="13" width="3" height="5" rx="1" fill="#7C4DFF"/>`,
       zen: `<circle cx="29" cy="9" r="2" fill="#F48FB1"/><circle cx="29" cy="9" r=".8" fill="#FFF59D"/>`,
-      otaku: `<path d="M30 9l-3-2v4zM30 9l3-2v4z" fill="#F06292"/>`,
+      otaku: `<g class="pet-bandana-ninja"><path d="M26 12q8 -3 15 0l-.8 3q-7 -3 -13.4 0z" fill="#1565C0"/><rect x="31" y="11" width="5.5" height="3" rx="0.5" fill="#CFD8DC" stroke="#455A64" stroke-width="0.4"/><path d="M26 12l-4 3M26 13.5l-3 4" stroke="#1565C0" stroke-width="1.2" stroke-linecap="round"/></g>`,
       programador: `<path d="M27 15q7-12 14 0" stroke="#37474F" stroke-width="1.4" fill="none"/>`,
       sertanejo: `<path d="M27 11q7-6 14 0z" fill="#9C6A35"/><path d="M24 11.5h20" stroke="#9C6A35" stroke-width="1.6" stroke-linecap="round"/>`,
       feiticeiro: `<path d="M27 11q7 -3 14 0q-4 -1 -6 -9q-4 5 -8 9z" fill="#283593"/><path d="M33 3l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="#FFE082"/>`,
