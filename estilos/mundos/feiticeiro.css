@@ -431,6 +431,29 @@ html[data-mundo="feiticeiro"] .tarefa-petrificada::after {
   }
 }
 
+/* 54. Ficha de estudo: pergaminho de anotações */
+.feit-pergaminho-ficha {
+  background: #fdf6e2 !important;
+  color: #3b2a14 !important;
+  border: 2px solid #8c5a1e !important;
+  border-radius: 4px !important;
+  box-shadow:
+    0 4px 10px rgba(140, 90, 30, 0.2),
+    inset 0 0 14px rgba(184, 134, 43, 0.15) !important;
+  font-family: "Cormorant Garamond", serif !important;
+  position: relative;
+}
+
+/* 60. Modo Suave em Ajustes */
+html[data-feiticeiro-suave] .feit-cursor-estrela,
+html[data-feiticeiro-suave] .feit-vela-flutua,
+html[data-feiticeiro-suave] .feitico-animo-brilho,
+html[data-feiticeiro-suave] .feit-coruja-correio,
+html[data-feiticeiro-suave] .feit-runas-concluir {
+  display: none !important;
+  animation: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   #circulo-magico {
     display: none;

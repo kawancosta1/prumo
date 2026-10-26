@@ -1176,3 +1176,173 @@ function truquePetLevitar() {
 ACOES_EXTRAS["feit-pet-levitar"] = () => {
   truquePetLevitar();
 };
+
+/* =========================================================
+   FEITICEIRO: LOTE 6 (ITENS 51 A 60)
+   ========================================================= */
+
+/* 51. Matérias viram disciplinas da academia com ícone */
+const DISCIPLINAS_ACADEMIA = {
+  quimica: { nome: "Poções & Alquimia", icone: "🧪" },
+  biologia: { nome: "Herbologia Mística", icone: "🌿" },
+  historia: { nome: "História das Runas", icone: "📜" },
+  fisica: { nome: "Astronomia Arcana", icone: "🔭" },
+  matematica: { nome: "Aritmância Antiga", icone: "📐" },
+  idiomas: { nome: "Línguas Antigas", icone: "ᚱ" },
+  artes: { nome: "Ilusionismo", icone: "✨" }
+};
+
+function disciplinaArcana(materia = "") {
+  const m = (materia || "").toLowerCase();
+  for (const [k, v] of Object.entries(DISCIPLINAS_ACADEMIA)) {
+    if (m.includes(k) || k.includes(m)) return v;
+  }
+  return { nome: `Disciplina: ${materia || "Magia Geral"}`, icone: "🔮" };
+}
+
+/* 52. Revisão espaçada: recarregar feitiço com runa */
+function recarregarFeiticoHTML(ficha) {
+  return `<div class="card sub feit-recarregar-feitico" style="display:flex;align-items:center;justify-content:space-between;padding:8px">
+    <div>
+      <span style="font-size:16px;color:#CA8A04">ᚦ</span>
+      <b>${esc(ficha ? ficha.pergunta || ficha.termo || "Conceito arcano" : "Feitiço em recarga")}</b>
+    </div>
+    <span class="tag">⚡ Pronto para canalizar</span>
+  </div>`;
+}
+
+/* 53. Foco longo (50 min) dá feitiço raro */
+const FEITICOS_RAROS_POOL = [
+  "Supernova Serena",
+  "Vórtice do Tempo",
+  "Chama do Arquimago",
+  "Escudo de Diamante",
+  "Aurora Arcana",
+  "Canto das Estrelas"
+];
+
+function concederFeiticoRaroFoco(minutos = 50) {
+  if (minutos < 50) return null;
+  const d = dadosFeit();
+  if (!Array.isArray(d.feiticosRaros)) d.feiticosRaros = [];
+  const faltam = FEITICOS_RAROS_POOL.filter(f => !d.feiticosRaros.includes(f));
+  const f = faltam.length ? faltam[Math.floor(Math.random() * faltam.length)] : FEITICOS_RAROS_POOL[0];
+  if (!d.feiticosRaros.includes(f)) d.feiticosRaros.push(f);
+  d.feiticos = (d.feiticos || 0) + 1;
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Feitiço Raro Descoberto! ✨",
+      texto: `Você dominou o feitiço "${f}" após um foco estelar.`,
+      tipo: "conquista",
+      mood: "party"
+    });
+  }
+  return f;
+}
+
+/* 55. Meta de leitura semanal vira cota da biblioteca */
+function cotaBibliotecaHTML() {
+  const meta = (typeof S !== "undefined" && S.leitura && S.leitura.meta) || 60;
+  const paginas = (typeof S !== "undefined" && S.leitura && S.leitura.paginasSemana) || 0;
+  return `<div class="card sub sunken feit-cota-biblio" style="padding:8px;margin-top:6px">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <b>📚 Cota da Biblioteca da Torre</b>
+      <span class="mono">${paginas} / ${meta} págs</span>
+    </div>
+    <div style="background:#1E293B;height:6px;border-radius:3px;overflow:hidden;margin-top:4px">
+      <div style="background:#CA8A04;width:${Math.min(100, Math.round((paginas / meta) * 100))}%;height:100%"></div>
+    </div>
+  </div>`;
+}
+
+/* 57. Humores por escola de magia */
+if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.feiticeiro) {
+  MUNDO_FX.feiticeiro.humorExtra = humor => {
+    const escM = typeof escolaAtual === "function" ? escolaAtual() : "estrela";
+    if (escM === "fogo") {
+      return humor === "happy" ? "Chama ardente e triunfante! 🔥" : "Brasa inquieta, aguardando oxigênio.";
+    }
+    if (escM === "gelo") {
+      return humor === "happy" ? "Cristal sereno e límpido. ❄️" : "Geleira paciente e silenciosa.";
+    }
+    if (escM === "natureza") {
+      return humor === "happy" ? "Floresta florescendo em magia. 🌿" : "Raiz firme suportando a tempestade.";
+    }
+    return humor === "happy" ? "Luz astral brilhando na torre. ⭐" : "Noite estrelada reflexiva.";
+  };
+}
+
+/* 58. Evento do solstício com roupa exclusiva */
+function solsticioAtivo(dataStr = today()) {
+  const md = dataStr.slice(5);
+  // Solstício de Inverno / Verão (~21/06 e ~21/12 ± 5 dias)
+  const dJun = Math.abs(diffDays(`2026-06-21`, `2026-${md}`));
+  const dDez = Math.abs(diffDays(`2026-12-21`, `2026-${md}`));
+  return dJun <= 5 || dDez <= 5;
+}
+
+ACOES_EXTRAS["feit-resgatar-solsticio"] = () => {
+  const d = dadosFeit();
+  d.solsticioResgatado = true;
+  if (typeof S !== "undefined") {
+    S.eq = S.eq || {};
+    S.eq.top = "feit_manto_solsticio";
+  }
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Manto do Solstício Resgatado! ☀️",
+      texto: "O calor cósmico do solstício agora veste seu Prumi.",
+      tipo: "conquista",
+      mood: "party"
+    });
+  }
+  render();
+};
+
+/* 59. Lua real do dia calculada no cartão */
+function calcularFaseLuaReal(dataStr = today()) {
+  const ref = new Date("2026-01-18T00:00:00Z");
+  const agora = new Date(dataStr + "T12:00:00Z");
+  const diffDias = (agora - ref) / (1000 * 60 * 60 * 24);
+  const ciclo = 29.53058867;
+  const fase = ((diffDias % ciclo) + ciclo) % ciclo;
+  if (fase < 1.84) return { nome: "Lua Nova", icone: "🌑", fase: 0 };
+  if (fase < 7.38) return { nome: "Lua Crescente", icone: "🌒", fase: 1 };
+  if (fase < 9.23) return { nome: "Quarto Crescente", icone: "🌓", fase: 2 };
+  if (fase < 14.77) return { nome: "Crescente Gibosa", icone: "🌔", fase: 3 };
+  if (fase < 16.61) return { nome: "Lua Cheia", icone: "🌕", fase: 4 };
+  if (fase < 22.15) return { nome: "Minguante Gibosa", icone: "🌖", fase: 5 };
+  if (fase < 23.99) return { nome: "Quarto Minguante", icone: "🌗", fase: 6 };
+  return { nome: "Lua Minguante", icone: "🌘", fase: 7 };
+}
+
+/* 60. Opção em Ajustes para desligar efeitos de magia fortes */
+function aplicarModoFeiticeiroSuave() {
+  const d = dadosFeit();
+  const suave = !!d.efeitosSuaves;
+  document.documentElement.toggleAttribute("data-feiticeiro-suave", suave);
+}
+document.addEventListener("DOMContentLoaded", aplicarModoFeiticeiroSuave);
+
+ACOES_EXTRAS["toggle-feiticeiro-suave"] = () => {
+  const d = dadosFeit();
+  d.efeitosSuaves = !d.efeitosSuaves;
+  commit();
+  aplicarModoFeiticeiroSuave();
+  render();
+};
+
+/* Hook no enfeiteHero para mostrar a lua real */
+if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.feiticeiro) {
+  const antigoEnfeiteLote5 = MUNDO_FX.feiticeiro.enfeiteHero;
+  MUNDO_FX.feiticeiro.enfeiteHero = () => {
+    const base = typeof antigoEnfeiteLote5 === "function" ? antigoEnfeiteLote5() : "";
+    const lua = calcularFaseLuaReal();
+    return (
+      `<span class="feit-lua-tag" style="margin-right:6px" title="${lua.nome}">${lua.icone} ${lua.nome}</span>` +
+      base
+    );
+  };
+}

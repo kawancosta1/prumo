@@ -27,7 +27,12 @@ PERSONAS.feiticeiro = {
     "As estrelas se alinharam{nome}: <b>{n}</b> tarefas e uma xícara de chá de lavanda.",
     "Bom dia, aprendiz{nome}. <b>{n}</b> encantamentos esperam na mesa da torre.",
     "Abri o grimório na página certa{nome}. São <b>{n}</b> feitiços hoje.",
-    "O cristal mostrou seu dia{nome}: <b>{n}</b> tarefas e um final brilhante."
+    "O cristal mostrou seu dia{nome}: <b>{n}</b> tarefas e um final brilhante.",
+    "Pelos ventos do zênite{nome}! Temos <b>{n}</b> encantamentos a transcrever.",
+    "Os astrolábios da torre indicam <b>{n}</b> missões arcanas hoje.",
+    "Saudações místicas! O círculo está traçado com <b>{n}</b> deveres sagrados.",
+    "Que a luz de Éter guie seus passos: <b>{n}</b> feitiços catalogados.",
+    "A névoa matinal se dissipa revelando <b>{n}</b> feitiços no pergaminho."
   ],
   cheers: [
     "Feitiço lançado com perfeição! ✦",
@@ -38,7 +43,12 @@ PERSONAS.feiticeiro = {
     "Nem o arquimago faria mais rápido.",
     "Encantamento concluído. Anota no grimório!",
     "Uma estrela nova nasceu no seu céu.",
-    "Lumen! Mais uma tarefa iluminada."
+    "Lumen! Mais uma tarefa iluminada.",
+    "Ressonância arcana perfeita! O tomo vibrou.",
+    "Gesta gloriosa! As runas dançam em seu louvor.",
+    "Magia primordial em estado puro! Excelente trabalho.",
+    "Feitiço cravado com tinta estelar no livro mestre.",
+    "A trama do cosmos se alinhou com essa conclusão."
   ],
   drink: [
     "<b>+{ml} mL</b> de poção de clareza. A mente agradece.",
@@ -65,17 +75,25 @@ PERSONAS.feiticeiro = {
   night: [
     "A lua subiu na torre. Fecha o grimório do dia e descansa.",
     "Hora das estrelas. Anota o que aprendeu e vai sonhar com constelações.",
-    "Até os feiticeiros dormem. Apaga a vela."
+    "Até os feiticeiros dormem. Apaga a vela.",
+    "O véu da noite cobriu o santuário. Repouse sua mente arcana.",
+    "As corujas assumem a vigília. Bons sonhos entre as constelações."
   ],
   done: [
     "Pergaminho completo! Hoje você foi um arquimago.",
     "Todos os feitiços lançados. A torre está em paz.",
-    "Lista vazia. Isso sim é magia de verdade."
+    "Lista vazia. Isso sim é magia de verdade.",
+    "O grande ritual de hoje está selado e consumado!",
+    "Nem nos mais antigos alfarrábios se viu tamanha proeza.",
+    "A torre refulge em triunfo! Dia magistralmente concluído.",
+    "Todas as profecias do dia foram cumpridas com perfeição."
   ],
   focus: [
     "Silêncio na biblioteca. Hora de estudar o grimório.",
     "Concentração de feiticeiro: nem um dragão passando te distrai.",
-    "A vela está acesa. Foco até ela derreter."
+    "A vela está acesa. Foco até ela derreter.",
+    "Canalize sua energia no vórtice do aprendizado.",
+    "Mente límpida como poção recém-destilada: foco absoluto."
   ]
 };
 
@@ -673,5 +691,19 @@ ITEMS.push(
       `<path d="M60 10L60 -4" stroke="#FFF59D" stroke-width="2.4" stroke-linecap="round"/>` +
       `<path d="M88 18L102 8" stroke="#FDE047" stroke-width="2" stroke-linecap="round"/>` +
       `<circle cx="60" cy="38" r="4" fill="#67E8F9" class="brilhinho"/>`
+  },
+  {
+    id: "feit_manto_solsticio",
+    p: "feiticeiro",
+    slot: "top",
+    name: "Manto do Solstício Solar",
+    price: 0,
+    svg: () =>
+      topBase("#F59E0B") +
+      `<path d="M42 84L60 114L78 84" fill="#FEF08A" ${O}/>` +
+      `<circle cx="60" cy="114" r="6" fill="#F97316"/>` +
+      `<path d="M20 120Q60 145 100 120L94 150H26Z" fill="#D97706" opacity=".8"/>` +
+      estrelaFeit(60, 114, 4, "#FEF08A") +
+      topHem
   }
 );
