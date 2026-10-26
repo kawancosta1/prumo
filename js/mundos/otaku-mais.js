@@ -760,6 +760,34 @@ function fichaOtakuBlocoHTML() {
         premioMundo(15, "Vilão derrotado! O arco do vilão foi superado. +15 gotas!");
       }
     }
+
+    // 18. Som "shing" de espada ao concluir tarefa de prioridade alta
+    if (x && x.prio >= 2 && typeof pegarAudio === "function" && S.sons && S.sons.pagina) {
+      const ctx = pegarAudio();
+      if (ctx) somShingEspada(ctx, saidaMundo(ctx, 0.8), ctx.currentTime + 0.05);
+    }
+
+    // 13 & 19. Lista toda feita: chuva de pétalas, letreiro Fim e jingle de abertura (uma vez por dia)
+    const tarefasHoje = S.tasks.filter(t => t.date === today());
+    const todasFeitas = tarefasHoje.length > 0 && tarefasHoje.every(t => t.done);
+    if (todasFeitas && d.fimEpisodioDia !== today()) {
+      d.fimEpisodioDia = today();
+      mostrarLetreiroFim();
+      MUNDO_FX.otaku.trocaAba();
+      if (typeof pegarAudio === "function" && S.sons && S.sons.pagina) {
+        const ctx = pegarAudio();
+        if (ctx) jingleAberturaOtaku(ctx, saidaMundo(ctx, 0.7), ctx.currentTime + 0.2);
+      }
+    }
+  };
+
+  const trocaAbaAntesLote2 = MUNDO_FX.otaku.trocaAba;
+  MUNDO_FX.otaku.trocaAba = () => {
+    trocaAbaAntesLote2();
+    const v = themeVar("otaku").id;
+    if (v === "shonen") {
+      cortinaDiagonalShonen();
+    }
   };
 
   const camadasAntes = MUNDO_FX.otaku.camadasPrumi;
@@ -774,6 +802,10 @@ function fichaOtakuBlocoHTML() {
         <g class="vapor"><path d="M-2 -5q-2 -4 1 -7" stroke="#fff" stroke-width="1.2" fill="none" opacity=".8"/></g>
       </g>`;
     }
+    // 11. Expressões de anime no rosto por humor
+    rostoExtra += expressoesAnimeSVG(arg.mood);
+    // 14. Olhos brilhando de anime enquanto aura está ativa
+    rostoExtra += olhosBrilhandoAuraSVG();
     return { fundo: base.fundo || "", rosto: rostoExtra };
   };
 
@@ -790,3 +822,126 @@ function fichaOtakuBlocoHTML() {
     return contextoAntes ? contextoAntes() : null;
   };
 }
+
+/* ==========================================================================
+   OTAKU: LEVA 2 (Itens 11 a 20) - Visual, Efeitos e Sons
+   ========================================================================== */
+
+// 11. Expressões de anime no rosto por humor: gota de suor, veia de raiva, bochecha corada
+function expressoesAnimeSVG(mood) {
+  if (mood === "upset") {
+    return `<g class="veia-raiva" transform="translate(85 36)">
+      <path d="M-6 -2L-2 -2L-2 -6L2 -6L2 -2L6 -2L6 2L2 2L2 6L-2 6L-2 2L-6 2Z" fill="#E53935" stroke="var(--ink)" stroke-width="0.8"/>
+      <path d="M-4 0H4M0 -4V4" stroke="#B71C1C" stroke-width="1.2"/>
+    </g>`;
+  }
+  if (mood === "sad" || mood === "cry") {
+    return `<g class="gota-suor-anime" transform="translate(86 46)">
+      <path d="M0 -8Q6 2 3 7Q0 11 -4 8Q-7 4 -1 0Z" fill="#81D4FA" stroke="var(--ink)" stroke-width="1"/>
+      <path d="M-1 2Q1 5 0 7" stroke="#fff" stroke-width="1" fill="none"/>
+    </g>`;
+  }
+  if (mood === "happy" || mood === "party") {
+    return `<g class="bochechas-anime">
+      <ellipse cx="38" cy="72" rx="5" ry="3" fill="#F48FB1" opacity="0.85"/>
+      <path d="M35 70l2 4M38 70l2 4M41 70l2 4" stroke="#E91E63" stroke-width="0.8"/>
+      <ellipse cx="82" cy="72" rx="5" ry="3" fill="#F48FB1" opacity="0.85"/>
+      <path d="M79 70l2 4M82 70l2 4M85 70l2 4" stroke="#E91E63" stroke-width="0.8"/>
+    </g>`;
+  }
+  return "";
+}
+
+// 14. Olhos brilhando quando aura ativa
+function olhosBrilhandoAuraSVG() {
+  if (!auraLigada()) return "";
+  return `<g class="olhos-brilho-anime">
+    <path d="M47 57l1.5 5.5l5.5 1.5l-5.5 1.5l-1.5 5.5l-1.5-5.5l-5.5-1.5l5.5-1.5z" fill="#FFF9C4" opacity="0.9"/>
+    <circle cx="47" cy="64" r="2.2" fill="#fff"/>
+    <path d="M73 57l1.5 5.5l5.5 1.5l-5.5 1.5l-1.5 5.5l-1.5-5.5l-5.5-1.5l5.5-1.5z" fill="#FFF9C4" opacity="0.9"/>
+    <circle cx="73" cy="64" r="2.2" fill="#fff"/>
+  </g>`;
+}
+
+// 13. Letreiro FIM ao concluir todas as tarefas do dia
+function mostrarLetreiroFim() {
+  if (document.getElementById("letreiro-fim-anime")) return;
+  const el = document.createElement("div");
+  el.id = "letreiro-fim-anime";
+  el.className = "letreiro-fim-anime";
+  el.innerHTML = `<div class="fim-box"><span class="fim-kanji">完</span><span class="fim-texto">FIM DO EPISÓDIO</span></div>`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// 15. Cortina diagonal no tema Shonen
+function cortinaDiagonalShonen() {
+  if (RM) return;
+  const el = document.createElement("div");
+  el.id = "cortina-shonen";
+  el.className = "cortina-shonen";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 600);
+}
+
+// 18. Som "shing" de espada (WebAudio)
+function somShingEspada(ctx, saida, t) {
+  if (!ctx || !saida) return;
+  const o = ctx.createOscillator();
+  o.type = "triangle";
+  o.frequency.setValueAtTime(3200, t);
+  o.frequency.exponentialRampToValueAtTime(1400, t + 0.15);
+  const g = envelope(ctx, t, 0.005, 0.25, 0.18);
+  o.connect(g).connect(saida);
+  o.start(t);
+  o.stop(t + 0.3);
+
+  [4400, 5870, 7840].forEach((f, i) => sino(ctx, saida, t + 0.01 + i * 0.02, f, 0.6, 0.04, [1, 2]));
+}
+
+// 19. Jingle curto de abertura (5 notas) ao bater a meta do dia
+function jingleAberturaOtaku(ctx, saida, t) {
+  if (!ctx || !saida) return;
+  const notas = [523.25, 659.25, 783.99, 880.0, 1046.5];
+  notas.forEach((f, i) => {
+    const o = ctx.createOscillator();
+    o.type = "sine";
+    o.frequency.value = f;
+    const g = envelope(ctx, t + i * 0.09, 0.01, 0.24, 0.12);
+    o.connect(g).connect(saida);
+    o.start(t + i * 0.09);
+    o.stop(t + i * 0.09 + 0.28);
+  });
+}
+
+// 20. Ambiente de foco "sala de aula": giz, relógio e cigarras
+SONS_MUNDO.otaku.ambiente = ctx => {
+  const base = ambienteRuido(ctx, { freq: 4800, tipo: "bandpass", vol: 0.035, onda: 0.16, q: 3 });
+  const pulso = ctx.createOscillator();
+  pulso.frequency.value = 38;
+  const pg = ctx.createGain();
+  pg.gain.value = 0.3;
+  pulso.connect(pg).connect(base.saida.gain);
+  pulso.start();
+
+  const relogioTimer = setInterval(() => {
+    if (!ctx || ctx.state === "closed") return;
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    o.type = "sine";
+    o.frequency.setValueAtTime(1100, t);
+    o.frequency.exponentialRampToValueAtTime(260, t + 0.025);
+    const g = envelope(ctx, t, 0.001, 0.03, 0.025);
+    o.connect(g).connect(ctx.destination);
+    o.start(t);
+    o.stop(t + 0.04);
+  }, 1000);
+
+  return {
+    parar() {
+      clearInterval(relogioTimer);
+      base.parar();
+      pulso.stop(ctx.currentTime + 1.1);
+    }
+  };
+};

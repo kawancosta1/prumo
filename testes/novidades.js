@@ -13,7 +13,7 @@ module.exports = async url => {
   const t = (id, title, extra = "") =>
     `{ id: "${id}", title: "${title}", area: "geral", date: today(), done: false, prio: 0, sub: []${extra} }`;
   ev(
-    `S.onboarded = true; S.semConta = true; S.coins = 100; S.wake = "00:01"; S.sleep = "23:59"; S.tasks = [${t("a", "Estudar cálculo", ", prio: 3")}, ${t("b", "Ligar pro banco")}, ${t("c", "Reunião", ', time: "23:30"')}]; tab = "hoje"; render();`
+    `S.onboarded = true; S.semConta = true; S.coins = 100; S.wake = "00:00"; S.sleep = "23:59"; S.tasks = [${t("a", "Estudar cálculo", ", prio: 3")}, ${t("b", "Ligar pro banco")}, ${t("c", "Reunião", ', time: "23:30"')}]; tab = "hoje"; render();`
   );
 
   // planejar meu dia
