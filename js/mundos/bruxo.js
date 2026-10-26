@@ -604,5 +604,26 @@ ITEMS.push(
     price: 170,
     svg: () =>
       `<g transform="translate(15 132)"><path d="M-8 4Q-4 -4 4 -2Q12 0 16 6Q10 6 6 2Q-2 0 -6 6Z" fill="#E65100" stroke="var(--ink)" stroke-width="1.2"/><circle cx="-4" cy="-1" r="1.4" fill="#FFD54F"/><path d="M-1 2Q4 4 8 2" stroke="#FFAB00" stroke-width="1" fill="none"/></g>`
+  },
+  {
+    id: "bru_manto_outono",
+    p: "bruxo",
+    slot: "top",
+    name: "Manto de folhas de outono",
+    price: 240,
+    svg: () =>
+      `<path d="M20 64Q60 74 100 64L106 128Q60 136 14 128Z" fill="#C62828" stroke="var(--ink)" stroke-width="1.4"/>` +
+      `<path d="M24 76q8-10 16 0q-8 10 -16 0M48 84q8-10 16 0q-8 10 -16 0M72 76q8-10 16 0q-8 10 -16 0" fill="#FB8C00"/>` +
+      `<path d="M36 102q6-8 12 0q-6 8 -12 0M60 106q6-8 12 0q-6 8 -12 0" fill="#FDD835"/>`
+  },
+  {
+    id: "bru_chapeu_lua_real",
+    p: "bruxo",
+    slot: "hat",
+    name: "Chapéu com lua de verdade",
+    price: 260,
+    svg: () =>
+      chapeuBruxa("#1A1829", "#FFD54F", "#76FF03") +
+      `<g transform="translate(64 -6)"><circle cx="0" cy="0" r="10" fill="#FFF8E1" opacity=".95"/><circle cx="3" cy="-2" r="8" fill="#1A1829"/><circle cx="-2" cy="0" r="2" fill="#FFF59D"/></g>`
   }
 );

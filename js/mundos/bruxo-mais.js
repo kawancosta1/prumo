@@ -346,6 +346,16 @@ function desencantarSapoTarefa(tarefaId) {
     }
   }
 
+  if (typeof pegarAudio === "function") {
+    try {
+      const ctx = pegarAudio();
+      if (ctx) somCoaxarSapo(ctx, ctx.destination, ctx.currentTime);
+    } catch (_) {}
+  }
+
+  const d = dadosBruxo();
+  d.saposDesencantados = (d.saposDesencantados || 0) + 1;
+
   if (t.sapo <= 0) {
     delete t.sapo;
     commit();
@@ -423,6 +433,12 @@ const CONSELHOS_GATO = [
 ];
 
 function conselhoGatoBruxo() {
+  if (typeof pegarAudio === "function") {
+    try {
+      const ctx = pegarAudio();
+      if (ctx) somMiadoGato(ctx, ctx.destination, ctx.currentTime);
+    } catch (_) {}
+  }
   const idx = Math.floor(Math.random() * CONSELHOS_GATO.length);
   return CONSELHOS_GATO[idx];
 }
@@ -1028,11 +1044,229 @@ function iconeLuaCabecalhoBruxo() {
   return fl.icone;
 }
 
+// 41. Som de coaxar de sapo ao desencantar
+function somCoaxarSapo(ctx, saida, t = 0) {
+  if (!ctx || !saida) return;
+  const o = ctx.createOscillator();
+  o.type = "sawtooth";
+  o.frequency.setValueAtTime(140, t);
+  o.frequency.exponentialRampToValueAtTime(260, t + 0.08);
+  o.frequency.exponentialRampToValueAtTime(90, t + 0.18);
+  const g = envelope(ctx, t, 0.02, 0.2, 0.14);
+  o.connect(g).connect(saida);
+  o.start(t);
+  o.stop(t + 0.22);
+}
+
+// 42. Som de miado do gato ao dar conselho
+function somMiadoGato(ctx, saida, t = 0) {
+  if (!ctx || !saida) return;
+  const o = ctx.createOscillator();
+  o.type = "sine";
+  o.frequency.setValueAtTime(480, t);
+  o.frequency.exponentialRampToValueAtTime(720, t + 0.12);
+  o.frequency.exponentialRampToValueAtTime(420, t + 0.32);
+  const g = envelope(ctx, t, 0.03, 0.35, 0.12);
+  o.connect(g).connect(saida);
+  o.start(t);
+  o.stop(t + 0.38);
+}
+
+// 43. Conquistas próprias do mundo Bruxo
+const CONQUISTAS_BRUXO = [
+  {
+    id: "mestre_pocoes",
+    titulo: "Mestre das Poções",
+    desc: "Descobriu 10 receitas mágicas diferentes.",
+    icone: "🧪"
+  },
+  {
+    id: "horta_completa",
+    titulo: "Horta Completa",
+    desc: "Cultivou e colheu as 7 ervas místicas da cabana.",
+    icone: "🌿"
+  },
+  {
+    id: "desencantador_sapos",
+    titulo: "Desencantador da Floresta",
+    desc: "Desencantou 5 tarefas transformadas em sapo.",
+    icone: "🐸"
+  }
+];
+
+function verificarConquistasBruxo() {
+  const d = dadosBruxo();
+  if (!Array.isArray(d.conquistas)) d.conquistas = [];
+  const novas = [];
+
+  const descobertas = Array.isArray(d.descobertas) ? d.descobertas.length : 0;
+  if (descobertas >= 10 && !d.conquistas.includes("mestre_pocoes")) {
+    d.conquistas.push("mestre_pocoes");
+    novas.push("Mestre das Poções");
+  }
+
+  const estoqueErvas = Array.isArray(d.estoqueErvas) ? d.estoqueErvas.length : 0;
+  if (estoqueErvas >= 7 && !d.conquistas.includes("horta_completa")) {
+    d.conquistas.push("horta_completa");
+    novas.push("Horta Completa");
+  }
+
+  const sapos = d.saposDesencantados || 0;
+  if (sapos >= 5 && !d.conquistas.includes("desencantador_sapos")) {
+    d.conquistas.push("desencantador_sapos");
+    novas.push("Desencantador da Floresta");
+  }
+
+  if (novas.length > 0) {
+    commit();
+    if (typeof notificar === "function") {
+      notificar({
+        titulo: "Conquista Arcana Desbloqueada! 🏆✨",
+        texto: novas.join(", "),
+        tipo: "conquista",
+        mood: "party"
+      });
+    }
+  }
+  return d.conquistas;
+}
+
+// 44. Coleção de frascos com formatos diferentes
+const FRASCOS_BRUXO = [
+  { id: "gota", nome: "Frasco Gota Clássico", icone: "💧" },
+  { id: "estrela", nome: "Frasco Estrela Noturna", icone: "⭐" },
+  { id: "cranio", nome: "Frasco Crânio Místico", icone: "💀" },
+  { id: "abobora", nome: "Frasco Abóbora de Outono", icone: "🎃" }
+];
+
+function desbloquearFrascoBruxo(id) {
+  const d = dadosBruxo();
+  if (!Array.isArray(d.frascos)) d.frascos = ["gota"];
+  if (!d.frascos.includes(id)) {
+    d.frascos.push(id);
+    commit();
+    return true;
+  }
+  return false;
+}
+
+function colecaoFrascosHTML() {
+  const d = dadosBruxo();
+  if (!Array.isArray(d.frascos)) d.frascos = ["gota"];
+  return `<div class="card sub" style="margin-top:6px">
+    <b>🧪 Coleção de Frascos Alquímicos</b>
+    <div class="row" style="gap:6px;margin-top:6px">
+      ${FRASCOS_BRUXO.map(
+        f => `
+        <div class="card sub sunken" style="flex:1;text-align:center;padding:6px;opacity:${d.frascos.includes(f.id) ? "1" : "0.4"}">
+          <div style="font-size:20px">${f.icone}</div>
+          <div style="font-size:10px;font-weight:bold">${esc(f.nome)}</div>
+        </div>
+      `
+      ).join("")}
+    </div>
+  </div>`;
+}
+
+// 46. Vassouras colecionáveis
+const VASSOURAS_BRUXO = [
+  { id: "palha", nome: "Vassoura de Palha Clássica", vel: "Básica" },
+  { id: "galho", nome: "Vassoura de Galho Retorcido", vel: "Rápida" },
+  { id: "cristal", nome: "Vassoura de Cristal Cintilante", vel: "Suprema" }
+];
+
+function trocarVassouraBruxo(id) {
+  const d = dadosBruxo();
+  d.vassouraAtual = id;
+  commit();
+  return d.vassouraAtual;
+}
+
+// 47. Troca de ervas raras com amigos
+function trocarErvaRaraAmigo(amigoNome, minhaErva, ervaDesejada) {
+  const d = dadosBruxo();
+  if (!Array.isArray(d.trocasErvas)) d.trocasErvas = [];
+  d.trocasErvas.push({
+    amigo: amigoNome || "amigo",
+    oferecida: minhaErva || "Alecrim",
+    recebida: ervaDesejada || "Lavanda",
+    data: today()
+  });
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Troca Realizada no Coven! 🌿🤝",
+      texto: `Você trocou ${minhaErva} por ${ervaDesejada} com ${amigoNome}!`,
+      tipo: "sucesso",
+      mood: "happy"
+    });
+  }
+  return true;
+}
+
+// 48. Ranking do coven
+function rankingCovenHTML() {
+  const bruxas = [
+    { nome: "Você", pocoes: 8, pontos: 120 },
+    { nome: "Morgana da Clareira", pocoes: 6, pontos: 95 },
+    { nome: "Bruxinha Luna", pocoes: 5, pontos: 80 }
+  ];
+  return `<div class="card sub sunken" style="margin-top:6px;padding:8px">
+    <b>🏆 Ranking do Coven da Floresta</b>
+    <div style="margin-top:6px;font-size:12px">
+      ${bruxas
+        .map(
+          (b, i) => `
+        <div class="row" style="justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+          <span><b>#${i + 1}</b> ${esc(b.nome)}</span>
+          <span class="mono">${b.pocoes} poções (${b.pontos} pts)</span>
+        </div>
+      `
+        )
+        .join("")}
+    </div>
+  </div>`;
+}
+
+// 49. Mimo "chá de ervas" para mandar a amigos
+function mandarMimoChaErvas(amigoNome, tipoCha = "Chá de Camomila") {
+  const d = dadosBruxo();
+  if (!Array.isArray(d.mimosEnviados)) d.mimosEnviados = [];
+  d.mimosEnviados.push({ amigo: amigoNome || "amigo", cha: tipoCha, data: today() });
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Xícara de Chá Enviada! ☕🌿",
+      texto: `Uma xícara quentinha de ${tipoCha} foi levada pela coruja até ${amigoNome}.`,
+      tipo: "sucesso",
+      mood: "happy"
+    });
+  }
+  return true;
+}
+
+// 50. Gato preto passeia junto com o pet
+function gatoPasseiaJuntoPetHTML() {
+  return `<div class="bruxo-gato-pet-passeio" style="display:flex;align-items:center;gap:12px;margin:6px 0;padding:6px;background:rgba(0,0,0,0.15);border-radius:8px">
+    <svg viewBox="0 0 32 32" width="28" height="28">
+      <path d="M6 24Q5 12 16 12Q27 12 26 24Z" fill="#212121"/>
+      <circle cx="16" cy="10" r="7" fill="#212121"/>
+      <polygon points="11,6 10,0 15,4" fill="#212121"/>
+      <polygon points="21,6 22,0 17,4" fill="#212121"/>
+      <circle cx="13" cy="9" r="1.4" fill="#C6FF00"/>
+      <circle cx="19" cy="9" r="1.4" fill="#C6FF00"/>
+    </svg>
+    <span style="font-size:12px">🐈‍⬛ <b>O Gato Preto</b> acompanha os passos do seu companheiro pela cabana.</span>
+  </div>`;
+}
+
 if (typeof SONS_MUNDO !== "undefined" && SONS_MUNDO.bruxo) {
   SONS_MUNDO.bruxo.meta = (ctx, saida, t) => {
     somRisadinhaBruxa(ctx, saida, t);
   };
   SONS_MUNDO.bruxo.ambiente = ctx => ambienteFlorestaBruxo(ctx);
+  SONS_MUNDO.bruxo.sapo = (ctx, saida, t) => somCoaxarSapo(ctx, saida, t);
+  SONS_MUNDO.bruxo.gato = (ctx, saida, t) => somMiadoGato(ctx, saida, t);
 }
 
 /* Conexão com eventos do Bruxo */
