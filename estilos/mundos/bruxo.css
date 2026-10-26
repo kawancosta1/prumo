@@ -163,12 +163,181 @@ html[data-mundo="bruxo"][data-variante="ervas"] .bubble {
   padding: 12px;
 }
 
+/* 11. Fumaça verde da poção */
+.bruxo-fumaca-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+.bruxo-fumaca-puff {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(118, 255, 3, 0.75) 0%,
+    rgba(156, 204, 101, 0.35) 60%,
+    transparent 100%
+  );
+  filter: blur(8px);
+  animation: subirFumaca 1.6s ease-out forwards;
+}
+@keyframes subirFumaca {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(var(--dx, 20px), -120px) scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* 12. Bolhas de evaporação da tarefa */
+.bruxo-bolha-evapora {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #f4ff81, #76ff03);
+  box-shadow: 0 0 6px rgba(118, 255, 3, 0.6);
+  pointer-events: none;
+  z-index: 1000;
+  animation: evaporaBolha 0.8s ease-out forwards;
+}
+@keyframes evaporaBolha {
+  0% {
+    transform: scale(0.4) translateY(0);
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.4) translateY(-40px);
+    opacity: 0;
+  }
+}
+
+/* 13. Teias nos cantos dos cartões (Lua de sangue) */
+html[data-mundo="bruxo"][data-variante="lua"] .card {
+  position: relative;
+  overflow: visible;
+}
+html[data-mundo="bruxo"][data-variante="lua"] .card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M40 0 L0 0 Q20 20 40 40 Z' fill='none' stroke='%23ff5252' stroke-width='0.9' opacity='0.45'/%3E%3Cpath d='M40 0 L15 0 Q25 15 40 25 Z' fill='none' stroke='%23ff5252' stroke-width='0.7' opacity='0.5'/%3E%3Cpath d='M40 0 L28 0 Q33 8 40 14 Z' fill='none' stroke='%23ff5252' stroke-width='0.7' opacity='0.55'/%3E%3Cpath d='M40 0 L0 40' stroke='%23ff5252' stroke-width='0.8' opacity='0.4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 14. Velas do altar */
+.bruxo-velas-altar {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 8px 0;
+  margin: 6px 0;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+.bruxo-vela {
+  position: relative;
+  width: 14px;
+  height: 28px;
+  background: #fdf6e2;
+  border-radius: 3px 3px 0 0;
+  box-shadow: inset -2px 0 3px rgba(0, 0, 0, 0.2);
+}
+.bruxo-vela.apagada {
+  opacity: 0.45;
+  filter: grayscale(0.8);
+}
+.bruxo-pavio {
+  position: absolute;
+  top: -5px;
+  left: 6px;
+  width: 2px;
+  height: 5px;
+  background: #2b1d0c;
+}
+.bruxo-chama {
+  position: absolute;
+  top: -16px;
+  left: 3px;
+  width: 8px;
+  height: 12px;
+  border-radius: 50% 50% 20% 20%;
+  background: radial-gradient(circle at bottom center, #ffeb3b, #ff5722);
+  box-shadow: 0 0 8px #ff9800;
+  animation: chamaOscila 0.3s ease-in-out infinite alternate;
+}
+@keyframes chamaOscila {
+  0% {
+    transform: scale(1) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1.1) rotate(3deg);
+  }
+}
+
+/* 15. Abóbora com humor */
+.bruxo-abobora-humor {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+/* 16. Vaga-lumes noturnos */
+.bruxo-vagalumes {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.bruxo-vagalume {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #d4e157;
+  box-shadow:
+    0 0 8px #c6ff00,
+    0 0 14px #aeea00;
+  animation: vagaLumeFlutua 4s ease-in-out infinite alternate;
+}
+@keyframes vagaLumeFlutua {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(var(--vx, 30px), var(--vy, -40px));
+    opacity: 0.3;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html[data-mundo="bruxo"] :is(.herobox, .stage)::before,
   .caldeirao-dia *,
   .prumi .bolha-sobe,
   .bruxo-sapo-badge,
-  .bruxo-vassoura-voo {
+  .bruxo-vassoura-voo,
+  .bruxo-fumaca-puff,
+  .bruxo-bolha-evapora,
+  .bruxo-chama,
+  .bruxo-vagalume {
     animation: none !important;
   }
 }

@@ -380,6 +380,12 @@ function covenSemanalHTML() {
 // 7. Voo de vassoura animado a cada 5 tarefas
 function animarVooVassoura() {
   if (RM) return;
+  if (typeof pegarAudio === "function") {
+    try {
+      const ctx = pegarAudio();
+      if (ctx) somVassouraVoo(ctx, ctx.destination, ctx.currentTime);
+    } catch (_) {}
+  }
   const v = document.createElement("div");
   v.className = "bruxo-vassoura-voo";
   v.innerHTML = `<svg viewBox="0 0 64 32" width="64" height="32">
@@ -461,12 +467,197 @@ function grimorioErvasHTML() {
   </div>`;
 }
 
+// 11. Fumaça verde subindo ao preparar poção
+function animarFumacaPocao() {
+  if (typeof document === "undefined" || RM) return;
+  const c = document.createElement("div");
+  c.className = "bruxo-fumaca-container";
+  for (let i = 0; i < 6; i++) {
+    const puff = document.createElement("div");
+    puff.className = "bruxo-fumaca-puff";
+    const sz = 60 + Math.random() * 80;
+    puff.style.width = sz + "px";
+    puff.style.height = sz + "px";
+    puff.style.left = `calc(50% - ${sz / 2}px + ${(Math.random() - 0.5) * 120}px)`;
+    puff.style.bottom = `${20 + Math.random() * 60}px`;
+    puff.style.setProperty("--dx", `${(Math.random() - 0.5) * 80}px`);
+    puff.style.animationDelay = `${(i * 0.15).toFixed(2)}s`;
+    c.appendChild(puff);
+  }
+  document.body.appendChild(c);
+  setTimeout(() => c.remove(), 2200);
+}
+
+const prepararOriginalBruxo = ACOES_EXTRAS["bru-preparar"];
+ACOES_EXTRAS["bru-preparar"] = b => {
+  animarFumacaPocao();
+  if (typeof prepararOriginalBruxo === "function") prepararOriginalBruxo(b);
+};
+
+// 12. Tarefa concluída evapora em bolhas
+function animarEvaporacaoBolhas(el) {
+  if (typeof document === "undefined" || RM) return;
+  let x = (typeof window !== "undefined" ? window.innerWidth : 400) / 2;
+  let y = (typeof window !== "undefined" ? window.innerHeight : 600) / 2;
+  if (el && typeof el.getBoundingClientRect === "function") {
+    const r = el.getBoundingClientRect();
+    if (r.width > 0 || r.height > 0) {
+      x = r.left + r.width / 2;
+      y = r.top + r.height / 2;
+    }
+  }
+  for (let i = 0; i < 6; i++) {
+    const b = document.createElement("div");
+    b.className = "bruxo-bolha-evapora";
+    const sz = 10 + Math.random() * 14;
+    b.style.width = sz + "px";
+    b.style.height = sz + "px";
+    b.style.left = `${x + (Math.random() - 0.5) * 60}px`;
+    b.style.top = `${y + (Math.random() - 0.5) * 20}px`;
+    b.style.animationDelay = `${(i * 0.08).toFixed(2)}s`;
+    document.body.appendChild(b);
+    setTimeout(() => b.remove(), 1000);
+  }
+}
+
+// 14. Velas que acendem uma a uma conforme as tarefas do dia
+function velasBruxoHTML(feitas) {
+  const total =
+    typeof feitas === "number"
+      ? feitas
+      : (typeof S !== "undefined" &&
+          Array.isArray(S.tasks) &&
+          S.tasks.filter(t => t.done && t.date === today()).length) ||
+        0;
+  let html = '<div class="bruxo-velas-altar" title="Velas sagradas acesas pelo trabalho do dia">';
+  for (let i = 0; i < 5; i++) {
+    const acesa = total >= i + 1;
+    html += `<div class="bruxo-vela ${acesa ? "acesa" : "apagada"}">
+      <div class="bruxo-pavio"></div>
+      ${acesa ? '<div class="bruxo-chama"></div>' : ""}
+    </div>`;
+  }
+  html += "</div>";
+  return html;
+}
+
+// 15. Abóboras com rostinho que mudam com o humor no tema Abóboras
+function aboboraHumorHTML(humor) {
+  const h = humor || (typeof S !== "undefined" ? S.mood : "happy");
+  let boca = "M6 14 Q10 18 14 14";
+  let olhos =
+    '<polygon points="5,8 7,5 9,8" fill="#1b120c"/><polygon points="11,8 13,5 15,8" fill="#1b120c"/>';
+  if (h === "radiant") {
+    olhos = '<circle cx="7" cy="7" r="2.2" fill="#fff"/><circle cx="13" cy="7" r="2.2" fill="#fff"/>';
+    boca = "M5 13 Q10 20 15 13 Z";
+  } else if (h === "upset") {
+    olhos =
+      '<line x1="5" y1="6" x2="8" y2="8" stroke="#1b120c" stroke-width="1.8"/><line x1="15" y1="6" x2="12" y2="8" stroke="#1b120c" stroke-width="1.8"/>';
+    boca = "M6 16 L8 14 L10 16 L12 14 L14 16";
+  } else if (h === "sad" || h === "cry") {
+    olhos = '<circle cx="7" cy="8" r="1.5" fill="#1b120c"/><circle cx="13" cy="8" r="1.5" fill="#1b120c"/>';
+    boca = "M6 17 Q10 12 14 17";
+  }
+  return `<svg class="bruxo-abobora-humor" viewBox="0 0 20 20" width="20" height="20" aria-label="Abóbora ${h}">
+    <path d="M10 2 C9 1 11 0 10 3" stroke="#2e7d32" stroke-width="2" fill="none"/>
+    <ellipse cx="10" cy="11" rx="8" ry="7" fill="#fb8c00"/>
+    <ellipse cx="10" cy="11" rx="5" ry="7" fill="#f57c00"/>
+    ${olhos}
+    <path d="${boca}" stroke="#1b120c" stroke-width="1.5" fill="none"/>
+  </svg>`;
+}
+
+// 16. Vaga-lumes no fundo à noite
+function iniciarVagalumesBruxo(forcarNoite) {
+  if (typeof document === "undefined" || RM) return;
+  const hora = new Date().getHours();
+  const ehNoite = forcarNoite || hora >= 18 || hora < 6;
+  if (!ehNoite) return;
+  if (document.querySelector(".bruxo-vagalumes")) return;
+  const cont = document.createElement("div");
+  cont.className = "bruxo-vagalumes";
+  cont.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 10; i++) {
+    const vl = document.createElement("span");
+    vl.className = "bruxo-vagalume";
+    vl.style.left = `${Math.random() * 95}%`;
+    vl.style.top = `${Math.random() * 85 + 5}%`;
+    vl.style.setProperty("--vx", `${(Math.random() - 0.5) * 60}px`);
+    vl.style.setProperty("--vy", `${(Math.random() - 0.5) * 60}px`);
+    vl.style.animationDelay = `${(Math.random() * 3).toFixed(1)}s`;
+    vl.style.animationDuration = `${(3 + Math.random() * 2).toFixed(1)}s`;
+    cont.appendChild(vl);
+  }
+  document.body.appendChild(cont);
+}
+
+function pararVagalumesBruxo() {
+  if (typeof document === "undefined") return;
+  const v = document.querySelector(".bruxo-vagalumes");
+  if (v) v.remove();
+}
+
+// 17. Caldeirão muda de cor conforme ingredientes adicionados
+function corCaldeiraoDinamica(itens, feita) {
+  if (feita) {
+    const p = typeof POCOES !== "undefined" && POCOES.find(x => x.nome === feita);
+    return (p && p.cor) || "#76FF03";
+  }
+  const n = Array.isArray(itens) ? itens.length : 0;
+  if (n === 0) return "#33691E";
+  if (n === 1) return "#7B1FA2";
+  if (n === 2) return "#00897B";
+  if (n === 3) return "#FB8C00";
+  return "#76FF03";
+}
+
+// 18. Risadinha de bruxa sintetizada ao bater a meta
+function somRisadinhaBruxa(ctx, saida, t = 0) {
+  if (!ctx || !saida) return;
+  const notas = [880, 1174, 987, 1318, 1046, 880];
+  notas.forEach((freq, idx) => {
+    tocarTom(ctx, saida, t + idx * 0.08, freq, 0.12, "triangle", 0.08, 0.01);
+    tocarTom(ctx, saida, t + idx * 0.08 + 0.01, freq * 1.5, 0.08, "sine", 0.04, 0.01);
+  });
+}
+
+// 19. Coruja e vento no ambiente de foco "floresta"
+function ambienteFlorestaBruxo(ctx) {
+  const pioCoruja = (c, s, t) => {
+    tocarTom(c, s, t, 520, 0.4, "sine", 0.05, 0.08);
+    tocarTom(c, s, t + 0.35, 415, 0.6, "sine", 0.06, 0.1);
+  };
+  const vento = (c, s, t) => {
+    rajada(c, s, t, 1.8, 480, "bandpass", 0.04, 0.6);
+  };
+  return ambienteComposto(ctx, { freq: 400, tipo: "lowpass", vol: 0.04, onda: 0.1 }, [
+    [vento, 3000, 8000],
+    [pioCoruja, 8000, 18000],
+    [grilo, 1500, 4500]
+  ]);
+}
+
+// 20. Som de vassoura passando quando atravessa a tela
+function somVassouraVoo(ctx, saida, t = 0) {
+  if (!ctx || !saida) return;
+  rajada(ctx, saida, t, 0.65, 800, "bandpass", 0.12, 0.3);
+  tocarTom(ctx, saida, t + 0.05, 320, 0.5, "sine", 0.06, 0.2);
+}
+
+if (typeof SONS_MUNDO !== "undefined" && SONS_MUNDO.bruxo) {
+  SONS_MUNDO.bruxo.meta = (ctx, saida, t) => {
+    somRisadinhaBruxa(ctx, saida, t);
+  };
+  SONS_MUNDO.bruxo.ambiente = ctx => ambienteFlorestaBruxo(ctx);
+}
+
 /* Conexão com eventos do Bruxo */
 if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.bruxo) {
   const antigoAoConcluirBruxo = MUNDO_FX.bruxo.aoConcluir;
   MUNDO_FX.bruxo.aoConcluir = (tarefa, b) => {
     if (typeof antigoAoConcluirBruxo === "function") antigoAoConcluirBruxo(tarefa, b);
     conferirProtecaoManha();
+    animarEvaporacaoBolhas(b);
     const feitas =
       (typeof S !== "undefined" &&
         Array.isArray(S.tasks) &&
@@ -475,6 +666,26 @@ if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.bruxo) {
     if (feitas > 0 && feitas % 5 === 0) {
       animarVooVassoura();
     }
+    const meta = (typeof S !== "undefined" && S.metaTarefas) || 5;
+    if (feitas >= meta) {
+      const d = dadosBruxo();
+      if (!d.risadinhaHoje || d.risadinhaHoje !== today()) {
+        d.risadinhaHoje = today();
+        commit();
+        if (typeof pegarAudio === "function") {
+          try {
+            const ctx = pegarAudio();
+            if (ctx) somRisadinhaBruxa(ctx, ctx.destination, ctx.currentTime);
+          } catch (_) {}
+        }
+      }
+    }
+  };
+
+  const antigaTrocaAbaBruxo = MUNDO_FX.bruxo.trocaAba;
+  MUNDO_FX.bruxo.trocaAba = () => {
+    if (typeof antigaTrocaAbaBruxo === "function") antigaTrocaAbaBruxo();
+    iniciarVagalumesBruxo();
   };
 
   const antigaSecaoHojeBruxo = MUNDO_FX.bruxo.secaoHoje;
@@ -485,15 +696,26 @@ if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.bruxo) {
     }
     const lua = faseLuaBruxo();
     const conselho = conselhoGatoBruxo();
+    const feitasHoje =
+      (typeof S !== "undefined" &&
+        Array.isArray(S.tasks) &&
+        S.tasks.filter(t => t.done && t.date === today()).length) ||
+      0;
+
+    let decoracaoAbobora = "";
+    if (typeof S !== "undefined" && S.themeBy && S.themeBy.bruxo === "abobora") {
+      decoracaoAbobora = aboboraHumorHTML(S.mood);
+    }
 
     html += cartaoMundo(
       "cm-bruxo-lua-gato",
-      `Fase Lunar: ${lua.nome} ${lua.icone}`,
+      `${decoracaoAbobora}Fase Lunar: ${lua.nome} ${lua.icone}`,
       lua.bonus,
       `<div class="card sub sunken" style="padding:8px;margin-bottom:6px">
         <b>🐈‍⬛ O Gato Preto Murmura:</b><br>
         <span style="font-size:12px;font-style:italic">"${esc(conselho)}"</span>
       </div>
+      ${velasBruxoHTML(feitasHoje)}
       ${sabaDeSextaHTML()}
       ${livroDeReceitasHTML()}
       ${covenSemanalHTML()}
