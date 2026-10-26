@@ -221,6 +221,96 @@ html[data-mundo="otaku"][data-variante="festival"] header.top::after {
 html[data-mundo="otaku"][data-variante="festival"] header.top {
   position: relative;
 }
+
+/* Lote 1: Temporadas, Vilão, Rival, Golpes e Ficha */
+html[data-mundo="otaku"] .cm-proximo-ep {
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+html[data-mundo="otaku"] .vilao-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+html[data-mundo="otaku"] .hp-bar {
+  height: 12px;
+  background: color-mix(in srgb, var(--ink) 15%, transparent);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--ink);
+}
+html[data-mundo="otaku"] .hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e53935, #ffb300);
+  transition: width 0.3s ease;
+}
+
+html[data-mundo="otaku"] .rival-placar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 10px 0;
+}
+html[data-mundo="otaku"] .rival-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--card);
+  border: 2px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  border-radius: 8px;
+  min-width: 70px;
+}
+html[data-mundo="otaku"] .rival-item.vencendo {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+html[data-mundo="otaku"] .rival-item b {
+  font-size: 1.4em;
+  color: var(--accent);
+}
+html[data-mundo="otaku"] .rival-vs {
+  font-weight: 900;
+  font-size: 1.1em;
+  color: var(--ink);
+  opacity: 0.6;
+}
+
+html[data-mundo="otaku"] .chip-golpe {
+  background: color-mix(in srgb, var(--accent) 15%, var(--card));
+  color: var(--accent);
+  font-weight: 700;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+html[data-mundo="otaku"] .recap-texto {
+  font-style: italic;
+  line-height: 1.45;
+  border-left: 3px solid var(--accent);
+  padding-left: 10px;
+}
+
+.ficha-otaku .ficha-otaku-corpo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  padding: 8px 0;
+}
+.ficha-otaku .ficha-linha {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+
 @media (prefers-reduced-motion: reduce) {
   #linhas-otaku,
   .sugoi-otaku,

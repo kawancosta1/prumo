@@ -87,6 +87,7 @@ function perfilHTML() {
         : ""
     }
     ${S.emo && S.emo.mixtape && S.emo.mixtape.faixas.length ? `<div class="ms-bloco"><span class="ms-titulo">Mixtape: ${esc(S.emo.mixtape.nome || "sem nome")}</span><ol class="faixas">${S.emo.mixtape.faixas.map(f => `<li><span>${esc(f)}</span></li>`).join("")}</ol></div>` : ""}
+    ${typeof fichaOtakuBlocoHTML === "function" ? fichaOtakuBlocoHTML() : ""}
 
     <div class="ms-bloco">
       <span class="ms-titulo">Fotolog</span>

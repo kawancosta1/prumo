@@ -11,10 +11,16 @@ function taskRow(x, { showDate = false } = {}) {
   if (showDate) meta.push(`<span class="due soon" style="padding:1px 6px">${esc(relDay(x.date))}</span>`);
   if (x.time) meta.push(`<span class="mono">${esc(x.time)}</span>`);
   meta.push(`<span class="chip">${AREAS[x.area] || "Geral"}</span>`);
-  if (x.prio)
+  if (x.prio) {
     meta.push(
       `<span class="prio p${x.prio}" title="Prioridade ${PRIO[x.prio].toLowerCase()}">${"!".repeat(x.prio)}</span>`
     );
+    if (S.persona === "otaku" && x.prio >= 2 && typeof nomeGolpeEspecial === "function") {
+      meta.push(
+        `<span class="chip chip-golpe" title="Ataque especial">${esc(nomeGolpeEspecial(x.title))}</span>`
+      );
+    }
+  }
   if (x.repeat) meta.push(`<span title="${REPEAT[x.repeat]}" style="display:inline-flex">${ICON.rep}</span>`);
   if (x.sub.length) meta.push(`<span class="mono">${subDone}/${x.sub.length}</span>`);
   const atrasada = !x.done && x.date < today(); // no emo, vira fantasminha (ver estilos/mundos/emo.css)

@@ -484,5 +484,309 @@ ITEMS.push(
     ink: "#5D4037",
     svg: () =>
       `<path class="brilhinho" d="${BODY}" fill="none" stroke="#FFD54F" stroke-width="12" opacity=".75"/><path d="M30 120l6 -10M88 118l-5 -9M60 140v-12" stroke="#FFB300" stroke-width="2.4" stroke-linecap="round"/>`
+  },
+  {
+    id: "otaku_carta_senpai",
+    p: "otaku",
+    slot: "hand",
+    name: "Carta do Senpai",
+    price: 150,
+    svg: (x, y) =>
+      H(
+        x,
+        y,
+        `<rect x="-10" y="-8" width="20" height="14" rx="2" fill="#FFF0F5" stroke="var(--ink)" stroke-width="1.2"/><path d="M-10 -8L0 0L10 -8" stroke="var(--ink)" stroke-width="1.2" fill="none"/><path d="M0 0l-3 4h6z" fill="#E91E63"/>`
+      )
   }
 );
+
+/* ==========================================================================
+   OTAKU: LEVA 1 (Itens 1 a 10) - Temporadas, Vilão, Rival, Golpes e Rotina Anime
+   ========================================================================== */
+
+const NOMES_TEMPORADAS_OTAKU = [
+  "O Despertar do Protagonista",
+  "Arco da Determinação Infinita",
+  "A Batalha pelo Amanhã",
+  "Torneio dos Mestres",
+  "A Chama da Coragem",
+  "O Segredo da Estrela Cadente",
+  "Rumo ao Topo do Mundo",
+  "Aliança dos Heróis",
+  "O Mistério do Templo Oculto",
+  "Crônicas da Primavera Eterna",
+  "O Golpe Final",
+  "A Lenda Renascida"
+];
+
+function temporadaOtakuAtual() {
+  const m = today().slice(0, 7);
+  const idx = (parseInt(m.slice(5, 7), 10) - 1) % NOMES_TEMPORADAS_OTAKU.length;
+  return { mes: m, nome: `Temporada ${m.slice(5, 7)}: ${NOMES_TEMPORADAS_OTAKU[idx]}` };
+}
+
+// 1. Temporadas: abertura no Hoje
+function aberturaTemporadaHTML() {
+  const t = temporadaOtakuAtual();
+  const d = dadosMundo("otaku");
+  const ehDia1 = today().slice(8) === "01";
+  if (d.aberturaVista === t.mes) return "";
+  if (!ehDia1 && d.aberturaVista) return "";
+  return cartaoMundo(
+    "cm-abertura",
+    "Abertura da Temporada!",
+    esc(t.nome),
+    `<p class="note">Música épica tocando, pétalas ao vento e uma nova jornada que começa!</p>
+     <div class="cm-botoes">
+       <button class="btn small primary" data-act="otaku-abertura">Assistir abertura (+5 gotas)</button>
+     </div>`
+  );
+}
+
+ACOES_EXTRAS["otaku-abertura"] = () => {
+  const t = temporadaOtakuAtual();
+  const d = dadosMundo("otaku");
+  d.aberturaVista = t.mes;
+  premioMundo(5, "Abertura assistida! Nova temporada iniciada! +5 gotas.");
+  MUNDO_FX.otaku.trocaAba();
+  commit();
+};
+
+// 2. Próximo episódio: ao fechar o dia
+function proximoEpisodioHTML() {
+  if (!S.journal[today()]) return "";
+  const amanha = addDays(today(), 1);
+  const marcadas = S.tasks.filter(t => !t.done && t.date === amanha);
+  const nomeHeroi = S.name || "nosso herói";
+  const texto = marcadas.length
+    ? `No próximo episódio de Prumo: "${esc(marcadas[0].title)}"! Conseguirá ${esc(nomeHeroi)} superar mais este desafio? Não perca!`
+    : `No próximo episódio de Prumo: "O Enigma do Dia Livre"! Quais aventuras aguardam ${esc(nomeHeroi)}? Não perca!`;
+  return `<div class="cm-proximo-ep"><b>Prévia do próximo episódio:</b> <i>${texto}</i></div>`;
+}
+
+// 3. Arco do vilão (3 ou mais atrasadas)
+function vilaoOtakuHTML() {
+  const atrasadas = S.tasks.filter(t => !t.done && t.date && t.date < today());
+  const d = dadosMundo("otaku");
+  if (atrasadas.length < 3) return "";
+  if (!d.vilao || !d.vilao.ativo || d.vilao.derrotadoEm === today()) {
+    d.vilao = {
+      ativo: true,
+      nome: "Lorde da Procrastinação",
+      vidaMax: atrasadas.length,
+      vidaAtual: atrasadas.length,
+      derrotadoEm: ""
+    };
+  } else {
+    if (atrasadas.length > d.vilao.vidaMax) d.vilao.vidaMax = atrasadas.length;
+    d.vilao.vidaAtual = Math.min(d.vilao.vidaMax, atrasadas.length);
+  }
+  const pct = Math.max(0, Math.min(100, Math.round((d.vilao.vidaAtual / d.vilao.vidaMax) * 100)));
+  return cartaoMundo(
+    "cm-vilao",
+    "Arco do Vilão!",
+    esc(d.vilao.nome),
+    `<div class="vilao-box">
+      <div class="vilao-barra"><div class="hp-bar"><div class="hp-fill" style="width:${pct}%"></div></div><small>HP: ${d.vilao.vidaAtual}/${d.vilao.vidaMax} · Resolva tarefas atrasadas para derrotar o vilão!</small></div>
+    </div>`
+  );
+}
+
+// 4. Rival
+function rivalOtakuHTML() {
+  const d = dadosMundo("otaku");
+  const sem = mondayOf(today());
+  if (!d.rival || d.rival.semana !== sem) {
+    const passadas = S.tasks.filter(t => t.done && t.date >= addDays(today(), -7)).length;
+    const mediaDia = Math.max(2, Math.min(6, Math.round(passadas / 7) || 3));
+    const diaSem = (new Date().getDay() + 6) % 7;
+    d.rival = {
+      semana: sem,
+      nome: "Rival Takeshi",
+      tarefas: Math.max(1, (diaSem + 1) * mediaDia)
+    };
+  }
+  const feitasSemana = S.tasks.filter(t => t.done && (t.feitaEm || t.date) >= sem).length;
+  const lider = feitasSemana >= d.rival.tarefas;
+  return cartaoMundo(
+    "cm-rival",
+    "Duelo de Rivais",
+    `Você vs ${esc(d.rival.nome)}`,
+    `<div class="rival-placar">
+      <div class="rival-item ${lider ? "vencendo" : ""}"><span>Você</span><b>${feitasSemana}</b></div>
+      <div class="rival-vs">VS</div>
+      <div class="rival-item ${!lider ? "vencendo" : ""}"><span>${esc(d.rival.nome)}</span><b>${d.rival.tarefas}</b></div>
+    </div>
+    <span class="note">${lider ? "Você está liderando a disputa da semana! Continue assim!" : "O rival está na frente! Conclua missões para virar o jogo!"}</span>`
+  );
+}
+
+// 5. Ataque especial
+const PREFIXOS_GOLPES = [
+  "Rajada",
+  "Corte Relâmpago",
+  "Impacto Meteoro",
+  "Dança das Lâminas",
+  "Rugido do Trovão",
+  "Vórtice Espiritual",
+  "Explosão Estelar"
+];
+function nomeGolpeEspecial(titulo) {
+  let h = 0;
+  for (let i = 0; i < (titulo || "").length; i++) h = (h * 31 + titulo.charCodeAt(i)) | 0;
+  const p = PREFIXOS_GOLPES[Math.abs(h) % PREFIXOS_GOLPES.length];
+  return `${p}... ${titulo}!`;
+}
+
+// 6. Nível de poder no foco
+function nivelPoderFoco() {
+  const m = S.sessions.filter(s => s.date === today()).reduce((a, b) => a + b.min, 0);
+  if (m >= 100) return { rank: "Mestre", poder: 9001, min: m };
+  if (m >= 75) return { rank: "Jounin", poder: 5000, min: m };
+  if (m >= 50) return { rank: "Chunin", poder: 1500, min: m };
+  if (m >= 25) return { rank: "Genin", poder: 500, min: m };
+  return { rank: "Iniciante", poder: 100, min: m };
+}
+
+// 7. Senpai notou (7 dias seguidos)
+function diasSeguidosTarefas() {
+  const dias = new Set(S.tasks.filter(t => t.done).map(t => t.feitaEm || t.date));
+  let d = today(),
+    c = 0;
+  if (!dias.has(d)) d = addDays(d, -1);
+  while (dias.has(d)) {
+    c++;
+    d = addDays(d, -1);
+  }
+  return c;
+}
+
+function verificarSenpaiNotou() {
+  const streak = diasSeguidosTarefas();
+  if (streak >= 7 && !S.owned.includes("otaku_carta_senpai")) {
+    S.owned.push("otaku_carta_senpai");
+    notificar({
+      titulo: "O Senpai te notou!",
+      texto: "7 dias seguidos de treino! Você recebeu a Carta do Senpai.",
+      mood: "party",
+      tipo: "conquista"
+    });
+    react("happy", "Kyaaa~! O Senpai finalmente notou sua dedicação!", 3500);
+  }
+}
+
+// 8. Recapitulando (domingo)
+function recapitulandoHTML() {
+  if (new Date().getDay() !== 0) return "";
+  const d7 = addDays(today(), -6);
+  const feitas = S.tasks.filter(t => t.done && (t.feitaEm || t.date) >= d7).length;
+  const foco = S.sessions.filter(s => s.date >= d7).reduce((a, b) => a + b.min, 0);
+  const agua = Math.round(
+    Array.from({ length: 7 }, (_, i) => waterToday(addDays(today(), -i))).reduce((a, b) => a + b, 0) / 1000
+  );
+  return cartaoMundo(
+    "cm-recap",
+    "Anteriormente em Prumo...",
+    "Recapitulando a semana",
+    `<p class="recap-texto">"Nosso protagonista venceu <b>${feitas} missões</b>, acumulou <b>${foco} minutos de treino</b> e bebeu <b>${agua} L de água</b>! Uma verdadeira saga heroica!"</p>`
+  );
+}
+
+// 9. Hora do lámen
+function horaDoLamen() {
+  const h = new Date().getHours();
+  return h >= 0 && h < 4;
+}
+
+// 10. Ficha de personagem
+function fichaPersonagemOtaku() {
+  const habitosNomes = S.habits.map(h => (h.name || "").toLowerCase()).join(" ");
+  let classe = "Paladino da Produtividade";
+  if (/treino|exerc|corr|academia|alongar|caminh/.test(habitosNomes)) classe = "Guerreiro do Dojo";
+  else if (/estud|ler|livro|cálculo|program|pesquis/.test(habitosNomes)) classe = "Mago dos Pergaminhos";
+  else if (/água|medit|respir|dorm|silênc/.test(habitosNomes)) classe = "Ninja da Concentração";
+
+  const streak = diasSeguidosTarefas();
+  const poder = levelOf(S.xp).lvl * 350 + streak * 75 + S.habits.length * 40;
+  const golpeFav = S.habits.length ? `Técnica Suprema: ${S.habits[0].name}` : "Impacto do Foco Absoluto";
+  const rank = nivelPoderFoco().rank;
+
+  return { classe, poder, golpe: golpeFav, rank };
+}
+
+function fichaOtakuBlocoHTML() {
+  if (S.persona !== "otaku") return "";
+  const f = fichaPersonagemOtaku();
+  return `<div class="ms-bloco ficha-otaku">
+    <span class="ms-titulo">Ficha de Personagem (Anime)</span>
+    <div class="ficha-otaku-corpo">
+      <div class="ficha-linha"><b>Classe:</b> <span>${esc(f.classe)}</span></div>
+      <div class="ficha-linha"><b>Poder de Combate:</b> <span class="mono">${f.poder.toLocaleString("pt-BR")}</span></div>
+      <div class="ficha-linha"><b>Golpe Favorito:</b> <span>${esc(f.golpe)}</span></div>
+      <div class="ficha-linha"><b>Rank Ninja no Foco:</b> <span>${esc(f.rank)}</span></div>
+    </div>
+  </div>`;
+}
+
+// Ganchos integrados do mundo Otaku
+{
+  const secaoAntes = MUNDO_FX.otaku.secaoHoje;
+  MUNDO_FX.otaku.secaoHoje = () => {
+    const epHTML = secaoAntes();
+    const ab = aberturaTemporadaHTML();
+    const vil = vilaoOtakuHTML();
+    const riv = rivalOtakuHTML();
+    const rec = recapitulandoHTML();
+    const prox = proximoEpisodioHTML();
+    const rk = nivelPoderFoco();
+    const rankHTML = cartaoMundo(
+      "cm-rank-foco",
+      "Rank de Poder no Foco",
+      `${rk.rank} (${rk.poder} de poder)`,
+      `<span class="note">A cada 25 min de foco você sobe de rank ninja! Tempo hoje: <b>${rk.min} min</b>.</span>`
+    );
+    return ab + vil + epHTML + rankHTML + riv + rec + prox;
+  };
+
+  const concluirAntesLote1 = MUNDO_FX.otaku.aoConcluir;
+  MUNDO_FX.otaku.aoConcluir = (x, el) => {
+    concluirAntesLote1(x, el);
+    verificarSenpaiNotou();
+    const d = dadosMundo("otaku");
+    if (d.vilao && d.vilao.ativo && d.vilao.vidaAtual > 0 && x && x.date && x.date < today()) {
+      d.vilao.vidaAtual = Math.max(0, d.vilao.vidaAtual - 1);
+      if (d.vilao.vidaAtual === 0 && d.vilao.derrotadoEm !== today()) {
+        d.vilao.derrotadoEm = today();
+        premioMundo(15, "Vilão derrotado! O arco do vilão foi superado. +15 gotas!");
+      }
+    }
+  };
+
+  const camadasAntes = MUNDO_FX.otaku.camadasPrumi;
+  MUNDO_FX.otaku.camadasPrumi = arg => {
+    const base = camadasAntes ? camadasAntes(arg) : { fundo: "", rosto: "" };
+    let rostoExtra = base.rosto || "";
+    if (horaDoLamen()) {
+      rostoExtra += `<g class="otaku-lamen-noite" transform="translate(68 112)">
+        <path d="M-10 -2H10Q9 10 0 10Q-9 10 -10 -2Z" fill="#E53935" stroke="var(--ink)" stroke-width="1.2"/>
+        <path d="M-8 -2q3 -3 6 0t6 0" stroke="#FBC02D" stroke-width="1.6" fill="none"/>
+        <path d="M3 -8L-6 -18M6 -8L-1 -20" stroke="#8D6E63" stroke-width="1.2"/>
+        <g class="vapor"><path d="M-2 -5q-2 -4 1 -7" stroke="#fff" stroke-width="1.2" fill="none" opacity=".8"/></g>
+      </g>`;
+    }
+    return { fundo: base.fundo || "", rosto: rostoExtra };
+  };
+
+  const contextoAntes = MUNDO_FX.otaku.contextoMascote;
+  MUNDO_FX.otaku.contextoMascote = () => {
+    if (horaDoLamen()) {
+      const falas = [
+        "Hora do lámen da madrugada! O caldo perfeito para quem ainda está acordado.",
+        "Lámen quentinho na madrugada... Todo protagonista treina até tarde!",
+        "Madrugada de maratona de anime e tarefas pendentes... Come um lámen com o Prumi!"
+      ];
+      return { mood: "happy", msg: falas[new Date().getMinutes() % falas.length] };
+    }
+    return contextoAntes ? contextoAntes() : null;
+  };
+}
