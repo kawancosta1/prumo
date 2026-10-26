@@ -352,6 +352,82 @@ html[data-mundo="bruxo"][data-variante="lua"] .card::before {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
+/* 37. Cogumelos no chão */
+.bruxo-cogu-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  pointer-events: none;
+  z-index: 99;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+.bruxo-cogu-chao {
+  transform-origin: bottom center;
+  animation: brotarCogu 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes brotarCogu {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 38. Cursor de vassourinha */
+html[data-mundo="bruxo"] {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 21l11-11' stroke='%235d4037' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M13 11l7-7l2 4l-5 5z' fill='%23fbc02d' stroke='%233e2723' stroke-width='0.8'/%3E%3Ccircle cx='3' cy='21' r='1.5' fill='%238d6e63'/%3E%3C/svg%3E"),
+    auto;
+}
+html[data-mundo="bruxo"] button,
+html[data-mundo="bruxo"] a,
+html[data-mundo="bruxo"] [data-act],
+html[data-mundo="bruxo"] input,
+html[data-mundo="bruxo"] select {
+  cursor: pointer;
+}
+
+/* 39. Sapo que pula e some */
+.bruxo-sapo-pula-some {
+  animation: sapoPulaSome 0.6s ease-in forwards !important;
+}
+@keyframes sapoPulaSome {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-24px) scale(1.3);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-40px) scale(0.2);
+    opacity: 0;
+  }
+}
+.bruxo-estalo-desencantar {
+  position: absolute;
+  pointer-events: none;
+  animation: estaloFaisca 0.5s ease-out forwards;
+}
+@keyframes estaloFaisca {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html[data-mundo="bruxo"] :is(.herobox, .stage)::before,
   .caldeirao-dia *,

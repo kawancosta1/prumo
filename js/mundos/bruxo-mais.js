@@ -336,6 +336,16 @@ function desencantarSapoTarefa(tarefaId) {
   const t = typeof S !== "undefined" && Array.isArray(S.tasks) && S.tasks.find(x => x.id === tarefaId);
   if (!t || typeof t.sapo !== "number") return false;
   t.sapo -= 1;
+
+  if (typeof document !== "undefined") {
+    const el =
+      document.querySelector(`[data-tarefa-id="${tarefaId}"] .bruxo-sapo-badge`) ||
+      document.querySelector(".bruxo-sapo-badge");
+    if (el) {
+      el.classList.add("bruxo-sapo-pula-some");
+    }
+  }
+
   if (t.sapo <= 0) {
     delete t.sapo;
     commit();
@@ -746,6 +756,278 @@ function molduraFotologBruxoHTML(conteudo) {
   </div>`;
 }
 
+// 31. Encomendas diárias dos clientes da floresta
+const CLIENTES_FLORESTA = [
+  {
+    cliente: "Esquilo da clareira",
+    pocao: "Poção da Coragem",
+    recompensa: 15,
+    fala: "Tem nozes no alto da árvore que eu não consigo pegar sem coragem!"
+  },
+  {
+    cliente: "Coruja sábia",
+    pocao: "Xarope do Foco",
+    recompensa: 15,
+    fala: "Preciso catalogar as constelações desta noite sem piscar."
+  },
+  {
+    cliente: "Família de sapos",
+    pocao: "Chá da Gentileza",
+    recompensa: 15,
+    fala: "Queremos fazer as pazes com as rãs do lago vizinho."
+  },
+  {
+    cliente: "Espírito do bosque",
+    pocao: "Poção da Calma",
+    recompensa: 15,
+    fala: "O vento andou muito agitado hoje entre os pinheiros."
+  }
+];
+
+function encomendasFlorestaBruxo() {
+  const d = dadosBruxo();
+  if (!d.encomendasDia || d.encomendasDia.data !== today()) {
+    const idx = (diffDays("2026-01-01", today()) + 3) % CLIENTES_FLORESTA.length;
+    d.encomendasDia = {
+      data: today(),
+      cliente: CLIENTES_FLORESTA[idx],
+      entregue: false
+    };
+    commit();
+  }
+  return d.encomendasDia;
+}
+
+function entregarEncomendaFloresta() {
+  const d = dadosBruxo();
+  const enc = encomendasFlorestaBruxo();
+  if (!enc || enc.entregue) return false;
+  enc.entregue = true;
+  if (typeof S !== "undefined") {
+    S.coins = (S.coins || 0) + enc.cliente.recompensa;
+  }
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Encomenda Entregue! 🍂📦",
+      texto: `${enc.cliente.cliente} agradeceu com +${enc.cliente.recompensa} gotas douradas!`,
+      tipo: "conquista",
+      mood: "party"
+    });
+  }
+  return true;
+}
+
+function encomendasFlorestaHTML() {
+  const enc = encomendasFlorestaBruxo();
+  return `<div class="card sub sunken" style="margin-top:6px;padding:8px">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <b>🌲 Pedido de: ${esc(enc.cliente.cliente)}</b>
+      <span class="mono">${enc.entregue ? "✅ Entregue" : "⏳ Pendente"}</span>
+    </div>
+    <p style="font-size:12px;font-style:italic;margin:4px 0">"${esc(enc.cliente.fala)}"</p>
+    <div class="row" style="justify-content:space-between;align-items:center;margin-top:4px">
+      <span class="note">Item pedido: <b>${esc(enc.cliente.pocao)}</b> (+${enc.cliente.recompensa} gotas)</span>
+      ${!enc.entregue ? `<button class="btn small primary" data-act="bruxo-entregar-encomenda">Entregar</button>` : ""}
+    </div>
+  </div>`;
+}
+
+ACOES_EXTRAS["bruxo-entregar-encomenda"] = () => {
+  entregarEncomendaFloresta();
+  render();
+};
+
+// 32. Estoque de ingredientes guardados pro dia seguinte
+function guardarIngredienteEstoque(ingrediente) {
+  const d = dadosBruxo();
+  if (!Array.isArray(d.estoqueIngredientes)) d.estoqueIngredientes = [];
+  if (d.estoqueIngredientes.length >= 4) return false;
+  const ing = ingrediente || (d.caldeirao && d.caldeirao.itens && d.caldeirao.itens.pop());
+  if (!ing) return false;
+  d.estoqueIngredientes.push(ing);
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Ingrediente Guardado! 🏺",
+      texto: `${ing} foi guardado na despensa pro dia seguinte.`,
+      tipo: "info",
+      mood: "happy"
+    });
+  }
+  return true;
+}
+
+function usarIngredienteEstoque(idx = 0) {
+  const d = dadosBruxo();
+  if (!Array.isArray(d.estoqueIngredientes) || !d.estoqueIngredientes.length) return false;
+  const [ing] = d.estoqueIngredientes.splice(idx, 1);
+  if (!d.caldeirao.itens) d.caldeirao.itens = [];
+  d.caldeirao.itens.push(ing);
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Ingrediente Resgatado! 🌿",
+      texto: `${ing} foi jogado de volta no caldeirão.`,
+      tipo: "sucesso",
+      mood: "happy"
+    });
+  }
+  return ing;
+}
+
+// 33. Poção que dá errado (fumaça colorida inofensiva e fala engraçada)
+function prepararPocaoComChanceFalha(forcarFalha = false) {
+  const d = dadosBruxo();
+  const c = d.caldeirao;
+  if (!forcarFalha && (c.itens.length < 4 || Math.random() > 0.15)) {
+    return false;
+  }
+  animarFumacaPocao();
+  if (typeof S !== "undefined") S.coins = (S.coins || 0) + 2;
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Puf! A poção explodiu em purpurina! ✨💨",
+      texto: "Saiu uma fumacinha roxa cheirosa e o gato saiu correndo. Ganhou +2 gotas de consolação!",
+      tipo: "info",
+      mood: "upset"
+    });
+  }
+  return true;
+}
+
+// 34. Calendário lunar do mês
+function calendarioLunarMesHTML(ano, mes) {
+  const agora = new Date();
+  const a = typeof ano === "number" ? ano : agora.getFullYear();
+  const m = typeof mes === "number" ? mes : agora.getMonth();
+  const totalDias = new Date(a, m + 1, 0).getDate();
+  const nomesMeses = [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro"
+  ];
+
+  let html = `<div class="card sub" style="margin-top:6px">
+    <b>🌙 Calendário Lunar: ${nomesMeses[m]} ${a}</b>
+    <div style="display:grid;grid-template-columns:repeat(7, 1fr);gap:4px;margin-top:6px;text-align:center">`;
+
+  for (let dia = 1; dia <= totalDias; dia++) {
+    const dataStr = `${a}-${String(m + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+    const fl = faseLuaBruxo(dataStr);
+    const ehHoje = dataStr === today();
+    html += `<div style="padding:4px 2px;border-radius:4px;background:${ehHoje ? "rgba(118,255,3,0.18)" : "rgba(0,0,0,0.15)"};border:${ehHoje ? "1px solid #76ff03" : "1px solid transparent"}">
+      <div style="font-size:9px">${dia}</div>
+      <div style="font-size:14px">${fl.icone}</div>
+    </div>`;
+  }
+  html += `</div></div>`;
+  return html;
+}
+
+// 35. Amuletos de 3 ervas com efeito por 1 semana
+function criarAmuletoErvas(e1 = "Alecrim", e2 = "Lavanda", e3 = "Camomila") {
+  const d = dadosBruxo();
+  d.amuletoAtivo = {
+    nome: `Amuleto de ${e1}, ${e2} e ${e3}`,
+    ervas: [e1, e2, e3],
+    criadoEm: today(),
+    expiraEm: addDays(today(), 7)
+  };
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Amuleto Encantado Criado! 🪬🌿",
+      texto: `Proteção das 3 ervas ativada até ${d.amuletoAtivo.expiraEm}!`,
+      tipo: "sucesso",
+      mood: "party"
+    });
+  }
+  return d.amuletoAtivo;
+}
+
+// 36. Livro das sombras com capa roxa e cadeado opcional
+function alternarCadeadoLivroSombras() {
+  const d = dadosBruxo();
+  d.livroTrancado = !d.livroTrancado;
+  commit();
+  return d.livroTrancado;
+}
+
+function livroDasSombrasHTML() {
+  const d = dadosBruxo();
+  const trancado = !!d.livroTrancado;
+  return `<div class="card sub" style="background:#1e1035;border:2px solid #b388ff;border-radius:10px;padding:12px;margin-top:6px;color:#f3e8ff">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <div style="font-size:16px;font-weight:bold">📖 Livro das Sombras</div>
+      <button class="btn small" data-act="bruxo-toggle-cadeado">${trancado ? "🔒 Trancado" : "🔓 Aberto"}</button>
+    </div>
+    <div style="text-align:center;padding:12px 0">
+      <svg viewBox="0 0 80 100" width="80" height="100">
+        <rect x="5" y="5" width="70" height="90" rx="6" fill="#311B92" stroke="#FFD54F" stroke-width="2"/>
+        <circle cx="40" cy="50" r="18" fill="none" stroke="#FFD54F" stroke-width="1.8"/>
+        <path d="M40 32 L40 68 M22 50 L58 50" stroke="#FFD54F" stroke-width="1.2"/>
+        <circle cx="40" cy="50" r="6" fill="#76FF03"/>
+      </svg>
+    </div>
+    ${trancado ? `<p class="note" style="text-align:center">O feitiço de tranca guarda seus segredos mais antigos.</p>` : `<p class="note" style="text-align:center">Páginas de feitiços e rituais abertas para consulta.</p>`}
+  </div>`;
+}
+
+ACOES_EXTRAS["bruxo-toggle-cadeado"] = () => {
+  alternarCadeadoLivroSombras();
+  render();
+};
+
+// 37. Cogumelos que nascem no chão da tela ao longo do dia
+function brotarCogumelosDia() {
+  if (typeof document === "undefined" || RM) return;
+  const feitas =
+    (typeof S !== "undefined" &&
+      Array.isArray(S.tasks) &&
+      S.tasks.filter(t => t.done && t.date === today()).length) ||
+    0;
+  const qtd = Math.min(8, Math.max(1, Math.floor(feitas / 2) + 1));
+  let cont = document.querySelector(".bruxo-cogu-container");
+  if (!cont) {
+    cont = document.createElement("div");
+    cont.className = "bruxo-cogu-container";
+    cont.setAttribute("aria-hidden", "true");
+    document.body.appendChild(cont);
+  }
+  cont.innerHTML = "";
+  const cores = ["#E53935", "#8E24AA", "#FB8C00", "#43A047", "#1E88E5"];
+  for (let i = 0; i < qtd; i++) {
+    const cogu = document.createElement("div");
+    cogu.className = "bruxo-cogu-chao";
+    const cor = cores[i % cores.length];
+    cogu.innerHTML = `<svg viewBox="0 0 20 20" width="18" height="18">
+      <rect x="8" y="10" width="4" height="10" rx="1" fill="#FFF3E0"/>
+      <path d="M2 10 Q10 1 18 10 Z" fill="${cor}"/>
+      <circle cx="6" cy="6" r="1.2" fill="#fff"/>
+      <circle cx="12" cy="5" r="1.5" fill="#fff"/>
+      <circle cx="15" cy="8" r="1" fill="#fff"/>
+    </svg>`;
+    cont.appendChild(cogu);
+  }
+}
+
+// 40. Lua do cabeçalho muda de fase de verdade
+function iconeLuaCabecalhoBruxo() {
+  const fl = typeof faseLuaBruxo === "function" ? faseLuaBruxo() : { icone: "🌕" };
+  return fl.icone;
+}
+
 if (typeof SONS_MUNDO !== "undefined" && SONS_MUNDO.bruxo) {
   SONS_MUNDO.bruxo.meta = (ctx, saida, t) => {
     somRisadinhaBruxa(ctx, saida, t);
@@ -788,6 +1070,7 @@ if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.bruxo) {
   MUNDO_FX.bruxo.trocaAba = () => {
     if (typeof antigaTrocaAbaBruxo === "function") antigaTrocaAbaBruxo();
     iniciarVagalumesBruxo();
+    brotarCogumelosDia();
   };
 
   const antigaSecaoHojeBruxo = MUNDO_FX.bruxo.secaoHoje;
@@ -818,10 +1101,13 @@ if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.bruxo) {
         <span style="font-size:12px;font-style:italic">"${esc(conselho)}"</span>
       </div>
       ${velasBruxoHTML(feitasHoje)}
+      ${encomendasFlorestaHTML()}
       ${sabaDeSextaHTML()}
       ${livroDeReceitasHTML()}
       ${covenSemanalHTML()}
-      ${grimorioErvasHTML()}`
+      ${grimorioErvasHTML()}
+      ${calendarioLunarMesHTML()}
+      ${livroDasSombrasHTML()}`
     );
     return html;
   };
