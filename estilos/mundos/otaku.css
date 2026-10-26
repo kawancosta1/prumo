@@ -753,6 +753,32 @@ html[data-mundo="otaku"] .progress > span {
   color: #ff1744;
 }
 
+/* Lote 5: Grito de Incentivo, Balão e Cenas Favoritas */
+.grito-anime-balao {
+  position: relative;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--card));
+  text-align: center;
+  margin: 6px 0;
+  box-shadow: 2px 2px 0 var(--accent);
+}
+.grito-anime-balao .grito-texto {
+  font-family: var(--font-m, inherit);
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: 1.5px;
+  display: block;
+}
+.cena-thumb {
+  transition: transform 0.2s ease;
+}
+.cena-thumb:hover {
+  transform: scale(1.05);
+}
+
 @media (prefers-reduced-motion: reduce) {
   #linhas-otaku,
   .sugoi-otaku,

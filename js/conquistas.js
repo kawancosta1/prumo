@@ -196,6 +196,33 @@ const ACHS = [
     cur: () => S.stats.morcego || 0,
     reward: 30,
     secreta: true
+  },
+  {
+    id: "otaku_protagonista",
+    name: "Protagonista",
+    desc: "Completar 50 missões no mundo Otaku",
+    goal: 50,
+    cur: () => (S.mundos && S.mundos.otaku && S.mundos.otaku.missoesFeitas) || 0,
+    reward: 100,
+    mundo: "otaku"
+  },
+  {
+    id: "otaku_rival_derrotado",
+    name: "Rival derrotado",
+    desc: "Vencer o rival semanal pelo menos uma vez",
+    goal: 1,
+    cur: () => (S.mundos && S.mundos.otaku && S.mundos.otaku.rivalVitorias) || 0,
+    reward: 80,
+    mundo: "otaku"
+  },
+  {
+    id: "otaku_temporada_completa",
+    name: "Temporada completa",
+    desc: "Completar uma temporada inteira de anime",
+    goal: 1,
+    cur: () => (S.mundos && S.mundos.otaku && S.mundos.otaku.temporadasCompletas) || 0,
+    reward: 120,
+    mundo: "otaku"
   }
 ];
 
@@ -274,6 +301,9 @@ function checkAch() {
       S.coins += a.reward;
       S.xp += a.reward;
       got.push(a);
+      if (S.persona === "otaku" && typeof pacoteFigurinhasPorConquista === "function") {
+        pacoteFigurinhasPorConquista(a);
+      }
     }
   }
   const d = today(),

@@ -212,9 +212,15 @@ function viewAvisos() {
         .map(f => `<li><span>${esc(f)}</span></li>`)
         .join("")}</ol>`;
     }
+    if (i.tipo === "troca_figurinha")
+      return `${quem} te enviou a figurinha colecionável <b>${esc(i.figNome || i.figId || "Surpresa")}</b>!`;
+    if (i.tipo === "grito_incentivo")
+      return `<div class="grito-anime-balao"><span class="grito-texto">GANBATTE! ٩(◕‿◕｡)۶</span><p>${quem} te mandou um grito de incentivo de anime!</p></div>`;
     return quem;
   };
   const acoes = i => {
+    if (i.tipo === "troca_figurinha")
+      return `<div class="row"><button class="btn small primary" data-act="aceitar-troca-fig" data-id="${esc(i.id)}" data-fig="${esc(i.figId || "")}">Aceitar figurinha</button></div>`;
     if (i.tipo === "depoimento" && !S.perfil.depoVistos.includes(i.em))
       return `<div class="row"><button class="btn small primary" data-act="depo-caixa" data-id="${esc(i.id)}" data-ok="1">Aprovar</button><button class="btn small ghost" data-act="depo-caixa" data-id="${esc(i.id)}" data-ok="0">Recusar</button></div>`;
     if (i.tipo === "par" && S.parceria.id !== i.de)

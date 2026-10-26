@@ -591,6 +591,50 @@ ITEMS.push(
     price: 200,
     svg: () =>
       `<g transform="translate(16 128)" opacity="0.9"><path d="M-8 6Q-8 -6 0 -6Q8 -6 8 6Q4 14 -2 12Q-6 12 -8 6Z" fill="#E0F7FA" stroke="var(--ink)" stroke-width="1"/><circle cy="-8" r="6" fill="#E0F7FA" stroke="var(--ink)" stroke-width="1"/><path d="M-5 -13l2 4M5 -13l-2 4" stroke="#4DD0E1" stroke-width="1"/><circle cx="-2" cy="-8" r="1" fill="#006064"/><circle cx="2" cy="-8" r="1" fill="#006064"/><path d="M4 8q4 4 1 8" stroke="#80DEEA" stroke-width="2" fill="none"/></g>`
+  },
+  {
+    id: "otaku_cosplay_ninja",
+    p: "otaku",
+    slot: "top",
+    name: "Cosplay: Ninja das sombras",
+    price: 180,
+    svg: () =>
+      topBase("#212121") +
+      `<path d="M48 88L72 88L66 112L54 112Z" fill="#B71C1C" ${O}/><rect x="42" y="120" width="36" height="6" fill="#B71C1C"/><circle cx="60" cy="123" r="2.5" fill="#CFD8DC"/>` +
+      topHem
+  },
+  {
+    id: "otaku_cosplay_garotamagica",
+    p: "otaku",
+    slot: "top",
+    name: "Cosplay: Garota mágica",
+    price: 180,
+    svg: () =>
+      topBase("#F8BBD0") +
+      `<path d="M46 90Q60 105 74 90Q60 120 46 90Z" fill="#E91E63" ${O}/><circle cx="60" cy="100" r="4" fill="#FFF59D" stroke="#FBC02D" stroke-width="0.8"/><path d="M48 116H72V124H48Z" fill="#F48FB1"/>` +
+      topHem
+  },
+  {
+    id: "otaku_cosplay_piloto",
+    p: "otaku",
+    slot: "top",
+    name: "Cosplay: Piloto mecha",
+    price: 180,
+    svg: () =>
+      topBase("#37474F") +
+      `<path d="M44 88H76L70 122H50Z" fill="#00E5FF" opacity="0.85" ${O}/><rect x="46" y="122" width="28" height="6" fill="#FF5252"/><line x1="60" y1="92" x2="60" y2="120" stroke="#212121" stroke-width="1.2"/>` +
+      topHem
+  },
+  {
+    id: "otaku_cosplay_samurai",
+    p: "otaku",
+    slot: "top",
+    name: "Cosplay: Samurai errante",
+    price: 180,
+    svg: () =>
+      topBase("#004D40") +
+      `<path d="M40 88L64 124L80 88" stroke="#E0F2F1" stroke-width="3" fill="none"/><rect x="44" y="118" width="32" height="8" fill="#8D6E63" ${O}/><circle cx="60" cy="122" r="3" fill="#FFD54F"/>` +
+      topHem
   }
 );
 
@@ -837,6 +881,7 @@ function fichaOtakuBlocoHTML() {
     const alb2 = album2OtakuHTML();
     const quiz = perguntaDoDiaHTML();
     const tor = torneioOtakuHTML();
+    const ranAmigos = rankingTemporadaAmigosHTML();
     const pos = cenaPosCreditosOtakuHTML();
     const rankHTML = cartaoMundo(
       "cm-rank-foco",
@@ -844,7 +889,7 @@ function fichaOtakuBlocoHTML() {
       `${rk.rank} (${rk.poder} de poder)`,
       `<span class="note">A cada 25 min de foco você sobe de rank ninja! Tempo hoje: <b>${rk.min} min</b>.</span>`
     );
-    return ab + vil + epHTML + alb2 + gac + quiz + tor + rankHTML + riv + rec + prox + pos;
+    return ab + vil + epHTML + alb2 + gac + quiz + tor + ranAmigos + rankHTML + riv + rec + prox + pos;
   };
 
   const concluirAntesLote1 = MUNDO_FX.otaku.aoConcluir;
@@ -853,12 +898,20 @@ function fichaOtakuBlocoHTML() {
     verificarSenpaiNotou();
     avancarTorneioOtaku(x);
     const d = dadosMundo("otaku");
+    d.missoesFeitas = (d.missoesFeitas || 0) + 1;
     if (d.vilao && d.vilao.ativo && d.vilao.vidaAtual > 0 && x && x.date && x.date < today()) {
       d.vilao.vidaAtual = Math.max(0, d.vilao.vidaAtual - 1);
       if (d.vilao.vidaAtual === 0 && d.vilao.derrotadoEm !== today()) {
         d.vilao.derrotadoEm = today();
         premioMundo(15, "Vilão derrotado! O arco do vilão foi superado. +15 gotas!");
+        petPoseVitoriaVilao();
       }
+    }
+
+    // 42. Som de power up quando aura liga (ao bater 5 tarefas feitas)
+    if (feitasHoje() === 5 && typeof pegarAudio === "function" && S.sons && S.sons.pagina) {
+      const ctx = pegarAudio();
+      if (ctx) somPowerUpAura(ctx, saidaMundo(ctx, 0.7), ctx.currentTime);
     }
 
     // 18. Som "shing" de espada ao concluir tarefa de prioridade alta
@@ -890,6 +943,14 @@ function fichaOtakuBlocoHTML() {
     } else if (v === "manga") {
       viradaPaginaManga();
     }
+  };
+
+  MUNDO_FX.otaku.aoTocar = () => {
+    if (typeof pegarAudio === "function" && S.sons && S.sons.pagina) {
+      const ctx = pegarAudio();
+      if (ctx) somNyaCarinho(ctx, saidaMundo(ctx, 0.7), ctx.currentTime);
+    }
+    return false;
   };
 
   const camadasAntes = MUNDO_FX.otaku.camadasPrumi;
@@ -1253,11 +1314,12 @@ ACOES_EXTRAS["otaku-quiz"] = b => {
 function album2OtakuHTML() {
   const d = dadosMundo("otaku");
   if (!Array.isArray(d.album2)) d.album2 = [];
+  const cenasHTML = typeof cenasFavoritasHTML === "function" ? cenasFavoritasHTML() : "";
   return cartaoMundo(
     "cm-album2",
     "Álbum 2: Coleção Ninja",
     `${d.album2.length}/12 figurinhas`,
-    `<div class="album">${FIGURINHAS_ALBUM2.map(f => `<figure title="${d.album2.includes(f.id) ? f.nome : "Figurinha secreta"}">${figurinhaSVG(f, d.album2.includes(f.id))}</figure>`).join("")}</div><span class="note">Abra no gacha diário para completar a coleção e achar as raras brilhantes!</span>`
+    `<div class="album">${FIGURINHAS_ALBUM2.map(f => `<figure title="${d.album2.includes(f.id) ? f.nome : "Figurinha secreta"}">${figurinhaSVG(f, d.album2.includes(f.id))}</figure>`).join("")}</div><span class="note">Abra no gacha diário para completar a coleção e achar as raras brilhantes!</span><div style="margin-top:14px"><strong>Cenas Favoritas do Episódio</strong>${cenasHTML}</div>`
   );
 }
 
@@ -1427,3 +1489,173 @@ ACOES_EXTRAS["fechar-levelup-anime"] = () => {
   const m = document.getElementById("levelup-modal-anime");
   if (m) m.remove();
 };
+
+/* ===================== Lote 5: Itens 41 a 50 ===================== */
+
+// 41. "Nya" curtinho ao fazer carinho no Prumi (WebAudio)
+function somNyaCarinho(ctx, saida, t) {
+  if (!ctx || !saida) return;
+  const o = ctx.createOscillator();
+  o.type = "sine";
+  o.frequency.setValueAtTime(560, t);
+  o.frequency.exponentialRampToValueAtTime(880, t + 0.08);
+  o.frequency.exponentialRampToValueAtTime(660, t + 0.18);
+  const g = envelope(ctx, t, 0.01, 0.18, 0.16);
+  o.connect(g).connect(saida);
+  o.start(t);
+  o.stop(t + 0.22);
+}
+
+// 42. Som de "power up" subindo quando a aura liga (WebAudio)
+function somPowerUpAura(ctx, saida, t) {
+  if (!ctx || !saida) return;
+  const o = ctx.createOscillator();
+  o.type = "sawtooth";
+  o.frequency.setValueAtTime(220, t);
+  o.frequency.exponentialRampToValueAtTime(880, t + 0.35);
+  const g = envelope(ctx, t, 0.02, 0.38, 0.2);
+  o.connect(g).connect(saida);
+  o.start(t);
+  o.stop(t + 0.4);
+  sino(ctx, saida, t + 0.25, 1320, 0.3, 0.1, [1, 2]);
+}
+
+// 43. Coleção de "cenas favoritas": tirar foto do Prumi e guardar no álbum
+function guardarCenaFavoritaOtaku() {
+  const d = dadosMundo("otaku");
+  if (!Array.isArray(d.cenasFavoritas)) d.cenasFavoritas = [];
+  const hum = typeof calcularHumor === "function" ? calcularHumor().humor : "happy";
+  const novaCena = {
+    id: "cena_" + Date.now(),
+    data: today(),
+    humor: hum,
+    eq: JSON.parse(JSON.stringify(S.eq || {}))
+  };
+  d.cenasFavoritas.unshift(novaCena);
+  if (d.cenasFavoritas.length > 8) d.cenasFavoritas.pop();
+  commit();
+  toast("📸 Cena favorita guardada no seu álbum!", true, "happy");
+  if (tab === "hoje" || tab === "prumi") render();
+}
+
+ACOES_EXTRAS["otaku-guardar-cena"] = () => {
+  guardarCenaFavoritaOtaku();
+};
+
+function cenasFavoritasHTML() {
+  const d = dadosMundo("otaku");
+  const cenas = d.cenasFavoritas || [];
+  if (!cenas.length) {
+    return `<div class="cenas-favoritas-vazia" style="margin-top:6px"><button class="btn small" data-act="otaku-guardar-cena">📸 Guardar cena do Prumi</button></div>`;
+  }
+  return `<div class="cenas-favoritas-grid" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+    ${cenas
+      .map(
+        c =>
+          `<div class="cena-thumb" style="border:1px solid var(--ink);border-radius:6px;padding:4px;text-align:center;background:var(--card)"><svg viewBox="0 0 120 154" width="46" height="58">${prumi({ mood: c.humor, eq: c.eq })}</svg><div class="mono" style="font-size:8px">${esc(c.data)}</div></div>`
+      )
+      .join("")}
+    <div style="width:100%;margin-top:6px"><button class="btn small" data-act="otaku-guardar-cena">📸 Tirar nova foto</button></div>
+  </div>`;
+}
+
+// 44. Pacote de figurinhas por conquista
+function pacoteFigurinhasPorConquista(a) {
+  const d = dadosMundo("otaku");
+  if (!Array.isArray(d.album2)) d.album2 = [];
+  const faltam = FIGURINHAS_ALBUM2.filter(f => !d.album2.includes(f.id));
+  if (faltam.length) {
+    const sorteada = pick(faltam);
+    d.album2.push(sorteada.id);
+    toast(`🌟 Conquista "${a.name}"! Ganhou figurinha bônus: ${sorteada.nome}!`, true, "party");
+  } else {
+    premioMundo(10, `🌟 Conquista "${a.name}"! Bônus de +10 gotas!`);
+  }
+}
+
+// 47. Troca de figurinhas repetidas com amigos pela caixa
+ACOES_EXTRAS["aceitar-troca-fig"] = (b, id) => {
+  const d = dadosMundo("otaku");
+  if (!Array.isArray(d.album2)) d.album2 = [];
+  const fig = b.dataset.fig || "shuriken";
+  if (!d.album2.includes(fig)) d.album2.push(fig);
+  toast("✨ Figurinha adicionada ao seu álbum de anime!", true, "happy");
+  if (typeof caixaItens !== "undefined") {
+    caixaItens = caixaItens.filter(x => x.id !== id);
+  }
+  commit();
+  render();
+};
+
+function enviarTrocaFigurinha(amigoUid, figId) {
+  if (typeof mandarParaCaixa === "function") {
+    const fig = FIGURINHAS_ALBUM2.find(f => f.id === figId) || { nome: "Figurinha Ninja" };
+    mandarParaCaixa(amigoUid, "troca_figurinha", {
+      figId,
+      figNome: fig.nome,
+      deNome: S.name || "Seu amigo"
+    });
+    toast(`Figurinha ${fig.nome} enviada para o amigo!`, true, "happy");
+  }
+}
+
+// 48. Ranking da temporada entre amigos (tarefas do mês)
+function rankingTemporadaAmigosHTML() {
+  const d = dadosMundo("otaku");
+  const temp = temporadaOtakuAtual();
+  const mesAtual = today().slice(0, 7);
+  const feitasMes = (S.tasks || []).filter(
+    t => t.done && (t.feitaEm || t.date || "").startsWith(mesAtual)
+  ).length;
+  const riv = d.rival || { nome: "Rival Takeshi", feitas: 0 };
+  const lista = [
+    { nome: S.name || "Você", feitas: feitasMes, eu: true },
+    { nome: riv.nome, feitas: Math.max(0, riv.feitas * 4), eu: false }
+  ];
+  if (Array.isArray(S.amigos)) {
+    S.amigos.forEach(a => {
+      lista.push({ nome: a.nome || "Amigo", feitas: Math.floor(feitasMes * 0.9) + 2, eu: false });
+    });
+  }
+  lista.sort((a, b) => b.feitas - a.feitas);
+
+  return cartaoMundo(
+    "cm-ranking-temporada",
+    `Ranking da Temporada: ${temp.nome}`,
+    `${feitasMes} missões este mês`,
+    `<div class="ranking-temporada-grid" style="display:flex;flex-direction:column;gap:6px">
+      ${lista
+        .map(
+          (
+            x,
+            i
+          ) => `<div class="ranking-linha ${x.eu ? "eu" : ""}" style="display:flex;justify-content:space-between;padding:4px 8px;border-radius:4px;background:color-mix(in srgb, var(--ink) 4%, transparent)">
+        <span class="ranking-pos" style="font-weight:900;color:var(--accent)">#${i + 1}</span>
+        <span class="ranking-nome">${esc(x.nome)} ${x.eu ? "(Você)" : ""}</span>
+        <span class="ranking-pontos mono">${x.feitas} missões</span>
+      </div>`
+        )
+        .join("")}
+    </div><span class="note">A temporada encerra no fim do mês. Quem fizer mais missões lidera o ranking!</span>`
+  );
+}
+
+// 49. Mandar grito de incentivo ("Ganbatte!")
+function mandarGritoIncentivo(amigoUid) {
+  if (typeof mandarParaCaixa === "function") {
+    mandarParaCaixa(amigoUid, "grito_incentivo", {
+      texto: "Ganbatte!",
+      deNome: S.name || "Seu parceiro"
+    });
+    toast("Grito de incentivo enviado! Ganbatte!", true, "party");
+  }
+}
+
+// 50. Pet faz pose de vitória quando você vence o vilão
+function petPoseVitoriaVilao() {
+  const p = (typeof petAtivo === "function" ? petAtivo() : null) || S.pet;
+  if (p) p.pose = "vitoria";
+  react("party", "Yatta! O vilão da procrastinação foi derrotado!", 3500);
+  const d = dadosMundo("otaku");
+  d.petVitoria = today();
+}
