@@ -152,7 +152,7 @@ function cartaoLendoHTML(l) {
   return `<li class="livro-cartao"><button class="livro-capa" data-act="livro-abrir" data-id="${l.id}" aria-label="Abrir ${esc(l.titulo)}">${capaHTML(l, 52)}</button>
     <div class="main"><span class="title">${esc(l.titulo)}</span><span class="meta">${esc(l.autor || "Autor desconhecido")}</span>
       <div class="progress"><span style="width:${progressoDe(l)}%"></span></div>
-      <span class="meta mono">${l.pagina}${l.paginas ? ` de ${l.paginas} páginas · ${progressoDe(l)}%` : " páginas"}</span>
+      <span class="meta mono">${l.pagina}${l.paginas ? ` de ${l.paginas} páginas · ${progressoDe(l)}%` : " páginas"}${S.persona === "otaku" ? ` · <span class="capitulos-manga">Cap. ${Math.floor((l.pagina || 0) / 10)}</span>` : ""}</span>
       ${typeof previsaoHTML === "function" ? previsaoHTML(l) : ""}
       <div class="row" style="gap:6px"><button class="btn small primary" data-act="livro-timer" data-id="${l.id}">Ler agora</button><button class="btn small" data-act="livro-mais" data-id="${l.id}" data-n="10">+10</button><button class="btn small" data-act="livro-mais" data-id="${l.id}" data-n="25">+25</button><button class="btn small ghost" data-act="livro-abrir" data-id="${l.id}">Detalhes</button></div>
     </div></li>`;
@@ -161,7 +161,7 @@ function cartaoLendoHTML(l) {
 function detalheLivroHTML(l) {
   return `<div class="card livro-detalhe">
     <div class="row" style="align-items:flex-start;gap:12px">${capaHTML(l, 72)}
-      <div class="main" style="flex:1;min-width:0"><span class="title"><b>${esc(l.titulo)}</b></span><span class="meta">${esc(l.autor || "Autor desconhecido")}${l.ano ? ` · ${l.ano}` : ""}${l.paginas ? ` · ${l.paginas} páginas` : ""}</span>
+      <div class="main" style="flex:1;min-width:0"><span class="title"><b>${esc(l.titulo)}</b></span><span class="meta">${esc(l.autor || "Autor desconhecido")}${l.ano ? ` · ${l.ano}` : ""}${l.paginas ? ` · ${l.paginas} páginas` : ""}${S.persona === "otaku" ? ` · <span class="capitulos-manga">Cap. ${Math.floor((l.pagina || 0) / 10)}</span>` : ""}</span>
       ${notaHTML(l, true)}
       <button class="btn small ghost" data-act="livro-fav" data-id="${l.id}" aria-pressed="${l.fav}">${l.fav ? "Favorito" : "Marcar como favorito"}</button></div></div>
     <div class="chips" role="group" aria-label="Prateleira">${Object.entries(ESTANTES)

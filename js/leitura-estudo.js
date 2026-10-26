@@ -102,7 +102,11 @@ function planoProvaHTML(e) {
   const p = planoDoDia(e);
   if (!p || e.editandoPlano)
     return `<form class="row plano-form" data-form="plano-prova" data-id="${e.id}"><span class="note">Quantas horas quer estudar até lá?</span><input id="pp-${e.id}" type="number" min="1" max="200" value="${e.plano ? e.plano.horas : 6}" style="width:70px" aria-label="Horas de estudo até a prova"><button class="btn small" type="submit">${e.plano ? "Salvar" : "Planejar"}</button></form>`;
-  return `<div class="plano-prova ${p.pronto ? "pronto" : ""}"><div class="progress"><span style="width:${Math.min(100, Math.round((p.feito / p.total) * 100))}%"></span></div>
+  const chefeLabel =
+    S.persona === "otaku"
+      ? `<div class="chefe-batalha"><span class="chefe-tag">⚔️ Luta Contra o Chefe</span> · <span class="chefe-hp">HP: ${p.pronto ? "0 (Derrotado!)" : `${Math.max(0, p.total - p.feito)} min restantes`}</span></div>`
+      : "";
+  return `<div class="plano-prova ${p.pronto ? "pronto" : ""}">${chefeLabel}<div class="progress"><span style="width:${Math.min(100, Math.round((p.feito / p.total) * 100))}%"></span></div>
     <span class="note">${p.pronto ? `Meta de ${e.plano.horas}h batida! Agora é revisar com calma.` : `Hoje: <b>${p.feitoHoje}/${p.porDia} min</b> · ${fmtMin(p.feito)} de ${e.plano.horas}h · ${p.dias} ${p.dias === 1 ? "dia" : "dias"} até a prova`}</span>
     <button class="olink" data-act="plano-editar" data-id="${e.id}">Mudar plano</button></div>`;
 }

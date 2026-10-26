@@ -779,6 +779,59 @@ html[data-mundo="otaku"] .progress > span {
   transform: scale(1.05);
 }
 
+/* Lote 6: Chefe de Prova, Intervalo, Capítulos, Fotolog Mangá e Ajustes Suaves */
+.chefe-batalha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.chefe-tag {
+  color: #d32f2f;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.chefe-hp {
+  color: var(--ink);
+  font-family: var(--font-m, inherit);
+}
+.intervalo-comercial-anime {
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+  border: 1px dashed var(--accent);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 6px 0;
+  font-size: 0.9em;
+}
+.capitulos-manga {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* 59. Fotolog estilo página de mangá */
+html[data-mundo="otaku"] .fotolog-foto {
+  filter: grayscale(1) contrast(1.25);
+  background-image: radial-gradient(#212121 1px, transparent 1px);
+  background-size: 5px 5px;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+}
+html[data-mundo="otaku"] .fotolog-foto figcaption {
+  font-family: var(--font-m, inherit);
+  font-weight: 700;
+  background: #fff;
+  color: #000;
+  border-top: 2px solid #000;
+}
+
+/* 60. Efeitos fortes desligados */
+html[data-otaku-suave="1"]
+  :is(#linhas-otaku, .sugoi-otaku, .cortina-shonen, .virada-manga-fx, .olhos-brilho-anime) {
+  display: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   #linhas-otaku,
   .sugoi-otaku,

@@ -681,6 +681,9 @@ document.addEventListener("click", e => {
       timer.running = false;
       saveTimerState();
       render();
+      if (S.persona === "otaku" && typeof intervaloEpisodioOtaku === "function") {
+        intervaloEpisodioOtaku();
+      }
       break;
     case "finish": {
       const m = Math.round(elapsed() / 6e4);
@@ -689,6 +692,9 @@ document.addEventListener("click", e => {
         react("party", `<b>${m} min</b> de foco registrados. Orgulho!`, 3500);
         if (m >= 20) fx.big = true;
         else fx.burst = ".clock";
+      }
+      if (S.persona === "otaku" && typeof focoFinalizadoOtaku === "function") {
+        focoFinalizadoOtaku(m);
       }
       commit();
       break;

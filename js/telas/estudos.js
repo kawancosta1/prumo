@@ -51,6 +51,7 @@ function viewEstudos() {
         <button class="btn" data-act="finish" ${ms < 1000 ? "disabled" : ""}>Concluir e registrar</button>
         ${busy ? `<button class="btn ghost" data-act="reset">Zerar</button>` : ""}
       </div>
+      ${timer.acc > 0 && !timer.running && S.persona === "otaku" ? `<div class="intervalo-comercial-anime">📺 <b>Intervalo Comercial do Episódio</b>: hora de esticar os braços e fazer um alongamento ninja!</div>` : ""}
       ${somDoMundo() ? `<div class="row">${botaoSom("chuva", textoMundo("somFocoNome", "Chuva durante o foco"))}</div>` : ""}
       <span class="note">Quando o tempo acaba, toca um aviso e o relógio continua contando o tempo extra. Ao concluir, os minutos vão para a matéria.</span>
     </div>`

@@ -41,6 +41,7 @@ function viewAjustes() {
   </section>`
       : ""
   }
+  ${typeof efeitosMundoAjustesHTML === "function" ? efeitosMundoAjustesHTML() : ""}
   <section class="block">
     <h2 class="h2">Água</h2>
     <div class="setbox">

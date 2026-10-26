@@ -21,7 +21,12 @@ Object.assign(PERSONAS.otaku, {
     "Abertura tocando{nome}! Episódio de hoje: <b>{n}</b> desafios.",
     "Yosh{nome}! <b>{n}</b> tarefas e muita determinação.",
     'O narrador disse: "e assim começa mais um dia". São <b>{n}</b> missões{nome}.',
-    "Kon'nichiwa{nome}! Prepara o lámen: <b>{n}</b> tarefas no roteiro."
+    "Kon'nichiwa{nome}! Prepara o lámen: <b>{n}</b> tarefas no roteiro.",
+    "Hora do episódio{nome}! Equipamentos prontos e foco total!",
+    "O sol nasceu no horizonte ninja{nome}! <b>{n}</b> missões nos aguardam.",
+    "Mais um dia, mais um capítulo épico{nome}! Rumo à vitória!",
+    "Sensei disse que a disciplina vence o talento. Bora fazer <b>{n}</b> tarefas!",
+    "Dia novo com cara de temporada nova{nome}! <b>{n}</b> desafios na rota."
   ],
   cheers: [
     "Sugoi! Uma a menos!",
@@ -32,14 +37,24 @@ Object.assign(PERSONAS.otaku, {
     "Nível subindo... subindo... SUBIU!",
     "Kira kira! Riscou com estilo.",
     "Nem o rival faria tão rápido.",
-    "Plot twist: você é muito produtivo."
+    "Plot twist: você é muito produtivo.",
+    "Golpe perfeito! Nem precisou carregar energia!",
+    "Incrível! O narrador ficou sem palavras!",
+    "Essa foi rápida como um teletransporte ninja!",
+    "A trilha sonora de vitória começou a tocar!",
+    "Mais uma missão de rank concluída com perfeição!"
   ],
   drink: [
     "<b>+{ml} mL</b> de chakra recuperado!",
     "Glub! <b>+{ml} mL</b>. Barra de energia subindo.",
     "<b>+{ml} mL</b> de chá gelado de máquina de vending.",
     "Recuperou <b>{ml} mL</b> de HP. Pronto pro próximo round!",
-    "<b>+{ml} mL</b>. Todo protagonista se hidrata antes da luta."
+    "<b>+{ml} mL</b>. Todo protagonista se hidrata antes da luta.",
+    "<b>+{ml} mL</b> de poção de vitalidade pra conta!",
+    "Hidratação de guerreiro: <b>+{ml} mL</b>!",
+    "Gole refrescante! <b>+{ml} mL</b> pro tanque de energia.",
+    "Chakra estabilizado com <b>+{ml} mL</b> de água fresca!",
+    "Beba água para não falhar no clímax do episódio! <b>+{ml} mL</b>."
   ],
   goal: [
     "Meta de água batida! Forma final desbloqueada.",
@@ -59,7 +74,12 @@ Object.assign(PERSONAS.otaku, {
   night: [
     "Oyasumi! Fecha o dia e descansa.",
     "Cena pós-créditos: você dormindo bem. Fecha o dia!",
-    "Até o protagonista precisa de um episódio de descanso."
+    "Até o protagonista precisa de um episódio de descanso.",
+    "O sol se pôs e o episódio terminou. Oyasumi{nome}!",
+    "Feche o pergaminho e recupere as energias pro arco de amanhã.",
+    "Até os maiores heróis precisam de uma boa noite de sono.",
+    "Fim de transmissão por hoje! Bons sonhos e bom descanso.",
+    "A lua cheia vigia o vilarejo. Hora de descansar, guerreiro."
   ],
   done: [
     "Episódio do dia concluído. Que final épico!",
@@ -226,12 +246,42 @@ function balaoSugoi(alvo) {
   };
 }
 MUNDO_FX.otaku.humorNomes = {
-  Radiante: "Modo kira kira",
-  Feliz: "Sugoi",
-  "De boa": "Na paz do dojo",
-  Chateado: "Gota de suor",
-  Triste: "Chuva de anime",
-  Arrasado: "Fim de temporada"
+  get Radiante() {
+    const v = (S.themeBy && S.themeBy.otaku) || "";
+    if (v === "shoujo") return "Brilho Shoujo Total";
+    if (v === "shonen") return "Super Protagonista";
+    return "Modo kira kira";
+  },
+  get Feliz() {
+    const v = (S.themeBy && S.themeBy.otaku) || "";
+    if (v === "shoujo") return "Coração Romântico";
+    if (v === "shonen") return "Determinação Épica";
+    return "Sugoi";
+  },
+  get "De boa"() {
+    const v = (S.themeBy && S.themeBy.otaku) || "";
+    if (v === "shoujo") return "Suspiro Doce";
+    if (v === "shonen") return "Treino de Rotina";
+    return "Na paz do dojo";
+  },
+  get Chateado() {
+    const v = (S.themeBy && S.themeBy.otaku) || "";
+    if (v === "shoujo") return "Coração Partido";
+    if (v === "shonen") return "Poder Selado";
+    return "Gota de suor";
+  },
+  get Triste() {
+    const v = (S.themeBy && S.themeBy.otaku) || "";
+    if (v === "shoujo") return "Chorando Pétalas";
+    if (v === "shonen") return "Derrota Amarga";
+    return "Chuva de anime";
+  },
+  get Arrasado() {
+    const v = (S.themeBy && S.themeBy.otaku) || "";
+    if (v === "shoujo") return "Desilusão Profunda";
+    if (v === "shonen") return "Chakra Esgotado";
+    return "Fim de temporada";
+  }
 };
 Object.assign(MUNDO_FX.otaku.textos, {
   sequencia: ["dia de treino", "dias de treino"],
@@ -635,6 +685,17 @@ ITEMS.push(
       topBase("#004D40") +
       `<path d="M40 88L64 124L80 88" stroke="#E0F2F1" stroke-width="3" fill="none"/><rect x="44" y="118" width="32" height="8" fill="#8D6E63" ${O}/><circle cx="60" cy="122" r="3" fill="#FFD54F"/>` +
       topHem
+  },
+  {
+    id: "otaku_evento_dia_do_anime",
+    p: "otaku",
+    slot: "top",
+    name: "Traje Festivo do Dia do Anime",
+    price: 0,
+    svg: () =>
+      topBase("#D50000") +
+      `<path d="M42 84L60 120L78 84" stroke="#FFD600" stroke-width="3" fill="none"/><circle cx="60" cy="102" r="5" fill="#FFD600"/><rect x="44" y="118" width="32" height="8" fill="#212121"/><circle cx="90" cy="104" r="8" fill="#FFF" stroke="#212121" stroke-width="1.2"/><text x="90" y="108" font-size="10" text-anchor="middle" font-weight="900" fill="#D50000">祭</text>` +
+      topHem
   }
 );
 
@@ -881,6 +942,8 @@ function fichaOtakuBlocoHTML() {
     const alb2 = album2OtakuHTML();
     const quiz = perguntaDoDiaHTML();
     const tor = torneioOtakuHTML();
+    const mon = typeof montagemTreinoHTML === "function" ? montagemTreinoHTML() : "";
+    const diaAnime = typeof bannerDiaDoAnimeHTML === "function" ? bannerDiaDoAnimeHTML() : "";
     const ranAmigos = rankingTemporadaAmigosHTML();
     const pos = cenaPosCreditosOtakuHTML();
     const rankHTML = cartaoMundo(
@@ -889,7 +952,23 @@ function fichaOtakuBlocoHTML() {
       `${rk.rank} (${rk.poder} de poder)`,
       `<span class="note">A cada 25 min de foco você sobe de rank ninja! Tempo hoje: <b>${rk.min} min</b>.</span>`
     );
-    return ab + vil + epHTML + alb2 + gac + quiz + tor + ranAmigos + rankHTML + riv + rec + prox + pos;
+    return (
+      ab +
+      diaAnime +
+      vil +
+      epHTML +
+      alb2 +
+      gac +
+      quiz +
+      tor +
+      mon +
+      ranAmigos +
+      rankHTML +
+      riv +
+      rec +
+      prox +
+      pos
+    );
   };
 
   const concluirAntesLote1 = MUNDO_FX.otaku.aoConcluir;
@@ -1039,7 +1118,7 @@ function mostrarLetreiroFim() {
 
 // 15. Cortina diagonal no tema Shonen
 function cortinaDiagonalShonen() {
-  if (RM) return;
+  if (RM || (typeof dadosMundo === "function" && dadosMundo("otaku").efeitosFortesDesligados)) return;
   const el = document.createElement("div");
   el.id = "cortina-shonen";
   el.className = "cortina-shonen";
@@ -1444,7 +1523,7 @@ function cenaPosCreditosOtakuHTML() {
 
 // 37. Brilho "kira" no número de gotas quando ele sobe
 function efeitoKiraGotas() {
-  if (RM) return;
+  if (RM || (typeof dadosMundo === "function" && dadosMundo("otaku").efeitosFortesDesligados)) return;
   const el = document.getElementById("coins");
   if (!el) return;
   el.classList.remove("kira-otaku");
@@ -1455,7 +1534,7 @@ function efeitoKiraGotas() {
 
 // 39. Virada de página tema mangá
 function viradaPaginaManga() {
-  if (RM) return;
+  if (RM || (typeof dadosMundo === "function" && dadosMundo("otaku").efeitosFortesDesligados)) return;
   if (document.getElementById("virada-manga-fx")) return;
   const el = document.createElement("div");
   el.id = "virada-manga-fx";
@@ -1659,3 +1738,110 @@ function petPoseVitoriaVilao() {
   const d = dadosMundo("otaku");
   d.petVitoria = today();
 }
+
+/* ===================== Lote 6: Itens 51 a 60 ===================== */
+
+// 52. Pausa do foco vira "intervalo do episódio" com dica de alongamento
+function intervaloEpisodioOtaku() {
+  react("happy", "📺 INTERVALO DO EPISÓDIO! Hora de esticar os braços e fazer um alongamento ninja!", 4000);
+}
+
+// 53. Montagem de treino: ao bater 2h de foco no dia, um cartão com as matérias estudadas
+function montagemTreinoHTML() {
+  const sessoesHoje = (S.sessions || []).filter(s => s.date === today());
+  const minHoje = sessoesHoje.reduce((a, b) => a + b.min, 0);
+  if (minHoje < 120) return "";
+  const porMateria = {};
+  sessoesHoje.forEach(s => {
+    const nome = (typeof subjName === "function" && subjName(s.subjectId)) || "Geral";
+    porMateria[nome] = (porMateria[nome] || 0) + s.min;
+  });
+  return cartaoMundo(
+    "cm-montagem-treino",
+    "🥊 Montagem de Treino Superada! (2h+ de Foco)",
+    `${minHoje} min treinados hoje`,
+    `<p>Você treinou com a determinação de um herói de shonen! O arco de treino do dia foi concluído com sucesso.</p>
+    <div class="montagem-materias" style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+      ${Object.entries(porMateria)
+        .map(
+          ([materia, minutos]) =>
+            `<div class="montagem-linha" style="display:flex;justify-content:space-between;padding:4px 8px;border-radius:4px;background:color-mix(in srgb, var(--ink) 4%, transparent)"><span class="montagem-mat"><b>${esc(materia)}</b></span><span class="mono">${minutos} min</span></div>`
+        )
+        .join("")}
+    </div>`
+  );
+}
+
+// 55. Modo "maratona": 3 focos seguidos dão bônus de gotas
+function focoFinalizadoOtaku(minutos) {
+  if (minutos < 15) return;
+  const d = dadosMundo("otaku");
+  d.maratonaFoco = (d.maratonaFoco || 0) + 1;
+  if (d.maratonaFoco >= 3) {
+    d.maratonaFoco = 0;
+    premioMundo(
+      15,
+      "🔥 Modo Maratona de Foco ativado! 3 sessões seguidas completadas: <b>+15 gotas</b> de bônus!"
+    );
+  } else {
+    toast(`Sessão ${d.maratonaFoco}/3 para o bônus da maratona!`, false, "focus");
+  }
+}
+
+// 58. "Dia do anime" (data fixa no ano) com roupa de evento
+function isDiaDoAnime() {
+  const d = today();
+  return d.endsWith("-12-15") || d.endsWith("-11-03");
+}
+
+function bannerDiaDoAnimeHTML() {
+  const d = dadosMundo("otaku");
+  const jaTem = S.owned.includes("otaku_evento_dia_do_anime");
+  if (!isDiaDoAnime() && !d.eventoDiaAnimeTeste) return "";
+  return cartaoMundo(
+    "cm-dia-do-anime",
+    "🎌 Dia do Anime!",
+    jaTem ? "Traje resgatado!" : "Presente especial de hoje",
+    jaTem
+      ? `<span class="note">Você já resgatou o traje festivo do Dia do Anime! Aproveite as comemorações.</span>`
+      : `<p>Hoje é comemorado o Dia do Anime! Resgate seu traje festivo exclusivo por tempo limitado.</p><button class="btn small primary" data-act="resgatar-dia-anime">Resgatar Traje Festivo (Grátis)</button>`
+  );
+}
+
+ACOES_EXTRAS["resgatar-dia-anime"] = () => {
+  if (!S.owned.includes("otaku_evento_dia_do_anime")) {
+    S.owned.push("otaku_evento_dia_do_anime");
+    commit();
+    toast("🎌 Traje Festivo do Dia do Anime adicionado ao seu guarda-roupa!", true, "party");
+    render();
+  }
+};
+
+// 60. Opção em Ajustes para desligar os efeitos mais fortes do mundo
+function efeitosMundoAjustesHTML() {
+  if (S.persona !== "otaku") return "";
+  const d = dadosMundo("otaku");
+  const desligado = d.efeitosFortesDesligados === true;
+  return `<section class="block">
+    <h2 class="h2">Efeitos visuais de anime</h2>
+    <div class="setbox">
+      <div class="setrow">
+        <div class="lbl">
+          <b>Efeitos intensos</b>
+          <span class="note">Linhas de velocidade, cortina diagonal, virada de página e brilhos fortes.</span>
+        </div>
+        <button class="btn small ${desligado ? "ghost" : "primary"}" data-act="toggle-efeitos-otaku">
+          ${desligado ? "Desligados" : "Ligados"}
+        </button>
+      </div>
+    </div>
+  </section>`;
+}
+
+ACOES_EXTRAS["toggle-efeitos-otaku"] = () => {
+  const d = dadosMundo("otaku");
+  d.efeitosFortesDesligados = !d.efeitosFortesDesligados;
+  commit();
+  applyTheme();
+  render();
+};
