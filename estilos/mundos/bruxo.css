@@ -328,6 +328,30 @@ html[data-mundo="bruxo"][data-variante="lua"] .card::before {
   }
 }
 
+/* 30. Fotolog com moldura de folhas e cogumelos */
+.bruxo-fotolog-moldura {
+  position: relative;
+  border: 3px double #7cb342;
+  border-radius: 12px;
+  padding: 6px;
+  background: color-mix(in srgb, #33691e 15%, var(--surface));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+.bruxo-fotolog-enfeite-cogu {
+  position: absolute;
+  bottom: -8px;
+  left: 10px;
+  font-size: 18px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+.bruxo-fotolog-enfeite-folhas {
+  position: absolute;
+  top: -8px;
+  right: 10px;
+  font-size: 18px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
 @media (prefers-reduced-motion: reduce) {
   html[data-mundo="bruxo"] :is(.herobox, .stage)::before,
   .caldeirao-dia *,

@@ -138,6 +138,36 @@ THEMES.bruxo = {
       wn: "Chá de camomila",
       pat: ["leaf", "leaf"]
     },
+    {
+      id: "pantano",
+      name: "Pântano",
+      price: 130,
+      L: ["#E8F5E9", "#FFFFFF", "#1B2E1D", "#2E7D32", "#81C784", "#F1F8F2", "#1B2E1D"],
+      D: ["#0A140C", "#122015", "#E8F5E9", "#66BB6A", "#81C784", "#C8E6C9", "#122015"],
+      part: "bolha",
+      wn: "Água do pântano",
+      pat: ["leaf", "bolha"]
+    },
+    {
+      id: "mar",
+      name: "Bruxa do mar",
+      price: 135,
+      L: ["#E0F2F1", "#FFFFFF", "#0A2422", "#00695C", "#4DB6AC", "#F0FAF9", "#0A2422"],
+      D: ["#051514", "#0A2422", "#E0F2F1", "#26A69A", "#4DB6AC", "#B2DFDB", "#0A2422"],
+      part: "bolha",
+      wn: "Água salgada encantada",
+      pat: ["bolha", "lua"]
+    },
+    {
+      id: "inverno",
+      name: "Inverno de bruxa",
+      price: 140,
+      L: ["#EDE7F6", "#FFFFFF", "#1A1528", "#3F51B5", "#7986CB", "#F5F2FA", "#1A1528"],
+      D: ["#0D0B17", "#171426", "#EDE7F6", "#5C6BC0", "#7986CB", "#C5CAE9", "#171426"],
+      part: "lua",
+      wn: "Chá de hortelã gélido",
+      pat: ["lua", "cogu"]
+    },
     { id: "lenda", name: "Lua roxa", ach: "nivel5", a: ["#4A148C", "#CE93D8"], w: ["#7B1FA2", "#BA68C8"] }
   ]
 };
@@ -511,5 +541,68 @@ ITEMS.push(
     ach: "semana_agua",
     svg: () =>
       `<rect x="0" y="-6" width="120" height="154" fill="#1B1B1B" opacity=".25"/><g transform="translate(100 134) scale(1.4)">${caldeiraoMini("#C6FF00")}</g><g class="vapor"><path d="M96 110q-6 -10 2 -18q8 -8 0 -18" stroke="#C5E1A5" stroke-width="3" fill="none" opacity=".6" stroke-linecap="round"/><path d="M106 112q6 -10 -2 -18" stroke="#CE93D8" stroke-width="3" fill="none" opacity=".5" stroke-linecap="round"/></g>`
+  },
+  {
+    id: "bru_capa_corvo",
+    p: "bruxo",
+    slot: "top",
+    name: "Capa de corvo",
+    price: 130,
+    svg: () =>
+      `<path d="M22 66Q60 72 98 66L104 126Q60 134 16 126Z" fill="#1A1829" stroke="var(--ink)" stroke-width="1.4"/><path d="M28 80L34 94L42 82L48 96L54 84L60 98L66 84L72 96L78 82L86 94L92 80" stroke="#311B92" stroke-width="1.8" fill="none"/>`
+  },
+  {
+    id: "bru_chapeu_cogu_gigante",
+    p: "bruxo",
+    slot: "hat",
+    name: "Chapéu de cogumelo gigante",
+    price: 140,
+    svg: () =>
+      `<path d="M10 50Q60 18 110 50Q98 62 60 56Q22 62 10 50Z" fill="#D32F2F" stroke="var(--ink)" stroke-width="1.8"/><ellipse cx="36" cy="40" rx="6" ry="4" fill="#FFF"/><ellipse cx="60" cy="32" rx="7" ry="5" fill="#FFF"/><ellipse cx="84" cy="40" rx="6" ry="4" fill="#FFF"/><rect x="52" y="52" width="16" height="8" fill="#FFF8E1" stroke="var(--ink)" stroke-width="1.2"/>`
+  },
+  {
+    id: "bru_colar_dente_lua",
+    p: "bruxo",
+    slot: "neck",
+    name: "Colar de dente de lua",
+    price: 90,
+    svg: () =>
+      `<path d="M44 80Q60 98 76 80" stroke="#B0BEC5" stroke-width="1.5" fill="none"/><path d="M60 92Q64 96 62 104Q59 98 57 95Z" fill="#ECEFF1" stroke="#37474F" stroke-width="1"/>`
+  },
+  {
+    id: "bru_botas_pontudas",
+    p: "bruxo",
+    slot: "shoes",
+    name: "Botas pontudas",
+    price: 110,
+    svg: () =>
+      `<path d="M38 132L36 148L24 148Q20 144 26 142L38 142ZM82 132L84 148L96 148Q100 144 94 142L82 142Z" fill="#2E1A47" stroke="var(--ink)" stroke-width="1.4"/><rect x="34" y="140" width="8" height="3" fill="#FBC02D"/><rect x="78" y="140" width="8" height="3" fill="#FBC02D"/>`
+  },
+  {
+    id: "bru_coruja_neves",
+    p: "bruxo",
+    slot: "pet",
+    name: "Coruja-das-neves",
+    price: 160,
+    svg: () =>
+      `<g transform="translate(15 125)"><ellipse rx="8" ry="10" fill="#FAFAFA" stroke="var(--ink)" stroke-width="1.2"/><circle cx="-3" cy="-4" r="2.8" fill="#FFEB3B"/><circle cx="3" cy="-4" r="2.8" fill="#FFEB3B"/><circle cx="-3" cy="-4" r="1.2" fill="#000"/><circle cx="3" cy="-4" r="1.2" fill="#000"/><polygon points="0,-1 -2,2 2,2" fill="#FFA000"/><path d="M-5 12v3M-2 12v3M2 12v3M5 12v3" stroke="#BDBDBD" stroke-width="1.2"/></g>`
+  },
+  {
+    id: "bru_morceguinho",
+    p: "bruxo",
+    slot: "pet",
+    name: "Morceguinho fofo",
+    price: 150,
+    svg: () =>
+      `<g transform="translate(15 127)"><circle cy="-2" r="7" fill="#311B92" stroke="var(--ink)" stroke-width="1.1"/><polygon points="-6,-7 -9,-14 -3,-9" fill="#311B92"/><polygon points="6,-7 9,-14 3,-9" fill="#311B92"/><circle cx="-2.5" cy="-2" r="1.4" fill="#CE93D8"/><circle cx="2.5" cy="-2" r="1.4" fill="#CE93D8"/><path d="M-7 0Q-18 -6 -14 6Q-10 4 -7 2Z" fill="#4A148C"/><path d="M7 0Q18 -6 14 6Q10 4 7 2Z" fill="#4A148C"/></g>`
+  },
+  {
+    id: "bru_salamandra",
+    p: "bruxo",
+    slot: "pet",
+    name: "Salamandra do fogo",
+    price: 170,
+    svg: () =>
+      `<g transform="translate(15 132)"><path d="M-8 4Q-4 -4 4 -2Q12 0 16 6Q10 6 6 2Q-2 0 -6 6Z" fill="#E65100" stroke="var(--ink)" stroke-width="1.2"/><circle cx="-4" cy="-1" r="1.4" fill="#FFD54F"/><path d="M-1 2Q4 4 8 2" stroke="#FFAB00" stroke-width="1" fill="none"/></g>`
   }
 );

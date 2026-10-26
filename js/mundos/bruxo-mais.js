@@ -377,7 +377,7 @@ function covenSemanalHTML() {
   </div>`;
 }
 
-// 7. Voo de vassoura animado a cada 5 tarefas
+// 7 e 28. Voo de vassoura animado com pet a cada 5 tarefas
 function animarVooVassoura() {
   if (RM) return;
   if (typeof pegarAudio === "function") {
@@ -392,6 +392,12 @@ function animarVooVassoura() {
     <path d="M4 28L48 6" stroke="#5D4037" stroke-width="4" stroke-linecap="round"/>
     <path d="M44 6L60 2L54 14Z" fill="#FBC02D"/>
     <circle cx="28" cy="14" r="5" fill="#4E342E"/>
+    <g class="bruxo-pet-vassoura" transform="translate(16 16) scale(0.65)">
+      <ellipse rx="6" ry="5" fill="#212121"/>
+      <circle cx="4" cy="-2" r="3.5" fill="#212121"/>
+      <polygon points="2,-5 4,-9 6,-5" fill="#212121"/>
+      <circle cx="5" cy="-2" r="0.8" fill="#C6FF00"/>
+    </g>
   </svg>`;
   document.body.appendChild(v);
   setTimeout(() => v.remove(), 2600);
@@ -642,6 +648,102 @@ function somVassouraVoo(ctx, saida, t = 0) {
   if (!ctx || !saida) return;
   rajada(ctx, saida, t, 0.65, 800, "bandpass", 0.12, 0.3);
   tocarTom(ctx, saida, t + 0.05, 320, 0.5, "sine", 0.06, 0.2);
+}
+
+// 25. Ervas raras por fase da lua
+const ERVAS_RARAS_LUA = {
+  cheia: {
+    id: "flor_meia_noite",
+    nome: "Flor da Meia-Noite",
+    desc: "Brilha com luz prateada na mata fechada.",
+    cor: "#E0E0E0"
+  },
+  nova: {
+    id: "raiz_sombras",
+    nome: "Raiz das Sombras",
+    desc: "Absorve os sussurros do silêncio noturno.",
+    cor: "#4A148C"
+  },
+  crescente: {
+    id: "brotinho_estelar",
+    nome: "Brotinho Estelar",
+    desc: "Dourado como faísca de estrela cadente.",
+    cor: "#FFD54F"
+  },
+  minguante: {
+    id: "liquen_silencio",
+    nome: "Líquen do Silêncio",
+    desc: "Gélido e calmante para as poções ancestrais.",
+    cor: "#80DEEA"
+  }
+};
+
+function colherErvaRaraLua() {
+  const lua = typeof faseLuaBruxo === "function" ? faseLuaBruxo() : { nome: "Lua Cheia" };
+  let chave = "cheia";
+  const n = (lua.nome || "").toLowerCase();
+  if (n.includes("nova")) chave = "nova";
+  else if (n.includes("crescente")) chave = "crescente";
+  else if (n.includes("minguante")) chave = "minguante";
+
+  const erva = ERVAS_RARAS_LUA[chave];
+  const d = dadosBruxo();
+  if (!Array.isArray(d.ervasRaras)) d.ervasRaras = [];
+  d.ervasRaras.push({ id: erva.id, nome: erva.nome, colhidaEm: today() });
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Erva Rara Colhida! 🌙✨",
+      texto: `Você encontrou ${erva.nome} sob a luz da ${lua.nome}.`,
+      tipo: "conquista",
+      mood: "happy"
+    });
+  }
+  return erva;
+}
+
+// 26. Mandar poção pra amigo
+function mandarPocaoAmigo(amigoNome, pocaoNome) {
+  const pNome = pocaoNome || "Poção da Coragem";
+  const aNome = amigoNome || "amigo";
+  const d = dadosBruxo();
+  if (!Array.isArray(d.pocoesEnviadas)) d.pocoesEnviadas = [];
+  d.pocoesEnviadas.push({ amigo: aNome, pocao: pNome, data: today() });
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Poção Enviada! 🧪💌",
+      texto: `${pNome} enviada com sucesso para ${aNome} com brilho verde mágico!`,
+      tipo: "sucesso",
+      mood: "party"
+    });
+  }
+  return true;
+}
+
+// 27. Pet com chapéu de bruxa vira sapo por 5 segundos
+function bruxoPetViraSapo() {
+  const d = dadosBruxo();
+  d.petSapoAte = Date.now() + 5000;
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Ribbit! O Pet virou sapo! 🐸👑",
+      texto: "Um feitiço travesso transformou seu companheiro por 5 segundos!",
+      tipo: "info",
+      mood: "happy"
+    });
+  }
+  return true;
+}
+
+// 30. Fotolog com moldura de folhas e cogumelos
+function molduraFotologBruxoHTML(conteudo) {
+  return `<div class="bruxo-fotolog-moldura">
+    <div class="bruxo-fotolog-enfeite-folhas">🍃🍁</div>
+    ${conteudo || ""}
+    <div class="bruxo-fotolog-enfeite-cogu">🍄🌿</div>
+  </div>`;
 }
 
 if (typeof SONS_MUNDO !== "undefined" && SONS_MUNDO.bruxo) {

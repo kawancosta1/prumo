@@ -576,6 +576,42 @@ const QUARTO_MUNDOS_NOVOS = [
       `<rect x="14" y="38" width="112" height="22" rx="4" fill="#365314"/>` +
       `<circle cx="28" cy="34" r="6" fill="#FEF08A"/>`
   },
+  {
+    slot: "poster",
+    id: "q_bruxo_prateleira_quarto",
+    nome: "Prateleira rústica de poções",
+    preco: 150,
+    mundo: "bruxo",
+    svg: () =>
+      `<rect x="2" y="10" width="44" height="40" fill="#4E342E" rx="2" stroke="#271C19" stroke-width="1.4"/><line x1="2" y1="24" x2="46" y2="24" stroke="#795548" stroke-width="2.5"/><line x1="2" y1="38" x2="46" y2="38" stroke="#795548" stroke-width="2.5"/><path d="M8 16h6v6h-6z" fill="#76FF03"/><circle cx="24" cy="19" r="3.5" fill="#B388FF"/><path d="M34 16h6v6h-6z" fill="#FF7043"/><path d="M12 30h7v6h-7z" fill="#4FC3F7"/><circle cx="28" cy="33" r="3.5" fill="#FFD54F"/><path d="M36 30h6v6h-6z" fill="#E53935"/>`
+  },
+  {
+    slot: "luz",
+    id: "q_bruxo_caldeirao_grande",
+    nome: "Caldeirão grande borbulhante",
+    preco: 160,
+    mundo: "bruxo",
+    svg: () =>
+      `<path d="M8 20h32q2 20 -16 22q-18 -2 -16 -22z" fill="#263238" stroke="#102027" stroke-width="1.6"/><ellipse cx="24" cy="20" rx="15" ry="3.5" fill="#76FF03"/><circle cx="18" cy="14" r="2.5" fill="#76FF03" opacity=".8"/><circle cx="28" cy="11" r="2" fill="#B2FF59" opacity=".9"/><path d="M14 42l-4 6M34 42l4 6" stroke="#37474F" stroke-width="2.2"/>`
+  },
+  {
+    slot: "teto",
+    id: "q_bruxo_ervas_penduradas",
+    nome: "Ervas curativas penduradas",
+    preco: 130,
+    mundo: "bruxo",
+    svg: () =>
+      `<line x1="0" y1="6" x2="100" y2="6" stroke="#5D4037" stroke-width="2.5"/><path d="M14 6v14q-5 4 0 8q5-4 0-8M34 6v16q-6 4 0 8q6-4 0-8M54 6v12q-5 3 0 7q5-3 0-7M74 6v15q-5 4 0 8q5-4 0-8" stroke="#33691E" stroke-width="2" fill="none"/>`
+  },
+  {
+    slot: "janela",
+    id: "q_bruxo_janela_lua",
+    nome: "Janela com lua cheia da cabana",
+    preco: 145,
+    mundo: "bruxo",
+    svg: () =>
+      `<circle cx="45" cy="37" r="30" fill="#1A1829" stroke="#5D4037" stroke-width="5"/><circle cx="54" cy="28" r="14" fill="#FFF9C4"/><circle cx="48" cy="24" r="2" fill="#FFF59D"/><path d="M45 7v60M15 37h60" stroke="#5D4037" stroke-width="3"/>`
+  },
 
   /* =========================================================
      6. MUNDO GAMER
