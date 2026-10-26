@@ -48,6 +48,7 @@ const servidor = http.createServer((req, res) => {
     ["Otaku: Lote 6 (Itens 51 a 60)", () => require("./otaku-lote6")(url)],
     ["Feiticeiro: Lote 1 (Itens 1 a 10)", () => require("./feiticeiro-lote1")(url)],
     ["Feiticeiro: Lote 2 (Itens 11 a 20)", () => require("./feiticeiro-lote2")(url)],
+    ["Feiticeiro: Lote 3 (Itens 21 a 30)", () => require("./feiticeiro-lote3")(url)],
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
     ["Quarto por Mundo", () => require("./quarto-mundos")(url)],

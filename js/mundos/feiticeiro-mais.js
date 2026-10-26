@@ -563,3 +563,192 @@ if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.feiticeiro) {
     if (b) efeitoRunasTarefa(b.closest(".card") || b);
   };
 }
+
+/* =========================================================
+   FEITICEIRO: LOTE 3 (ITENS 21 A 30)
+   ========================================================= */
+
+/* 24. Títulos novos e títulos secretos */
+function titulosSecretosDesbloqueados() {
+  const d = dadosFeit();
+  if (!Array.isArray(d.titulosSecretos)) d.titulosSecretos = [];
+  return d.titulosSecretos;
+}
+
+function desbloquearTituloSecreto(id) {
+  const d = dadosFeit();
+  if (!Array.isArray(d.titulosSecretos)) d.titulosSecretos = [];
+  if (!d.titulosSecretos.includes(id)) {
+    d.titulosSecretos.push(id);
+    commit();
+    const sec = (typeof TITULOS_SECRETOS !== "undefined" ? TITULOS_SECRETOS : []).find(t => t.id === id);
+    if (sec && typeof notificar === "function") {
+      notificar({
+        titulo: "Título Secreto Desbloqueado! ✦",
+        texto: `Você conquistou: "${sec.titulo}"`,
+        tipo: "conquista",
+        mood: "party"
+      });
+    }
+  }
+}
+
+/* 25. Selos mágicos colecionáveis por conquista */
+const SELOS_MAGICOS = [
+  { id: "selo_iniciado", nome: "Selo do Aprendiz", icone: "✦", desc: "Completou o primeiro ritual." },
+  { id: "selo_fogo", nome: "Selo do Fogo", icone: "🔥", desc: "Concluiu tarefas na escola do fogo." },
+  { id: "selo_gelo", nome: "Selo do Gelo", icone: "❄️", desc: "Manteve foco na escola do gelo." },
+  { id: "selo_estrela", nome: "Selo Estelar", icone: "⭐", desc: "Completou uma constelação inteira." },
+  { id: "selo_tempo", nome: "Selo do Tempo", icone: "⌛", desc: "Atingiu 50 minutos de estudo contínuo." }
+];
+
+function selosMagicosDesbloqueados() {
+  const d = dadosFeit();
+  if (!Array.isArray(d.selos)) d.selos = [];
+  return d.selos;
+}
+
+function desbloquearSeloMagico(id) {
+  const d = dadosFeit();
+  if (!Array.isArray(d.selos)) d.selos = [];
+  if (!d.selos.includes(id)) {
+    d.selos.push(id);
+    commit();
+    const selo = SELOS_MAGICOS.find(s => s.id === id);
+    if (selo && typeof notificar === "function") {
+      notificar({
+        titulo: "Novo Selo Mágico! ✦",
+        texto: `Você obteve o ${selo.nome} (${selo.icone}).`,
+        tipo: "conquista",
+        mood: "party"
+      });
+    }
+  }
+}
+
+/* 26. Academia com amigos (quem faz mais feitiços vira diretor) */
+function rankingAcademiaFeiticeiro() {
+  const d = dadosFeit();
+  const feitosVc = d.feiticos || 0;
+  const lista = [{ nome: (typeof S !== "undefined" && S.name) || "Você", feitiços: feitosVc, eVoce: true }];
+  if (typeof S !== "undefined" && Array.isArray(S.friends) && S.friends.length) {
+    S.friends.forEach(f => {
+      lista.push({ nome: f.nome || f.name || "Mago Amigo", feitiços: f.feitosSemana || 5, eVoce: false });
+    });
+  } else {
+    // Membros fictícios da academia para ranking dinâmico
+    lista.push({ nome: "Mestre Elion", feitiços: 14, eVoce: false });
+    lista.push({ nome: "Aluna Lyra", feitiços: 8, eVoce: false });
+  }
+  lista.sort((a, b) => b.feitiços - a.feitiços);
+  lista.forEach((item, idx) => {
+    item.posicao = idx + 1;
+    item.diretor = idx === 0;
+  });
+  return lista;
+}
+
+/* 27. Mandar feitiço de ânimo para amigos pela caixa */
+function mandarFeiticoAnimo(paraNome = "Amigo") {
+  if (typeof S === "undefined") return;
+  if (!Array.isArray(S.notifs)) S.notifs = [];
+  S.notifs.unshift({
+    id: "feit_animo_" + Date.now(),
+    tipo: "feitico_animo",
+    d: today(),
+    de: S.name || "Feiticeiro",
+    texto: `✦ Um feitiço de ânimo e clareza enviado para ${paraNome}!`
+  });
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Feitiço de Ânimo Enviado! ✨",
+      texto: `Sua energia mágica chegou até ${paraNome}.`,
+      tipo: "social",
+      mood: "happy"
+    });
+  }
+}
+
+ACOES_EXTRAS["feit-mandar-animo"] = () => {
+  const nome = (typeof S !== "undefined" && S.pair && S.pair.name) || "seu amigo";
+  mandarFeiticoAnimo(nome);
+  render();
+};
+
+/* 28. Pet com chapéu de mago e faíscas ao pular */
+function efeitoPetFaiscas(petEl) {
+  if (RM || !petEl) return;
+  for (let i = 0; i < 4; i++) {
+    const s = document.createElement("span");
+    s.className = "feit-pet-faisca";
+    s.textContent = "✦";
+    s.style.setProperty("--tx", `${(Math.random() - 0.5) * 32}px`);
+    s.style.setProperty("--ty", `${-12 - Math.random() * 20}px`);
+    s.style.left = "50%";
+    s.style.top = "20%";
+    petEl.style.position = "relative";
+    petEl.appendChild(s);
+    setTimeout(() => s.remove(), 600);
+  }
+}
+
+/* 30. Moldura de pergaminho no Fotolog */
+if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.feiticeiro) {
+  MUNDO_FX.feiticeiro.molduraFotolog = () => "feit-moldura-pergaminho";
+}
+
+/* Atualiza o cartão do Hoje com a Academia e Selos Mágicos */
+if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.feiticeiro) {
+  const antigaSecaoHojeLote2 = MUNDO_FX.feiticeiro.secaoHoje;
+  MUNDO_FX.feiticeiro.secaoHoje = () => {
+    let html = "";
+    if (typeof antigaSecaoHojeLote2 === "function") {
+      html += antigaSecaoHojeLote2();
+    }
+    const ranking = rankingAcademiaFeiticeiro();
+    const diretor = ranking.find(r => r.diretor);
+    const selos = selosMagicosDesbloqueados();
+
+    html += cartaoMundo(
+      "cm-academia-amigos",
+      "Academia Arcana",
+      `Diretor da Semana: ${esc(diretor ? diretor.nome : "Você")}`,
+      `<div class="note" style="margin-bottom:8px">Lançamento semanal de feitiços entre aprendizes e mestres.</div>
+      <div class="row" style="gap:6px;margin-bottom:8px">
+        ${ranking
+          .slice(0, 3)
+          .map(
+            r =>
+              `<div class="card sub sunken" style="flex:1;padding:6px;font-size:11px;text-align:center">
+                <b>${r.posicao}º ${esc(r.nome)}</b><br>
+                <span>${r.feitiços} feitiços</span>
+                ${r.diretor ? '<div style="color:#F59E0B;font-weight:bold;font-size:10px">👑 Diretor</div>' : ""}
+              </div>`
+          )
+          .join("")}
+      </div>
+      <div class="row" style="gap:6px">
+        <button class="btn small" data-act="feit-mandar-animo">✨ Mandar Feitiço de Ânimo</button>
+        <button class="btn small primary" data-act="feit-abrir-mapa-ceu">✦ Ver Planetário</button>
+      </div>`
+    );
+
+    html += cartaoMundo(
+      "cm-selos-magicos",
+      "Selos Mágicos Colecionáveis",
+      `${selos.length} de ${SELOS_MAGICOS.length} selos`,
+      `<div class="row" style="gap:8px;flex-wrap:wrap">
+        ${SELOS_MAGICOS.map(s => {
+          const tem = selos.includes(s.id);
+          return `<div class="card sub ${tem ? "" : "sunken"}" style="padding:6px 10px;text-align:center;opacity:${tem ? "1" : "0.45"}">
+            <span style="font-size:16px">${s.icone}</span><br>
+            <b style="font-size:10px">${esc(s.nome)}</b>
+          </div>`;
+        }).join("")}
+      </div>`
+    );
+
+    return html;
+  };
+}

@@ -142,6 +142,36 @@ THEMES.feiticeiro = {
       pat: ["runa", "lua"]
     },
     {
+      id: "sombras",
+      name: "Mago das sombras",
+      price: 150,
+      L: ["#ECEBF2", "#FFFFFF", "#211D2D", "#4A3E65", "#6B5B8E", "#F8F7FC", "#211D2D"],
+      D: ["#0E0C14", "#181522", "#EBE8F5", "#9D8EC2", "#7E6EAA", "#D8D2EB", "#181522"],
+      part: "lua",
+      wn: "Essência sombria",
+      pat: ["lua", "spark"]
+    },
+    {
+      id: "druida",
+      name: "Druida",
+      price: 150,
+      L: ["#F0F4EE", "#FFFFFF", "#1E2D1A", "#2E6B2A", "#5E9E5A", "#F7FAF5", "#1E2D1A"],
+      D: ["#0B1408", "#142010", "#E8F2E4", "#7EC478", "#5E9E5A", "#D3E8CD", "#142010"],
+      part: "leaf",
+      wn: "Orvalho da floresta",
+      pat: ["leaf", "spark"]
+    },
+    {
+      id: "arcanoreal",
+      name: "Arcano real",
+      price: 160,
+      L: ["#F7F0FA", "#FFFFFF", "#2A1238", "#6A1B9A", "#AB47BC", "#FCF8FD", "#2A1238"],
+      D: ["#12051A", "#220D30", "#F8EAFE", "#CE93D8", "#AB47BC", "#E8CEF2", "#220D30"],
+      part: "gem",
+      wn: "Néctar dourado",
+      pat: ["gem", "runa"]
+    },
+    {
       id: "lenda",
       name: "Eclipse dourado",
       ach: "nivel5",
@@ -544,5 +574,75 @@ ITEMS.push(
       `<rect x="0" y="-6" width="120" height="154" fill="#283593" opacity=".35"/><path d="M92 148V40l8 -18 8 18V148Z" fill="#5C6BC0" opacity=".7"/><path d="M90 40h20l-10 -26z" fill="#1A237E" opacity=".8"/><rect class="pisca" x="97" y="60" width="6" height="8" fill="#FFE082"/><rect x="97" y="90" width="6" height="8" fill="#FFE082" opacity=".7"/>` +
       estrelaFeit(16, 14, 3, "#FFF59D") +
       estrelaFeit(40, 6, 2, "#FFF59D")
+  },
+  {
+    id: "feit_robe_arquimago",
+    p: "feiticeiro",
+    slot: "top",
+    name: "Robe de arquimago",
+    price: 170,
+    svg: () =>
+      topBase("#1A1B3A") +
+      `<path d="M42 84L60 110L78 84" fill="#E8C55A" ${O}/><path d="M50 90L60 102L70 90" fill="#1A1B3A"/><path d="M60 110V150" stroke="#E8C55A" stroke-width="3"/><path d="M0 144H120" stroke="#C9A646" stroke-width="4"/><g stroke="#E8C55A" stroke-width="1.6" fill="none"><circle cx="34" cy="120" r="4"/><circle cx="86" cy="120" r="4"/></g>` +
+      topHem
+  },
+  {
+    id: "feit_cajado_dragao",
+    p: "feiticeiro",
+    slot: "hand",
+    name: "Cajado de dragão",
+    price: 180,
+    svg: (x, y) =>
+      H(
+        x,
+        y,
+        `<path d="M2 14L10 -42" stroke="#4E342E" stroke-width="4.2" stroke-linecap="round"/><path d="M6 -36Q12 -44 14 -52Q8 -48 4 -44" stroke="#D84315" stroke-width="3" fill="none"/><circle cx="12" cy="-48" r="4.5" fill="#FF8A65" stroke="#BF360C" stroke-width="1.2"/><g class="brilhinho">${estrelaFeit(12, -48, 5, "#FFE082")}</g>`
+      )
+  },
+  {
+    id: "feit_chapeu_lua",
+    p: "feiticeiro",
+    slot: "hat",
+    name: "Chapéu de lua",
+    price: 130,
+    svg: () =>
+      chapeuMago("#311B92", "#9575CD", false) +
+      `<path d="M64 20a6 6 0 1 0 4 9a5 5 0 1 1-4-9z" fill="#FFF59D"/><g class="brilhinho">${estrelaFeit(50, 32, 2.6, "#FFE082")}</g>`
+  },
+  {
+    id: "feit_oculos_alquimista",
+    p: "feiticeiro",
+    slot: "face",
+    name: "Óculos de alquimista",
+    price: 110,
+    svg: () =>
+      `<rect x="34" y="58" width="16" height="12" rx="3" fill="#FFE082" fill-opacity=".3" stroke="#8D6E63" stroke-width="2"/><rect x="64" y="58" width="16" height="12" rx="3" fill="#80DEEA" fill-opacity=".3" stroke="#8D6E63" stroke-width="2"/><path d="M50 64H64M34 64H28M80 64H86" stroke="#8D6E63" stroke-width="2"/>`
+  },
+  {
+    id: "feit_fenix",
+    p: "feiticeiro",
+    slot: "pet",
+    name: "Fênix",
+    price: 180,
+    svg: () =>
+      `<g transform="translate(15 124)"><path d="M-10 10Q-14 -6 -2 -8Q8 -8 10 4Q8 10 -10 10Z" fill="#D84315" stroke="var(--ink)" stroke-width="1.1"/><path d="M-4 -8Q-2 -18 6 -12Q0 -8 -4 -8Z" fill="#FF7043" stroke="var(--ink)" stroke-width=".9"/><circle cx="4" cy="-4" r="1.5" fill="#FFE082"/><path d="M-10 4Q-18 6 -16 -2" stroke="#FF7043" stroke-width="2.5" fill="none"/><g class="brilhinho">${estrelaFeit(8, -12, 3, "#FFD54F")}</g></g>`
+  },
+  {
+    id: "feit_gato_estrela",
+    p: "feiticeiro",
+    slot: "pet",
+    name: "Gato-estrela",
+    price: 170,
+    svg: () =>
+      `<g transform="translate(15 125)"><ellipse cx="0" cy="0" rx="9" ry="8" fill="#1A1B3A" stroke="var(--ink)" stroke-width="1.1"/><path d="M-7 -6L-9 -13L-2 -8M2 -8L9 -13L7 -6" fill="#1A1B3A" stroke="var(--ink)" stroke-width="1"/><circle cx="-3" cy="-1" r="1.4" fill="#FFE082"/><circle cx="3" cy="-1" r="1.4" fill="#FFE082"/><g class="brilhinho">${estrelaFeit(0, -2, 2.5, "#80D8FF")}</g></g>`
+  },
+  {
+    id: "feit_golem_pedra",
+    p: "feiticeiro",
+    slot: "pet",
+    name: "Golem de pedra",
+    price: 160,
+    svg: () =>
+      `<g transform="translate(15 125)"><rect x="-9" y="-10" width="18" height="18" rx="4" fill="#78909C" stroke="var(--ink)" stroke-width="1.2"/><rect x="-5" y="-4" width="3" height="3" fill="#80DEEA"/><rect x="2" y="-4" width="3" height="3" fill="#80DEEA"/><path d="M-6 3h12" stroke="#37474F" stroke-width="1.4"/></g>`
   }
 );

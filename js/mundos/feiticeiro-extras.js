@@ -56,7 +56,26 @@ const TITULOS_MAGO = [
   [60, "Feiticeiro da torre"],
   [120, "Mestre das runas"],
   [250, "Arquimago"],
-  [500, "Lenda das estrelas"]
+  [500, "Lenda das estrelas"],
+  [750, "Guardião do Astral"],
+  [1000, "Tecelão do Tempo"]
+];
+const TITULOS_SECRETOS = [
+  {
+    id: "feit_sec_astronomo",
+    titulo: "Astrônomo Noturno",
+    desc: "Estudou à noite e desvendou o planetário."
+  },
+  {
+    id: "feit_sec_elementos",
+    titulo: "Dominador dos Elementos",
+    desc: "Lançou feitiços nas quatro escolas de magia."
+  },
+  {
+    id: "feit_sec_vazio",
+    titulo: "Alquimista do Vazio",
+    desc: "Meta de água batida e mana canalizada no mesmo dia."
+  }
 ];
 const FEITICOS_DO_DIA = [
   ["Arrumatum", "Arruma a mesa em 5 minutos."],

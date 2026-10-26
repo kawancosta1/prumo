@@ -450,6 +450,42 @@ const QUARTO_MUNDOS_NOVOS = [
       `<path d="M30 17Q75 4 120 17Q75 30 30 17Z" fill="none" stroke="#FDE047" stroke-width="1.4"/>` +
       `<circle cx="75" cy="17" r="5" fill="#F59E0B"/>`
   },
+  {
+    slot: "movel",
+    id: "q_feit_caldeirao_estudos",
+    nome: "Caldeirão de estudos",
+    preco: 120,
+    mundo: "feiticeiro",
+    svg: () =>
+      `<ellipse cx="22" cy="18" rx="16" ry="6" fill="#334155"/>` +
+      `<path d="M6 18Q4 42 22 44Q40 42 38 18Z" fill="#1E293B"/>` +
+      `<ellipse cx="22" cy="18" rx="14" ry="4.5" fill="#7C3AED" opacity=".85"/>` +
+      `<circle cx="18" cy="16" r="2.2" fill="#C4B5FD"/>` +
+      `<path d="M10 42L6 46M34 42L38 46" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round"/>`
+  },
+  {
+    slot: "pelucia",
+    id: "q_feit_globo_celeste",
+    nome: "Globo celeste",
+    preco: 110,
+    mundo: "feiticeiro",
+    svg: () =>
+      `<circle cx="15" cy="13" r="10" fill="#1E1B4B" stroke="#CA8A04" stroke-width="1.2"/>` +
+      `<path d="M5 13a10 10 0 0 0 20 0" stroke="#FDE047" stroke-width="1" fill="none"/>` +
+      `<path d="M15 23v3M9 26h12" stroke="#CA8A04" stroke-width="1.8" stroke-linecap="round"/>`
+  },
+  {
+    slot: "luz",
+    id: "q_feit_vela_flutuante",
+    nome: "Vela flutuante",
+    preco: 95,
+    mundo: "feiticeiro",
+    svg: () =>
+      `<g class="feit-vela-flutua"><rect x="15" y="14" width="8" height="20" rx="2" fill="#FEF08A" stroke="#EAB308" stroke-width="1"/>` +
+      `<path d="M19 14v-4" stroke="#78350F" stroke-width="1.2"/>` +
+      `<ellipse cx="19" cy="8" rx="3" ry="5" fill="#F97316"/>` +
+      `<ellipse cx="19" cy="9" rx="1.5" ry="3" fill="#FEF08A"/></g>`
+  },
 
   /* =========================================================
      5. MUNDO BRUXO
