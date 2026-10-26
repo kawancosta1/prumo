@@ -397,3 +397,169 @@ ACOES_EXTRAS["feit-iniciar-duelo"] = (b, id) => {
   );
   render();
 };
+
+/* =========================================================
+   FEITICEIRO: LOTE 2 (ITENS 11 A 20)
+   ========================================================= */
+
+/* 11. Runas brilham em volta da tarefa ao concluir */
+function efeitoRunasTarefa(alvo) {
+  if (RM || !alvo) return;
+  const container = document.createElement("div");
+  container.className = "feit-runas-concluir";
+  const runas = ["ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ"];
+  runas.forEach((r, i) => {
+    const span = document.createElement("span");
+    span.textContent = r;
+    span.style.setProperty("--i", i);
+    container.appendChild(span);
+  });
+  alvo.style.position = "relative";
+  alvo.appendChild(container);
+  setTimeout(() => container.remove(), 1200);
+}
+
+/* 12. Rastro de estrelinhas no cursor (PC, mundo Feiticeiro) */
+if (typeof window !== "undefined" && !window.__feiticeiroCursorAtivo) {
+  window.__feiticeiroCursorAtivo = true;
+  let ultimoRastro = 0;
+  document.addEventListener("pointermove", e => {
+    if (RM) return;
+    if (typeof S === "undefined" || S.persona !== "feiticeiro") return;
+    if (e.pointerType !== "mouse") return;
+    const agora = Date.now();
+    if (agora - ultimoRastro < 65) return;
+    ultimoRastro = agora;
+    const star = document.createElement("span");
+    star.className = "feit-cursor-estrela";
+    star.textContent = "✦";
+    star.style.left = e.clientX + "px";
+    star.style.top = e.clientY + "px";
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 700);
+  });
+}
+
+/* 14. Mapa do céu completo com todas as constelações */
+function mapaDoCeuCompletoSVG() {
+  const d = dadosFeit();
+  const mapa = d.ceu.mapa || [];
+  const W = 360,
+    H = 260;
+  let s = `<svg viewBox="0 0 ${W} ${H}" class="feit-planetario-svg" aria-label="Mapa celeste completo">`;
+  s += `<rect width="${W}" height="${H}" fill="#0A0B1E" rx="8"/>`;
+  // Nebulosas e pontos de fundo
+  s += `<circle cx="80" cy="80" r="60" fill="#3B82F6" opacity=".12"/>`;
+  s += `<circle cx="260" cy="160" r="70" fill="#8B5CF6" opacity=".12"/>`;
+  for (let i = 0; i < 40; i++) {
+    const x = ((i * 47) % (W - 20)) + 10;
+    const y = ((i * 31) % (H - 20)) + 10;
+    s += `<circle cx="${x}" cy="${y}" r="0.9" fill="#FFF3C4" opacity=".6"/>`;
+  }
+  // Desenho das constelações completadas no céu
+  CONSTELACOES.forEach((nome, idx) => {
+    const completa = mapa.includes(idx) || d.ceu.atual > idx;
+    const cx = 50 + (idx % 3) * 120 + (Math.floor(idx / 3) % 2) * 20;
+    const cy = 45 + Math.floor(idx / 3) * 75;
+    const pts = FORMAS_CONSTELACAO[idx % FORMAS_CONSTELACAO.length];
+    s += `<g transform="translate(${cx - 40} ${cy - 20}) scale(0.7)">`;
+    // Linhas
+    pts.slice(1).forEach(([x, y], k) => {
+      s += `<line x1="${pts[k][0]}" y1="${pts[k][1]}" x2="${x}" y2="${y}" stroke="${completa ? "#FDE047" : "#334155"}" stroke-width="${completa ? 1.4 : 0.8}"/>`;
+    });
+    // Estrelas
+    pts.forEach(([x, y]) => {
+      s += `<circle cx="${x}" cy="${y}" r="${completa ? 2.8 : 1.6}" fill="${completa ? "#FFE082" : "#475569"}"/>`;
+    });
+    s += `<text x="58" y="50" font-size="7" text-anchor="middle" fill="${completa ? "#FDE047" : "#64748B"}" font-family="serif">${esc(nome)}</text>`;
+    s += `</g>`;
+  });
+  s += `</svg>`;
+  return s;
+}
+
+ACOES_EXTRAS["feit-abrir-mapa-ceu"] = () => {
+  const d = dadosFeit();
+  const modal = document.createElement("div");
+  modal.className = "modal-fundo feit-modal-ceu";
+  modal.innerHTML = `<div class="modal card" style="max-width:380px">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <b>✦ Planetário da Torre</b>
+      <button class="btn icon small" data-act="feit-fechar-modal">✕</button>
+    </div>
+    <span class="note" style="margin-bottom:8px">Constelações completadas: <b>${(d.ceu.mapa || []).length} de ${CONSTELACOES.length}</b></span>
+    ${mapaDoCeuCompletoSVG()}
+    <button class="btn small primary" style="margin-top:10px" data-act="feit-fechar-modal">Fechar Planetário</button>
+  </div>`;
+  document.body.appendChild(modal);
+};
+
+ACOES_EXTRAS["feit-fechar-modal"] = b => {
+  const m = b.closest(".modal-fundo");
+  if (m) m.remove();
+};
+
+/* 16. Poção do mascote brilha com a meta batida */
+function conferirBrilhoPocaoHero() {
+  if (typeof S === "undefined" || S.persona !== "feiticeiro") return;
+  const bateu = (S.water || 0) >= (S.waterGoal || 2000);
+  const hero = document.querySelector(".herobox");
+  if (hero) hero.classList.toggle("pocao-brilhando", bateu);
+}
+document.addEventListener("DOMContentLoaded", conferirBrilhoPocaoHero);
+
+/* 18. Som de Harpa ao concluir tarefa */
+function somHarpaConcluir(ctx, saida, t) {
+  // Arpejo de harpa celestial em 4 notas (C5, E5, G5, C6)
+  [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+    tocarTom(ctx, saida, t + i * 0.07, freq, 1.2, "sine", 0.06, 0.02);
+    // Harmônico suave de corda
+    tocarTom(ctx, saida, t + i * 0.07, freq * 2, 0.8, "triangle", 0.02, 0.01);
+  });
+}
+
+/* 19. Coro suave ao completar constelação */
+function somCoroConstelacao(ctx, saida, t = 0) {
+  // Acorde místico de coro com 3 vozes
+  [392, 493.88, 587.33].forEach(freq => {
+    tocarTom(ctx, saida, t, freq, 2.5, "sine", 0.07, 0.3);
+    tocarTom(ctx, saida, t + 0.1, freq * 1.5, 2.2, "sine", 0.03, 0.2);
+  });
+}
+
+/* Atualiza os ganchos de som no feiticeiro */
+if (typeof SONS_MUNDO !== "undefined" && SONS_MUNDO.feiticeiro) {
+  SONS_MUNDO.feiticeiro.concluir = (ctx, saida, t) => {
+    somHarpaConcluir(ctx, saida, t);
+    // sino cristalino no topo
+    tocarTom(ctx, saida, t + 0.28, 2093, 0.6, "sine", 0.04, 0.01);
+  };
+
+  /* 20. Som ambiente de biblioteca: lareira, páginas virando e coruja */
+  SONS_MUNDO.feiticeiro.ambiente = ctx => {
+    return ambienteComposto(ctx, { freq: 1100, tipo: "lowpass", vol: 0.04, onda: 0.06 }, [
+      // Estalos de lareira
+      [(c, s, t) => rajada(c, s, t, 0.06, 3200, "bandpass", 0.09, 0.9), 1200, 3800],
+      // Página de livro virando
+      [(c, s, t) => rajada(c, s, t, 0.2, 1400, "lowpass", 0.1, 1.2), 8000, 18000],
+      // Pio de coruja suave ao longe
+      [
+        (c, s, t) => {
+          tocarTom(c, s, t, 440, 0.4, "sine", 0.04, 0.1);
+          tocarTom(c, s, t + 0.3, 330, 0.6, "sine", 0.05, 0.1);
+        },
+        16000,
+        28000
+      ]
+    ]);
+  };
+}
+
+/* Adiciona o botão do mapa do céu e gancho de runas ao concluir */
+if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.feiticeiro) {
+  const antigoAoConcluirLote1 = MUNDO_FX.feiticeiro.aoConcluir;
+  MUNDO_FX.feiticeiro.aoConcluir = (tarefa, b) => {
+    if (typeof antigoAoConcluirLote1 === "function") antigoAoConcluirLote1(tarefa, b);
+    if (b) efeitoRunasTarefa(b.closest(".card") || b);
+  };
+}
