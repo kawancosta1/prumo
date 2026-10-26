@@ -46,12 +46,13 @@ module.exports = async url => {
     ev("S.coins") === g0 - 5 && ev("fomePet(petAtivo())") > 99,
     "dar comida custa 5 gotas e enche a barriga"
   );
+  const mult = ev("MUNDO_FX[S.persona] && MUNDO_FX[S.persona].multiplicadorGotas ? MUNDO_FX[S.persona].multiplicadorGotas() : 1");
   const g3 = ev("S.coins");
   clicar('[data-act="pet-carinho"]');
   ok(ev("petAtivo().carinhos[today()]") === 1, "carinho conta");
-  ok(ev("S.coins") === g3 + 1, "carinho vale 1 gota");
+  ok(ev("S.coins") === g3 + 1 * mult, "carinho vale 1 gota");
   ev(`for (let i = 0; i < 15; i++) fazerCarinho(petAtivo())`);
-  ok(ev("S.coins") === g3 + 10, "carinho rende no máximo 10 gotas por dia");
+  ok(ev("S.coins") === g3 + 10 * mult, "carinho rende no máximo 10 gotas por dia");
   clicar('[data-act="pet-banho"]');
   ok(
     ev("petAtivo().banho") === ev("today()") && D.querySelector('[data-act="pet-banho"]').disabled,
@@ -119,7 +120,7 @@ module.exports = async url => {
   ok(ag && ag.classList.contains("escondido") && !ag.hidden, "na aba certa aparece só uma pontinha");
   const g1 = ev("S.coins");
   ag.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
-  ok(ev("S.coins") === g1 + 5 && ev("petsDados().esconde.achado"), "achou! +5 gotas");
+  ok(ev("S.coins") === g1 + 5 * mult && ev("petsDados().esconde.achado"), "achou! +5 gotas");
 
   // arrastar: pega, leva e solta (cai no chão); toque rápido continua sendo carinho
   ev(`tab = "hoje"; render();`);
@@ -185,11 +186,11 @@ module.exports = async url => {
   const g4 = ev("S.coins");
   clicar('[data-act="pet-especial"]');
   ok(
-    ev("S.coins") === g4 + 3 && ev(`petDoPainel().especialDia === today()`),
+    ev("S.coins") === g4 + 3 * mult && ev(`petDoPainel().especialDia === today()`),
     "interação especial dá +3 uma vez por dia"
   );
   clicar('[data-act="pet-especial"]');
-  ok(ev("S.coins") === g4 + 3, "segunda vez no dia não dá mais gota");
+  ok(ev("S.coins") === g4 + 3 * mult, "segunda vez no dia não dá mais gota");
   for (const e of ["vaca", "boi", "coala"])
     ok(
       /<svg/.test(
