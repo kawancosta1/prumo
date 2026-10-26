@@ -330,6 +330,67 @@ html[data-mundo="feiticeiro"] .fotolog-foto .fl-quadro::after {
   }
 }
 
+/* 37. Selo de cera no cartão do Prumi */
+html[data-mundo="feiticeiro"] .herobox {
+  position: relative;
+}
+.feit-selo-cera {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  filter: drop-shadow(0 2px 5px rgba(185, 28, 28, 0.5));
+  z-index: 3;
+}
+
+/* 38. Velas flutuantes no cabeçalho */
+.feit-velas-cabecalho .feit-vela-item.acesa {
+  filter: drop-shadow(0 0 4px #f59e0b);
+}
+.feit-velas-cabecalho .feit-vela-item.apagada {
+  opacity: 0.45;
+}
+
+/* 39. Pergaminho que desenrola ao subir de título */
+.feit-modal-pergaminho .feit-pergaminho-desenrola {
+  background: #fef3c7;
+  color: #78350f;
+  border: 3px double #b45309;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.5),
+    inset 0 0 20px rgba(180, 83, 9, 0.15);
+  max-width: 320px;
+  text-align: center;
+  padding: 18px;
+  transform: scaleY(0.1);
+  transform-origin: top;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.feit-modal-pergaminho.ativo .feit-pergaminho-desenrola {
+  transform: scaleY(1);
+}
+
+/* 40. Tarefa atrasada petrificada */
+html[data-mundo="feiticeiro"] .card.tarefa.atrasada,
+html[data-mundo="feiticeiro"] .tarefa-petrificada {
+  background: #334155 !important;
+  color: #94a3b8 !important;
+  border-color: #475569 !important;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+  position: relative;
+  filter: grayscale(0.85);
+}
+html[data-mundo="feiticeiro"] .card.tarefa.atrasada::after,
+html[data-mundo="feiticeiro"] .tarefa-petrificada::after {
+  content: "🗿 petrificada";
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+  font-size: 9px;
+  color: #cbd5e1;
+  font-family: monospace;
+  opacity: 0.8;
+}
+
 @media (prefers-reduced-motion: reduce) {
   #circulo-magico {
     display: none;
@@ -339,6 +400,7 @@ html[data-mundo="feiticeiro"] .fotolog-foto .fl-quadro::after {
   .feit-cursor-estrela,
   .feit-vela-flutua,
   .feitico-animo-brilho,
+  .feit-modal-pergaminho .feit-pergaminho-desenrola,
   html[data-mundo="feiticeiro"][data-variante="astral"] body {
     animation: none;
   }

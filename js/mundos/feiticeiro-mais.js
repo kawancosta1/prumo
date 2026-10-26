@@ -749,6 +749,231 @@ if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.feiticeiro) {
       </div>`
     );
 
+    /* 31. Componentes de feitiço */
+    const comp = atualizarComponentesHabitos();
+    html += cartaoMundo(
+      "cm-componentes-magicos",
+      "Bolsa de Componentes",
+      "Ingredientes colhidos dos rituais diários",
+      `<div class="row" style="gap:8px;text-align:center">
+        <div class="card sub sunken" style="flex:1;padding:6px">⭐ <b>${comp.poEstrela || 0}</b><br><span style="font-size:10px">Pó de Estrela</span></div>
+        <div class="card sub sunken" style="flex:1;padding:6px">🪶 <b>${comp.penaArcana || 0}</b><br><span style="font-size:10px">Pena Arcana</span></div>
+        <div class="card sub sunken" style="flex:1;padding:6px">🔮 <b>${comp.cristalMana || 0}</b><br><span style="font-size:10px">Cristal de Mana</span></div>
+      </div>`
+    );
+
+    /* 35. Chuva de meteoros rara */
+    const meteoro = chuvaMeteoroAtiva();
+    if (meteoro) {
+      html += cartaoMundo(
+        "cm-meteoro-raro",
+        "Fenômeno Celestial Ativo! ☄️",
+        `Chuva de ${esc(meteoro.nome)}`,
+        `<div class="note">As estrelas cadentes revelaram a constelação rara <b>${esc(meteoro.constelacao)}</b>. Concentre-se nos feitiços de hoje para sintonizar a energia do cosmos!</div>`
+      );
+    }
+
     return html;
+  };
+}
+
+/* =========================================================
+   FEITICEIRO: LOTE 4 (ITENS 31 A 40)
+   ========================================================= */
+
+/* 31. Componentes de feitiço por hábitos */
+function atualizarComponentesHabitos() {
+  const d = dadosFeit();
+  if (!d.componentes || typeof d.componentes !== "object") {
+    d.componentes = { poEstrela: 0, penaArcana: 0, cristalMana: 0, habitosVistos: {} };
+  }
+  if (!d.componentes.habitosVistos) d.componentes.habitosVistos = {};
+  if (typeof S === "undefined" || !Array.isArray(S.habits)) return d.componentes;
+
+  const feitos = S.habits.filter(h => typeof habitDone === "function" && habitDone(h, today()));
+  feitos.forEach((h, i) => {
+    const chave = `${today()}_${h.id}`;
+    if (!d.componentes.habitosVistos[chave]) {
+      d.componentes.habitosVistos[chave] = true;
+      const tipos = ["poEstrela", "penaArcana", "cristalMana"];
+      const sorteado = tipos[i % tipos.length];
+      d.componentes[sorteado] = (d.componentes[sorteado] || 0) + 1;
+    }
+  });
+  return d.componentes;
+}
+
+/* 32. Feitiço Tempus: adiar 1x na semana sem quebrar sequência */
+function podeUsarTempus() {
+  const d = dadosFeit();
+  const semana = typeof weekOf === "function" ? weekOf(today()) : today().slice(0, 7);
+  return d.ultimoTempusSemana !== semana;
+}
+
+function usarTempusAdiar(tarefaId) {
+  if (!podeUsarTempus()) return false;
+  const t = typeof S !== "undefined" && Array.isArray(S.tasks) && S.tasks.find(x => x.id === tarefaId);
+  if (!t) return false;
+  const d = dadosFeit();
+  d.ultimoTempusSemana = typeof weekOf === "function" ? weekOf(today()) : today().slice(0, 7);
+  t.date = typeof addDays === "function" ? addDays(today(), 1) : today();
+  commit();
+  if (typeof notificar === "function") {
+    notificar({
+      titulo: "Feitiço Tempus Lançado! ⌛",
+      texto: "A tarefa foi adiada sem quebrar sua sequência arcana.",
+      tipo: "sucesso",
+      mood: "party"
+    });
+  }
+  return true;
+}
+
+ACOES_EXTRAS["feit-tempus-adiar"] = (b, id) => {
+  usarTempusAdiar(id);
+  render();
+};
+
+/* 33. Exames da academia de magia */
+function examesAcademia() {
+  if (typeof S === "undefined" || !S.estudos || !Array.isArray(S.estudos.provas)) return [];
+  return S.estudos.provas.map(p => {
+    const minEstudados = (S.sessions || [])
+      .filter(s => s.materia === p.materia)
+      .reduce((acc, cur) => acc + (cur.min || 0), 0);
+    const metaMin = (p.metaHoras || 10) * 60;
+    const notaPreparacao = Math.min(100, Math.round((minEstudados / metaMin) * 100));
+    return {
+      ...p,
+      notaPreparacao,
+      classificacao:
+        notaPreparacao >= 90
+          ? "Arquimago (S)"
+          : notaPreparacao >= 70
+            ? "Adepto (A)"
+            : notaPreparacao >= 50
+              ? "Iniciado (B)"
+              : "Aprendiz (C)"
+    };
+  });
+}
+
+/* 34. Ampulheta no foco */
+function ampulhetaFocoSVG(fracao = 0.5) {
+  const f = Math.max(0, Math.min(1, fracao));
+  const baseH = f * 16;
+  return `<svg viewBox="0 0 48 64" class="feit-ampulheta-svg" width="48" height="64">
+    <rect x="6" y="4" width="36" height="4" rx="1.5" fill="#C9A646"/>
+    <rect x="6" y="56" width="36" height="4" rx="1.5" fill="#C9A646"/>
+    <path d="M10 8V56M38 8V56" stroke="#8C5A1E" stroke-width="2"/>
+    <path d="M12 8C12 24 22 28 22 32C22 36 12 40 12 56H36C36 40 26 36 26 32C26 28 36 24 36 8Z" fill="#E0F2FE" fill-opacity=".25" stroke="#CA8A04" stroke-width="1.4"/>
+    <path d="M14 8C14 20 22 25 24 28C26 25 34 20 34 8Z" fill="#FDE047" opacity="${Math.max(0.1, 1 - f * 0.9)}"/>
+    <line x1="24" y1="28" x2="24" y2="48" stroke="#FDE047" stroke-width="1.2" stroke-dasharray="2 2"/>
+    <path d="M14 56C14 50 18 ${56 - baseH} 24 ${56 - baseH}C30 ${56 - baseH} 34 50 34 56Z" fill="#FDE047"/>
+  </svg>`;
+}
+
+/* 35. Chuvas de meteoros reais e constelações raras */
+const METEOROS_REAIS = [
+  { id: "lyrid", nome: "Líridas", mesDia: "04-22", constelacao: "Líra Celeste" },
+  { id: "perseid", nome: "Perseidas", mesDia: "08-12", constelacao: "Pégaso Cintilante" },
+  { id: "orionid", nome: "Orionídeas", mesDia: "10-21", constelacao: "Caçador Astral" },
+  { id: "geminid", nome: "Geminídeas", mesDia: "12-14", constelacao: "Gêmeos do Vácuo" }
+];
+
+function chuvaMeteoroAtiva(dataStr = today()) {
+  const md = dataStr.slice(5);
+  return (
+    METEOROS_REAIS.find(m => {
+      return typeof diffDays === "function" && Math.abs(diffDays(`2026-${m.mesDia}`, `2026-${md}`)) <= 3;
+    }) || null
+  );
+}
+
+/* 36. Diário do mago com páginas do grimório */
+function paginasDiarioMago() {
+  if (typeof S === "undefined" || !S.diario) return [];
+  const entradas = Object.entries(S.diario)
+    .filter(([_, txt]) => txt && txt.trim())
+    .sort(([d1], [d2]) => d2.localeCompare(d1));
+  return entradas.map(([data, texto], idx) => ({
+    pagina: idx + 1,
+    data,
+    texto
+  }));
+}
+
+/* 37. Selo de cera no cartão do Prumi */
+function enfeiteSeloCeraSVG() {
+  return `<div class="feit-selo-cera" title="Selo do Arquimago">
+    <svg viewBox="0 0 28 28" width="28" height="28">
+      <circle cx="14" cy="14" r="12" fill="#B91C1C" stroke="#7F1D1D" stroke-width="1.5"/>
+      <path d="M14 6L16 11L21 11L17 14L19 19L14 16L9 19L11 14L7 11L12 11Z" fill="#FDE047"/>
+    </svg>
+  </div>`;
+}
+
+/* 38. Velas flutuantes no cabeçalho */
+function velasCabecalhoSVG(feitas = 0, total = 5) {
+  const n = Math.min(7, Math.max(3, total || 5));
+  let s = `<div class="feit-velas-cabecalho" style="display:flex;gap:6px;align-items:center;justify-content:center;margin:4px 0">`;
+  for (let i = 0; i < n; i++) {
+    const acesa = i < feitas;
+    s += `<svg viewBox="0 0 16 26" width="16" height="26" class="feit-vela-item ${acesa ? "acesa" : "apagada"}">
+      <rect x="4" y="10" width="8" height="14" rx="1.5" fill="${acesa ? "#FEF08A" : "#64748B"}" stroke="${acesa ? "#CA8A04" : "#334155"}" stroke-width="0.8"/>
+      <path d="M8 10V7" stroke="#334155" stroke-width="1"/>
+      ${acesa ? `<ellipse cx="8" cy="4.5" rx="2.5" ry="4" fill="#F97316" class="brilhinho"/><ellipse cx="8" cy="5" rx="1.2" ry="2.2" fill="#FEF08A"/>` : ""}
+    </svg>`;
+  }
+  s += `</div>`;
+  return s;
+}
+
+/* 39. Desenrolar de pergaminho ao subir de título */
+function desenrolarPergaminhoNovoTitulo(novoTitulo) {
+  if (RM) return;
+  const overlay = document.createElement("div");
+  overlay.className = "modal-fundo feit-modal-pergaminho";
+  overlay.innerHTML = `<div class="feit-pergaminho-desenrola card">
+    <div style="font-weight:bold;letter-spacing:1px;font-size:11px;margin-bottom:6px">✦ DECRETO DA TORRE ✦</div>
+    <div style="margin:8px 0">
+      <p style="font-size:12px;margin:4px 0">Pelo poder das estrelas e do grimório sagrado:</p>
+      <h2 style="font-family:'Cinzel Decorative',serif;color:#B45309;margin:8px 0">${esc(novoTitulo)}</h2>
+      <p class="note" style="font-size:11px">Um novo escalão de sabedoria foi alcançado.</p>
+    </div>
+    <button class="btn small primary" data-act="feit-fechar-modal" style="margin-top:10px">Aceitar Título</button>
+  </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add("ativo"), 30);
+}
+
+/* 40. Tarefas petrificadas (atrasadas) */
+function marcarTarefasPetrificadas() {
+  if (typeof S === "undefined" || S.persona !== "feiticeiro") return;
+  const elCards = document.querySelectorAll(".card.tarefa");
+  elCards.forEach(card => {
+    if (card.classList.contains("atrasada")) {
+      card.classList.add("tarefa-petrificada");
+    }
+  });
+}
+document.addEventListener("DOMContentLoaded", marcarTarefasPetrificadas);
+
+/* Conecta selo de cera e velas flutuantes no enfeiteHero */
+if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.feiticeiro) {
+  const antigoEnfeite = MUNDO_FX.feiticeiro.enfeiteHero;
+  MUNDO_FX.feiticeiro.enfeiteHero = () => {
+    const base = typeof antigoEnfeite === "function" ? antigoEnfeite() : "";
+    const feitas =
+      (typeof S !== "undefined" &&
+        Array.isArray(S.tasks) &&
+        S.tasks.filter(t => t.done && t.date === today()).length) ||
+      0;
+    const total =
+      (typeof S !== "undefined" &&
+        Array.isArray(S.tasks) &&
+        S.tasks.filter(t => t.date === today()).length) ||
+      5;
+    return base + enfeiteSeloCeraSVG() + velasCabecalhoSVG(feitas, total);
   };
 }
