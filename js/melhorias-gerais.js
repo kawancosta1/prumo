@@ -1938,3 +1938,212 @@ function calcularRitmoLeitura(paginasLidas, minutosGastos, totalPaginas) {
     horasRestantesEstimadas: Math.round((minutosRestantes / 60) * 10) / 10
   };
 }
+
+// 141. Fichas de estudo com repetição espaçada SM-2
+function calcularProximaRevisaoSM2(fatorFacilidade, repeticoes, intervalo, qualidade) {
+  const q = Math.min(5, Math.max(0, parseInt(qualidade, 10) || 0));
+  let ef = typeof fatorFacilidade === "number" ? fatorFacilidade : 2.5;
+  let reps = typeof repeticoes === "number" ? repeticoes : 0;
+  let intv = typeof intervalo === "number" ? intervalo : 1;
+
+  if (q >= 3) {
+    if (reps === 0) {
+      intv = 1;
+    } else if (reps === 1) {
+      intv = 6;
+    } else {
+      intv = Math.round(intv * ef);
+    }
+    reps++;
+  } else {
+    reps = 0;
+    intv = 1;
+  }
+
+  ef = ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+  if (ef < 1.3) ef = 1.3;
+
+  return {
+    fatorFacilidade: Math.round(ef * 100) / 100,
+    repeticoes: reps,
+    intervaloDias: intv
+  };
+}
+
+// 142. Modo Prova com contagem regressiva e distribuição
+function planoRevisaoProva(diasAteProva, topicos) {
+  const dias = Math.max(1, parseInt(diasAteProva, 10) || 1);
+  const lista = Array.isArray(topicos) ? topicos : [];
+  const topicosPorDia = Math.max(1, Math.ceil(lista.length / dias));
+  const cronograma = [];
+  for (let d = 1; d <= dias; d++) {
+    const inicio = (d - 1) * topicosPorDia;
+    const fim = inicio + topicosPorDia;
+    const itensDia = lista.slice(inicio, fim);
+    cronograma.push({
+      dia: d,
+      ehSimulado: d === dias,
+      topicos: itensDia.length ? itensDia : ["Revisão Geral e Simulado"]
+    });
+  }
+  return cronograma;
+}
+
+// 143. Histórico comparativo de hidratação semanal
+function comparativoAguaSemanal(diasSemana, metaDiaria) {
+  const meta = Math.max(1, parseInt(metaDiaria, 10) || 2000);
+  const arr = Array.isArray(diasSemana) ? diasSemana : [];
+  const total = arr.reduce((acc, v) => acc + (Number(v) || 0), 0);
+  const media = arr.length ? Math.round(total / arr.length) : 0;
+  const melhor = arr.length ? Math.max(...arr.map(Number)) : 0;
+  return {
+    total,
+    mediaDiaria: media,
+    melhorDia: melhor,
+    percentualMetaSemanal: Math.round((total / (meta * (arr.length || 7))) * 100)
+  };
+}
+
+// 144. Rotina matinal guiada no Hoje
+function rotinaMatinalHojeHTML(passos) {
+  const lista = Array.isArray(passos)
+    ? passos
+    : ["Beber 1 copo de água", "Alongar por 3 minutos", "Listar 3 metas principais"];
+  let itens = "";
+  lista.forEach((p, idx) => {
+    itens += `<div style="margin:4px 0;">✓ ${sanitizarHTMLSeguro(p)}</div>`;
+  });
+  return (
+    `<div class="card-rotina-matinal">` +
+    `<strong style="font-size:12px;">☀️ BOM DIA! SUA ROTINA MATINAL</strong>` +
+    `<div style="margin-top:6px; font-size:12px;">${itens}</div>` +
+    `</div>`
+  );
+}
+
+// 145. Resumo executivo de encerramento do dia
+function resumoEncerramentoDiaHTML(resumo) {
+  const r = resumo || {};
+  const tarefas = r.tarefasFeitas || 0;
+  const gotas = r.gotasGanhas || 0;
+  return (
+    `<div class="card-resumo-encerramento">` +
+    `<strong style="font-size:13px;">🌙 DIA CONCLUÍDO COM SUCESSO</strong>` +
+    `<p style="margin:6px 0 0; font-size:12px;">Você concluiu <strong>${tarefas}</strong> tarefas e ganhou <strong>${gotas}💧</strong> hoje. Descanse bem!</p>` +
+    `</div>`
+  );
+}
+
+// 146. Agrupamento de tarefas por contexto e tags
+function agruparTarefasPorTags(tarefas) {
+  const lista = Array.isArray(tarefas) ? tarefas : [];
+  const grupos = { geral: [] };
+  lista.forEach(t => {
+    const match = (t.titulo || "").match(/#([a-zA-Z0-9_-]+)/);
+    if (match) {
+      const tag = match[1].toLowerCase();
+      if (!grupos[tag]) grupos[tag] = [];
+      grupos[tag].push(t);
+    } else {
+      grupos.geral.push(t);
+    }
+  });
+  return grupos;
+}
+
+// 147. Exportação e importação em formato Markdown
+function exportarTarefasMarkdown(tarefas) {
+  const lista = Array.isArray(tarefas) ? tarefas : [];
+  return lista
+    .map(t => `- [${t.feita ? "x" : " "}] ${t.titulo || ""}${t.prio ? ` (prio: ${t.prio})` : ""}`)
+    .join("\n");
+}
+
+function importarTarefasMarkdown(mdTexto) {
+  if (typeof mdTexto !== "string") return [];
+  const linhas = mdTexto.split("\n");
+  const tarefas = [];
+  linhas.forEach((linha, idx) => {
+    const m = /^\s*-\s*\[([ xX])\]\s*(.+)$/.exec(linha);
+    if (m) {
+      const feita = m[1].toLowerCase() === "x";
+      const titulo = m[2].trim();
+      tarefas.push({
+        id: `t_md_${Date.now()}_${idx}`,
+        titulo,
+        feita
+      });
+    }
+  });
+  return tarefas;
+}
+
+// 148. Pareamento rápido entre dispositivos via QR Code ou Link seguro
+function gerarPayloadPareamento(estado) {
+  const dados = {
+    tarefas: (estado && estado.tarefas) || [],
+    habitos: (estado && estado.habitos) || [],
+    gotas: (estado && estado.gotas) || 0,
+    exportadoEm: Date.now()
+  };
+  const json = JSON.stringify(dados);
+  return comprimirTextoLZW(json);
+}
+
+// 149. Resolução visual de conflitos de sincronia
+function resolverConflitoSincronia(versaoLocal, versaoRemota, estrategia) {
+  const loc = Array.isArray(versaoLocal) ? versaoLocal : [];
+  const rem = Array.isArray(versaoRemota) ? versaoRemota : [];
+  if (estrategia === "manterLocal") return [...loc];
+  if (estrategia === "manterRemoto") return [...rem];
+
+  // Estratégia padrão: fusão inteligente por id
+  const mapa = new Map();
+  rem.forEach(t => {
+    if (t && t.id) mapa.set(t.id, t);
+  });
+  loc.forEach(t => {
+    if (t && t.id) {
+      const anterior = mapa.get(t.id);
+      if (!anterior || (t.atualizadoEm || 0) >= (anterior.atualizadoEm || 0)) {
+        mapa.set(t.id, t);
+      }
+    }
+  });
+  return Array.from(mapa.values());
+}
+
+// 150. Música ambiente binaural sintetizada para estudos
+function iniciarSonsBinaurais(frequenciaBase, diferencaHz) {
+  const ctx = obterContextoAudioSeguro();
+  if (!ctx) return null;
+  const base = typeof frequenciaBase === "number" ? frequenciaBase : 200;
+  const diff = typeof diferencaHz === "number" ? diferencaHz : 10;
+  try {
+    const oscEsq = ctx.createOscillator();
+    const oscDir = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    oscEsq.frequency.setValueAtTime(base, ctx.currentTime);
+    oscDir.frequency.setValueAtTime(base + diff, ctx.currentTime);
+    gain.gain.setValueAtTime(0.02, ctx.currentTime);
+
+    oscEsq.connect(gain);
+    oscDir.connect(gain);
+    gain.connect(ctx.destination);
+
+    oscEsq.start();
+    oscDir.start();
+
+    return {
+      parar: () => {
+        try {
+          oscEsq.stop();
+          oscDir.stop();
+        } catch (_) {}
+      }
+    };
+  } catch (_) {
+    return null;
+  }
+}
