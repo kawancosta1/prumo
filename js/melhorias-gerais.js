@@ -2338,3 +2338,158 @@ function filaOfflineSincronia(filaAtual, novaAcao) {
   }
   return fila;
 }
+
+// ========================================================
+// NOVAS 260 MELHORIAS GERAIS - LOTE 1 (ITENS 1 A 10)
+// ========================================================
+
+// G1. Transição de fade suave ao trocar de aba sem saltos na rolagem
+function aplicarFadeTransicaoAba(container) {
+  if (!container || typeof container.classList !== "object") return;
+  if (verificarPreferenciaMovimentoReduzido()) return;
+  container.classList.remove("fade-transicao-aba");
+  // Força refluxo leve para reiniciar animação
+  void container.offsetWidth;
+  container.classList.add("fade-transicao-aba");
+}
+
+// G2. Efeito de brilho perolado nas gotas quando a meta diária for batida
+function aplicarBrilhoPeroladoGotas(elGotas, ativo) {
+  if (!elGotas || typeof elGotas.classList !== "object") return;
+  if (ativo) {
+    elGotas.classList.add("brilho-perolado-gotas");
+  } else {
+    elGotas.classList.remove("brilho-perolado-gotas");
+  }
+}
+
+// G3. Micro-salto elástico do Prumi quando você adiciona uma nova tarefa
+function animarSaltoElasticoPrumi(elPrumi) {
+  if (!elPrumi || typeof elPrumi.classList !== "object") return;
+  if (verificarPreferenciaMovimentoReduzido()) return;
+  elPrumi.classList.remove("salto-elastico-prumi");
+  void elPrumi.offsetWidth;
+  elPrumi.classList.add("salto-elastico-prumi");
+  setTimeout(() => {
+    if (elPrumi) elPrumi.classList.remove("salto-elastico-prumi");
+  }, 400);
+}
+
+// G4. Animação de poeira mágica ao subir de nível no perfil
+function animarPoeiraMagicaLevelUp(elementoAlvo, qtdParticulas) {
+  if (typeof document === "undefined" || !elementoAlvo) return [];
+  if (verificarPreferenciaMovimentoReduzido()) return [];
+  const qtd = Math.min(16, Math.max(4, parseInt(qtdParticulas, 10) || 8));
+  const ret = elementoAlvo.getBoundingClientRect
+    ? elementoAlvo.getBoundingClientRect()
+    : { left: 0, top: 0, width: 40, height: 40 };
+  const particulas = [];
+
+  for (let i = 0; i < qtd; i++) {
+    const p = document.createElement("div");
+    p.className = "particula-poeira-magica";
+    const angulo = (i / qtd) * 2 * Math.PI;
+    const dist = 20 + Math.random() * 25;
+    const dx = Math.cos(angulo) * dist;
+    const dy = Math.sin(angulo) * dist - 15;
+    p.style.setProperty("--dx", `${dx}px`);
+    p.style.setProperty("--dy", `${dy}px`);
+    p.style.left = `${ret.left + ret.width / 2}px`;
+    p.style.top = `${ret.top + ret.height / 2}px`;
+    document.body.appendChild(p);
+    particulas.push(p);
+    setTimeout(() => {
+      if (p.parentNode) p.parentNode.removeChild(p);
+    }, 750);
+  }
+  return particulas;
+}
+
+// G5. Ondulação concêntrica ao tocar no botão de beber água
+function animarOndulacaoConcentricaAgua(botaoEl, clientX, clientY) {
+  if (!botaoEl || typeof botaoEl.appendChild !== "function") return null;
+  if (verificarPreferenciaMovimentoReduzido()) return null;
+  botaoEl.classList.add("ondulacao-concentrica-agua");
+  const onda = document.createElement("span");
+  onda.className = "ondulacao-onda";
+
+  const ret = botaoEl.getBoundingClientRect();
+  const tamanho = Math.max(ret.width, ret.height);
+  onda.style.width = `${tamanho}px`;
+  onda.style.height = `${tamanho}px`;
+
+  const x = (typeof clientX === "number" && clientX > 0 ? clientX - ret.left : ret.width / 2) - tamanho / 2;
+  const y = (typeof clientY === "number" && clientY > 0 ? clientY - ret.top : ret.height / 2) - tamanho / 2;
+  onda.style.left = `${x}px`;
+  onda.style.top = `${y}px`;
+
+  botaoEl.appendChild(onda);
+  setTimeout(() => {
+    if (onda.parentNode) onda.parentNode.removeChild(onda);
+  }, 550);
+  return onda;
+}
+
+// G6. Vibração sutil no card ao arrastar para reordenar itens
+function aplicarVibracaoArrastoCard(cardEl, ativo) {
+  if (!cardEl || typeof cardEl.classList !== "object") return;
+  if (ativo && !verificarPreferenciaMovimentoReduzido()) {
+    cardEl.classList.add("card-vibrando-arrasto");
+  } else {
+    cardEl.classList.remove("card-vibrando-arrasto");
+  }
+}
+
+// G7. Efeito de desdobrar pergaminho ao abrir notas longas do diário
+function animarDesdobrarPergaminho(elementoNota) {
+  if (!elementoNota || typeof elementoNota.classList !== "object") return;
+  if (verificarPreferenciaMovimentoReduzido()) return;
+  elementoNota.classList.remove("desdobrar-pergaminho");
+  void elementoNota.offsetWidth;
+  elementoNota.classList.add("desdobrar-pergaminho");
+}
+
+// G8. Brilho metálico sutil nos selos de conquistas recém-desbloqueadas
+function aplicarBrilhoMetalicoSelo(seloEl) {
+  if (!seloEl || typeof seloEl.classList !== "object") return;
+  seloEl.classList.add("brilho-metalico-selo");
+}
+
+// G9. Rastro de faíscas ao concluir todas as tarefas de prioridade alta
+function animarRastroFaiscasConclusao(elementoAlvo) {
+  if (typeof document === "undefined" || !elementoAlvo) return [];
+  if (verificarPreferenciaMovimentoReduzido()) return [];
+  const ret = elementoAlvo.getBoundingClientRect
+    ? elementoAlvo.getBoundingClientRect()
+    : { left: 0, top: 0, width: 20, height: 20 };
+  const faiscas = [];
+
+  for (let i = 0; i < 6; i++) {
+    const f = document.createElement("div");
+    f.className = "particula-faisca-conclusao";
+    const fx = (Math.random() - 0.5) * 40;
+    const fy = -10 - Math.random() * 25;
+    f.style.setProperty("--fx", `${fx}px`);
+    f.style.setProperty("--fy", `${fy}px`);
+    f.style.left = `${ret.left + ret.width / 2}px`;
+    f.style.top = `${ret.top + ret.height / 2}px`;
+    document.body.appendChild(f);
+    faiscas.push(f);
+    setTimeout(() => {
+      if (f.parentNode) f.parentNode.removeChild(f);
+    }, 500);
+  }
+  return faiscas;
+}
+
+// G10. Transição fluida entre modo claro e escuro em todos os elementos
+function aplicarTransicaoModoEscuroSuave(duracaoMs) {
+  if (typeof document === "undefined" || !document.documentElement) return;
+  const d = Math.max(100, parseInt(duracaoMs, 10) || 250);
+  document.documentElement.classList.add("transicao-tema-ativa");
+  setTimeout(() => {
+    if (document.documentElement) {
+      document.documentElement.classList.remove("transicao-tema-ativa");
+    }
+  }, d + 50);
+}

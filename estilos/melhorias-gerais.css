@@ -879,6 +879,198 @@ a,
   color: #64748b;
 }
 
+/* ========================================================
+   NOVAS 260 MELHORIAS GERAIS - LOTE 1 (ITENS 1 A 10)
+   ======================================================== */
+
+/* 1. Transição de fade suave ao trocar de aba sem saltos na rolagem */
+.fade-transicao-aba {
+  animation: fadeAbaSuave 0.22s ease-out;
+}
+@keyframes fadeAbaSuave {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 2. Efeito de brilho perolado nas gotas */
+.brilho-perolado-gotas {
+  position: relative;
+  overflow: hidden;
+  animation: pulsoPerolado 2s infinite ease-in-out;
+}
+@keyframes pulsoPerolado {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.8)) drop-shadow(0 0 12px rgba(56, 189, 248, 0.6));
+  }
+  100% {
+    filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.4));
+  }
+}
+
+/* 3. Micro-salto elástico do Prumi */
+.salto-elastico-prumi {
+  animation: saltoPrumiAnim 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes saltoPrumiAnim {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  30% {
+    transform: scale(1.08, 0.92) translateY(2px);
+  }
+  60% {
+    transform: scale(0.96, 1.06) translateY(-8px);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+
+/* 4. Poeira mágica ao subir de nível */
+.particula-poeira-magica {
+  position: absolute;
+  pointer-events: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fde047 0%, #ca8a04 100%);
+  animation: subirPoeiraMagica 0.7s ease-out forwards;
+}
+@keyframes subirPoeiraMagica {
+  0% {
+    opacity: 1;
+    transform: scale(0.4) translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4) translate(var(--dx, 0px), var(--dy, -24px));
+  }
+}
+
+/* 5. Ondulação concêntrica ao tocar no botão de beber água */
+.ondulacao-concentrica-agua {
+  position: relative;
+  overflow: hidden;
+}
+.ondulacao-onda {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.35);
+  transform: scale(0);
+  animation: ondaConcentricaAnim 0.5s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ondaConcentricaAnim {
+  to {
+    transform: scale(3.5);
+    opacity: 0;
+  }
+}
+
+/* 6. Vibração sutil no card ao arrastar */
+.card-vibrando-arrasto {
+  animation: vibracaoCardAnim 0.12s linear infinite;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18) !important;
+  opacity: 0.9;
+}
+@keyframes vibracaoCardAnim {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-0.6deg);
+  }
+  75% {
+    transform: rotate(0.6deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* 7. Efeito de desdobrar pergaminho */
+.desdobrar-pergaminho {
+  animation: desdobrarPergaminhoAnim 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  transform-origin: top center;
+}
+@keyframes desdobrarPergaminhoAnim {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.1) scaleX(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1) scaleX(1);
+  }
+}
+
+/* 8. Brilho metálico sutil nos selos */
+.brilho-metalico-selo {
+  position: relative;
+  overflow: hidden;
+}
+.brilho-metalico-selo::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent 30%, rgba(255, 255, 255, 0.45) 50%, transparent 70%);
+  transform: rotate(25deg);
+  animation: passarBrilhoMetalico 3s infinite;
+  pointer-events: none;
+}
+@keyframes passarBrilhoMetalico {
+  0%,
+  60% {
+    transform: translateX(-120%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(120%) rotate(25deg);
+  }
+}
+
+/* 9. Rastro de faíscas ao concluir tarefas de alta prioridade */
+.particula-faisca-conclusao {
+  position: absolute;
+  pointer-events: none;
+  width: 4px;
+  height: 4px;
+  background: #f59e0b;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #fbbf24;
+  animation: faiscaVoa 0.45s ease-out forwards;
+}
+@keyframes faiscaVoa {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--fx, 15px), var(--fy, -15px)) scale(0.2);
+  }
+}
+
+/* 10. Transição fluida entre modo claro e escuro */
+html.transicao-tema-ativa,
+html.transicao-tema-ativa * {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particula-desintegracao,
   .prumi-squash,
@@ -905,6 +1097,15 @@ a,
   .fita-bobina,
   .corda-viola-vibrando,
   .eq-barra,
+  .fade-transicao-aba,
+  .brilho-perolado-gotas,
+  .salto-elastico-prumi,
+  .particula-poeira-magica,
+  .ondulacao-onda,
+  .card-vibrando-arrasto,
+  .desdobrar-pergaminho,
+  .brilho-metalico-selo::after,
+  .particula-faisca-conclusao,
   .badge-conquista-desbloqueada {
     animation: none !important;
     transform: none !important;
