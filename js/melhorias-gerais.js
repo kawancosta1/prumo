@@ -3079,3 +3079,216 @@ function obterBadgeFrequenciaTarefa(tipoRepeticao) {
   };
   return mapa[r] || { rotulo: "Única", classe: "", icone: "" };
 }
+// G51. Alerta sonoro com sintetizador nativo Web Audio API sem arquivos externos
+let _sharedAudioCtx = null;
+function tocarSomSintetizado(tipo = "click") {
+  if (typeof window === "undefined") return false;
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return false;
+  try {
+    if (!_sharedAudioCtx) _sharedAudioCtx = new AudioCtx();
+    if (_sharedAudioCtx.state === "suspended") _sharedAudioCtx.resume();
+    const ctx = _sharedAudioCtx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    const agora = ctx.currentTime;
+
+    if (tipo === "conclusao") {
+      // Arpejo de duas notas alegres (C5 -> G5)
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(523.25, agora);
+      osc.frequency.exponentialRampToValueAtTime(783.99, agora + 0.12);
+      gain.gain.setValueAtTime(0.08, agora);
+      gain.gain.exponentialRampToValueAtTime(0.001, agora + 0.28);
+      osc.start(agora);
+      osc.stop(agora + 0.28);
+    } else if (tipo === "aviso") {
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(349.23, agora);
+      osc.frequency.setValueAtTime(261.63, agora + 0.15);
+      gain.gain.setValueAtTime(0.1, agora);
+      gain.gain.exponentialRampToValueAtTime(0.001, agora + 0.35);
+      osc.start(agora);
+      osc.stop(agora + 0.35);
+    } else {
+      // Click sutil
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(800, agora);
+      gain.gain.setValueAtTime(0.04, agora);
+      gain.gain.exponentialRampToValueAtTime(0.001, agora + 0.05);
+      osc.start(agora);
+      osc.stop(agora + 0.05);
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// G52. Medidor de intensidade de hábitos com gradiente de medalha/metal
+function obterCorIntensidadeHabito(diasSeguidos) {
+  const d = parseInt(diasSeguidos, 10) || 0;
+  if (d >= 60) return { classe: "habito-gradiente-diamante", nivel: "Diamante", dias: d };
+  if (d >= 21) return { classe: "habito-gradiente-ouro", nivel: "Ouro", dias: d };
+  if (d >= 7) return { classe: "habito-gradiente-prata", nivel: "Prata", dias: d };
+  if (d >= 3) return { classe: "habito-gradiente-bronze", nivel: "Bronze", dias: d };
+  return { classe: "", nivel: "Iniciando", dias: d };
+}
+
+// G53. Estimativa de tempo total de tarefas do dia
+function calcularTempoTotalEstimadoMinutos(tarefas) {
+  if (!Array.isArray(tarefas)) return { minutos: 0, formatado: "0 min" };
+  let total = 0;
+  tarefas.forEach(t => {
+    if (!t) return;
+    const texto = `${t.title || ""} ${t.dur || ""}`;
+    // Procura padrões como "30min", "45m", "1h", "1h30", "2h45m"
+    const mH = texto.match(/(\d+)\s*h(?:oras?)?(?:\s*(\d+)\s*m)?/i);
+    const mM = texto.match(/(\d+)\s*(?:min|m)(?!h)/i);
+    if (mH) {
+      total += parseInt(mH[1], 10) * 60 + (mH[2] ? parseInt(mH[2], 10) : 0);
+    } else if (mM) {
+      total += parseInt(mM[1], 10);
+    }
+  });
+  const horas = Math.floor(total / 60);
+  const mins = total % 60;
+  const formatado =
+    horas > 0 ? `${horas}h${mins > 0 ? ` ${mins}min` : ""}` : `${mins} min`;
+  return { minutos: total, formatado };
+}
+
+// G54. Formatação humanizada de datas relativas com Intl.RelativeTimeFormat
+function formatarDataRelativaIntl(dataAlvo, dataBase) {
+  if (!dataAlvo) return "";
+  try {
+    const parseData = str => {
+      if (str instanceof Date) return str;
+      const partes = String(str).split("-").map(Number);
+      return new Date(partes[0], partes[1] - 1, partes[2]);
+    };
+    const dtAlvo = parseData(dataAlvo);
+    const dtBase = dataBase ? parseData(dataBase) : new Date();
+    const diffDias = Math.round((dtAlvo - dtBase) / (1000 * 60 * 60 * 24));
+    if (typeof Intl !== "undefined" && Intl.RelativeTimeFormat) {
+      const rtf = new Intl.RelativeTimeFormat("pt-BR", { numeric: "auto" });
+      return rtf.format(diffDias, "day");
+    }
+    if (diffDias === 0) return "hoje";
+    if (diffDias === 1) return "amanhã";
+    if (diffDias === -1) return "ontem";
+    return diffDias > 0 ? `em ${diffDias} dias` : `há ${Math.abs(diffDias)} dias`;
+  } catch (e) {
+    return String(dataAlvo);
+  }
+}
+
+// G55. Modo foco estrito: recolhimento de distrações
+function aplicarModoFocoEstrito(container, ativo = true) {
+  const el = container || (typeof document !== "undefined" ? document.body : null);
+  if (!el || typeof el.classList !== "object") return false;
+  if (ativo) {
+    el.classList.add("modo-foco-estrito-ativo");
+  } else {
+    el.classList.remove("modo-foco-estrito-ativo");
+  }
+  return ativo;
+}
+
+// G56. Agrupamento de tarefas por período do dia (Manhã, Tarde, Noite)
+function agruparTarefasPorPeriodo(tarefas) {
+  const grupos = { manha: [], tarde: [], noite: [], flexivel: [] };
+  if (!Array.isArray(tarefas)) return grupos;
+  tarefas.forEach(t => {
+    if (!t) return;
+    const hora = t.time ? parseInt(t.time.split(":")[0], 10) : NaN;
+    if (isNaN(hora)) grupos.flexivel.push(t);
+    else if (hora < 12) grupos.manha.push(t);
+    else if (hora < 18) grupos.tarde.push(t);
+    else grupos.noite.push(t);
+  });
+  return grupos;
+}
+
+// G57. Comparativo de hidratação semanal com média diária
+function calcularMediaAguaSemanal(historicoAgua, metaDiaria = 2500, dias = 7) {
+  if (!historicoAgua || typeof historicoAgua !== "object") {
+    return { mediaML: 0, porcentagemMeta: 0, totalML: 0 };
+  }
+  const meta = Math.max(500, parseInt(metaDiaria, 10) || 2500);
+  const chaves = Object.keys(historicoAgua).sort().slice(-dias);
+  if (!chaves.length) return { mediaML: 0, porcentagemMeta: 0, totalML: 0 };
+  let soma = 0;
+  chaves.forEach(d => {
+    const copos = historicoAgua[d];
+    if (Array.isArray(copos)) {
+      copos.forEach(c => (soma += c.ml || 0));
+    }
+  });
+  const mediaML = Math.round(soma / chaves.length);
+  const porcentagemMeta = Math.min(100, Math.round((mediaML / meta) * 100));
+  return { mediaML, porcentagemMeta, totalML: soma };
+}
+
+// G58. Detecção e aviso de sono irregular
+function verificarJanelaSonoSaudavel(horaAcordar = "07:00", horaDormir = "23:00") {
+  const toMin = h => {
+    const [hh, mm] = String(h || "00:00").split(":").map(Number);
+    return (hh || 0) * 60 + (mm || 0);
+  };
+  const minAcordar = toMin(horaAcordar);
+  const minDormir = toMin(horaDormir);
+  let duracaoMin = minAcordar - minDormir;
+  if (duracaoMin <= 0) duracaoMin += 24 * 60;
+  const horas = Math.round((duracaoMin / 60) * 10) / 10;
+  const saudavel = horas >= 7 && horas <= 9.5;
+  const aviso =
+    horas < 6
+      ? `Sono curto (${horas}h). Tente dormir um pouco mais cedo.`
+      : horas > 10
+        ? `Sono longo (${horas}h). Cuidado com o cansaço excessivo.`
+        : `Janela saudável (${horas}h). Ritmo excelente!`;
+  return { horas, saudavel, aviso };
+}
+
+// G59. Indicador de checklist/subtarefas com barra de preenchimento
+function gerarBarraProgressoSubtarefas(subtarefas) {
+  if (!Array.isArray(subtarefas) || !subtarefas.length) {
+    return { total: 0, concluidas: 0, porcentagem: 0, rotulo: "" };
+  }
+  const total = subtarefas.length;
+  const concluidas = subtarefas.filter(s => s && s.done).length;
+  const porcentagem = Math.round((concluidas / total) * 100);
+  const rotulo = `${concluidas}/${total} concluídas (${porcentagem}%)`;
+  return { total, concluidas, porcentagem, rotulo };
+}
+
+// G60. Sistema de Desfazer em fila (Undo Stack com histórico de até N ações)
+function criarFilaDesfazer(tamanhoMaximo = 5) {
+  const pilha = [];
+  const max = Math.max(1, parseInt(tamanhoMaximo, 10) || 5);
+  return {
+    push(estado) {
+      if (estado == null) return;
+      pilha.push(typeof estado === "object" ? JSON.stringify(estado) : String(estado));
+      if (pilha.length > max) pilha.shift();
+    },
+    pop() {
+      const item = pilha.pop();
+      if (!item) return null;
+      try {
+        return JSON.parse(item);
+      } catch (e) {
+        return item;
+      }
+    },
+    tamanho() {
+      return pilha.length;
+    },
+    limpar() {
+      pilha.length = 0;
+    }
+  };
+}

@@ -1508,3 +1508,42 @@ html.transicao-tema-ativa * {
   background: var(--surface2, #202433);
   color: var(--muted, #949ab0);
 }
+/* 51 a 60. Áudio sintético, gradientes de hábitos, períodos do dia e subtarefas */
+.habito-gradiente-bronze { color: #cd7f32 !important; border-color: rgba(205, 127, 50, 0.4) !important; }
+.habito-gradiente-prata { color: #c0c0c0 !important; border-color: rgba(192, 192, 192, 0.4) !important; }
+.habito-gradiente-ouro { color: #ffd700 !important; border-color: rgba(255, 215, 0, 0.5) !important; text-shadow: 0 0 6px rgba(255, 215, 0, 0.3); }
+.habito-gradiente-diamante { color: #70d6ff !important; border-color: rgba(112, 214, 255, 0.6) !important; text-shadow: 0 0 8px rgba(112, 214, 255, 0.5); }
+
+.modo-foco-estrito-ativo .tabs,
+.modo-foco-estrito-ativo .top .right,
+.modo-foco-estrito-ativo .brand {
+  opacity: 0.15;
+  pointer-events: none;
+  filter: grayscale(0.8);
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+.periodo-secao-titulo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted, #949ab0);
+  margin-block: 14px 6px;
+}
+
+.barra-subtarefas-container {
+  height: 4px;
+  background: var(--line, #282c3f);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.barra-subtarefas-progresso {
+  height: 100%;
+  background: var(--accent, #3f7fd9);
+  transition: width 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
+}
