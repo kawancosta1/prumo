@@ -1815,3 +1815,126 @@ function rotinaSkincareHTML(etapa, feita) {
     `</div>`
   );
 }
+
+// 131. Estatísticas de afeição do pet
+function estatisticasAfeicaoPet(pet) {
+  const carinho = pet && typeof pet.carinho === "number" ? pet.carinho : 0;
+  const diasJuntos = pet && typeof pet.diasJuntos === "number" ? pet.diasJuntos : 1;
+  const nivelApego = Math.min(10, Math.floor(carinho / 10) + 1);
+  const bonusFocoMinutos = Math.min(15, nivelApego * 1.5);
+  return {
+    nivelApego,
+    carinhoTotal: carinho,
+    diasJuntos,
+    bonusFocoMinutos
+  };
+}
+
+// 132. Itens de quarto interativos
+function interagirItemQuarto(itemId, estado) {
+  const id = String(itemId || "");
+  const est = estado || {};
+  if (!est.itensQuarto) est.itensQuarto = {};
+  const statusAtual = Boolean(est.itensQuarto[id]);
+  est.itensQuarto[id] = !statusAtual;
+  return {
+    itemId: id,
+    ativo: !statusAtual,
+    mensagem: !statusAtual ? `Você ativou ${id}!` : `Você desativou ${id}.`
+  };
+}
+
+// 133. Visita surpresa de amigos no quarto
+function visitaAmigoQuartoHTML(amigo) {
+  const nome = sanitizarHTMLSeguro((amigo && amigo.nome) || "Um amigo");
+  const recado = sanitizarHTMLSeguro((amigo && amigo.recado) || "Passando para desejar foco!");
+  return (
+    `<div class="balao-visita-amigo">` +
+    `<span>👋</span>` +
+    `<div><strong>${nome}</strong>: "${recado}"</div>` +
+    `</div>`
+  );
+}
+
+// 134. Fotolog com filtros temáticos
+function aplicarFiltroFotolog(tipoFiltro, imgEl) {
+  const filtro = String(tipoFiltro || "vintage").toLowerCase();
+  const classesValidas = {
+    vintage: "filtro-fotolog-vintage",
+    neon: "filtro-fotolog-neon",
+    bw: "filtro-fotolog-bw"
+  };
+  const classeAplicar = classesValidas[filtro] || classesValidas.vintage;
+  if (imgEl && imgEl.classList) {
+    Object.values(classesValidas).forEach(c => imgEl.classList.remove(c));
+    imgEl.classList.add(classeAplicar);
+  }
+  return classeAplicar;
+}
+
+// 135. Títulos de nobreza e conquistas no perfil
+function obterTituloPerfil(tarefasFeitas, diasStreak) {
+  const t = Math.max(0, parseInt(tarefasFeitas, 10) || 0);
+  const s = Math.max(0, parseInt(diasStreak, 10) || 0);
+  if (t >= 100 && s >= 30) return "Lorde da Disciplina";
+  if (t >= 50 && s >= 14) return "Cavaleiro do Foco";
+  if (t >= 20 || s >= 7) return "Aprendiz Dedicado";
+  return "Iniciante Constante";
+}
+
+// 136. Assistente de divisão de tarefas complexas
+function quebrarTarefaEmPassos(tituloTarefa) {
+  const titulo = String(tituloTarefa || "").trim();
+  if (!titulo) return [];
+  return [
+    { titulo: `Planejar e estruturar: ${titulo}`, concluido: false },
+    { titulo: `Executar núcleo: ${titulo}`, concluido: false },
+    { titulo: `Revisar e finalizar: ${titulo}`, concluido: false }
+  ];
+}
+
+// 137. Modo Pomodoro com transição automática estudo/pausa
+function pomodoroComTransicao(cicloAtual) {
+  const c = Math.max(1, parseInt(cicloAtual, 10) || 1);
+  const isPausaLonga = c % 4 === 0;
+  return {
+    ciclo: c,
+    minutosFoco: 25,
+    minutosPausa: isPausaLonga ? 15 : 5,
+    proximaPausaLongaEm: isPausaLonga ? 4 : 4 - (c % 4)
+  };
+}
+
+// 138. Lembretes recorrentes a cada X dias
+function habitoRecorrenciaFlexivel(dataUltima, intervaloDias, dataHoje) {
+  const intv = Math.max(1, parseInt(intervaloDias, 10) || 1);
+  if (!dataUltima) return true;
+  const diff = memoDiffDays(dataUltima, dataHoje);
+  return diff >= intv;
+}
+
+// 139. Gráfico quadriculado estilo GitHub para hábitos
+function quadriculadoHabitosAnual(historicoDias) {
+  const dias = Array.isArray(historicoDias) ? historicoDias : [];
+  let celulas = "";
+  dias.forEach(d => {
+    const qtd = Math.min(3, Math.max(0, parseInt(d.quantidade, 10) || 0));
+    celulas += `<div class="celula-habito" data-nivel="${qtd}" title="${d.data || ""}: ${qtd} concluídos"></div>`;
+  });
+  return `<div class="quadriculado-habitos-grid">${celulas}</div>`;
+}
+
+// 140. Calculadora de ritmo de leitura na Estante
+function calcularRitmoLeitura(paginasLidas, minutosGastos, totalPaginas) {
+  const pag = Math.max(0, parseInt(paginasLidas, 10) || 0);
+  const min = Math.max(1, parseInt(minutosGastos, 10) || 1);
+  const tot = Math.max(pag, parseInt(totalPaginas, 10) || pag);
+  const paginasPorHora = Math.round((pag / min) * 60);
+  const paginasRestantes = tot - pag;
+  const minutosRestantes = paginasPorHora > 0 ? Math.round((paginasRestantes / paginasPorHora) * 60) : 0;
+  return {
+    paginasPorHora,
+    paginasRestantes,
+    horasRestantesEstimadas: Math.round((minutosRestantes / 60) * 10) / 10
+  };
+}
