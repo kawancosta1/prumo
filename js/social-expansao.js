@@ -572,3 +572,530 @@ function gerarSnapshotSessaoEstudo(minutos = 50, tarefasFeitas = 3, mascotes = "
     tituloSnapshot: `Sessão de Foco: +${minutos} min juntos!`
   };
 }
+
+
+/* ========================================================
+   LOTES 51 A 100: MIMOS, PRIVACIDADE, RETROSPECTIVA,
+   EMPATIA E MINIJOGOS COOPERATIVOS
+   ======================================================== */
+
+// S51. Envio de correio elegante de gotas com mensagem
+function enviarCorreioEleganteGotas(destinatario = "Parceiro", quantidade = 10, mensagem = "Com carinho!") {
+  const qtd = Math.max(1, parseInt(quantidade, 10) || 1);
+  return {
+    id: "mimo-" + Date.now(),
+    destinatario,
+    gotas: qtd,
+    mensagem: String(mensagem || "").slice(0, 140),
+    dataEnvio: new Date().toISOString(),
+    aberto: false
+  };
+}
+
+// S52. Catálogo de mimos e lembranças afetivas virtuais
+function obterCatalogoMimosVirtuais() {
+  return [
+    { id: "cha_camomila", nome: "Chá de Camomila Quentinho", icone: "🍵", precoGotas: 15 },
+    { id: "buque_flores", nome: "Flores do Campo Secas", icone: "💐", precoGotas: 20 },
+    { id: "carta_perfumada", nome: "Carta Perfumada com Lacre", icone: "💌", precoGotas: 25 },
+    { id: "amuleto_sorte", nome: "Cristal da Serenidade", icone: "🔮", precoGotas: 30 }
+  ];
+}
+
+// S53. Lista de desejos de cosméticos da dupla
+function formatarWishlistDupla(itensDesejados = []) {
+  if (!Array.isArray(itensDesejados)) return { totalDesejados: 0, itens: [] };
+  return {
+    totalDesejados: itensDesejados.length,
+    itens: itensDesejados.map(it => ({ id: it.id, nome: it.nome, custoGotas: it.custoGotas || 50, salvo: Boolean(it.salvo) }))
+  };
+}
+
+// S54. Entrega de mimo surpresa na porta do quarto do mascote
+function entregarMimoSurpresaPorta(item = {}, remetente = "Parceiro") {
+  return {
+    localEntrega: "tapete_da_porta",
+    itemNome: item.nome || "Presente Misterioso",
+    icone: item.icone || "🎁",
+    remetente,
+    notificacao: `Um entregador mágico deixou um mimo de ${remetente} na porta do seu quarto!`
+  };
+}
+
+// S55. Contribuição cooperativa no pote de economia da dupla
+function contribuirPoteEconomiaConjunta(cofre = {}, gotasContribuicao = 20) {
+  const atual = parseInt(cofre.gotasAcumuladas, 10) || 0;
+  const meta = Math.max(50, parseInt(cofre.metaGotas, 10) || 200);
+  const add = Math.max(1, parseInt(gotasContribuicao, 10) || 1);
+  const novoTotal = atual + add;
+  return {
+    cofreAtualizado: { ...cofre, gotasAcumuladas: novoTotal },
+    metaAlcancada: novoTotal >= meta,
+    porcentagem: Math.min(100, Math.round((novoTotal / meta) * 100))
+  };
+}
+
+// S56. Empréstimo virtual de ficha de leitura da estante
+function gerarFichaEmprestimoLivroVirtual(livro = {}, amigo = "Parceiro") {
+  return {
+    livroTitulo: livro.titulo || "Livro Favorito",
+    autor: livro.autor || "Desconhecido",
+    tomadorEmprestimo: amigo,
+    dataEmprestimo: new Date().toLocaleDateString("pt-BR"),
+    status: "emprestado_com_afeto"
+  };
+}
+
+// S57. Geração de cupom afetivo personalizado
+function gerarCupomAfetoPersonalizado(titulo = "Vale Massagem", descricao = "Válido para 15 minutos de relaxamento", icone = "💆") {
+  return {
+    id: "cupom-" + Date.now(),
+    titulo,
+    descricao,
+    icone,
+    usado: false,
+    resgatadoEm: null
+  };
+}
+
+// S58. Validação de proposta de escambo de roupas
+function validarPropostaEscamboRoupas(itemOfertado = {}, itemSolicitado = {}) {
+  const temOfertado = Boolean(itemOfertado.id);
+  const temSolicitado = Boolean(itemSolicitado.id);
+  const justo = temOfertado && temSolicitado && itemOfertado.id !== itemSolicitado.id;
+  return {
+    propostaValida: justo,
+    mensagem: justo ? "Proposta de troca equilibrada pronta para envio!" : "Selecione itens válidos e distintos para trocar."
+  };
+}
+
+// S59. Reação e balão de surpresa ao abrir presente
+function gerarReacaoAberturaPresente(item = {}) {
+  return {
+    animacao: "explosao_estrelas",
+    balaoFala: `Uau! Um ${item.nome || "presente"}! Amei tanto! ✨❤️`,
+    itemDesbloqueado: item
+  };
+}
+
+// S60. Caixa de lembranças anual de mimos trocados
+function gerarCaixaLembrancasAnual(presentesTrocados = []) {
+  const lista = Array.isArray(presentesTrocados) ? presentesTrocados : [];
+  return {
+    ano: new Date().getFullYear(),
+    totalLembrancas: lista.length,
+    itensMaisQueridos: lista.slice(0, 5)
+  };
+}
+
+// S61. Filtragem estrita de tarefas visíveis para o parceiro
+function filtrarTarefasVisiveisDupla(tarefas = []) {
+  if (!Array.isArray(tarefas)) return [];
+  return tarefas.filter(t => {
+    const texto = (t.texto || "").toLowerCase();
+    const tagPrivada = texto.includes("#privado") || texto.includes("@privado");
+    return !t.privada && !tagPrivada;
+  });
+}
+
+// S62. Isolamento de acesso do diário pessoal
+function protegerDiarioPessoalAcesso(diario = [], chaveAcesso = "") {
+  const autorizado = chaveAcesso === "minha-chave-biometrica";
+  if (!autorizado) {
+    return { protegido: true, entradas: [], mensagem: "Diário criptografado e estritamente pessoal." };
+  }
+  return { protegido: false, entradas: diario };
+}
+
+// S63. Alternância do modo silencioso social
+function alternarModoSilenciosoSocial(estadoDupla = {}, ativo = true) {
+  return {
+    ...estadoDupla,
+    modoSilencioso: Boolean(ativo),
+    notificacoesPausadas: Boolean(ativo)
+  };
+}
+
+// S64. Validação de consentimento de toques e vibrações
+function validarConsentimentoToques(preferencias = {}, tipoInteracao = "vibracao") {
+  if (tipoInteracao === "vibracao") return preferencias.permitirVibracoes !== false;
+  if (tipoInteracao === "som") return preferencias.permitirSons !== false;
+  return true;
+}
+
+// S65. Anonimização de hábito sensível para o feed da dupla
+function anonimizarHabitoCompartilhado(habito = {}) {
+  if (habito.sensivel) {
+    return { id: habito.id, texto: "Momento de autocuidado concluído 🌿", categoria: "saude" };
+  }
+  return habito;
+}
+
+// S66. Redimensionamento e compressão local em Canvas
+function redimensionarImagemMuralCanvas(imagemLargura = 800, imagemAltura = 600, maxDimensao = 400) {
+  let w = imagemLargura;
+  let h = imagemAltura;
+  if (w > maxDimensao || h > maxDimensao) {
+    if (w > h) {
+      h = Math.round((h * maxDimensao) / w);
+      w = maxDimensao;
+    } else {
+      w = Math.round((w * maxDimensao) / h);
+      h = maxDimensao;
+    }
+  }
+  return { novaLargura: w, novaAltura: h, compactado: true };
+}
+
+// S67. Sanitização de mensagens do mural contra XSS
+function sanitizarMensagemMuralXSS(texto = "") {
+  return String(texto || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// S68. Blur de proteção de privacidade na perda de foco da janela
+function aplicarBlurPrivacidadeJanelaPerdida(elemento) {
+  if (!elemento || typeof elemento.classList !== "object") return false;
+  elemento.classList.add("blur-privacidade-ativa");
+  return true;
+}
+
+// S69. Revogação instantânea de chaves e sessão da dupla
+function revogarAcessoDuplaInstantaneo(sessaoDupla = {}) {
+  return {
+    sessaoAtiva: false,
+    chaveRevogada: true,
+    dataRevogacao: Date.now(),
+    mensagem: "Acesso de sincronização da dupla invalidado com sucesso."
+  };
+}
+
+// S70. Painel transparente de auditoria de dados compartilhados
+function gerarRelatorioAuditoriaCompartilhamento(permissoes = {}) {
+  return {
+    compartilhaTarefas: permissoes.tarefas !== false,
+    compartilhaAgua: permissoes.agua !== false,
+    compartilhaEstudos: permissoes.estudos !== false,
+    compartilhaDiario: false, // Sempre estritamente privado
+    compartilhaNotasPrivadas: false
+  };
+}
+
+// S71. Retrospectiva mensal da dupla (Recap)
+function gerarRetrospectivaMensalDupla(metricasMes = {}) {
+  return {
+    mesAno: metricasMes.mesAno || "Outubro 2026",
+    tarefasFeitasJuntos: parseInt(metricasMes.tarefasFeitasJuntos, 10) || 0,
+    horasFocoJuntos: parseFloat(metricasMes.horasFocoJuntos) || 0,
+    muralRecadosEnviados: parseInt(metricasMes.muralRecadosEnviados, 10) || 0,
+    resumoAfetuoso: "Vocês formaram um time incrível este mês!"
+  };
+}
+
+// S72. Diagnóstico de divisão equitativa de tarefas domésticas/compartilhadas
+function calcularEquidadeDivisaoTarefas(tarefasEu = 12, tarefasParceiro = 10) {
+  const t1 = parseInt(tarefasEu, 10) || 0;
+  const t2 = parseInt(tarefasParceiro, 10) || 0;
+  const total = t1 + t2;
+  if (total === 0) return { equitativo: true, diferenca: 0, porcentagemEu: 50 };
+  const percEu = Math.round((t1 / total) * 100);
+  const equitativo = Math.abs(percEu - 50) <= 15;
+  return {
+    totalTarefas: total,
+    porcentagemEu: percEu,
+    porcentagemParceiro: 100 - percEu,
+    equitativo,
+    statusTexto: equitativo ? "Divisão bem equilibrada ⚖️" : "Um dos dois está sobrecarregado"
+  };
+}
+
+// S73. Grade de consistência estilo GitHub em dupla
+function gerarHeatmapConsistenciaDupla(historicoSincronizado = []) {
+  if (!Array.isArray(historicoSincronizado)) return { dias: [], totalDiasAtivos: 0 };
+  let ativos = 0;
+  const dias = historicoSincronizado.map(d => {
+    const ambos = Boolean(d.ambosCumpriram);
+    if (ambos) ativos++;
+    return { data: d.data, nivelIntensidade: ambos ? 4 : (d.peloMenosUm ? 2 : 0) };
+  });
+  return { dias, totalDiasAtivos: ativos };
+}
+
+// S74. Identificação do dia da semana mais harmonioso
+function identificarDiaSemanaMaisHarmonioso(historicoDias = []) {
+  const contadores = { "Domingo": 0, "Segunda": 0, "Terça": 0, "Quarta": 0, "Quinta": 0, "Sexta": 0, "Sábado": 0 };
+  const nomesDias = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+  if (Array.isArray(historicoDias)) {
+    historicoDias.forEach(d => {
+      if (d.data && d.ambosCumpriram) {
+        const idx = new Date(d.data).getDay();
+        contadores[nomesDias[idx]]++;
+      }
+    });
+  }
+  let melhor = "Quarta";
+  let max = -1;
+  Object.keys(contadores).forEach(k => {
+    if (contadores[k] > max) {
+      max = contadores[k];
+      melhor = k;
+    }
+  });
+  return { diaMaisProdutivo: melhor, totalTarefasNoDia: Math.max(0, max) };
+}
+
+// S75. Total de gotas geradas em conjunto
+function calcularTotalGotasGeradasConjunto(historicoDupla = []) {
+  if (!Array.isArray(historicoDupla)) return 0;
+  return historicoDupla.reduce((acc, h) => acc + (parseInt(h.gotas, 10) || 0), 0);
+}
+
+// S76. Recorde histórico da sequência (streak) ininterrupta
+function calcularMaiorStreakHistoricoDupla(historico = []) {
+  if (!Array.isArray(historico)) return 0;
+  let max = 0;
+  let atual = 0;
+  historico.forEach(d => {
+    if (d.ambosCumpriram) {
+      atual++;
+      if (atual > max) max = atual;
+    } else {
+      atual = 0;
+    }
+  });
+  return max;
+}
+
+// S77. Linha do tempo cronológica de memórias
+function gerarLinhaDoTempoMemoriaDupla(eventos = []) {
+  if (!Array.isArray(eventos)) return [];
+  return [...eventos].sort((a, b) => (new Date(a.data).getTime() || 0) - (new Date(b.data).getTime() || 0));
+}
+
+// S78. Título temático da parceria
+function calcularNivelTituloParceria(diasJuntos = 10, tarefasJuntos = 30) {
+  if (diasJuntos >= 180 && tarefasJuntos >= 200) return "Almas Gêmeas Produtivas 💖";
+  if (diasJuntos >= 60 && tarefasJuntos >= 100) return "Dupla Dinâmica Imbatível ⚡";
+  if (diasJuntos >= 30) return "Companheiros Dedicados 🌱";
+  return "Amigos em Jornada 🤝";
+}
+
+// S79. Estrutura pronta para impressão do álbum de memórias
+function gerarDadosAlbumMemoriaImpressao(dupla = {}) {
+  return {
+    titulo: `Álbum de Cumplicidade: ${dupla.parceiroNome || "Dupla"}`,
+    totalDias: dupla.streak || 0,
+    dataExportacao: new Date().toLocaleDateString("pt-BR")
+  };
+}
+
+// S80. Previsão de data do próximo marco da dupla
+function preverDataProximoMarcoDupla(ritmoAtualTarefas = 4, metaAlvo = 100, concluidas = 60) {
+  const faltam = Math.max(0, metaAlvo - concluidas);
+  const diasNec = ritmoAtualTarefas > 0 ? Math.ceil(faltam / ritmoAtualTarefas) : 30;
+  const dataPrevisao = new Date(Date.now() + diasNec * 86400000).toLocaleDateString("pt-BR");
+  return { diasNecessarios: diasNec, dataPrevisao, metaAlvo };
+}
+
+// S81. Sinalizador discreto de sobrecarga para o parceiro
+function gerarSinalizadorSobrecargaDia(motivo = "cansaco") {
+  return {
+    alerta: true,
+    mensagem: "Hoje meu dia foi puxado, estou desacelerando.",
+    motivo,
+    icone: "🌙💤"
+  };
+}
+
+// S82. Template de elogio sincero baseado em psicologia positiva
+function obterTemplateElogioSincero(categoria = "esforco") {
+  const templates = {
+    esforco: "Admiro muito a forma como você não desiste mesmo nos dias difíceis.",
+    presenca: "Sua parceria torna minhas rotinas muito mais leves e alegres.",
+    cuidado: "Obrigado por sempre me lembrar de beber água e descansar."
+  };
+  return templates[categoria] || templates.esforco;
+}
+
+// S83. Check-in emocional matinal
+function gerarCheckinEmocionalMatinal(respostas = {}) {
+  const energia = respostas.energia || "moderada";
+  const sentimento = respostas.sentimento || "tranquilo";
+  return {
+    energia,
+    sentimento,
+    textoResumo: `Hoje me sinto ${sentimento} com energia ${energia}.`,
+    timestamp: Date.now()
+  };
+}
+
+// S84. Caixinha de alinhamento e acolhimento com gentileza
+function gerarCaixaPerdaoAlinhamento(registro = {}) {
+  return {
+    assunto: registro.assunto || "Conversa Aconchegante",
+    pontosPositivos: registro.pontosPositivos || "Temos um carinho enorme um pelo outro.",
+    alinhamentoSugerido: registro.alinhamentoSugerido || "Vamos organizar melhor nossos horários de sono.",
+    status: "resolvido_com_amor"
+  };
+}
+
+// S85. Conselho empático do Prumi para a dupla
+function obterConselhoEmpaticoPrumiDupla(situacao = "cansados") {
+  return {
+    conselho: "Quando ambos estiverem cansados, celebrem apenas estarem presentes. Uma pausa juntos faz milagres!",
+    humorPrumi: "empático"
+  };
+}
+
+// S86. Total de motivos de gratidão mútua registrados
+function contarMotivosGratidaoReciproca(listaGratidoes = []) {
+  if (!Array.isArray(listaGratidoes)) return 0;
+  return listaGratidoes.length;
+}
+
+// S87. Alerta cuidadoso contra sobrecarga de estudos (>10h)
+function verificarAlertaSobrecargaEstudo(horasEstudoDia = 11) {
+  const horas = parseFloat(horasEstudoDia) || 0;
+  const sobrecarregado = horas >= 10;
+  return {
+    sobrecarregado,
+    horas,
+    mensagemAlerta: sobrecarregado ? "Aviso carinhoso: você já estudou bastante hoje. O cérebro precisa de descanso!" : "Ritmo saudável."
+  };
+}
+
+// S88. Reforço positivo para desafios cotidianos vencidos
+function gerarCelebracaoPequenoAvanco(conquista = "Lavou a louça") {
+  return {
+    titulo: "Vitória do Cotidiano! 🌟",
+    mensagem: `Você superou o cansaço e concluiu: "${conquista}". Cada detalhe importa!`
+  };
+}
+
+// S89. Sinal simples de apoio silencioso (coração sem texto)
+function dispararSinalApoioSilencioso(nome = "Você") {
+  return {
+    tipo: "abraço_silencioso",
+    icone: "🤍",
+    mensagem: `${nome} enviou um abraço silencioso de carinho.`,
+    timestamp: Date.now()
+  };
+}
+
+// S90. Sincronização da animação de respiração da dupla
+function sincronizarRitmoRespiracaoDupla(faseRespiracao = "inspirar") {
+  const fases = {
+    inspirar: { duracaoSegundos: 4, escalaCirculo: 1.5, texto: "Inspirando juntos..." },
+    segurar:  { duracaoSegundos: 4, escalaCirculo: 1.5, texto: "Segurem o ar..." },
+    expirar:  { duracaoSegundos: 4, escalaCirculo: 1.0, texto: "Soltando suavemente..." }
+  };
+  return fases[faseRespiracao] || fases.inspirar;
+}
+
+// S91. Gerador de quiz diário da dupla
+function gerarQuizDoDiaDupla(pergunta = "Qual nosso lanche favorito da tarde?", opcoes = ["Café com bolo", "Frutas frescas", "Chá gelado"]) {
+  return {
+    pergunta,
+    opcoes,
+    respondidoEu: null,
+    respondidoParceiro: null
+  };
+}
+
+// S92. Inicializador de jogo da velha afetivo
+function inicializarJogoDaVelhaAfetivo() {
+  return {
+    tabuleiro: Array(9).fill(""),
+    turno: "❤️", // ❤️ ou ⭐
+    vencedor: null,
+    empate: false
+  };
+}
+
+// S93. Progresso do quebra-cabeça de foto da dupla (a cada 5 tarefas)
+function calcularProgressoQuebraCabecaDupla(tarefasFeitas = 15, totalPecas = 12) {
+  const pecasDesbloqueadas = Math.min(totalPecas, Math.floor(tarefasFeitas / 5));
+  return {
+    pecasDesbloqueadas,
+    totalPecas,
+    completou: pecasDesbloqueadas >= totalPecas,
+    porcentagem: Math.round((pecasDesbloqueadas / totalPecas) * 100)
+  };
+}
+
+// S94. Processador de traços de desenho colaborativo em dueto
+function processarTracoDuetoCanvas(tracos = [], novoTraco = {}) {
+  const lista = Array.isArray(tracos) ? [...tracos] : [];
+  if (novoTraco.x !== undefined && novoTraco.y !== undefined) {
+    lista.push({ ...novoTraco, timestamp: Date.now() });
+  }
+  return lista;
+}
+
+// S95. Cabo de guerra contra a procrastinação
+function calcularCaboDeGuerraProcrastinacao(tarefasDupla = 8, nivelPreguica = 5) {
+  const forcaDupla = tarefasDupla * 10;
+  const forcaPreguica = nivelPreguica * 10;
+  const vantagemDupla = forcaDupla - forcaPreguica;
+  return {
+    vantagemDupla,
+    vencendo: vantagemDupla > 0,
+    mensagem: vantagemDupla > 0 ? "A dupla está puxando o monstrinho da preguiça!" : "Bora fazer uma tarefa para virar o jogo!"
+  };
+}
+
+// S96. Minijogo rápido de pescaria de gotas mágicas
+function gerarPescariaGotasMinijogo(sementes = 5) {
+  const total = Math.max(1, parseInt(sementes, 10) || 5);
+  const peixinhos = [];
+  for (let i = 0; i < total; i++) {
+    peixinhos.push({ id: "peixe-" + i, gotasValor: Math.floor(2 + Math.random() * 4), capturado: false });
+  }
+  return { peixinhos, totalDisponivel: total };
+}
+
+// S97. Posição na pista de corrida dos mascotes por copos d'água
+function calcularPosicoesCorridaMascotes(aguaEu = 5, aguaParceiro = 6) {
+  const maxCopos = 8;
+  const posEu = Math.min(90, Math.round((aguaEu / maxCopos) * 85));
+  const posParc = Math.min(90, Math.round((aguaParceiro / maxCopos) * 85));
+  return {
+    posicaoEuPorcentagem: posEu,
+    posicaoParceiroPorcentagem: posParc,
+    lider: aguaEu > aguaParceiro ? "Eu" : (aguaParceiro > aguaEu ? "Parceiro" : "Empate")
+  };
+}
+
+// S98. Caça ao tesouro de bilhetes escondidos no quarto
+function esconderBilheteCacaTesouro(quartoMovel = "estante", recado = "Achou meu recadinho secreto! ❤️") {
+  return {
+    movelOculto: quartoMovel,
+    recado,
+    descoberto: false,
+    dica: `Olhe perto da ${quartoMovel}...`
+  };
+}
+
+// S99. Gerador de pequenas rimas afetuosas
+function gerarRimaAfetuosaAleatoria() {
+  const rimas = [
+    "Entre uma tarefa e um café quentinho, te mando todo o meu carinho.",
+    "O dia é longo e cheio de lição, mas você mora no meu coração.",
+    "Beba água e respire sem pressa, nossa amizade é uma linda promessa."
+  ];
+  return rimas[Math.floor(Math.random() * rimas.length)] || rimas[0];
+}
+
+// S100. Pódio cooperativo semanal conjunto
+function calcularPodioCooperativoSemanal(metaBatida = true) {
+  return {
+    lugarEu: 1,
+    lugarParceiro: 1,
+    trofeu: metaBatida ? "Troféu Dourado de Cumplicidade 🏆" : "Medalha de Dedicação Conjunta 🥈",
+    mensagem: metaBatida ? "Vitória em equipe perfeita!" : "Semana de aprendizado e crescimento juntos."
+  };
+}

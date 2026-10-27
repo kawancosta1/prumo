@@ -103,3 +103,81 @@
   50% { transform: scale(1.15) rotate(10deg); }
   100% { transform: scale(1) rotate(0deg); }
 }
+
+
+/* ========================================================
+   LOTES 51 A 100: MIMOS, PRIVACIDADE, RETROSPECTIVA,
+   EMPATIA E MINIJOGOS COOPERATIVOS
+   ======================================================== */
+
+/* Envelope de correio elegante */
+.envelope-presente-dupla {
+  position: relative;
+  width: 140px;
+  height: 90px;
+  background: #f8bbd0;
+  border-radius: 6px;
+  border: 2px solid #ec407a;
+  box-shadow: 0 4px 12px rgba(236, 64, 122, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #880e4f;
+  animation: balancoEnvelopeAnim 2s ease-in-out infinite alternate;
+}
+@keyframes balancoEnvelopeAnim {
+  0% { transform: translateY(0) rotate(-2deg); }
+  100% { transform: translateY(-6px) rotate(2deg); }
+}
+
+/* Blur de privacidade em janela desfocada */
+.blur-privacidade-ativa {
+  filter: blur(8px);
+  pointer-events: none;
+  transition: filter 0.3s ease;
+}
+
+/* Tabuleiro Jogo da Velha Afetivo */
+.tabuleiro-velha-afetivo {
+  display: grid;
+  grid-template-columns: repeat(3, 50px);
+  grid-template-rows: repeat(3, 50px);
+  gap: 6px;
+  margin: 12px auto;
+  background: var(--surface, #fff);
+  padding: 8px;
+  border-radius: 8px;
+}
+.celula-velha-afetiva {
+  background: var(--sunken, #f1f5f9);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+.celula-velha-afetiva:hover {
+  background: var(--accent-soft, #e2e8f0);
+  transform: scale(1.05);
+}
+
+/* Pista de corrida amistosa de mascotes */
+.pista-corrida-mascotes {
+  position: relative;
+  height: 60px;
+  background: var(--sunken, #f8fafc);
+  border-radius: 30px;
+  border: 2px dashed var(--line, #cbd5e1);
+  overflow: hidden;
+  margin: 12px 0;
+}
+.corredor-mascote-icone {
+  position: absolute;
+  top: 14px;
+  font-size: 24px;
+  transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
