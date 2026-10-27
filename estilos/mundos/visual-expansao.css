@@ -1,0 +1,392 @@
+/*
+  visual-expansao.css - 100 Melhorias Visuais por Personalidade do Prumo
+  Cobre as 10 camadas visuais para cada um dos mundos com aceleracao de hardware (GPU),
+  gradientes tematicos, animacoes fluidas de particulas, iluminacao dinamica e microinteracoes.
+*/
+
+/* ==========================================================================
+   01. ATMOSFERAS E ILUMINACAO AMBIENTAL POR MUNDO
+   ========================================================================== */
+
+/* ZEN */
+[data-mundo="zen"], body[data-persona="zen"] {
+  --mv-primaria: #5d7052;
+  --mv-secundaria: #8fa382;
+  --mv-brilho: rgba(143, 163, 130, 0.25);
+  --mv-fundo-grad: radial-gradient(circle at 50% 20%, #f4f6f0 0%, #e2e8dc 60%, #cfd8c7 100%);
+  --mv-borda: rgba(93, 112, 82, 0.3);
+  --mv-sombra: 0 8px 24px rgba(93, 112, 82, 0.12);
+}
+.zen-nevoa-bambu {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 100%, rgba(207, 216, 199, 0.5) 0%, transparent 70%);
+  animation: mv-respiro-zen 8s ease-in-out infinite alternate;
+}
+@keyframes mv-respiro-zen {
+  0% { opacity: 0.4; transform: translateY(0); }
+  100% { opacity: 0.85; transform: translateY(-8px); }
+}
+
+/* ROCK */
+[data-mundo="rock"], body[data-persona="rock"] {
+  --mv-primaria: #e52521;
+  --mv-secundaria: #1f1f1f;
+  --mv-brilho: rgba(229, 37, 33, 0.4);
+  --mv-fundo-grad: linear-gradient(135deg, #181818 0%, #0d0d0d 50%, #200808 100%);
+  --mv-borda: rgba(229, 37, 33, 0.4);
+  --mv-sombra: 0 8px 30px rgba(229, 37, 33, 0.25);
+}
+.rock-luz-palco {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 120%;
+  height: 250px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: conic-gradient(from 180deg at 50% 0%, transparent 160deg, rgba(229, 37, 33, 0.15) 175deg, rgba(255, 60, 60, 0.28) 180deg, rgba(229, 37, 33, 0.15) 185deg, transparent 200deg);
+  animation: mv-canhao-rock 5s ease-in-out infinite alternate;
+}
+@keyframes mv-canhao-rock {
+  0% { transform: translateX(-52%) rotate(-5deg); }
+  100% { transform: translateX(-48%) rotate(5deg); }
+}
+
+/* EMO */
+[data-mundo="emo"], body[data-persona="emo"] {
+  --mv-primaria: #8a3ab9;
+  --mv-secundaria: #120e18;
+  --mv-brilho: rgba(138, 58, 185, 0.35);
+  --mv-fundo-grad: linear-gradient(180deg, #181120 0%, #0c0811 70%, #1c0f24 100%);
+  --mv-borda: rgba(138, 58, 185, 0.35);
+  --mv-sombra: 0 8px 25px rgba(138, 58, 185, 0.22);
+}
+.emo-chuva-janela {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(105deg, transparent, transparent 15px, rgba(138, 58, 185, 0.05) 16px, transparent 17px);
+  animation: mv-chuva-emo 1.5s linear infinite;
+}
+@keyframes mv-chuva-emo {
+  from { background-position: 0 0; }
+  to { background-position: -20px 80px; }
+}
+
+/* OTAKU */
+[data-mundo="otaku"], body[data-persona="otaku"] {
+  --mv-primaria: #ff4785;
+  --mv-secundaria: #1f1b2e;
+  --mv-brilho: rgba(255, 71, 133, 0.35);
+  --mv-fundo-grad: radial-gradient(circle at 80% 20%, #251b35 0%, #130f1c 60%, #1f1426 100%);
+  --mv-borda: rgba(255, 71, 133, 0.35);
+  --mv-sombra: 0 8px 25px rgba(255, 71, 133, 0.22);
+}
+.otaku-petalas-sakura {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #ff85a2 2px, transparent 3px), radial-gradient(circle, #ffaec0 1.5px, transparent 2px);
+  background-size: 80px 80px, 120px 120px;
+  animation: mv-sakura-cair 7s linear infinite;
+}
+@keyframes mv-sakura-cair {
+  0% { transform: translateY(-50px) translateX(0); }
+  50% { transform: translateY(50px) translateX(25px); }
+  100% { transform: translateY(150px) translateX(0); }
+}
+
+/* GAMER */
+[data-mundo="gamer"], body[data-persona="gamer"] {
+  --mv-primaria: #00f3ff;
+  --mv-secundaria: #090a10;
+  --mv-brilho: rgba(0, 243, 255, 0.4);
+  --mv-fundo-grad: linear-gradient(160deg, #0b0e17 0%, #05060a 60%, #100b1a 100%);
+  --mv-borda: rgba(0, 243, 255, 0.35);
+  --mv-sombra: 0 0 20px rgba(0, 243, 255, 0.25);
+}
+.gamer-grade-cibernetica {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-size: 32px 32px;
+  background-image: linear-gradient(to right, rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+}
+
+/* PROGRAMADOR */
+[data-mundo="programador"], body[data-persona="programador"] {
+  --mv-primaria: #00ff66;
+  --mv-secundaria: #0d1117;
+  --mv-brilho: rgba(0, 255, 102, 0.3);
+  --mv-fundo-grad: linear-gradient(180deg, #0d1117 0%, #05080c 100%);
+  --mv-borda: rgba(0, 255, 102, 0.3);
+  --mv-sombra: 0 6px 20px rgba(0, 255, 102, 0.15);
+}
+.prog-scanline {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+}
+
+/* BRUXO */
+[data-mundo="bruxo"], body[data-persona="bruxo"] {
+  --mv-primaria: #9d4edd;
+  --mv-secundaria: #150d1e;
+  --mv-brilho: rgba(157, 78, 221, 0.4);
+  --mv-fundo-grad: radial-gradient(circle at 50% 30%, #20112e 0%, #0d0714 70%, #1b0a1d 100%);
+  --mv-borda: rgba(157, 78, 221, 0.35);
+  --mv-sombra: 0 8px 25px rgba(157, 78, 221, 0.25);
+}
+.bruxo-fumaca-caldeirao {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 80%, rgba(157, 78, 221, 0.15) 0%, transparent 60%);
+  animation: mv-caldeirao-pulsar 4s ease-in-out infinite alternate;
+}
+@keyframes mv-caldeirao-pulsar {
+  0% { transform: scale(0.95); opacity: 0.6; }
+  100% { transform: scale(1.05); opacity: 1; }
+}
+
+/* FEITICEIRO */
+[data-mundo="feiticeiro"], body[data-persona="feiticeiro"] {
+  --mv-primaria: #3a86ff;
+  --mv-secundaria: #0a1128;
+  --mv-brilho: rgba(58, 134, 255, 0.4);
+  --mv-fundo-grad: radial-gradient(circle at 50% 50%, #101c42 0%, #070a1a 80%);
+  --mv-borda: rgba(58, 134, 255, 0.35);
+  --mv-sombra: 0 8px 30px rgba(58, 134, 255, 0.25);
+}
+.feiticeiro-circulo-magico {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(58, 134, 255, 0.08) 50%, transparent 60%);
+  animation: mv-giro-arcano 20s linear infinite;
+}
+@keyframes mv-giro-arcano {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* CLEANBOY */
+[data-mundo="cleanboy"], body[data-persona="cleanboy"] {
+  --mv-primaria: #b08968;
+  --mv-secundaria: #ede0d4;
+  --mv-brilho: rgba(176, 137, 104, 0.2);
+  --mv-fundo-grad: linear-gradient(180deg, #fbf7f4 0%, #f3ece4 60%, #e6dcd0 100%);
+  --mv-borda: rgba(176, 137, 104, 0.25);
+  --mv-sombra: 0 6px 18px rgba(176, 137, 104, 0.08);
+}
+.clean-luz-difusa {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.8) 0%, transparent 60%);
+}
+
+/* COACH */
+[data-mundo="coach"], body[data-persona="coach"] {
+  --mv-primaria: #d4af37;
+  --mv-secundaria: #141b24;
+  --mv-brilho: rgba(212, 175, 55, 0.35);
+  --mv-fundo-grad: linear-gradient(145deg, #1d2532 0%, #101620 60%, #1b202c 100%);
+  --mv-borda: rgba(212, 175, 55, 0.35);
+  --mv-sombra: 0 8px 24px rgba(212, 175, 55, 0.18);
+}
+
+/* FORROZEIRO */
+[data-mundo="forrozeiro"], body[data-persona="forrozeiro"] {
+  --mv-primaria: #e76f51;
+  --mv-secundaria: #264653;
+  --mv-brilho: rgba(231, 111, 81, 0.35);
+  --mv-fundo-grad: radial-gradient(circle at 50% 20%, #4a342c 0%, #231611 70%, #1b0f0b 100%);
+  --mv-borda: rgba(231, 111, 81, 0.35);
+  --mv-sombra: 0 8px 25px rgba(231, 111, 81, 0.2);
+}
+
+/* FUNKEIRO */
+[data-mundo="funkeiro"], body[data-persona="funkeiro"] {
+  --mv-primaria: #ff007f;
+  --mv-secundaria: #18051e;
+  --mv-brilho: rgba(255, 0, 127, 0.45);
+  --mv-fundo-grad: linear-gradient(135deg, #240030 0%, #0e0014 60%, #300028 100%);
+  --mv-borda: rgba(255, 0, 127, 0.4);
+  --mv-sombra: 0 0 25px rgba(255, 0, 127, 0.3);
+}
+
+/* PAGODEIRO */
+[data-mundo="pagodeiro"], body[data-persona="pagodeiro"] {
+  --mv-primaria: #f4a261;
+  --mv-secundaria: #2a3a40;
+  --mv-brilho: rgba(244, 162, 97, 0.35);
+  --mv-fundo-grad: radial-gradient(circle at 80% 20%, #3b372f 0%, #1a1e20 80%);
+  --mv-borda: rgba(244, 162, 97, 0.3);
+  --mv-sombra: 0 8px 22px rgba(244, 162, 97, 0.18);
+}
+
+/* RAPPER */
+[data-mundo="rapper"], body[data-persona="rapper"] {
+  --mv-primaria: #ffd166;
+  --mv-secundaria: #1a1a24;
+  --mv-brilho: rgba(255, 209, 102, 0.35);
+  --mv-fundo-grad: linear-gradient(170deg, #1c1b26 0%, #0d0c13 70%, #201e2b 100%);
+  --mv-borda: rgba(255, 209, 102, 0.35);
+  --mv-sombra: 0 8px 25px rgba(255, 209, 102, 0.2);
+}
+
+/* SERTANEJO */
+[data-mundo="sertanejo"], body[data-persona="sertanejo"] {
+  --mv-primaria: #c88d51;
+  --mv-secundaria: #2b1f18;
+  --mv-brilho: rgba(200, 141, 81, 0.3);
+  --mv-fundo-grad: linear-gradient(180deg, #38261e 0%, #1c130d 70%, #291a13 100%);
+  --mv-borda: rgba(200, 141, 81, 0.35);
+  --mv-sombra: 0 8px 22px rgba(200, 141, 81, 0.18);
+}
+
+/* TRAPPER */
+[data-mundo="trapper"], body[data-persona="trapper"] {
+  --mv-primaria: #7928ca;
+  --mv-secundaria: #09090b;
+  --mv-brilho: rgba(121, 40, 202, 0.45);
+  --mv-fundo-grad: radial-gradient(circle at 30% 20%, #1f0b33 0%, #09060c 70%, #160724 100%);
+  --mv-borda: rgba(121, 40, 202, 0.4);
+  --mv-sombra: 0 0 24px rgba(121, 40, 202, 0.28);
+}
+
+/* VOVO */
+[data-mundo="vovo"], body[data-persona="vovo"] {
+  --mv-primaria: #d88373;
+  --mv-secundaria: #f2e9e4;
+  --mv-brilho: rgba(216, 131, 115, 0.25);
+  --mv-fundo-grad: linear-gradient(180deg, #f9f5f0 0%, #ebe2d8 70%, #ded2c3 100%);
+  --mv-borda: rgba(216, 131, 115, 0.3);
+  --mv-sombra: 0 6px 20px rgba(216, 131, 115, 0.12);
+}
+
+/* ==========================================================================
+   02. COMPONENTES VISUAIS EXPANDIDOS DOS MUNDOS
+   ========================================================================== */
+
+/* Moldura e Cartao Master */
+.mv-cartao-personalidade {
+  background: var(--mv-fundo-grad, var(--card, #fff));
+  border: 1px solid var(--mv-borda, rgba(0,0,0,0.1));
+  box-shadow: var(--mv-sombra, 0 4px 14px rgba(0,0,0,0.06));
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+}
+.mv-cartao-personalidade:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px var(--mv-brilho, rgba(0,0,0,0.15));
+}
+
+/* Estante e Prateleira Tematica */
+.mv-prateleira-tematica {
+  height: 14px;
+  width: 100%;
+  margin-top: 8px;
+  position: relative;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+[data-mundo="zen"] .mv-prateleira-tematica {
+  background: linear-gradient(90deg, #b8860b 0%, #d4a373 50%, #b8860b 100%);
+  border-bottom: 2px solid #8c6239;
+}
+[data-mundo="rock"] .mv-prateleira-tematica {
+  background: linear-gradient(90deg, #2b2b2b 0%, #404040 50%, #1f1f1f 100%);
+  border-top: 1px solid #ff3333;
+}
+[data-mundo="gamer"] .mv-prateleira-tematica {
+  background: #111420;
+  box-shadow: 0 0 12px var(--mv-primaria);
+  border-top: 2px solid var(--mv-primaria);
+}
+[data-mundo="bruxo"] .mv-prateleira-tematica {
+  background: #2a163d;
+  border-bottom: 3px solid #6b2d5c;
+  box-shadow: 0 0 10px rgba(157, 78, 221, 0.3);
+}
+
+/* Barra de Progresso / XP Dinamica */
+.mv-barra-progresso-mundo {
+  height: 10px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.15);
+  overflow: hidden;
+  position: relative;
+}
+.mv-barra-progresso-mundo-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 6px;
+  background: var(--mv-primaria, #333);
+  box-shadow: 0 0 10px var(--mv-brilho, transparent);
+  transition: width 0.6s cubic-bezier(0.3, 1.2, 0.3, 1);
+}
+
+/* Microinteracoes e Ondulacao ao Clicar */
+.mv-efeito-clique {
+  position: relative;
+  overflow: hidden;
+}
+.mv-efeito-clique::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: var(--mv-brilho, rgba(255,255,255,0.4));
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+.mv-efeito-clique:active::after {
+  animation: mv-ripple 0.4s ease-out;
+}
+@keyframes mv-ripple {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(22); opacity: 0; }
+}
+
+/* Modo Foco / Timer Cenografico */
+.mv-foco-impersivo-cenario {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--mv-fundo-grad);
+  border: 1px solid var(--mv-borda);
+}
+
+/* Transicao de Portal ao Trocar de Personalidade */
+.mv-portal-ativo {
+  animation: mv-portal-abrir 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes mv-portal-abrir {
+  0% {
+    filter: brightness(1.6) blur(6px);
+    transform: scale(0.97);
+  }
+  100% {
+    filter: brightness(1) blur(0);
+    transform: scale(1);
+  }
+}
