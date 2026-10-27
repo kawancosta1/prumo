@@ -2669,3 +2669,135 @@ function animarRevelacaoCircularModal(modalEl, centroX, centroY) {
   void modalEl.offsetWidth;
   modalEl.classList.add("modal-revelacao-circular");
 }
+
+// ========================================================
+// NOVAS 260 MELHORIAS GERAIS - LOTE 3 (ITENS 21 A 30)
+// ========================================================
+
+// G21. Efeito de água enchendo a tela de baixo para cima na meta batida
+function animarOndaTelaCheiaAguaBatida() {
+  if (typeof document === "undefined" || !document.body) return null;
+  if (verificarPreferenciaMovimentoReduzido()) return null;
+  let onda = document.getElementById("prumo-onda-meta-cheia");
+  if (!onda) {
+    onda = document.createElement("div");
+    onda.id = "prumo-onda-meta-cheia";
+    onda.className = "onda-tela-cheia-agua";
+    document.body.appendChild(onda);
+    setTimeout(() => {
+      if (onda && onda.parentNode) onda.parentNode.removeChild(onda);
+    }, 1450);
+  }
+  return onda;
+}
+
+// G22. Troca de roupa do Prumi com efeito de giro rápido de 360 graus
+function animarGiroTrocaRoupaPrumi(elPrumi) {
+  if (!elPrumi || typeof elPrumi.classList !== "object") return;
+  if (verificarPreferenciaMovimentoReduzido()) return;
+  elPrumi.classList.remove("prumi-giro-360");
+  void elPrumi.offsetWidth;
+  elPrumi.classList.add("prumi-giro-360");
+  setTimeout(() => {
+    if (elPrumi) elPrumi.classList.remove("prumi-giro-360");
+  }, 450);
+}
+
+// G23. Estrelas cadentes de fundo quando for noite e tudo estiver feito
+function gerarEstrelasCadentesNoite(container, qtd) {
+  if (typeof document === "undefined") return [];
+  if (verificarPreferenciaMovimentoReduzido()) return [];
+  const raiz = container || document.body;
+  const total = Math.min(6, Math.max(1, parseInt(qtd, 10) || 3));
+  const estrelas = [];
+
+  for (let i = 0; i < total; i++) {
+    const e = document.createElement("div");
+    e.className = "estrela-cadente-noite";
+    const x = Math.random() * 80;
+    const y = Math.random() * 40;
+    e.style.left = `${x}%`;
+    e.style.top = `${y}%`;
+    e.style.animationDelay = `${i * 0.25}s`;
+    raiz.appendChild(e);
+    estrelas.push(e);
+    setTimeout(
+      () => {
+        if (e.parentNode) e.parentNode.removeChild(e);
+      },
+      1100 + i * 250
+    );
+  }
+  return estrelas;
+}
+
+// G24. Transição de texto numérico com rolagem de odômetro vertical
+function animarOdometroVerticalGotas(elOdometro, valorNovo) {
+  if (!elOdometro || typeof elOdometro.innerHTML === "undefined") return;
+  const num = Math.max(0, parseInt(valorNovo, 10) || 0);
+  elOdometro.classList.add("odometro-coluna-numerica");
+  elOdometro.textContent = String(num);
+  elOdometro.setAttribute("data-valor", String(num));
+}
+
+// G25. Sombra projetada dinâmica que muda de ângulo com a hora do dia
+function calcularAnguloSombraHoraDia(hora) {
+  const h = typeof hora === "number" ? hora : new Date().getHours();
+  // 6h manhã: sombra longa para a esquerda (-45deg, 6px)
+  // 12h meio-dia: sombra vertical curta (0deg, 2px)
+  // 18h entardecer: sombra longa para a direita (45deg, 6px)
+  // Noite: sombra suave central
+  if (h < 6 || h >= 19) {
+    return { offsetX: 0, offsetY: 2, blur: 6, opacidade: 0.12 };
+  }
+  const progresso = (h - 6) / 12; // 0 a 1
+  const offsetX = Math.round((progresso - 0.5) * 12);
+  const offsetY = Math.round(2 + Math.abs(progresso - 0.5) * 4);
+  const opacidade = Math.round((0.15 + (1 - Math.abs(progresso - 0.5) * 0.4) * 0.1) * 100) / 100;
+  return { offsetX, offsetY, blur: 6, opacidade };
+}
+
+// G26. Balanço de corda suspensa nas placas dos mundos na loja
+function animarPlacaMundoBalancando(elPlaca, ativo) {
+  if (!elPlaca || typeof elPlaca.classList !== "object") return;
+  if (ativo && !verificarPreferenciaMovimentoReduzido()) {
+    elPlaca.classList.add("placa-mundo-balancando");
+  } else {
+    elPlaca.classList.remove("placa-mundo-balancando");
+  }
+}
+
+// G27. Deslize elástico no rodapé quando o usuário chega ao fim da página
+function aplicarDeslizeElasticoRodape(elRodape) {
+  if (!elRodape || typeof elRodape.classList !== "object") return;
+  if (verificarPreferenciaMovimentoReduzido()) return;
+  elRodape.classList.remove("rodape-deslize-elastico");
+  void elRodape.offsetWidth;
+  elRodape.classList.add("rodape-deslize-elastico");
+}
+
+// G28. Pulso de alerta vermelho suave em tarefas atrasadas há mais de 3 dias
+function aplicarAlertaAtrasoLongoSutil(cardEl, diasAtraso) {
+  if (!cardEl || typeof cardEl.classList !== "object") return;
+  const dias = parseInt(diasAtraso, 10) || 0;
+  if (dias >= 3 && !verificarPreferenciaMovimentoReduzido()) {
+    cardEl.classList.add("alerta-atraso-vermelho-sutil");
+    cardEl.setAttribute("data-dias-atraso", String(dias));
+  } else {
+    cardEl.classList.remove("alerta-atraso-vermelho-sutil");
+  }
+}
+
+// G29. Efeito de abrir cortina no quarto ao iniciar o dia pela primeira vez
+function animarAberturaCortinaQuarto(elCortina) {
+  if (!elCortina || typeof elCortina.classList !== "object") return;
+  if (verificarPreferenciaMovimentoReduzido()) return;
+  elCortina.classList.add("cortina-abrindo-quarto");
+}
+
+// G30. Efeito de fechar persiana no quarto ao bater a meta noturna
+function animarFechamentoPersianaQuarto(elPersiana) {
+  if (!elPersiana || typeof elPersiana.classList !== "object") return;
+  if (verificarPreferenciaMovimentoReduzido()) return;
+  elPersiana.classList.add("persiana-fechando-quarto");
+}

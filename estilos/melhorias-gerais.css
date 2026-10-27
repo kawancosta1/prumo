@@ -1250,6 +1250,165 @@ html.transicao-tema-ativa * {
   }
 }
 
+/* ========================================================
+   NOVAS 260 MELHORIAS GERAIS - LOTE 3 (ITENS 21 A 30)
+   ======================================================== */
+
+/* 21. Efeito de água enchendo a tela na meta batida */
+.onda-tela-cheia-agua {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.25) 0%, rgba(14, 165, 233, 0.5) 100%);
+  pointer-events: none;
+  z-index: 999;
+  animation: subirOndaTelaCheiaAnim 1.4s ease-out forwards;
+}
+@keyframes subirOndaTelaCheiaAnim {
+  0% {
+    clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+    opacity: 0.9;
+  }
+  60% {
+    clip-path: polygon(0 0%, 100% 10%, 100% 100%, 0 100%);
+    opacity: 0.8;
+  }
+  100% {
+    clip-path: polygon(0 0%, 100% 0%, 100% 100%, 0 100%);
+    opacity: 0;
+  }
+}
+
+/* 22. Troca de roupa do Prumi com giro rápido de 360 graus */
+.prumi-giro-360 {
+  animation: giro360PrumiAnim 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+@keyframes giro360PrumiAnim {
+  0% {
+    transform: scale(1) rotateY(0deg);
+  }
+  50% {
+    transform: scale(0.9) rotateY(180deg);
+  }
+  100% {
+    transform: scale(1) rotateY(360deg);
+  }
+}
+
+/* 23. Estrelas cadentes de fundo quando for noite */
+.estrela-cadente-noite {
+  position: absolute;
+  pointer-events: none;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #ffffff 0%, transparent 100%);
+  border-radius: 1px;
+  animation: cruzamentoEstrelaCadente 0.85s linear forwards;
+}
+@keyframes cruzamentoEstrelaCadente {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(-35deg) scaleX(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(120px, 80px) rotate(-35deg) scaleX(1.4);
+  }
+}
+
+/* 24. Odômetro vertical numérico */
+.odometro-coluna-numerica {
+  display: inline-block;
+  overflow: hidden;
+  height: 1.2em;
+  vertical-align: middle;
+}
+.odometro-trilho {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* 26. Balanço de corda suspensa nas placas dos mundos na loja */
+.placa-mundo-balancando {
+  animation: balancoPlacaCorda 3.2s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+@keyframes balancoPlacaCorda {
+  0% {
+    transform: rotate(-2.5deg);
+  }
+  100% {
+    transform: rotate(2.5deg);
+  }
+}
+
+/* 27. Deslize elástico no rodapé */
+.rodape-deslize-elastico {
+  animation: elasticoRodapeAnim 0.3s ease-out;
+}
+@keyframes elasticoRodapeAnim {
+  0% {
+    transform: translateY(12px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* 28. Pulso de alerta vermelho suave em tarefas atrasadas */
+.alerta-atraso-vermelho-sutil {
+  animation: pulsoAtrasoSutil 2.4s ease-in-out infinite;
+  border-left: 3px solid #ef4444 !important;
+}
+@keyframes pulsoAtrasoSutil {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(239, 68, 68, 0.08);
+  }
+}
+
+/* 29. Abertura de cortina no quarto ao iniciar o dia */
+.cortina-abrindo-quarto {
+  animation: abrirCortinaAnim 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  transform-origin: left center;
+}
+@keyframes abrirCortinaAnim {
+  0% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(0.15);
+    opacity: 0.4;
+  }
+}
+
+/* 30. Fechamento de persiana no quarto */
+.persiana-fechando-quarto {
+  animation: fecharPersianaAnim 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  transform-origin: top center;
+}
+@keyframes fecharPersianaAnim {
+  0% {
+    transform: scaleY(0.2);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0.95;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particula-desintegracao,
   .prumi-squash,
@@ -1294,6 +1453,14 @@ html.transicao-tema-ativa * {
   .pet-cauda-balancando,
   .particula-fumaca-fofa,
   .modal-revelacao-circular,
+  .onda-tela-cheia-agua,
+  .prumi-giro-360,
+  .estrela-cadente-noite,
+  .placa-mundo-balancando,
+  .rodape-deslize-elastico,
+  .alerta-atraso-vermelho-sutil,
+  .cortina-abrindo-quarto,
+  .persiana-fechando-quarto,
   .badge-conquista-desbloqueada {
     animation: none !important;
     transform: none !important;
