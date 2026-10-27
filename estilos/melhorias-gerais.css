@@ -1,0 +1,196 @@
+/*
+  Melhorias Gerais do Prumo
+  Animações, microinterações, acessibilidade e refinamentos de interface.
+*/
+
+/* 1. Confete direcional e partículas */
+.particula-desintegracao {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  animation: particulaSome 0.5s ease-out forwards;
+}
+@keyframes particulaSome {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx, 10px), var(--dy, -20px)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* 3. Squash & stretch no Prumi */
+.prumi-squash {
+  animation: prumiSquashAnim 0.35s cubic-bezier(0.2, 0.8, 0.4, 1.2) !important;
+}
+@keyframes prumiSquashAnim {
+  0% {
+    transform: scale(1, 1);
+  }
+  35% {
+    transform: scale(1.12, 0.88);
+  }
+  70% {
+    transform: scale(0.96, 1.04);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+/* 4. Transição de aba com deslize lateral */
+@media (min-width: 200px) {
+  main.enter.slide-left > section {
+    animation: slideTabLeft 0.32s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  }
+  main.enter.slide-right > section {
+    animation: slideTabRight 0.32s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  }
+}
+@keyframes slideTabLeft {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes slideTabRight {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 5. Entrada de tarefas com desdobramento suave */
+li.tarefa-expandindo {
+  overflow: hidden;
+  animation: desdobraTarefa 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+@keyframes desdobraTarefa {
+  0% {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  100% {
+    max-height: 140px;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 6. Odômetro e pulso no saldo de gotas */
+.odometro-pulso {
+  display: inline-block;
+  animation: odometroPulsar 0.4s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+@keyframes odometroPulsar {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.22);
+    color: var(--accent);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 7. Tremor de erro em campos inválidos */
+.tremor-erro {
+  animation: tremorInput 0.28s ease-in-out !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+}
+@keyframes tremorInput {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+/* 8. Desintegração de item ao excluir */
+.item-desintegrando {
+  pointer-events: none;
+  animation: itemDesintegra 0.35s ease-in forwards !important;
+}
+@keyframes itemDesintegra {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    max-height: 120px;
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.96) translateX(12px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.85) translateX(30px);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+/* 9. Brilho contínuo sutil em tarefas de prioridade alta */
+.tarefa-prio-alta-glow {
+  position: relative;
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent) !important;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 22%, transparent);
+  animation: prioGlowPulso 2.4s ease-in-out infinite alternate;
+}
+@keyframes prioGlowPulso {
+  0% {
+    box-shadow: 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 38%, transparent);
+  }
+}
+
+/* 10. Elevação de sombra e rotação sutil ao arrastar/segurar card */
+.card-elevado {
+  transform: scale(1.025) rotate(-0.8deg) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28) !important;
+  z-index: 50 !important;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particula-desintegracao,
+  .prumi-squash,
+  main.enter.slide-left > section,
+  main.enter.slide-right > section,
+  li.tarefa-expandindo,
+  .odometro-pulso,
+  .tremor-erro,
+  .item-desintegrando,
+  .tarefa-prio-alta-glow {
+    animation: none !important;
+    transform: none !important;
+  }
+}
