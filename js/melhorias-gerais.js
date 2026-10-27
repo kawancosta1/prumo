@@ -161,3 +161,118 @@ function tornarCardElevado(el, ativar = true) {
     el.classList.remove("card-elevado");
   }
 }
+
+// 11. Piscada natural assíncrona dos olhos do Prumi
+let piscadaTimer = null;
+function iniciarPiscadaNaturalPrumi() {
+  if (typeof document === "undefined" || (typeof RM !== "undefined" && RM)) return;
+  const piscar = () => {
+    const olhos = document.querySelectorAll(
+      ".prumi .olho, .prumi [data-olho], .prumi circle[cx='47'], .prumi circle[cx='73']"
+    );
+    if (olhos.length > 0) {
+      olhos.forEach(o => {
+        o.style.transformOrigin = "center";
+        o.style.transform = "scaleY(0.1)";
+      });
+      setTimeout(() => {
+        olhos.forEach(o => {
+          o.style.transform = "none";
+        });
+      }, 120);
+
+      // 20% de chance de piscada dupla fofa
+      if (Math.random() < 0.2) {
+        setTimeout(() => {
+          olhos.forEach(o => (o.style.transform = "scaleY(0.1)"));
+          setTimeout(() => olhos.forEach(o => (o.style.transform = "none")), 100);
+        }, 240);
+      }
+    }
+    const proxIntervalo = 3000 + Math.random() * 4500;
+    piscadaTimer = setTimeout(piscar, proxIntervalo);
+  };
+  piscadaTimer = setTimeout(piscar, 3500);
+}
+
+function pararPiscadaNaturalPrumi() {
+  if (piscadaTimer) {
+    clearTimeout(piscadaTimer);
+    piscadaTimer = null;
+  }
+}
+
+// 12. Respiração em repouso do Prumi
+function aplicarRespiracaoPrumi(el) {
+  if (!el || (typeof RM !== "undefined" && RM)) return;
+  const target = el.closest(".prumi") || el;
+  target.classList.add("prumi-respirando");
+}
+
+// 13. Flicker realista das velas e tochas
+function aplicarFlickerRealista(el) {
+  if (!el || (typeof RM !== "undefined" && RM)) return;
+  el.classList.add("flicker-realista");
+}
+
+// 14. Glow neon pulsante (Gamer)
+function aplicarGlowNeonGamer(el) {
+  if (!el || (typeof RM !== "undefined" && RM)) return;
+  el.classList.add("gamer-neon-pulsante");
+}
+
+// 15. Partículas de vapor ascendente
+function aplicarVaporAscendente(el) {
+  if (!el || (typeof RM !== "undefined" && RM)) return;
+  el.classList.add("vapor-ascendente");
+}
+
+// 16. Transição suave entre modo claro e escuro
+function aplicarTransicaoTemaSuave() {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.add("transicao-tema");
+  setTimeout(() => {
+    document.documentElement.classList.remove("transicao-tema");
+  }, 260);
+}
+
+// 17. Efeito de virada de página física na estante
+function animarViradaPaginaLivro(el) {
+  if (!el || (typeof RM !== "undefined" && RM)) return;
+  el.classList.remove("livro-virando-pagina");
+  void el.offsetWidth;
+  el.classList.add("livro-virando-pagina");
+  setTimeout(() => el.classList.remove("livro-virando-pagina"), 460);
+}
+
+// 18. Animação de flutuação dos pets
+function aplicarFlutuacaoPet(el) {
+  if (!el || (typeof RM !== "undefined" && RM)) return;
+  el.classList.add("pet-flutuando");
+}
+
+// 19. Degradê dinâmico no cabeçalho conforme a hora do dia
+function degradePelaHoraDia(dataHora) {
+  const hora = dataHora ? new Date(dataHora).getHours() : new Date().getHours();
+  // 5h às 8h: aurora matinal suave
+  if (hora >= 5 && hora < 9) {
+    return "linear-gradient(135deg, rgba(255, 183, 77, 0.18) 0%, rgba(240, 98, 146, 0.12) 100%)";
+  }
+  // 9h às 16h: dia claro e límpido
+  if (hora >= 9 && hora < 17) {
+    return "linear-gradient(135deg, rgba(79, 195, 247, 0.15) 0%, rgba(129, 199, 132, 0.1) 100%)";
+  }
+  // 17h às 19h: entardecer âmbar
+  if (hora >= 17 && hora < 20) {
+    return "linear-gradient(135deg, rgba(255, 112, 67, 0.2) 0%, rgba(149, 117, 205, 0.15) 100%)";
+  }
+  // 20h às 4h: noite estrelada profunda
+  return "linear-gradient(135deg, rgba(49, 27, 146, 0.25) 0%, rgba(18, 18, 36, 0.2) 100%)";
+}
+
+// 20. Clique elástico nos botões
+function ativarCliqueElasticoBotoes() {
+  if (typeof document === "undefined") return;
+  const botoes = document.querySelectorAll("button, .btn, [data-act]");
+  botoes.forEach(b => b.classList.add("btn-elastico"));
+}
