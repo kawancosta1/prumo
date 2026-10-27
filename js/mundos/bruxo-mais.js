@@ -1269,6 +1269,124 @@ if (typeof SONS_MUNDO !== "undefined" && SONS_MUNDO.bruxo) {
   SONS_MUNDO.bruxo.gato = (ctx, saida, t) => somMiadoGato(ctx, saida, t);
 }
 
+// 51. Foco vira "apurar a poção" (caldeirão borbulha mais forte durante o foco)
+function apurarPocaoFocoHTML(tempoRestante = "25:00") {
+  return `<div class="card sub" style="text-align:center;padding:12px;margin-top:6px;background:rgba(38,50,56,0.3)">
+    <div style="font-size:15px;font-weight:bold;margin-bottom:6px">🧪 Apurando a Poção do Conhecimento</div>
+    <svg viewBox="0 0 100 60" width="80" height="50">
+      <path d="M20 25H80Q84 55 50 56Q16 55 20 25Z" fill="#263238" stroke="var(--ink)" stroke-width="1.8"/>
+      <ellipse cx="50" cy="25" rx="30" ry="3.5" fill="#76FF03"/>
+      <g class="bolhas-caldeirao">
+        <circle cx="36" cy="20" r="3" fill="#76FF03"/>
+        <circle cx="50" cy="16" r="4" fill="#B2FF59"/>
+        <circle cx="64" cy="20" r="3" fill="#76FF03"/>
+      </g>
+    </svg>
+    <div class="mono" style="font-size:18px;margin-top:4px">${esc(tempoRestante)}</div>
+    <span class="note">Fogo brando aceso. Foco total sem mexer a colher!</span>
+  </div>`;
+}
+
+// 52. Matérias viram ervas do grimório com cor própria
+const MATERIAS_ERVAS_BRUXO = {
+  exatas: { erva: "Alecrim da Lógica", cor: "#7CB342", icone: "🌿" },
+  humanas: { erva: "Sálvia das Eras", cor: "#B388FF", icone: "🌾" },
+  biologicas: { erva: "Arruda da Vida", cor: "#26A69A", icone: "🌱" },
+  linguagens: { erva: "Hortelã da Eloquência", cor: "#FFB74D", icone: "🪻" },
+  padrao: { erva: "Camomila dos Estudos", cor: "#81C784", icone: "🌼" }
+};
+
+function materiaErvaBruxo(materiaNome) {
+  const norm = (materiaNome || "").toLowerCase();
+  if (norm.includes("mat") || norm.includes("fís") || norm.includes("quím") || norm.includes("cálc")) {
+    return MATERIAS_ERVAS_BRUXO.exatas;
+  }
+  if (norm.includes("hist") || norm.includes("geog") || norm.includes("filo") || norm.includes("socio")) {
+    return MATERIAS_ERVAS_BRUXO.humanas;
+  }
+  if (norm.includes("bio") || norm.includes("saúde") || norm.includes("anatom")) {
+    return MATERIAS_ERVAS_BRUXO.biologicas;
+  }
+  if (norm.includes("port") || norm.includes("ingl") || norm.includes("espanh") || norm.includes("liter")) {
+    return MATERIAS_ERVAS_BRUXO.linguagens;
+  }
+  return MATERIAS_ERVAS_BRUXO.padrao;
+}
+
+// 53. Prova vira "noite de lua cheia" (contagem até a lua cheia)
+function provaNoiteLuaCheiaHTML(prova) {
+  const dias = prova && typeof prova.date === "string" ? Math.max(0, diffDays(today(), prova.date)) : 7;
+  return `<div class="card sub" style="border:1px solid #ffd54f;background:rgba(255,213,79,0.08);margin-top:6px">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <b>🌕 Noite de Lua Cheia: ${esc((prova && prova.title) || "Grande Ritual de Prova")}</b>
+      <span class="mono">${dias === 0 ? "Hoje!" : `em ${dias} dias`}</span>
+    </div>
+    <span class="note">O alinhamento lunar exige grimórios revisados e poções prontas.</span>
+  </div>`;
+}
+
+// 54. Revisão espaçada vira "regar a planta"
+function textoRevisaoEspacadaBruxo() {
+  return "Regar o canteiro da memória 🪴";
+}
+
+// 55. Meta de leitura vira "páginas do livro das sombras"
+function textoMetaLeituraBruxo(paginas = 0, meta = 10) {
+  return `Páginas transcritas no Livro das Sombras: ${paginas} / ${meta} 📜✨`;
+}
+
+// 57. Humores por tema (Caldeirão tóxico vs Ervas)
+function humorPorTemaBruxo(temaId, humor = "happy") {
+  if (temaId === "caldeirao") {
+    const mapa = {
+      radiant: "Ebulição pura!",
+      happy: "Borbulhas verdes",
+      idle: "Fogo brando",
+      upset: "Fumaça ácida",
+      sad: "Caldeirão frio",
+      cry: "Poção azedou"
+    };
+    return mapa[humor] || "Borbulhando";
+  }
+  if (temaId === "ervas") {
+    const mapa = {
+      radiant: "Flor de lótus aberta",
+      happy: "Brotinho viçoso",
+      idle: "Chá morno",
+      upset: "Erva daninha",
+      sad: "Folhas secas",
+      cry: "Canteiro murcho"
+    };
+    return mapa[humor] || "Cultivando";
+  }
+  return null;
+}
+
+// 58. Evento de Halloween (15/10 a 05/11)
+function eventoHalloweenBruxoAtivo(dataStr) {
+  const d = dataStr ? parse(dataStr) : new Date();
+  const mes = d.getMonth();
+  const dia = d.getDate();
+  return (mes === 9 && dia >= 15) || (mes === 10 && dia <= 5);
+}
+
+// 59. Sexta-feira 13 com fala e efeito especiais
+function ehSextaFeira13Bruxo(dataStr) {
+  const d = dataStr ? parse(dataStr) : new Date();
+  return d.getDay() === 5 && d.getDate() === 13;
+}
+
+// 60. Opção em Ajustes para desligar cursor de vassoura e efeitos
+function alternarEfeitosBruxoSuave() {
+  const d = dadosBruxo();
+  d.desligarEfeitosFortes = !d.desligarEfeitosFortes;
+  commit();
+  if (typeof applyTheme === "function") {
+    applyTheme();
+  }
+  return d.desligarEfeitosFortes;
+}
+
 /* Conexão com eventos do Bruxo */
 if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.bruxo) {
   const antigoAoConcluirBruxo = MUNDO_FX.bruxo.aoConcluir;
@@ -1326,11 +1444,20 @@ if (typeof MUNDO_FX !== "undefined" && MUNDO_FX.bruxo) {
       decoracaoAbobora = aboboraHumorHTML(S.mood);
     }
 
+    let bannerEspecial = "";
+    if (eventoHalloweenBruxoAtivo()) {
+      bannerEspecial += `<div class="card sub sunken" style="border:1px solid #fb8c00;margin-bottom:6px">🎃 <b>Festival de Halloween das Bruxas:</b> Caldeirão com 2x bônus!</div>`;
+    }
+    if (ehSextaFeira13Bruxo()) {
+      bannerEspecial += `<div class="card sub sunken" style="border:1px solid #7c4dff;margin-bottom:6px">🐈‍⬛ <b>Sexta-feira 13:</b> O gato preto ronrona mais alto. Sorte dobrada!</div>`;
+    }
+
     html += cartaoMundo(
       "cm-bruxo-lua-gato",
       `${decoracaoAbobora}Fase Lunar: ${lua.nome} ${lua.icone}`,
       lua.bonus,
-      `<div class="card sub sunken" style="padding:8px;margin-bottom:6px">
+      `${bannerEspecial}
+      <div class="card sub sunken" style="padding:8px;margin-bottom:6px">
         <b>🐈‍⬛ O Gato Preto Murmura:</b><br>
         <span style="font-size:12px;font-style:italic">"${esc(conselho)}"</span>
       </div>

@@ -123,6 +123,10 @@ function applyTheme(personaOverride, varOverride) {
     const d = dadosMundo("otaku");
     document.documentElement.toggleAttribute("data-otaku-suave", !!d.efeitosFortesDesligados);
   }
+  if (pid === "bruxo" && typeof dadosMundo === "function") {
+    const d = dadosMundo("bruxo");
+    document.documentElement.toggleAttribute("data-bruxo-suave", !!d.desligarEfeitosFortes);
+  }
   // roupagem genérica (estilos/mundos/skins.css) para os mundos sem arquivo de CSS só deles
   document.documentElement.toggleAttribute("data-skin", pid !== "emo" && pid !== "rock");
   themePreview = varOverride ? { p: pid, v: varOverride } : personaOverride ? { p: pid, v: "base" } : null;

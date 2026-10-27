@@ -394,6 +394,12 @@ html[data-mundo="bruxo"] select {
   cursor: pointer;
 }
 
+/* 60. Modo suave: cursor padrão e animações desligadas */
+html[data-mundo="bruxo"][data-bruxo-suave],
+html[data-mundo="bruxo"][data-bruxo-suave] * {
+  cursor: auto !important;
+}
+
 /* 39. Sapo que pula e some */
 .bruxo-sapo-pula-some {
   animation: sapoPulaSome 0.6s ease-in forwards !important;

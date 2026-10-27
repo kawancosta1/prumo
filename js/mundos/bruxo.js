@@ -26,7 +26,11 @@ PERSONAS.bruxo = {
     "Lua crescente, vento bom{nome}. <b>{n}</b> ingredientes na receita de hoje.",
     "Acordei com o gato pisando na minha cara{nome}. <b>{n}</b> tarefas nos esperam.",
     "A bola de cristal tá meio embaçada, mas eu vejo <b>{n}</b> tarefas{nome}.",
-    "Chá de ervas pronto{nome}. Bora mexer o caldeirão das <b>{n}</b> tarefas?"
+    "Chá de ervas pronto{nome}. Bora mexer o caldeirão das <b>{n}</b> tarefas?",
+    "O gato preto já sentou na vassoura{nome}. <b>{n}</b> tarefas nos aguardam.",
+    "O sapo avisou pelo coaxar que hoje tem <b>{n}</b> obrigações{nome}.",
+    "Bom dia da cabana{nome}! O caldeirão acendeu sozinho com <b>{n}</b> tarefas.",
+    "Cheiro de alecrim e café fresco{nome}. Vamos dominar essas <b>{n}</b> tarefas."
   ],
   cheers: [
     "Plim! Jogou no caldeirão e virou poção.",
@@ -37,7 +41,12 @@ PERSONAS.bruxo = {
     "O sapo pulou de alegria. Riscou!",
     "Feitiço da produtividade funcionando.",
     "Caldeirão em ebulição! Continua.",
-    "Até a lua sorriu agora."
+    "Até a lua sorriu agora.",
+    "O gato deu uma cabeçada carinhosa na sua perna. Tarefa feita!",
+    "O sapo deu dois pulos e aplaudiu com as patas.",
+    "Fumaça roxa perfumada subiu no teto da cabana.",
+    "Mais um encantamento bem sucedido no diário.",
+    "O caldeirão deu um estalo de aprovação."
   ],
   drink: [
     "<b>+{ml} mL</b> de chá de ervas. Ou é água... sei lá, funciona.",
@@ -59,17 +68,28 @@ PERSONAS.bruxo = {
   late: [
     "<b>{n}</b> tarefas viraram sapo de tão velhas. Bora desencantar?",
     "<b>{n}</b> atrasadas no fundo do caldeirão. Mexe que sai.",
-    "Teia de aranha em <b>{n}</b> tarefas. Uma vassourada resolve."
+    "Teia de aranha em <b>{n}</b> tarefas. Uma vassourada resolve.",
+    "O gato tá sentado em cima das atrasadas pra ver se você resolve.",
+    "O sapo tá quase batendo papo com essas <b>{n}</b> tarefas antigas.",
+    "Poeira mágica acumulando em <b>{n}</b> tarefas. Vamos passar a vassoura?",
+    "O corvo deu três grasnados apontando pras tarefas esquecidas."
   ],
   night: [
     "Lua cheia, hora de fechar o caldeirão. Dorme bem.",
     "O gato já tá enrolado. Fecha o dia e vem sonhar.",
-    "As corujas acordaram. Bruxa boa descansa."
+    "As corujas acordaram. Bruxa boa descansa.",
+    "O sapo já dormiu na vitória-régia. Hora de apagar o fogo da cabana.",
+    "O gato preto ronrona no pé da cama. Dia encerrado com magia.",
+    "Lua alta na copa dos pinheiros. Descanse a mente, bruxinha."
   ],
   done: [
     "Receita completa! Poção perfeita de dia produtivo.",
     "Caldeirão limpinho. Hoje você foi a bruxa mais poderosa da floresta.",
-    "Tudo feito. Hora de um chá com o gato."
+    "Tudo feito. Hora de um chá com o gato.",
+    "O gato preto e o sapo estão dançando juntos. Tudo cumprido!",
+    "Caldeirão brilhando como ouro. Hoje a floresta inteira comemora.",
+    "Nenhuma pendência sob a luz das estrelas. Noite perfeita na cabana.",
+    "Ritual do dia finalizado com nota máxima pelo conselho das bruxas."
   ],
   focus: [
     "Mexendo o caldeirão em silêncio. Foco total.",
