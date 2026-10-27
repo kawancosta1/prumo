@@ -188,3 +188,116 @@ main:not(.enter) .day[aria-pressed="true"] {
   pointer-events: none;
   z-index: 60;
 }
+
+
+/* ==========================================================================
+   EXPANSAO DE ALTA PERFORMANCE DE ANIMACOES (MOLAS, MICRO-FEEDBACK E 60FPS)
+   ========================================================================== */
+
+:root {
+  --spring-rapida: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-elastica: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spring-suave: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Indicador de abas fluido */
+nav.tabs .ind {
+  transition:
+    transform 0.32s var(--spring-rapida),
+    width 0.32s var(--spring-rapida),
+    opacity 0.18s ease !important;
+  will-change: transform, width;
+}
+
+/* Entrada dos cartoes em cascata aprimorada com aceleracao 3D */
+main.enter > section {
+  animation: rise-3d 0.38s var(--spring-rapida) both;
+  will-change: transform, opacity;
+}
+@keyframes rise-3d {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Botoes com compressao tatil de alta resposta */
+.btn, button.acao, .check, .icon {
+  transition: transform 0.14s var(--spring-rapida), box-shadow 0.2s ease, background-color 0.18s ease;
+  will-change: transform;
+}
+.btn:active, button.acao:active {
+  transform: scale(0.96) translate3d(0, 1px, 0);
+}
+.check:active {
+  transform: scale(0.82);
+}
+
+/* Check com efeito de squeeze & pop elastico */
+li.just-done > .item > .check,
+li.just-done .check.main-check {
+  animation: check-spring-pop 0.42s var(--spring-elastica) !important;
+}
+@keyframes check-spring-pop {
+  0% { transform: scale(0.5); }
+  60% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
+/* Animacao de respiracao organica para pets e mascotes */
+.pet-avatar, .mascote-corpo, [data-act="pet-interagir"] {
+  animation: respiracao-organica 3.5s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes respiracao-organica {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.02); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Shimmer de luz em barras de progresso ativas */
+.progresso-shimmer, .mv-barra-progresso-mundo-fill {
+  position: relative;
+  overflow: hidden;
+}
+.progresso-shimmer::after, .mv-barra-progresso-mundo-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer-fluxo 2.2s infinite;
+}
+@keyframes shimmer-fluxo {
+  100% { left: 160%; }
+}
+
+/* Hover suave em cartoes de conteudo */
+.card, .mv-cartao-personalidade, .card-referencia-mundo {
+  transition: transform 0.25s var(--spring-rapida), box-shadow 0.25s ease;
+  will-change: transform, box-shadow;
+}
+.card:hover, .mv-cartao-personalidade:hover, .card-referencia-mundo:hover {
+  transform: translate3d(0, -3px, 0);
+}
+
+/* Toast com entrada elastica mais refinada */
+.toast.show {
+  animation: toast-spring 0.45s var(--spring-elastica) !important;
+}
+@keyframes toast-spring {
+  from {
+    transform: translate3d(-50%, 30px, 0) scale(0.88);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(-50%, 0, 0) scale(1);
+    opacity: 1;
+  }
+}
