@@ -139,3 +139,74 @@
 .spoiler-resenha-blur:hover, .spoiler-resenha-blur.revelado {
   filter: blur(0);
 }
+
+
+/* ========================================================
+   LOTES 501 A 600: PILHAS TEMÁTICAS, ESTANTE INFINITA,
+   METODOLOGIAS DE APRENDIZAGEM E O MARCO SUPREMO 600
+   ======================================================== */
+
+/* Luminária de mesa clássica (Luz circular acolhedora) */
+.luminaria-candeeiro-mesa {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(254, 240, 138, 0.45) 0%, rgba(254, 240, 138, 0.1) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Plaquinha de latão gravada na prateleira */
+.placa-latao-prateleira {
+  display: inline-block;
+  padding: 2px 10px;
+  background: linear-gradient(180deg, #ffd700 0%, #b45309 100%);
+  border: 1px solid #78350f;
+  border-radius: 3px;
+  color: #fff;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Borda folheada a ouro na lateral das páginas */
+.paginas-borda-ouro {
+  box-shadow: inset 0 -3px 0 #ffd700, 0 2px 4px rgba(255, 215, 0, 0.3);
+}
+
+/* Carimbo vintage de livro lido */
+.carimbo-concluido-vintage {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 3px solid #b91c1c;
+  color: #b91c1c;
+  font-family: 'Special Elite', monospace, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transform: rotate(-14deg);
+  opacity: 0.88;
+  mask-image: radial-gradient(circle, #000 60%, rgba(0,0,0,0.4) 100%);
+}
+
+/* Capa de linho com baixo relevo */
+.capa-linho-nobrecraft {
+  background-color: #334155;
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 4px);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: inset 1px 1px 3px rgba(255,255,255,0.2), inset -1px -1px 3px rgba(0,0,0,0.5);
+}
+
+/* Marcador magnético de página */
+.marcador-magnetico-svg {
+  position: absolute;
+  top: -4px;
+  right: 12px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+}

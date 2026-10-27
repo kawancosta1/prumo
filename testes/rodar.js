@@ -114,6 +114,8 @@ const servidor = http.createServer((req, res) => {
     ["Pets e Mascotes: Expansão Lote 4 (Itens 351 a 400)", () => require("./pets-lote4")(url)],
     ["Estante e Leitura: Expansão Lote 1 (Itens 401 a 450)", () => require("./estante-lote1")(url)],
     ["Estante e Leitura: Expansão Lote 2 (Itens 451 a 500)", () => require("./estante-lote2")(url)],
+    ["Estante e Leitura: Expansão Lote 3 (Itens 501 a 550)", () => require("./estante-lote3")(url)],
+    ["Estante e Leitura: Expansão Lote 4 (Itens 551 a 600)", () => require("./estante-lote4")(url)],
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
     ["Quarto por Mundo", () => require("./quarto-mundos")(url)],
