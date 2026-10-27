@@ -2493,3 +2493,179 @@ function aplicarTransicaoModoEscuroSuave(duracaoMs) {
     }
   }, d + 50);
 }
+
+// ========================================================
+// NOVAS 260 MELHORIAS GERAIS - LOTE 2 (ITENS 11 A 20)
+// ========================================================
+
+// G11. Confete direcionado brotando do elemento clicado
+function dispararConfeteBrotandoElemento(elOrigem, cores) {
+  if (typeof document === "undefined" || !elOrigem) return [];
+  if (verificarPreferenciaMovimentoReduzido()) return [];
+  const palette =
+    Array.isArray(cores) && cores.length ? cores : ["#38bdf8", "#ec4899", "#84cc16", "#f59e0b", "#a855f7"];
+  const ret = elOrigem.getBoundingClientRect
+    ? elOrigem.getBoundingClientRect()
+    : { left: 0, top: 0, width: 40, height: 40 };
+  const confetes = [];
+
+  for (let i = 0; i < 10; i++) {
+    const c = document.createElement("div");
+    c.className = "particula-confete-brotando";
+    c.style.backgroundColor = palette[i % palette.length];
+    const cx = (Math.random() - 0.5) * 80;
+    const cy = -25 - Math.random() * 50;
+    const rot = Math.floor(Math.random() * 360);
+    c.style.setProperty("--cx", `${cx}px`);
+    c.style.setProperty("--cy", `${cy}px`);
+    c.style.setProperty("--rot", `${rot}deg`);
+    c.style.left = `${ret.left + ret.width / 2}px`;
+    c.style.top = `${ret.top + ret.height / 2}px`;
+    document.body.appendChild(c);
+    confetes.push(c);
+    setTimeout(() => {
+      if (c.parentNode) c.parentNode.removeChild(c);
+    }, 750);
+  }
+  return confetes;
+}
+
+// G12. Ícone de cadeado que gira e abre suavemente ao autenticar
+function animarCadeadoAutenticacao(elCadeado) {
+  if (!elCadeado || typeof elCadeado.classList !== "object") return;
+  if (verificarPreferenciaMovimentoReduzido()) return;
+  elCadeado.classList.remove("cadeado-girando-abre");
+  void elCadeado.offsetWidth;
+  elCadeado.classList.add("cadeado-girando-abre");
+  setTimeout(() => {
+    if (elCadeado) elCadeado.classList.remove("cadeado-girando-abre");
+  }, 450);
+}
+
+// G13. Movimento de folhas caindo ao arquivar um hábito antigo
+function animarFolhasCaindoHabito(elHabito) {
+  if (typeof document === "undefined" || !elHabito) return [];
+  if (verificarPreferenciaMovimentoReduzido()) return [];
+  const ret = elHabito.getBoundingClientRect
+    ? elHabito.getBoundingClientRect()
+    : { left: 0, top: 0, width: 40, height: 20 };
+  const folhas = [];
+
+  for (let i = 0; i < 4; i++) {
+    const f = document.createElement("div");
+    f.className = "particula-folha-caindo";
+    const fx = (i % 2 === 0 ? 1 : -1) * (10 + Math.random() * 20);
+    f.style.setProperty("--fx", `${fx}px`);
+    f.style.left = `${ret.left + (ret.width * (i + 1)) / 5}px`;
+    f.style.top = `${ret.top + ret.height / 2}px`;
+    document.body.appendChild(f);
+    folhas.push(f);
+    setTimeout(() => {
+      if (f.parentNode) f.parentNode.removeChild(f);
+    }, 850);
+  }
+  return folhas;
+}
+
+// G14. Pulso rítmico no cronômetro Pomodoro no minuto final
+function aplicarPulsoMinutoFinalPomodoro(elTimer, ativo) {
+  if (!elTimer || typeof elTimer.classList !== "object") return;
+  if (ativo && !verificarPreferenciaMovimentoReduzido()) {
+    elTimer.classList.add("pomodoro-pulso-urgente");
+  } else {
+    elTimer.classList.remove("pomodoro-pulso-urgente");
+  }
+}
+
+// G15. Efeito de carimbo com tinta seca ao marcar meta como concluída
+function animarCarimboMetaConcluida(elCard, textoCarimbo) {
+  if (!elCard || typeof elCard.appendChild !== "function") return null;
+  const texto = sanitizarHTMLSeguro(textoCarimbo || "CONCLUÍDO");
+  let carimbo = elCard.querySelector(".carimbo-meta-concluida");
+  if (!carimbo) {
+    carimbo = document.createElement("div");
+    carimbo.className = "carimbo-meta-concluida";
+    carimbo.style.cssText =
+      "position:absolute; right:12px; top:8px; border:2px solid #22c55e; color:#22c55e; " +
+      "font-weight:900; font-size:11px; padding:2px 6px; border-radius:4px; text-transform:uppercase; pointer-events:none;";
+    elCard.style.position = "relative";
+    elCard.appendChild(carimbo);
+  }
+  carimbo.textContent = texto;
+  return carimbo;
+}
+
+// G16. Piscar de olhos sincronizado entre o Prumi e o pet
+function sincronizarPiscadaPrumiPet(elPrumi, elPet) {
+  if (verificarPreferenciaMovimentoReduzido()) return;
+  const elementos = [elPrumi, elPet].filter(el => el && typeof el.classList === "object");
+  elementos.forEach(el => {
+    el.classList.remove("olho-piscando-sincrono");
+    void el.offsetWidth;
+    el.classList.add("olho-piscando-sincrono");
+    setTimeout(() => {
+      if (el) el.classList.remove("olho-piscando-sincrono");
+    }, 250);
+  });
+}
+
+// G17. Balanço de cauda do pet ao receber carinho contínuo
+function animarBalancoCaudaPet(elPet, ativo) {
+  if (!elPet || typeof elPet.classList !== "object") return;
+  if (ativo && !verificarPreferenciaMovimentoReduzido()) {
+    elPet.classList.add("pet-cauda-balancando");
+  } else {
+    elPet.classList.remove("pet-cauda-balancando");
+  }
+}
+
+// G18. Efeito de fita métrica desenhando o progresso nos hábitos
+function animarFitaProgressoHabito(elBarra, percentual) {
+  if (!elBarra || typeof elBarra.style !== "object") return;
+  const pct = Math.min(100, Math.max(0, Number(percentual) || 0));
+  elBarra.classList.add("fita-progresso-animada");
+  elBarra.style.width = `${pct}%`;
+}
+
+// G19. Nuvem de fumaça fofa de desenho animado ao excluir item
+function animarFumacaExclusao(elAlvo) {
+  if (typeof document === "undefined" || !elAlvo) return [];
+  if (verificarPreferenciaMovimentoReduzido()) return [];
+  const ret = elAlvo.getBoundingClientRect
+    ? elAlvo.getBoundingClientRect()
+    : { left: 0, top: 0, width: 30, height: 30 };
+  const bolhas = [];
+
+  for (let i = 0; i < 5; i++) {
+    const b = document.createElement("div");
+    b.className = "particula-fumaca-fofa";
+    const tamanho = 12 + Math.random() * 14;
+    b.style.width = `${tamanho}px`;
+    b.style.height = `${tamanho}px`;
+    const sx = (i - 2) * 12;
+    const sy = -10 - Math.random() * 15;
+    b.style.setProperty("--sx", `${sx}px`);
+    b.style.setProperty("--sy", `${sy}px`);
+    b.style.left = `${ret.left + ret.width / 2 - tamanho / 2}px`;
+    b.style.top = `${ret.top + ret.height / 2 - tamanho / 2}px`;
+    document.body.appendChild(b);
+    bolhas.push(b);
+    setTimeout(() => {
+      if (b.parentNode) b.parentNode.removeChild(b);
+    }, 500);
+  }
+  return bolhas;
+}
+
+// G20. Expansão circular estilo revelação ao abrir modais em tela cheia
+function animarRevelacaoCircularModal(modalEl, centroX, centroY) {
+  if (!modalEl || typeof modalEl.style !== "object") return;
+  if (verificarPreferenciaMovimentoReduzido()) return;
+  const cx = typeof centroX === "number" ? `${centroX}px` : "50%";
+  const cy = typeof centroY === "number" ? `${centroY}px` : "50%";
+  modalEl.style.setProperty("--cx", cx);
+  modalEl.style.setProperty("--cy", cy);
+  modalEl.classList.remove("modal-revelacao-circular");
+  void modalEl.offsetWidth;
+  modalEl.classList.add("modal-revelacao-circular");
+}

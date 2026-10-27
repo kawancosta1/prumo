@@ -1071,6 +1071,185 @@ html.transicao-tema-ativa * {
     border-color 0.25s ease !important;
 }
 
+/* ========================================================
+   NOVAS 260 MELHORIAS GERAIS - LOTE 2 (ITENS 11 A 20)
+   ======================================================== */
+
+/* 11. Confete direcionado brotando do elemento */
+.particula-confete-brotando {
+  position: absolute;
+  pointer-events: none;
+  width: 7px;
+  height: 10px;
+  border-radius: 2px;
+  animation: brotarConfeteAnim 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes brotarConfeteAnim {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.5) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--cx, 20px), var(--cy, -45px)) scale(1) rotate(var(--rot, 180deg));
+  }
+}
+
+/* 12. Ícone de cadeado que gira e abre */
+.cadeado-girando-abre {
+  animation: girarAbrirCadeado 0.4s ease forwards;
+}
+@keyframes girarAbrirCadeado {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  40% {
+    transform: rotate(-15deg) scale(1.1);
+  }
+  80% {
+    transform: rotate(10deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* 13. Folhas caindo ao arquivar hábito */
+.particula-folha-caindo {
+  position: absolute;
+  pointer-events: none;
+  width: 10px;
+  height: 14px;
+  border-radius: 50% 0 50% 0;
+  background: #22c55e;
+  animation: cairFolhaAnim 0.8s ease-in forwards;
+}
+@keyframes cairFolhaAnim {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(var(--fx, 15px), 25px) rotate(60deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--fx, -15px), 55px) rotate(140deg);
+  }
+}
+
+/* 14. Pulso rítmico no cronômetro Pomodoro no minuto final */
+.pomodoro-pulso-urgente {
+  animation: pulsoUrgentePomodoro 1s infinite alternate ease-in-out;
+  color: #ef4444 !important;
+}
+@keyframes pulsoUrgentePomodoro {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.3));
+  }
+  100% {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.7));
+  }
+}
+
+/* 15. Efeito de carimbo de meta concluída */
+.carimbo-meta-concluida {
+  animation: baterCarimboAnim 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes baterCarimboAnim {
+  0% {
+    opacity: 0;
+    transform: scale(2.2) rotate(-18deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.95) rotate(-3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-5deg);
+  }
+}
+
+/* 16. Piscar de olhos sincronizado */
+.olho-piscando-sincrono {
+  animation: piscarOlhoSincronoAnim 0.22s ease-in-out forwards;
+  transform-origin: center;
+}
+@keyframes piscarOlhoSincronoAnim {
+  0% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.1);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+/* 17. Balanço de cauda do pet */
+.pet-cauda-balancando {
+  animation: balancarCaudaAnim 0.35s ease-in-out infinite alternate;
+  transform-origin: bottom left;
+}
+@keyframes balancarCaudaAnim {
+  0% {
+    transform: rotate(-12deg);
+  }
+  100% {
+    transform: rotate(18deg);
+  }
+}
+
+/* 18. Fita métrica animada de progresso de hábito */
+.fita-progresso-animada {
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.15) 0,
+    rgba(255, 255, 255, 0.15) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+/* 19. Nuvem de fumaça fofa de desenho animado ao excluir */
+.particula-fumaca-fofa {
+  position: absolute;
+  pointer-events: none;
+  background: #cbd5e1;
+  border-radius: 50%;
+  animation: espalharFumacaAnim 0.45s ease-out forwards;
+}
+@keyframes espalharFumacaAnim {
+  0% {
+    opacity: 0.85;
+    transform: translate(0, 0) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--sx, 0px), var(--sy, -15px)) scale(1.6);
+  }
+}
+
+/* 20. Revelação circular de modal */
+.modal-revelacao-circular {
+  animation: revelacaoCircularAnim 0.3s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+@keyframes revelacaoCircularAnim {
+  0% {
+    opacity: 0;
+    clip-path: circle(0% at var(--cx, 50%) var(--cy, 50%));
+  }
+  100% {
+    opacity: 1;
+    clip-path: circle(150% at var(--cx, 50%) var(--cy, 50%));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particula-desintegracao,
   .prumi-squash,
@@ -1106,6 +1285,15 @@ html.transicao-tema-ativa * {
   .desdobrar-pergaminho,
   .brilho-metalico-selo::after,
   .particula-faisca-conclusao,
+  .particula-confete-brotando,
+  .cadeado-girando-abre,
+  .particula-folha-caindo,
+  .pomodoro-pulso-urgente,
+  .carimbo-meta-concluida,
+  .olho-piscando-sincrono,
+  .pet-cauda-balancando,
+  .particula-fumaca-fofa,
+  .modal-revelacao-circular,
   .badge-conquista-desbloqueada {
     animation: none !important;
     transform: none !important;
