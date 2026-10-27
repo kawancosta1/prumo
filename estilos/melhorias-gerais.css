@@ -537,6 +537,44 @@ textarea:focus-visible {
   border: 0 !important;
 }
 
+/* 94. Fontes ampliadas com unidades relativas */
+.texto-responsivo-rem {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* 96. Compatibilidade com telas ultrafinas de 320px */
+@media (max-width: 360px) {
+  body {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  .touch-minimo {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* 97. Zona de alcance do polegar */
+.zona-polegar {
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+/* 100. Prevenção de zoom acidental no iOS Safari */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particula-desintegracao,
   .prumi-squash,

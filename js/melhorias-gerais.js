@@ -1238,3 +1238,104 @@ function assegurarAriaLabelsBotoes(container) {
   });
   return ajustados;
 }
+
+// 91. Marcação semântica das falas do Prumi
+function formatarFalaPrumiSemantica(fala, autor) {
+  const nome = sanitizarHTMLSeguro(autor || "Prumi");
+  const texto = sanitizarHTMLSeguro(fala || "");
+  return (
+    `<figure class="prumi-fala-semantica" role="group" aria-label="Fala do mascote">` +
+    `<blockquote cite="#prumi"><p>${texto}</p></blockquote>` +
+    `<figcaption class="sr-live-region">${nome}</figcaption>` +
+    `</figure>`
+  );
+}
+
+// 92. Fechamento de modais com tecla Escape
+function ouvirTeclaEscape(callbackFechar) {
+  if (typeof window === "undefined" || typeof callbackFechar !== "function") {
+    return () => {};
+  }
+  const handler = evt => {
+    if (evt.key === "Escape" || evt.key === "Esc") {
+      callbackFechar(evt);
+    }
+  };
+  window.addEventListener("keydown", handler);
+  return () => window.removeEventListener("keydown", handler);
+}
+
+// 93. Focus trap em modais abertos
+function aplicarFocusTrap(modalEl) {
+  if (!modalEl || typeof modalEl.querySelector !== "function") {
+    return () => {};
+  }
+  const seletor = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+  const handler = evt => {
+    if (evt.key !== "Tab") return;
+    const focaveis = Array.from(modalEl.querySelectorAll(seletor)).filter(
+      el => !el.hasAttribute("disabled") && el.offsetParent !== null
+    );
+    if (!focaveis.length) {
+      evt.preventDefault();
+      return;
+    }
+    const primeiro = focaveis[0];
+    const ultimo = focaveis[focaveis.length - 1];
+
+    if (evt.shiftKey) {
+      if (document.activeElement === primeiro) {
+        ultimo.focus();
+        evt.preventDefault();
+      }
+    } else {
+      if (document.activeElement === ultimo) {
+        primeiro.focus();
+        evt.preventDefault();
+      }
+    }
+  };
+
+  modalEl.addEventListener("keydown", handler);
+  return () => modalEl.removeEventListener("keydown", handler);
+}
+
+// 95. Indicação textual complementar em elementos coloridos
+function marcarStatusComTexto(el, status, textoComplementar) {
+  if (!el || typeof el.setAttribute !== "function") return;
+  const texto = textoComplementar || status;
+  el.setAttribute("data-status", String(status));
+  let span = el.querySelector(".status-texto-acessivel");
+  if (!span) {
+    span = document.createElement("span");
+    span.className = "status-texto-acessivel oculto-acessivel";
+    el.appendChild(span);
+  }
+  span.textContent = ` (${texto})`;
+}
+
+// 98. Retorno tátil via navigator.vibrate
+function dispararRetornoTatil(tipo) {
+  if (typeof navigator === "undefined" || typeof navigator.vibrate !== "function") {
+    return false;
+  }
+  try {
+    if (tipo === "sucesso") {
+      return navigator.vibrate([20, 40, 20]);
+    } else if (tipo === "alerta") {
+      return navigator.vibrate([40, 60, 40]);
+    } else {
+      return navigator.vibrate(10);
+    }
+  } catch (_) {
+    return false;
+  }
+}
+
+// 99. Inputs numéricos com inputmode="numeric"
+function garantirInputmodeNumerico(inputEl) {
+  if (!inputEl || typeof inputEl.setAttribute !== "function") return;
+  inputEl.setAttribute("inputmode", "numeric");
+  inputEl.setAttribute("pattern", "[0-9]*");
+}
