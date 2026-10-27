@@ -1634,3 +1634,184 @@ function tocarViolaSertanejo(cordaNota) {
     osc.stop(ctx.currentTime + 0.35);
   } catch (_) {}
 }
+
+// 121. Console interativo de comandos no mundo Programador
+function executarComandoConsole(cmd, estado) {
+  const c = String(cmd || "")
+    .trim()
+    .toLowerCase();
+  const est = estado || {};
+  if (c === "help") {
+    return "Comandos disponíveis: status, gotas, tarefas, clear, ping";
+  }
+  if (c === "status") {
+    const tarefasFeitas = Array.isArray(est.tarefas) ? est.tarefas.filter(t => t.feita).length : 0;
+    return `STATUS: OK | Tarefas feitas: ${tarefasFeitas} | Conexão: Local`;
+  }
+  if (c === "gotas") {
+    const gotas = typeof est.gotas === "number" ? est.gotas : 0;
+    return `GOTAS: ${gotas}💧 disponíveis`;
+  }
+  if (c === "ping") {
+    return "PONG! 0ms latência";
+  }
+  if (c === "clear") {
+    return "";
+  }
+  return `Comando desconhecido: "${c}". Digite "help" para ver as opções.`;
+}
+
+// 122. Jardim zen com pedras empilháveis
+function jardimZenPedrasHTML(qtdPedras) {
+  const n = Math.min(7, Math.max(1, parseInt(qtdPedras, 10) || 3));
+  let pedrasHTML = "";
+  for (let i = 0; i < n; i++) {
+    const largura = 70 - i * 8;
+    const altura = 16 - i * 1.5;
+    pedrasHTML += `<div class="pedra-zen" style="width:${largura}px; height:${altura}px;"></div>`;
+  }
+  return `<div class="jardim-zen-pedras" aria-label="Torre de equilíbrio">${pedrasHTML}</div>`;
+}
+
+// 123. Bateria de dedilhado rápido no mundo Roqueiro
+function bateriaRockDedilhado(peca) {
+  const ctx = obterContextoAudioSeguro();
+  if (!ctx) return false;
+  const p = String(peca || "caixa").toLowerCase();
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const freq = p === "bumbo" ? 75 : p === "prato" ? 1200 : 250;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.1);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+// 124. Livro de receitas de chás e bolos no mundo Vovó
+function receitasVovoHTML(filtro) {
+  const receitas = [
+    { nome: "Chá de Camomila Calmante", gotas: 2, efeito: "Alivia ansiedade de prazos" },
+    { nome: "Bolo de Fubá com Erva-Doce", gotas: 5, efeito: "Dobra gotas da próxima tarefa" },
+    { nome: "Chá de Hortelã Refrescante", gotas: 3, efeito: "Foco revigorado por 25 min" }
+  ];
+  const f = String(filtro || "").toLowerCase();
+  const filtradas = receitas.filter(r => !f || r.nome.toLowerCase().includes(f));
+  let itens = "";
+  filtradas.forEach(r => {
+    itens +=
+      `<div style="border-bottom:1px dashed #cbd5e1; padding:6px 0;">` +
+      `<strong>${sanitizarHTMLSeguro(r.nome)}</strong> (Custo: ${r.gotas}💧)<br/>` +
+      `<span style="font-size:12px; color:#64748b;">${sanitizarHTMLSeguro(r.effect || r.efeito)}</span>` +
+      `</div>`;
+  });
+  return `<div class="receitas-vovo-container" style="font-size:13px;">${itens}</div>`;
+}
+
+// 125. Painel de metas SMART e gráficos de linha no mundo Coach
+function painelCoachMetasHTML(metas) {
+  const lista = Array.isArray(metas) ? metas : [];
+  let cards = "";
+  lista.forEach(m => {
+    const pct = Math.min(100, Math.max(0, parseInt(m.progresso, 10) || 0));
+    cards +=
+      `<div style="margin-bottom:8px;">` +
+      `<div style="display:flex; justify-content:space-between; font-size:12px;">` +
+      `<span>${sanitizarHTMLSeguro(m.titulo || "Meta")}</span>` +
+      `<strong>${pct}%</strong>` +
+      `</div>` +
+      `<div style="background:#e2e8f0; border-radius:4px; height:8px; overflow:hidden;">` +
+      `<div style="width:${pct}%; background:#22c55e; height:100%;"></div>` +
+      `</div>` +
+      `</div>`;
+  });
+  return `<div class="painel-coach-metas">${cards || "<p>Nenhuma meta ativa.</p>"}</div>`;
+}
+
+// 126. Pista de dança ritmada no mundo Forrozeiro
+function pistaForroHTML(ritmo) {
+  const r = String(ritmo || "xote");
+  return (
+    `<div class="pista-forro" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; max-width:180px; margin:auto;">` +
+    `<div style="background:#fbbf24; height:32px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:11px;">1-2</div>` +
+    `<div style="background:#f59e0b; height:32px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:11px;">Gira</div>` +
+    `<div style="background:#d97706; height:32px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:11px;">${sanitizarHTMLSeguro(r)}</div>` +
+    `</div>`
+  );
+}
+
+// 127. Roda de samba interativa no mundo Pagodeiro
+function rodaSambaHTML(instrumentosAtivos) {
+  const ativos = Array.isArray(instrumentosAtivos) ? instrumentosAtivos : ["pandeiro"];
+  const insts = [
+    { id: "pandeiro", nome: "Pandeiro" },
+    { id: "cavaquinho", nome: "Cavaquinho" },
+    { id: "tanta", nome: "Tantã" }
+  ];
+  let chips = "";
+  insts.forEach(ins => {
+    const ligado = ativos.includes(ins.id);
+    const bg = ligado ? "#10b981" : "#94a3b8";
+    chips +=
+      `<span style="background:${bg}; color:#fff; padding:4px 8px; border-radius:12px; font-size:12px; margin-right:4px;">` +
+      `${ins.nome} ${ligado ? "🎵" : ""}` +
+      `</span>`;
+  });
+  return `<div class="roda-samba">${chips}</div>`;
+}
+
+// 128. Paredão de som com equalizador visual no mundo Funkeiro
+function paredaoFunkHTML(frequencias) {
+  const barras = Array.isArray(frequencias) && frequencias.length ? frequencias : [12, 20, 8, 24, 16];
+  let eqHTML = "";
+  barras.forEach(h => {
+    eqHTML += `<span class="eq-barra" style="height:${h}px;"></span>`;
+  });
+  return (
+    `<div class="paredao-funk">` +
+    `<div style="font-weight:bold; font-size:12px; color:#ec4899; margin-bottom:6px;">PAREDÃO DO PRUMO</div>` +
+    `<div>${eqHTML}</div>` +
+    `</div>`
+  );
+}
+
+// 129. Vitrine de sneakers e correntes no mundo Trapper
+function vitrineSneakersHTML(sneakers) {
+  const lista = Array.isArray(sneakers)
+    ? sneakers
+    : [
+        { id: "sneaker_dourado", nome: "Sneaker Dourado" },
+        { id: "corrente_gelo", nome: "Corrente de Gelo" }
+      ];
+  let cards = "";
+  lista.forEach(s => {
+    cards +=
+      `<div style="display:inline-block; border:1px solid #475569; border-radius:6px; padding:6px; margin:4px; font-size:11px; background:#1e293b; color:#f8fafc;">` +
+      `👟 ${sanitizarHTMLSeguro(s.nome)}` +
+      `</div>`;
+  });
+  return `<div class="vitrine-sneakers">${cards}</div>`;
+}
+
+// 130. Rotina de skincare matinal e noturna no mundo Cleanboy
+function rotinaSkincareHTML(etapa, feita) {
+  const e = sanitizarHTMLSeguro(etapa || "Gel de Limpeza");
+  const f = Boolean(feita);
+  return (
+    `<div class="card-skincare" style="display:flex; align-items:center; justify-content:space-between;">` +
+    `<div>` +
+    `<span style="font-size:11px; color:#64748b;">AUTOCUIDADO</span><br/>` +
+    `<strong>${e}</strong>` +
+    `</div>` +
+    `<span style="font-size:18px;">${f ? "✨" : "💧"}</span>` +
+    `</div>`
+  );
+}

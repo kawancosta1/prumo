@@ -686,6 +686,67 @@ a,
   }
 }
 
+/* 121. Console interativo Programador */
+.terminal-programador {
+  background: #0f172a;
+  color: #38bdf8;
+  font-family: monospace;
+  font-size: 13px;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #1e293b;
+}
+
+/* 122. Jardim zen com pedras empilháveis */
+.jardim-zen-pedras {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 2px;
+  padding: 12px;
+}
+
+.pedra-zen {
+  background: #71717a;
+  border-radius: 50% 50% 45% 45%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 128. Paredão de som Funk */
+.paredao-funk {
+  background: #111827;
+  border: 2px solid #374151;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+
+.eq-barra {
+  width: 8px;
+  background: #ec4899;
+  border-radius: 2px;
+  display: inline-block;
+  margin: 0 2px;
+  animation: oscilarEqualizador 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes oscilarEqualizador {
+  0% {
+    height: 6px;
+  }
+  100% {
+    height: 24px;
+  }
+}
+
+/* 130. Skincare Cleanboy */
+.card-skincare {
+  border-radius: 10px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  padding: 10px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particula-desintegracao,
   .prumi-squash,
@@ -711,6 +772,7 @@ a,
   .habito-arquivado-pendular,
   .fita-bobina,
   .corda-viola-vibrando,
+  .eq-barra,
   .badge-conquista-desbloqueada {
     animation: none !important;
     transform: none !important;
