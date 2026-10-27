@@ -1085,3 +1085,156 @@ function garantirFontDisplaySwap(cssText) {
     return match;
   });
 }
+
+// 81. Cache em memória para templates SVG
+const mapaCacheSVG = new Map();
+
+function obterCacheSVG(id, geradorFn) {
+  if (typeof id !== "string") return "";
+  if (mapaCacheSVG.has(id)) {
+    return mapaCacheSVG.get(id);
+  }
+  const svg = typeof geradorFn === "function" ? geradorFn() : "";
+  mapaCacheSVG.set(id, svg);
+  return svg;
+}
+
+function limparCacheSVG() {
+  mapaCacheSVG.clear();
+}
+
+// 82. Sistema de migração de versões de esquema
+function migrarVersaoEsquema(estado, versaoAlvo, migradores) {
+  if (!estado || typeof estado !== "object") return estado;
+  let versaoAtual = typeof estado._versao === "number" ? estado._versao : 1;
+  const mapa = migradores || {};
+
+  while (versaoAtual < versaoAlvo) {
+    const proxima = versaoAtual + 1;
+    if (typeof mapa[proxima] === "function") {
+      estado = mapa[proxima](estado);
+    }
+    versaoAtual = proxima;
+  }
+  estado._versao = versaoAlvo;
+  return estado;
+}
+
+// 83. Memoização de cálculos de diffDays
+const mapaMemoDiffDays = new Map();
+
+function memoDiffDays(dataA, dataB) {
+  const chave = `${dataA}_${dataB}`;
+  if (mapaMemoDiffDays.has(chave)) {
+    return mapaMemoDiffDays.get(chave);
+  }
+  const tA = new Date(dataA).getTime();
+  const tB = new Date(dataB).getTime();
+  const diff = Math.round((tB - tA) / (1000 * 60 * 60 * 24));
+  if (mapaMemoDiffDays.size >= 64) {
+    const primeiro = mapaMemoDiffDays.keys().next().value;
+    mapaMemoDiffDays.delete(primeiro);
+  }
+  mapaMemoDiffDays.set(chave, diff);
+  return diff;
+}
+
+// 84. Otimização de cache offline no Service Worker
+function gerarCacheManifesto(versao, rotas) {
+  const v = String(versao || "1.0.0");
+  const base = [
+    "/",
+    "/index.html",
+    "/estilos/base.css",
+    "/estilos/melhorias-gerais.css",
+    "/js/melhorias-gerais.js"
+  ];
+  const extras = Array.isArray(rotas) ? rotas : [];
+  const conjunto = new Set([...base, ...extras]);
+  return {
+    nomeCache: `prumo-cache-v${v}`,
+    arquivos: Array.from(conjunto),
+    criadoEm: Date.now()
+  };
+}
+
+// 85. Validação rigorosa de "use strict" em scripts
+function validarUseStrictEmScript(codigo) {
+  if (typeof codigo !== "string") return false;
+  const limpo = codigo.trim();
+  return (
+    limpo.startsWith('"use strict"') ||
+    limpo.startsWith("'use strict'") ||
+    /^\/\*[\s\S]*?\*\/\s*['"]use strict['"]/.test(limpo)
+  );
+}
+
+// 86. Validador de contraste WCAG 2.1 AA
+function calcularLuminanciaRelativa(hex) {
+  let cor = String(hex || "").replace("#", "");
+  if (cor.length === 3) {
+    cor = cor[0] + cor[0] + cor[1] + cor[1] + cor[2] + cor[2];
+  }
+  const r8 = parseInt(cor.substring(0, 2), 16) || 0;
+  const g8 = parseInt(cor.substring(2, 4), 16) || 0;
+  const b8 = parseInt(cor.substring(4, 6), 16) || 0;
+
+  const transformar = c8 => {
+    const v = c8 / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  };
+
+  const R = transformar(r8);
+  const G = transformar(g8);
+  const B = transformar(b8);
+  return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+}
+
+function validarContrasteWCAG(hex1, hex2) {
+  const l1 = calcularLuminanciaRelativa(hex1);
+  const l2 = calcularLuminanciaRelativa(hex2);
+  const maisClaro = Math.max(l1, l2);
+  const maisEscuro = Math.min(l1, l2);
+  const razao = (maisClaro + 0.05) / (maisEscuro + 0.05);
+  const razaoArredondada = Math.round(razao * 100) / 100;
+  return {
+    razao: razaoArredondada,
+    passaNormal: razaoArredondada >= 4.5,
+    passaGrande: razaoArredondada >= 3.0
+  };
+}
+
+// 89. Regiões dinâmicas aria-live="polite" para leitores de tela
+function anunciarLeitorTela(mensagem, prioridade) {
+  if (typeof document === "undefined" || !mensagem) return;
+  let liveEl = document.getElementById("prumo-aria-live");
+  if (!liveEl) {
+    liveEl = document.createElement("div");
+    liveEl.id = "prumo-aria-live";
+    liveEl.className = "sr-live-region";
+    liveEl.setAttribute("aria-live", prioridade === "assertive" ? "assertive" : "polite");
+    liveEl.setAttribute("aria-atomic", "true");
+    document.body.appendChild(liveEl);
+  }
+  liveEl.textContent = "";
+  setTimeout(() => {
+    if (liveEl) liveEl.textContent = String(mensagem);
+  }, 20);
+}
+
+// 90. Rótulos semânticos aria-label automáticos em botões icon-only
+function assegurarAriaLabelsBotoes(container) {
+  if (typeof document === "undefined") return 0;
+  const raiz = container || document;
+  const botoes = raiz.querySelectorAll("button:not([aria-label])");
+  let ajustados = 0;
+  botoes.forEach(btn => {
+    const texto = btn.textContent.trim();
+    if (!texto) {
+      const titulo = btn.getAttribute("title") || "Ação";
+      btn.setAttribute("aria-label", titulo);
+      ajustados++;
+    }
+  });
+  return ajustados;
+}
