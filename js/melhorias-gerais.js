@@ -746,3 +746,184 @@ function registrarCicloVidaMundo(nomeMundo, ganchos = {}) {
   };
   return CICLO_VIDA_MUNDOS[nomeMundo];
 }
+
+// 61. Despachante de frames (eliminação de layout thrashing)
+const filaLeituraDOM = [];
+const filaEscritaDOM = [];
+let agendamentoFrameAtivo = false;
+
+function executarFilaFrameDOM() {
+  agendamentoFrameAtivo = false;
+  // Executa todas as leituras primeiro
+  while (filaLeituraDOM.length > 0) {
+    const fn = filaLeituraDOM.shift();
+    try {
+      fn();
+    } catch (_) {}
+  }
+  // Executa todas as escritas em seguida
+  while (filaEscritaDOM.length > 0) {
+    const fn = filaEscritaDOM.shift();
+    try {
+      fn();
+    } catch (_) {}
+  }
+}
+
+function agendarLeituraDOM(fn) {
+  if (typeof fn !== "function") return;
+  filaLeituraDOM.push(fn);
+  if (!agendamentoFrameAtivo) {
+    agendamentoFrameAtivo = true;
+    requestAnimationFrame(executarFilaFrameDOM);
+  }
+}
+
+function agendarEscritaDOM(fn) {
+  if (typeof fn !== "function") return;
+  filaEscritaDOM.push(fn);
+  if (!agendamentoFrameAtivo) {
+    agendamentoFrameAtivo = true;
+    requestAnimationFrame(executarFilaFrameDOM);
+  }
+}
+
+// 62. Formatadores nativos com Intl reutilizável
+let fmtNumeroMemo = null;
+function formatarMoedaGotas(n = 0) {
+  if (!fmtNumeroMemo && typeof Intl !== "undefined" && typeof Intl.NumberFormat === "function") {
+    fmtNumeroMemo = new Intl.NumberFormat("pt-BR");
+  }
+  return fmtNumeroMemo ? fmtNumeroMemo.format(n) : String(n);
+}
+
+// 63. Reutilização de singleton para AudioContext
+let audioContextGlobal = null;
+function obterContextoAudioSeguro() {
+  if (typeof window === "undefined") return null;
+  const A = window.AudioContext || window.webkitAudioContext;
+  if (!A) return null;
+  if (!audioContextGlobal) {
+    try {
+      audioContextGlobal = new A();
+    } catch (_) {
+      return null;
+    }
+  }
+  if (audioContextGlobal.state === "suspended") {
+    audioContextGlobal.resume().catch(() => {});
+  }
+  return audioContextGlobal;
+}
+
+// 64. Compressão LZW simples para redução de espaço no localStorage
+function comprimirTextoLZW(str) {
+  if (typeof str !== "string" || !str) return "";
+  const dict = {};
+  const data = (str + "").split("");
+  const out = [];
+  let currChar;
+  let phrase = data[0];
+  let code = 256;
+  for (let i = 1; i < data.length; i++) {
+    currChar = data[i];
+    if (dict[phrase + currChar] != null) {
+      phrase += currChar;
+    } else {
+      out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+      dict[phrase + currChar] = code++;
+      phrase = currChar;
+    }
+  }
+  out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+  return out.map(n => String.fromCharCode(n)).join("");
+}
+
+function descomprimirTextoLZW(str) {
+  if (typeof str !== "string" || !str) return "";
+  const dict = {};
+  const data = (str + "").split("");
+  let currChar = String.fromCharCode(data[0].charCodeAt(0));
+  let oldPhrase = currChar;
+  const out = [currChar];
+  let code = 256;
+  let phrase;
+  for (let i = 1; i < data.length; i++) {
+    const currCode = data[i].charCodeAt(0);
+    if (currCode < 256) {
+      phrase = data[i];
+    } else {
+      phrase = dict[currCode] ? dict[currCode] : oldPhrase + currChar;
+    }
+    out.push(phrase);
+    currChar = phrase.charAt(0);
+    dict[code++] = oldPhrase + currChar;
+    oldPhrase = phrase;
+  }
+  return out.join("");
+}
+
+// 65. Iteração de alta performance para listas volumosas
+function iterarRapido(arr, fn) {
+  if (!Array.isArray(arr) || typeof fn !== "function") return;
+  const len = arr.length;
+  let i = 0;
+  while (i < len) {
+    fn(arr[i], i);
+    i++;
+  }
+}
+
+// 66. Catálogo de Design Tokens centralizado
+const DESIGN_TOKENS = Object.freeze({
+  raioPadrao: 9,
+  animacaoPadraoMs: 250,
+  espacamentoTouchPx: 48,
+  maxCaracteresTitulo: 120,
+  duracaoNotificacaoMs: 4000
+});
+
+// 67. Gestão de metadados de elementos com WeakMap
+const mapaMetadadosWeak = typeof WeakMap !== "undefined" ? new WeakMap() : null;
+
+function registrarMetadadoElemento(el, dados) {
+  if (!el || !mapaMetadadosWeak || typeof dados !== "object") return;
+  mapaMetadadosWeak.set(el, dados);
+}
+
+function obterMetadadoElemento(el) {
+  if (!el || !mapaMetadadosWeak) return null;
+  return mapaMetadadosWeak.get(el) || null;
+}
+
+// 68. Verificação de regressão visual do Prumi via hash FNV-1a
+function calcularHashSVGPrumi(svgStr) {
+  if (typeof svgStr !== "string") return 0;
+  let hash = 2166136261;
+  for (let i = 0; i < svgStr.length; i++) {
+    hash ^= svgStr.charCodeAt(i);
+    hash = (hash * 16777619) >>> 0;
+  }
+  return hash.toString(16);
+}
+
+// 69. Carregador assíncrono sob demanda com Promise
+function carregarScriptSobDemanda(src) {
+  return new Promise((resolve, reject) => {
+    if (typeof document === "undefined") return resolve(false);
+    if (document.querySelector(`script[src="${src}"]`)) return resolve(true);
+    const s = document.createElement("script");
+    s.src = src;
+    s.async = true;
+    s.onload = () => resolve(true);
+    s.onerror = err => reject(err);
+    document.body.appendChild(s);
+  });
+}
+
+// 70. Validador estático contra violações de CSP
+function verificarConformidadeCSP(htmlStr) {
+  if (typeof htmlStr !== "string") return true;
+  const padroesProibidos = [/on\w+\s*=/i, /<script[^>]*>/i, /javascript:\s*/i];
+  return !padroesProibidos.some(reg => reg.test(htmlStr));
+}
