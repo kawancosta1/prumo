@@ -2801,3 +2801,165 @@ function animarFechamentoPersianaQuarto(elPersiana) {
   if (verificarPreferenciaMovimentoReduzido()) return;
   elPersiana.classList.add("persiana-fechando-quarto");
 }
+
+// G31. Otimização no carregamento de fontes secundárias sem bloquear pintura
+function otimizarCarregamentoFontesSecundarias(idLink = "fontes-mundos") {
+  if (typeof document === "undefined") return false;
+  const link = document.getElementById(idLink);
+  if (link && link.media === "print") {
+    link.media = "all";
+    return true;
+  }
+  return false;
+}
+
+// G32. Preservação de foco ativo ao re-renderizar conteúdo
+function preservarFocoElemento(container, fnAcao) {
+  if (typeof document === "undefined") return null;
+  const ativo = document.activeElement;
+  const seletor =
+    ativo && ativo.id
+      ? `#${ativo.id}`
+      : ativo && ativo.getAttribute && ativo.getAttribute("data-tab")
+        ? `[data-tab="${ativo.getAttribute("data-tab")}"]`
+        : null;
+  if (typeof fnAcao === "function") fnAcao();
+  if (seletor && container && typeof container.querySelector === "function") {
+    const novo = container.querySelector(seletor);
+    if (novo && typeof novo.focus === "function") {
+      novo.focus();
+      return novo;
+    }
+  }
+  return null;
+}
+
+// G33. Preservação da posição de rolagem em containers de tarefas
+function preservarPosicaoScrollContainer(container, fnAcao) {
+  if (!container || typeof container !== "object") return 0;
+  const topo = container.scrollTop || 0;
+  if (typeof fnAcao === "function") fnAcao();
+  container.scrollTop = topo;
+  return topo;
+}
+
+// G34. Pool de contexto 2D e dimensões de Canvas para partículas
+const _canvasPoolCache = new WeakMap();
+function obterPoolCanvasParticulas(canvas) {
+  if (!canvas || typeof canvas.getContext !== "function") return null;
+  if (_canvasPoolCache.has(canvas)) return _canvasPoolCache.get(canvas);
+  const ctx = canvas.getContext("2d");
+  const info = { ctx, largura: canvas.width || 0, altura: canvas.height || 0 };
+  _canvasPoolCache.set(canvas, info);
+  return info;
+}
+
+// G35. Cache seletivo em Map de elementos DOM frequentes
+const _domCacheMap = new Map();
+function obterElementoCache(id) {
+  if (typeof document === "undefined" || !id) return null;
+  if (_domCacheMap.has(id)) {
+    const el = _domCacheMap.get(id);
+    if (el && el.isConnected) return el;
+  }
+  const el = document.getElementById(id);
+  if (el) _domCacheMap.set(id, el);
+  return el;
+}
+
+// G36. Download nativo de backup JSON no navegador via Blob
+function baixarBackupJsonNavegador(dados, nomeArquivo) {
+  if (typeof Blob === "undefined" || typeof document === "undefined") return false;
+  try {
+    const texto = typeof dados === "string" ? dados : JSON.stringify(dados, null, 2);
+    const blob = new Blob([texto], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nomeArquivo || "prumo-backup.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// G37. Download nativo de arquivo de calendário ICS via Blob
+function baixarArquivoIcsNavegador(conteudoIcs, nomeArquivo) {
+  if (typeof Blob === "undefined" || typeof document === "undefined") return false;
+  try {
+    const blob = new Blob([conteudoIcs || ""], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nomeArquivo || "lembrete.ics";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// G38. Cálculo correto de prioridades por quantidade de pontos de exclamação
+function calcularPrioridadeExclamacoes(textoExclamacao) {
+  const str = String(textoExclamacao || "").trim();
+  if (str === "!!!") return 3; // alta
+  if (str === "!!") return 2;  // média
+  if (str === "!") return 1;   // baixa
+  return 0;
+}
+
+// G39. Verificação de cota excedida de armazenamento no LocalStorage
+function verificarCotaArmazenamento(erro) {
+  if (!erro || typeof erro !== "object") return { excedeu: false, mensagem: "" };
+  const nome = erro.name || "";
+  const codigo = erro.code || 0;
+  const ehCota =
+    nome === "QuotaExceededError" ||
+    nome === "NS_ERROR_DOM_QUOTA_REACHED" ||
+    codigo === 22 ||
+    codigo === 1014;
+  return {
+    excedeu: ehCota,
+    mensagem: ehCota ? "Armazenamento cheio no navegador. Exporte um backup." : (erro.message || "")
+  };
+}
+
+// G40. Tratamento global de atalhos de teclado (1-5 abas, N nova tarefa, Esc fechar)
+function tratarAtalhoTecladoGeral(evento, callbackAba, callbackNova, callbackFechar) {
+  if (!evento || typeof evento !== "object") return null;
+  const target = evento.target;
+  const isInput =
+    target &&
+    (target.tagName === "INPUT" ||
+      target.tagName === "TEXTAREA" ||
+      target.tagName === "SELECT" ||
+      target.isContentEditable);
+
+  if (evento.key === "Escape") {
+    if (typeof callbackFechar === "function") callbackFechar();
+    return "escape";
+  }
+
+  if (isInput || evento.ctrlKey || evento.metaKey || evento.altKey) return null;
+
+  if (evento.key === "n" || evento.key === "N") {
+    if (typeof callbackNova === "function") callbackNova();
+    return "nova";
+  }
+
+  const mapaAbas = { "1": "hoje", "2": "estudos", "3": "dieta", "4": "social", "5": "prumi" };
+  if (mapaAbas[evento.key]) {
+    const aba = mapaAbas[evento.key];
+    if (typeof callbackAba === "function") callbackAba(aba);
+    return aba;
+  }
+
+  return null;
+}

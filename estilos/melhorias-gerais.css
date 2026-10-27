@@ -1466,3 +1466,17 @@ html.transicao-tema-ativa * {
     transform: none !important;
   }
 }
+
+/* 31 a 40. Preservação de foco, pool de partículas e acessibilidade */
+.foco-restaurado-pulso {
+  outline: 2px solid var(--accent, #3f7fd9) !important;
+  outline-offset: 2px;
+  transition: outline 0.25s ease;
+}
+.scroll-suave-preservado {
+  scroll-behavior: smooth;
+}
+.particula-pool-ativa {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
