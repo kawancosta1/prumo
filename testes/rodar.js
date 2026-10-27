@@ -121,6 +121,7 @@ const servidor = http.createServer((req, res) => {
     ["Mundos Visuais: Expansão Lote 3 (Cleanboy, Coach, Forró, Funk - 400 itens)", () => require("./mundos-visual-lote3")(url)],
     ["Mundos Visuais: Expansão Lote 4 (Pagode, Rap, Sertanejo, Trap, Vovó - 500 itens)", () => require("./mundos-visual-lote4")(url)],
     ["Top 20 Referências por Personalidade (20 x 16+)", () => require("./referencias-mundos")(url)],
+    ["Averiguação Divertida da Leitura (Pet & Estante)", () => require("./leitura-averiguacao")(url)],
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
     ["Quarto por Mundo", () => require("./quarto-mundos")(url)],
