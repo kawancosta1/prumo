@@ -1452,3 +1452,185 @@ function assegurarLabelsFormulario(container) {
   });
   return criados;
 }
+
+// 111. Árvore de evolução visual do Prumi por nível
+function nivelEvolucaoPrumi(nivel) {
+  const n = Math.max(1, parseInt(nivel, 10) || 1);
+  if (n < 5) {
+    return { estagio: "Bebê", titulo: "Prumi Curioso", aura: "suave", escala: 0.9 };
+  } else if (n < 10) {
+    return { estagio: "Aprendiz", titulo: "Prumi Esforçado", aura: "brilho", escala: 1.0 };
+  } else if (n < 20) {
+    return { estagio: "Explorador", titulo: "Prumi Aventureiro", aura: "dourada", escala: 1.1 };
+  }
+  return { estagio: "Mestre", titulo: "Prumi Iluminado", aura: "cosmica", escala: 1.2 };
+}
+
+// 112. Guarda-roupa com prévia dinâmica ao vivo
+function previaRoupaAoVivo(itemRoupa, elPreview) {
+  if (!elPreview || !itemRoupa) return;
+  const slot = String(itemRoupa.slot || "geral");
+  let slotEl = elPreview.querySelector(`[data-slot="${slot}"]`);
+  if (!slotEl) {
+    slotEl = document.createElement("div");
+    slotEl.setAttribute("data-slot", slot);
+    elPreview.appendChild(slotEl);
+  }
+  slotEl.textContent = itemRoupa.nome || "";
+  slotEl.setAttribute("data-item-id", itemRoupa.id || "");
+}
+
+// 113. Camadas livres de roupas com ordenação de z-index
+function sistemaCamadasRoupas(pecas) {
+  if (!Array.isArray(pecas)) return [];
+  const pesos = {
+    corpo: 0,
+    calca: 10,
+    camisa: 20,
+    casaco: 30,
+    pes: 40,
+    acessorio: 50,
+    chapeu: 60
+  };
+  return [...pecas].sort((a, b) => {
+    const pesoA = pesos[a.slot] !== undefined ? pesos[a.slot] : 25;
+    const pesoB = pesos[b.slot] !== undefined ? pesos[b.slot] : 25;
+    return pesoA - pesoB;
+  });
+}
+
+// 114. Personalidade customizável do pet
+function definirTemperamentoPet(pet, temperamento) {
+  if (!pet || typeof pet !== "object") return pet;
+  const temperamentosValidos = ["brincalhao", "sereno", "comilao", "estudioso"];
+  const temp = temperamentosValidos.includes(temperamento) ? temperamento : "sereno";
+  pet.temperamento = temp;
+  if (temp === "brincalhao") {
+    pet.falaFavorita = "Vamos pular e bater recordes!";
+  } else if (temp === "comilao") {
+    pet.falaFavorita = "Já pegou um petisco depois dessa tarefa?";
+  } else if (temp === "estudioso") {
+    pet.falaFavorita = "Foco total na próxima meta!";
+  } else {
+    pet.falaFavorita = "Respire fundo e mantenha o equilíbrio.";
+  }
+  return pet;
+}
+
+// 115. Eventos sazonais automáticos para cada estação
+function obterEstacaoAnoAtual(data) {
+  const d = data instanceof Date ? data : new Date();
+  const mes = d.getMonth() + 1;
+  const dia = d.getDate();
+
+  // Hemisfério Sul:
+  // Verão: 21/dez a 20/mar
+  // Outono: 21/mar a 20/jun
+  // Inverno: 21/jun a 22/set
+  // Primavera: 23/set a 20/dez
+  const md = mes * 100 + dia;
+  if (md >= 1221 || md < 321) {
+    return { id: "verao", nome: "Verão", icone: "☀️", bonusGotas: 1.2 };
+  } else if (md >= 321 && md < 621) {
+    return { id: "outono", nome: "Outono", icone: "🍂", bonusGotas: 1.0 };
+  } else if (md >= 621 && md < 923) {
+    return { id: "inverno", nome: "Inverno", icone: "❄️", bonusGotas: 1.0 };
+  }
+  return { id: "primavera", nome: "Primavera", icone: "🌸", bonusGotas: 1.1 };
+}
+
+// 116. Missões diárias rotativas com desafios temáticos
+function gerarMissoesRotativasDia(dataStr, mundo) {
+  const d = String(dataStr || "2026-10-26");
+  const m = String(mundo || "padrao");
+  let seed = 0;
+  for (let i = 0; i < d.length; i++) seed += d.charCodeAt(i);
+
+  const banco = [
+    { id: "agua", texto: "Beba 4 copos de água hoje", gotas: 5 },
+    { id: "tarefa", texto: "Conclua 3 tarefas prioritárias", gotas: 8 },
+    { id: "habito", texto: "Mantenha a sequência de 1 hábito", gotas: 4 },
+    { id: "leitura", texto: "Leia ao menos 10 páginas", gotas: 6 },
+    { id: "pet", texto: "Faça carinho no pet 3 vezes", gotas: 3 }
+  ];
+
+  const idx1 = seed % banco.length;
+  const idx2 = (seed + 1) % banco.length;
+  const idx3 = (seed + 2) % banco.length;
+
+  return [banco[idx1], banco[idx2], banco[idx3]].map((mis, pos) => ({
+    ...mis,
+    id: `${mis.id}_${m}_${pos}`,
+    concluida: false
+  }));
+}
+
+// 117. Cofre de gotas com juros de produtividade
+function pouparGotasCofre(saldoCofre, sequenciaDias) {
+  const saldo = Math.max(0, parseInt(saldoCofre, 10) || 0);
+  const seq = Math.max(0, parseInt(sequenciaDias, 10) || 0);
+  // Rendimento diário proporcional à sequência (0.5% a cada 7 dias de streak, max 5%)
+  const taxaPercentual = Math.min(5, Math.floor(seq / 7) * 0.5 + 1);
+  const rendimento = Math.floor((saldo * taxaPercentual) / 100);
+  return {
+    saldoNovo: saldo + rendimento,
+    rendimentoGotas: rendimento,
+    taxaPercentual
+  };
+}
+
+// 118. Minigame retrô de 8 bits no mundo Gamer
+function minigameGamer8BitHTML() {
+  return (
+    `<div class="minigame-8bit-container">` +
+    `<div class="minigame-8bit-tela" id="tela-8bit">SCORE: 0000 | LVL: 1<br/>PRESS START TO FOCUS</div>` +
+    `<div style="display:flex; justify-content:space-between; margin-top:8px;">` +
+    `<button class="btn-8bit" data-btn="a">A</button>` +
+    `<button class="btn-8bit" data-btn="b">B</button>` +
+    `</div>` +
+    `</div>`
+  );
+}
+
+// 119. Fitas cassete colecionáveis no mundo Emo
+function fitaCasseteEmoHTML(titulo, artista, duracaoMin) {
+  const t = sanitizarHTMLSeguro(titulo || "Mixtape Emo");
+  const a = sanitizarHTMLSeguro(artista || "Various Artists");
+  const d = parseInt(duracaoMin, 10) || 45;
+  return (
+    `<div class="fita-cassete-emo">` +
+    `<div style="display:flex; justify-content:space-around; align-items:center;">` +
+    `<span class="fita-bobina"></span>` +
+    `<div style="font-size:12px; font-weight:bold;">${t}</div>` +
+    `<span class="fita-bobina"></span>` +
+    `</div>` +
+    `<div style="font-size:10px; color:#a1a1aa; text-align:center; margin-top:4px;">${a} (${d} min)</div>` +
+    `</div>`
+  );
+}
+
+// 120. Viola afinável interativa no mundo Sertanejo
+function tocarViolaSertanejo(cordaNota) {
+  const ctx = obterContextoAudioSeguro();
+  if (!ctx) return;
+  const afinações = {
+    mi: 329.63,
+    si: 246.94,
+    solSust: 207.65,
+    re: 146.83,
+    la: 110.0
+  };
+  const freq = afinações[cordaNota] || afinações.mi;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.35);
+  } catch (_) {}
+}

@@ -610,6 +610,82 @@ a,
   touch-action: manipulation;
 }
 
+/* 118. Minigame 8 bits retrô Gamer */
+.minigame-8bit-container {
+  background: #18181b;
+  border: 3px solid #3f3f46;
+  border-radius: 12px;
+  padding: 12px;
+  max-width: 320px;
+  margin: 8px auto;
+  font-family: monospace;
+}
+
+.minigame-8bit-tela {
+  background: #84cc16;
+  color: #1a2e05;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  min-height: 80px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-8bit {
+  background: #ef4444;
+  color: #ffffff;
+  border: 2px solid #991b1b;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-weight: bold;
+}
+
+/* 119. Fitas cassete colecionáveis Emo */
+.fita-cassete-emo {
+  background: #27272a;
+  border: 2px solid #52525b;
+  border-radius: 8px;
+  padding: 8px;
+  color: #e4e4e7;
+  position: relative;
+}
+
+.fita-bobina {
+  width: 22px;
+  height: 22px;
+  border: 2px dashed #a1a1aa;
+  border-radius: 50%;
+  display: inline-block;
+  animation: girarBobina 4s linear infinite;
+}
+
+@keyframes girarBobina {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 120. Viola afinável Sertanejo */
+.corda-viola-vibrando {
+  animation: vibrarCorda 0.15s ease-in-out 3;
+}
+
+@keyframes vibrarCorda {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particula-desintegracao,
   .prumi-squash,
@@ -633,6 +709,8 @@ a,
   .copo-enchimento-liquido,
   .rastro-estrela-feiticeiro,
   .habito-arquivado-pendular,
+  .fita-bobina,
+  .corda-viola-vibrando,
   .badge-conquista-desbloqueada {
     animation: none !important;
     transform: none !important;
