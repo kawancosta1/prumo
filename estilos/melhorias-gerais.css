@@ -313,6 +313,151 @@ button.btn:active,
   transition: transform 0.08s cubic-bezier(0.2, 0.8, 0.4, 1.2) !important;
 }
 
+/* 21. Balão de fala com surgimento pop */
+.balao-pop {
+  animation: balaoPopSurgir 0.32s cubic-bezier(0.18, 0.9, 0.32, 1.2) forwards;
+  transform-origin: bottom left;
+}
+@keyframes balaoPopSurgir {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 22. Checkmark com traço vetorial contínuo */
+.check-traco-animado svg path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkTracoAnim 0.35s ease-out forwards;
+}
+@keyframes checkTracoAnim {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* 23. Level up com raios solares rotativos */
+.level-up-raios-rotativos {
+  position: absolute;
+  inset: -50px;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 215, 0, 0.15) 0deg 15deg,
+    transparent 15deg 30deg
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  animation: raiosSolaresGiram 16s linear infinite;
+}
+@keyframes raiosSolaresGiram {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 24. Enchimento fluido do copo d'água */
+.copo-enchimento-liquido {
+  transform-origin: bottom center;
+  animation: enchimentoAguaAnim 0.6s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+}
+@keyframes enchimentoAguaAnim {
+  0% {
+    transform: scaleY(0.1);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+/* 25. Card de detalhes expansível */
+.card-detalhe-expansivel {
+  transition:
+    max-height 0.35s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+  overflow: hidden;
+}
+
+/* 26. Partícula estelar do feiticeiro */
+.rastro-estrela-feiticeiro {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffd54f;
+  box-shadow:
+    0 0 8px #ffeb3b,
+    0 0 14px #b388ff;
+  pointer-events: none;
+  z-index: 99999;
+  animation: rastroEstrelaSumir 0.4s ease-out forwards;
+}
+@keyframes rastroEstrelaSumir {
+  0% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+}
+
+/* 27. Folha caindo ao arquivar hábitos */
+.habito-arquivado-pendular {
+  animation: folhaCaindoAnim 0.5s ease-in forwards !important;
+  pointer-events: none;
+}
+@keyframes folhaCaindoAnim {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(18px) rotate(8deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(45px) rotate(-14deg);
+    opacity: 0;
+  }
+}
+
+/* 28. Salto de badge de conquista */
+.badge-conquista-desbloqueada {
+  animation: badgeSaltoFaiscaAnim 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+}
+@keyframes badgeSaltoFaiscaAnim {
+  0% {
+    transform: scale(0.5);
+  }
+  60% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 29. Carrossel do quarto cinético */
+.carrossel-quarto-cinetico {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particula-desintegracao,
   .prumi-squash,
@@ -329,7 +474,14 @@ button.btn:active,
   .vapor-ascendente,
   .livro-virando-pagina,
   .pet-flutuando,
-  .btn-elastico:active {
+  .btn-elastico:active,
+  .balao-pop,
+  .check-traco-animado svg path,
+  .level-up-raios-rotativos,
+  .copo-enchimento-liquido,
+  .rastro-estrela-feiticeiro,
+  .habito-arquivado-pendular,
+  .badge-conquista-desbloqueada {
     animation: none !important;
     transform: none !important;
   }

@@ -276,3 +276,106 @@ function ativarCliqueElasticoBotoes() {
   const botoes = document.querySelectorAll("button, .btn, [data-act]");
   botoes.forEach(b => b.classList.add("btn-elastico"));
 }
+
+// 21. Balão de fala com surgimento pop
+function aplicarPopBalao(el) {
+  if (!el || (typeof RM !== "undefined" && RM)) return;
+  el.classList.remove("balao-pop");
+  void el.offsetWidth;
+  el.classList.add("balao-pop");
+}
+
+// 22. Checkmark com traço vetorial contínuo
+function animarCheckmarkTraco(checkEl) {
+  if (!checkEl || (typeof RM !== "undefined" && RM)) return;
+  checkEl.classList.add("check-traco-animado");
+  setTimeout(() => checkEl.classList.remove("check-traco-animado"), 400);
+}
+
+// 23. Level up com raios solares rotativos
+function levelUpRaiosHTML() {
+  return `<div class="level-up-raios-rotativos" aria-hidden="true"></div>`;
+}
+
+// 24. Enchimento fluido do copo d'água
+function animarEnchimentoCopo(copoEl) {
+  if (!copoEl || (typeof RM !== "undefined" && RM)) return;
+  copoEl.classList.remove("copo-enchimento-liquido");
+  void copoEl.offsetWidth;
+  copoEl.classList.add("copo-enchimento-liquido");
+  setTimeout(() => copoEl.classList.remove("copo-enchimento-liquido"), 650);
+}
+
+// 25. Card de detalhes expansível
+function expandirCardDetalhe(el) {
+  if (!el) return;
+  el.classList.add("card-detalhe-expansivel");
+  if (el.style.maxHeight && el.style.maxHeight !== "0px") {
+    el.style.maxHeight = "0px";
+  } else {
+    el.style.maxHeight = `${el.scrollHeight + 30}px`;
+  }
+}
+
+// 26. Partículas estelares que seguem o ponteiro na aba Feiticeiro
+let rastroEstelarAtivo = false;
+let rastroEstelarHandler = null;
+
+function iniciarRastroEstelarFeiticeiro() {
+  if (typeof document === "undefined" || (typeof RM !== "undefined" && RM) || rastroEstelarAtivo) return;
+  rastroEstelarAtivo = true;
+  rastroEstelarHandler = e => {
+    if (typeof S !== "undefined" && S.persona !== "feiticeiro") return;
+    if (Math.random() > 0.35) return; // Limita frequência para zero impacto de performance
+    const p = document.createElement("span");
+    p.className = "rastro-estrela-feiticeiro";
+    p.style.left = `${e.clientX - 3}px`;
+    p.style.top = `${e.clientY - 3}px`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 420);
+  };
+  window.addEventListener("pointermove", rastroEstelarHandler, { passive: true });
+}
+
+function pararRastroEstelarFeiticeiro() {
+  if (rastroEstelarHandler) {
+    window.removeEventListener("pointermove", rastroEstelarHandler);
+    rastroEstelarHandler = null;
+    rastroEstelarAtivo = false;
+  }
+}
+
+// 27. Efeito de folha de papel caindo ao arquivar hábitos
+function animarHabitoArquivado(el, onFim) {
+  if (!el) {
+    if (typeof onFim === "function") onFim();
+    return;
+  }
+  if (typeof RM !== "undefined" && RM) {
+    if (typeof onFim === "function") onFim();
+    return;
+  }
+  el.classList.add("habito-arquivado-pendular");
+  setTimeout(() => {
+    if (typeof onFim === "function") onFim();
+  }, 480);
+}
+
+// 28. Animação de badges de conquistas
+function animarBadgeConquista(el) {
+  if (!el || (typeof RM !== "undefined" && RM)) return;
+  el.classList.add("badge-conquista-desbloqueada");
+  setTimeout(() => el.classList.remove("badge-conquista-desbloqueada"), 550);
+}
+
+// 29. Carrossel do quarto com amortecimento cinético
+function ativarCarrosselCinetico(containerEl) {
+  if (!containerEl) return;
+  containerEl.classList.add("carrossel-quarto-cinetico");
+}
+
+// 30. Respeito absoluto a prefers-reduced-motion
+function verificarPreferenciaMovimentoReduzido() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
