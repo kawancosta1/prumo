@@ -3292,3 +3292,510 @@ function criarFilaDesfazer(tamanhoMaximo = 5) {
     }
   };
 }
+// G61. Algoritmo SM-2 para Repetição Espaçada com intervalos dinâmicos
+function calcularRevisaoEspacadaSM2(passoAtual = 0, notaFacilidade = 4, fatorFacilidade = 2.5) {
+  const nota = Math.max(1, Math.min(5, parseInt(notaFacilidade, 10) || 4));
+  let ff = Math.max(1.3, fatorFacilidade + (0.1 - (5 - nota) * (0.08 + (5 - nota) * 0.02)));
+  let proximoPasso = passoAtual + 1;
+  let intervaloDias = 1;
+  if (nota < 3) {
+    proximoPasso = 0;
+    intervaloDias = 1;
+  } else if (proximoPasso === 1) {
+    intervaloDias = 1;
+  } else if (proximoPasso === 2) {
+    intervaloDias = 6;
+  } else {
+    intervaloDias = Math.round(6 * Math.pow(ff, proximoPasso - 2));
+  }
+  return { passo: proximoPasso, intervaloDias, fatorFacilidade: Math.round(ff * 100) / 100 };
+}
+
+// G62. Distribuição percentual de tempo de estudo por disciplina
+function calcularDistribuicaoTempoEstudo(sessoes) {
+  if (!Array.isArray(sessoes) || !sessoes.length) return [];
+  const mapSubj = {};
+  let total = 0;
+  sessoes.forEach(s => {
+    if (!s) return;
+    const sid = s.subjectId || "geral";
+    const min = parseInt(s.min, 10) || 0;
+    mapSubj[sid] = (mapSubj[sid] || 0) + min;
+    total += min;
+  });
+  if (total === 0) return [];
+  return Object.entries(mapSubj).map(([sid, min]) => ({
+    subjectId: sid,
+    minutos: min,
+    porcentagem: Math.round((min / total) * 100)
+  })).sort((a, b) => b.minutos - a.minutos);
+}
+
+// G63. Grade horária semanal organizada por dia e horário
+function gerarGradeHorariaSemanal(aulas) {
+  const grade = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+  if (!Array.isArray(aulas)) return grade;
+  aulas.forEach(a => {
+    if (!a) return;
+    const dia = parseInt(a.day, 10);
+    if (grade[dia]) grade[dia].push(a);
+  });
+  Object.keys(grade).forEach(d => {
+    grade[d].sort((a, b) => String(a.start || "").localeCompare(String(b.start || "")));
+  });
+  return grade;
+}
+
+// G64. Contador de ciclos de Pomodoro com indicação para pausa longa
+function calcularContadorCiclosPomodoro(sessoesHoje, cicloMax = 4) {
+  const n = Math.max(0, parseInt(sessoesHoje, 10) || 0);
+  const max = Math.max(1, parseInt(cicloMax, 10) || 4);
+  const cicloAtual = (n % max) + 1;
+  const pausaLonga = n > 0 && n % max === 0;
+  return { sessoesTotais: n, cicloAtual, pausaLonga, totalCiclos: Math.floor(n / max) };
+}
+
+// G65. Gerador de som de foco (ruído suave senoidal) via Web Audio
+function obterRuidoBrancoFoco(tipo = "suave") {
+  if (typeof window === "undefined") return false;
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return false;
+    const ctx = new AudioCtx();
+    const bufferSize = ctx.sampleRate * 2;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.05;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    noise.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = tipo === "binaural" ? 220 : 400;
+    noise.connect(filter);
+    filter.connect(ctx.destination);
+    noise.start();
+    return () => {
+      try { noise.stop(); ctx.close(); } catch (e) {}
+    };
+  } catch (e) {
+    return false;
+  }
+}
+
+// G66. Avaliação de taxa de retenção e acertos em revisões do mês
+function avaliarDesempenhoRevisao(revisoes) {
+  if (!Array.isArray(revisoes) || !revisoes.length) return { taxa: 0, concluidas: 0, total: 0 };
+  const concluidas = revisoes.filter(r => r && r.done).length;
+  const taxa = Math.round((concluidas / revisoes.length) * 100);
+  return { taxa, concluidas, total: revisoes.length };
+}
+
+// G67. Contagem regressiva em dias até a data da prova
+function calcularContadorDiasAteProva(dataProva, dataAtual) {
+  if (!dataProva) return 0;
+  const dP = new Date(String(dataProva).replace(/-/g, "/"));
+  const dA = dataAtual ? new Date(String(dataAtual).replace(/-/g, "/")) : new Date();
+  const diffTime = dP.getTime() - dA.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+// G68. Checklist e progresso percentual de conteúdos para prova
+function gerarChecklistConteudoProva(topicos) {
+  if (!Array.isArray(topicos) || !topicos.length) return { total: 0, estudados: 0, porcentagem: 0 };
+  const estudados = topicos.filter(t => t && (t.done || t.estudado)).length;
+  const porcentagem = Math.round((estudados / topicos.length) * 100);
+  return { total: topicos.length, estudados, porcentagem };
+}
+
+// G69. Calculadora de nota necessária em prova final
+function calcularMediaNecessariaProva(nota1, nota2, peso1 = 2, peso2 = 3, mediaAlvo = 6.0) {
+  const n1 = parseFloat(nota1) || 0;
+  const n2 = parseFloat(nota2) || 0;
+  const p1 = parseFloat(peso1) || 1;
+  const p2 = parseFloat(peso2) || 1;
+  const alvo = parseFloat(mediaAlvo) || 6.0;
+  const pesoFinal = 3;
+  const somaAtual = n1 * p1 + n2 * p2;
+  const somaTotalPesos = p1 + p2 + pesoFinal;
+  const necessaria = (alvo * somaTotalPesos - somaAtual) / pesoFinal;
+  return Math.max(0, Math.round(necessaria * 10) / 10);
+}
+
+// G70. Snapshot estruturado de sessão de estudo para log histórico
+function gerarSnapshotSessaoFoco(materiaId, duracaoMin, notas = "") {
+  return {
+    id: "sess_" + Date.now(),
+    subjectId: materiaId || "geral",
+    minutos: Math.max(1, parseInt(duracaoMin, 10) || 25),
+    notas: String(notas || "").trim(),
+    concluidoEm: new Date().toISOString()
+  };
+}
+
+// G71. Meta dinâmica de hidratação esperada para o horário atual
+function calcularHidratacaoHorarioRitmo(metaTotal = 2500, horaAcordar = "07:00", horaDormir = "23:00", horaAtual) {
+  const toMin = h => {
+    const [hh, mm] = String(h || "00:00").split(":").map(Number);
+    return (hh || 0) * 60 + (mm || 0);
+  };
+  const minAcordar = toMin(horaAcordar);
+  const minDormir = toMin(horaDormir);
+  let janelaMin = minDormir - minAcordar;
+  if (janelaMin <= 0) janelaMin += 24 * 60;
+  const d = horaAtual ? (horaAtual instanceof Date ? horaAtual : new Date()) : new Date();
+  const minAtual = d.getHours() * 60 + d.getMinutes();
+  let decorrido = minAtual - minAcordar;
+  if (decorrido < 0) decorrido = 0;
+  if (decorrido > janelaMin) decorrido = janelaMin;
+  const proporcao = decorrido / janelaMin;
+  return Math.round(metaTotal * proporcao);
+}
+
+// G72. Estrutura organizada de refeições diárias
+function gerarDiarioAlimentarRefeicao(refeicoes = {}, dia = 0) {
+  const diaObj = refeicoes[dia] || {};
+  return {
+    cafe: diaObj.cafe || "",
+    almoco: diaObj.almoco || "",
+    lanche: diaObj.lanche || "",
+    jantar: diaObj.jantar || "",
+    registrado: !!(diaObj.cafe || diaObj.almoco || diaObj.lanche || diaObj.jantar)
+  };
+}
+
+// G73. Medição de consumo de cafeína com alerta de horário
+function calcularConsumoCafeinaDia(xicarasCafe = 0, horaUltimaXicara = 12) {
+  const x = Math.max(0, parseInt(xicarasCafe, 10) || 0);
+  const mgTotal = x * 80;
+  const hora = parseInt(horaUltimaXicara, 10) || 12;
+  const alertaSono = hora >= 16 && x > 0;
+  const excesso = mgTotal > 400;
+  return { xicaras: x, cafeinaMg: mgTotal, alertaSono, excesso };
+}
+
+// G74. Estado visual de hidratação do Prumi
+function obterStatusDesidratacaoPrumi(mlIngerido, mlEsperado) {
+  const ing = Math.max(0, parseInt(mlIngerido, 10) || 0);
+  const esp = Math.max(1, parseInt(mlEsperado, 10) || 1);
+  const pct = ing / esp;
+  if (pct >= 1.0) return { status: "radiante", humor: "party", label: "Meta batida ou no ritmo!" };
+  if (pct >= 0.75) return { status: "hidratado", humor: "happy", label: "Boa hidratação" };
+  if (pct >= 0.45) return { status: "seco", humor: "normal", label: "Hora de beber água" };
+  return { status: "murcho", humor: "worried", label: "Abaixo da meta!" };
+}
+
+// G75. Matriz mensal de atingimento de água para heatmap
+function gerarHistoricoMensalAguaHeatmap(historicoAgua = {}, mes, ano, metaDiaria = 2500) {
+  const m = mes != null ? mes : new Date().getMonth();
+  const y = ano != null ? ano : new Date().getFullYear();
+  const diasNoMes = new Date(y, m + 1, 0).getDate();
+  const matriz = [];
+  for (let d = 1; d <= diasNoMes; d++) {
+    const chave = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const lista = historicoAgua[chave] || [];
+    const total = Array.isArray(lista) ? lista.reduce((acc, c) => acc + (c.ml || 0), 0) : 0;
+    const porcentagem = Math.min(100, Math.round((total / metaDiaria) * 100));
+    matriz.push({ dia: d, data: chave, totalML: total, porcentagem });
+  }
+  return matriz;
+}
+
+// G76. Fator de compensação de hidratação por clima quente
+function calcularFatorCompensacaoClima(temperaturaC = 25, mlBase = 2500) {
+  const temp = parseFloat(temperaturaC) || 25;
+  if (temp > 30) return mlBase + 600;
+  if (temp > 26) return mlBase + 300;
+  return mlBase;
+}
+
+// G77. Agrupamento de itens de lista de compras por categoria
+function gerarListaComprasAgrupada(itens = []) {
+  const categorias = { hortifruti: [], mercearia: [], laticinios: [], limpeza: [], outros: [] };
+  if (!Array.isArray(itens)) return categorias;
+  itens.forEach(it => {
+    if (!it) return;
+    const cat = it.categoria && categorias[it.categoria] ? it.categoria : "outros";
+    categorias[cat].push(it);
+  });
+  return categorias;
+}
+
+// G78. Verificação de alimentos próximos ao vencimento
+function verificarValidadeAlimentos(dispensa = [], dataAtual) {
+  if (!Array.isArray(dispensa)) return [];
+  const dA = dataAtual ? new Date(String(dataAtual).replace(/-/g, "/")) : new Date();
+  return dispensa.filter(item => {
+    if (!item || !item.validade) return false;
+    const dV = new Date(String(item.validade).replace(/-/g, "/"));
+    const diffDias = Math.ceil((dV.getTime() - dA.getTime()) / (1000 * 60 * 60 * 24));
+    return diffDias <= 3;
+  });
+}
+
+// G79. Sequência contínua de dias cumprindo a meta de água
+function calcularSequenciaDiasAguaBatida(historicoAgua = {}, metaDiaria = 2500, dataBase) {
+  const meta = Math.max(500, parseInt(metaDiaria, 10) || 2500);
+  const parseDt = s => new Date(String(s).replace(/-/g, "/"));
+  let d = dataBase ? parseDt(dataBase) : new Date();
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    const chave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const copos = historicoAgua[chave];
+    const total = Array.isArray(copos) ? copos.reduce((acc, c) => acc + (c.ml || 0), 0) : 0;
+    if (total >= meta) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+// G80. Dicas contextuais de saúde baseadas no ritmo do dia
+function gerarDicaSaudeDia(humor = "normal", nivelAguaPct = 50, tarefasFeitas = 0) {
+  if (nivelAguaPct < 40) return "Dica: tome um copo d'água agora para manter o foco afiado!";
+  if (tarefasFeitas >= 5 && humor === "party") return "Produtividade lá no alto! Lembre-se de descansar a vista e alongar.";
+  if (humor === "worried") return "Respira fundo: priorize só o essencial hoje e deixe o resto para amanhã.";
+  return "Mantenha o ritmo leve: um passo de cada vez constrói sua rotina.";
+}
+
+// G81. Congelamento de sequência de hábito usando moedas/gotas
+function aplicarCongelamentoHabito(habito, saldoGotas = 0, custo = 50) {
+  if (!habito) return { sucesso: false, saldoRestante: saldoGotas };
+  if (saldoGotas < custo) return { sucesso: false, saldoRestante: saldoGotas, motivo: "Gotas insuficientes" };
+  habito.congeladoAte = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  return { sucesso: true, saldoRestante: saldoGotas - custo, habito };
+}
+
+// G82. Índice percentual de consistência de hábitos nos últimos 30 dias
+function calcularIndiceConsistenciaHabito(logsHabito = {}, dias = 30) {
+  let concluidos = 0;
+  const d = new Date();
+  for (let i = 0; i < dias; i++) {
+    const chave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    if (logsHabito[chave]) concluidos++;
+    d.setDate(d.getDate() - 1);
+  }
+  return Math.round((concluidos / dias) * 100);
+}
+
+// G83. Agrupamento de contatos sociais por status de periodicidade
+function agruparContatosPorFrequencia(pessoas = [], dataAtual) {
+  const grupos = { hoje: [], emDia: [], atrasados: [] };
+  if (!Array.isArray(pessoas)) return grupos;
+  const hojeStr = dataAtual || new Date().toISOString().slice(0, 10);
+  pessoas.forEach(p => {
+    if (!p) return;
+    const frequencia = parseInt(p.every, 10) || 0;
+    if (!frequencia) { grupos.emDia.push(p); return; }
+    if (!p.last) { grupos.atrasados.push(p); return; }
+    const dLast = new Date(String(p.last).replace(/-/g, "/"));
+    const dHoje = new Date(String(hojeStr).replace(/-/g, "/"));
+    const diffDias = Math.floor((dHoje - dLast) / (1000 * 60 * 60 * 24));
+    if (diffDias === frequencia) grupos.hoje.push(p);
+    else if (diffDias > frequencia) grupos.atrasados.push(p);
+    else grupos.emDia.push(p);
+  });
+  return grupos;
+}
+
+// G84. Cálculo da idade que o contato completará no próximo aniversário
+function calcularIdadeAniversariante(dataNascimento, dataAtual) {
+  if (!dataNascimento) return 0;
+  const dNasc = new Date(String(dataNascimento).replace(/-/g, "/"));
+  const dRef = dataAtual ? new Date(String(dataAtual).replace(/-/g, "/")) : new Date();
+  let idade = dRef.getFullYear() - dNasc.getFullYear();
+  return Math.max(0, idade);
+}
+
+// G85. Templates simpáticos de felicitações de aniversário
+function gerarTemplateMensagemAniversario(nomePessoa = "amigo", estilo = "amigo") {
+  const nome = String(nomePessoa || "").trim();
+  if (estilo === "formal") return `Parabéns pelo seu dia, ${nome}! Muita saúde, sucesso e realizações. Um forte abraço!`;
+  if (estilo === "parceiro") return `Feliz aniversário, meu amor! Que alegria celebrar sua vida hoje e sempre. Amo você, ${nome}!`;
+  return `Feliz aniversário, ${nome}! 🎉 Tudo de melhor hoje e sempre, muita saúde e conquistas! Bora comemorar!`;
+}
+
+// G86. Média e distribuição de humores do fechamento do dia no mês
+function analisarHumorDiarioMensal(diarios = {}) {
+  const entradas = Object.values(diarios || {});
+  if (!entradas.length) return { media: 0, total: 0 };
+  let soma = 0;
+  let contagem = 0;
+  entradas.forEach(e => {
+    if (e && e.humor != null) {
+      soma += parseInt(e.humor, 10) || 3;
+      contagem++;
+    }
+  });
+  return { media: contagem ? Math.round((soma / contagem) * 10) / 10 : 0, total: contagem };
+}
+
+// G87. Perguntas reflexivas guiadas rotativas para fechamento noturno
+function obterPerguntasReflexivasDiario(diaIndice = 0) {
+  const perguntas = [
+    "Pelo que você é mais grato no dia de hoje?",
+    "Qual foi a vitória ou aprendizado que mais te marcou hoje?",
+    "O que você faria diferente se pudesse recomeçar o dia?",
+    "Quem fez o seu dia mais leve ou mereceu um agradecimento?",
+    "Qual é a sua principal intenção ou prioridade para amanhã?"
+  ];
+  const idx = Math.abs(parseInt(diaIndice, 10) || 0) % perguntas.length;
+  return perguntas[idx];
+}
+
+// G88. Sequência de noites fechando o dia no diário
+function calcularDiasSeguidosFechandoDia(diarios = {}, dataAtual) {
+  const parseDt = s => new Date(String(s).replace(/-/g, "/"));
+  let d = dataAtual ? parseDt(dataAtual) : new Date();
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    const chave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    if (diarios[chave] && diarios[chave].closed) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+// G89. Ficha de ideias de presentes e preferências anotadas para contatos
+function gerarCartaoPresenteContato(contato = {}, novasSugestoes = []) {
+  const presentes = Array.isArray(contato.presentes) ? [...contato.presentes] : [];
+  if (Array.isArray(novasSugestoes)) {
+    novasSugestoes.forEach(s => { if (s && !presentes.includes(s)) presentes.push(s); });
+  }
+  return { id: contato.id, nome: contato.name || "Contato", sugestoes: presentes };
+}
+
+// G90. Resumo consolidado de rotina semanal
+function formatarRelatorioRotinaSemanal(dados = {}) {
+  const tarefasFeitas = parseInt(dados.tarefasFeitas, 10) || 0;
+  const aguaMediaML = parseInt(dados.aguaMediaML, 10) || 0;
+  const minutosFoco = parseInt(dados.minutosFoco, 10) || 0;
+  const habitosConsistentes = parseInt(dados.habitosConsistentes, 10) || 0;
+  return {
+    titulo: "Resumo Semanal",
+    tarefasFeitas,
+    horasFoco: Math.round((minutosFoco / 60) * 10) / 10,
+    aguaMediaLitros: Math.round((aguaMediaML / 1000) * 10) / 10,
+    habitosConsistentes
+  };
+}
+
+// G91. Curva progressiva suave de nível e XP (nível 1 ao 100)
+function calcularNivelXPProgressivo(xpTotal = 0) {
+  const xp = Math.max(0, parseInt(xpTotal, 10) || 0);
+  const nivel = Math.floor(Math.sqrt(xp / 50)) + 1;
+  const xpBaseNivel = Math.pow(nivel - 1, 2) * 50;
+  const xpProximoNivel = Math.pow(nivel, 2) * 50;
+  const progressoPct = Math.min(100, Math.round(((xp - xpBaseNivel) / (xpProximoNivel - xpBaseNivel || 1)) * 100));
+  return { nivel, xpAtual: xp, xpProximoNivel, progressoPct };
+}
+
+// G92. Prévia de provador de roupa e cenário antes de comprar
+function gerarPreviaProvadorItem(item = {}, mascoteEstado = {}) {
+  if (!item || !item.id) return mascoteEstado;
+  const slot = item.slot || "top";
+  const novoEquip = Object.assign({}, mascoteEstado.equip || {});
+  novoEquip[slot] = item.id;
+  return Object.assign({}, mascoteEstado, { equip: novoEquip, provando: item.id });
+}
+
+// G93. Filtro avançado do catálogo da loja por categoria, preço e busca
+function filtrarCatalogoLoja(itens = [], { categoria = "todos", busca = "", maxPreco = Infinity } = {}) {
+  if (!Array.isArray(itens)) return [];
+  const term = String(busca || "").toLowerCase().trim();
+  return itens.filter(it => {
+    if (!it) return false;
+    if (categoria !== "todos" && it.slot !== categoria && it.categoria !== categoria) return false;
+    if (it.price != null && it.price > maxPreco) return false;
+    if (term && !String(it.name || "").toLowerCase().includes(term)) return false;
+    return true;
+  });
+}
+
+// G94. Estatísticas de coleção e guarda-roupa desbloqueado
+function calcularEstatisticaColecaoItens(itensPossuidos = [], totalCatalogo = 100) {
+  const qtd = Array.isArray(itensPossuidos) ? itensPossuidos.length : 0;
+  const total = Math.max(1, parseInt(totalCatalogo, 10) || 100);
+  const pct = Math.min(100, Math.round((qtd / total) * 100));
+  return { possuidos: qtd, total, porcentagem: pct };
+}
+
+// G95. Animações e respostas físicas de interação com o mascote
+function obterAnimacaoInteracaoMascote(tipoToque = "barriga") {
+  const mapa = {
+    barriga: { animacao: "prumi-risada", som: "risada", humor: "happy", fala: "Hehe, isso faz cócegas!" },
+    cabeca: { animacao: "prumi-carinho", som: "ronronar", humor: "party", fala: "Adoro um carinho na cabeça!" },
+    agitar: { animacao: "prumi-tonto", som: "tonto", humor: "worried", fala: "Opa, que tontura!" }
+  };
+  return mapa[tipoToque] || mapa.barriga;
+}
+
+// G96. Verificação do horário de sono do mascote para animação "Zzz"
+function verificarHorarioDormirMascote(horaAtual, horaDormir = "23:00", horaAcordar = "07:00") {
+  const d = horaAtual ? (horaAtual instanceof Date ? horaAtual : new Date()) : new Date();
+  const hora = d.getHours() + d.getMinutes() / 60;
+  const [hD] = horaDormir.split(":").map(Number);
+  const [hA] = horaAcordar.split(":").map(Number);
+  const dormindo = hD > hA ? (hora >= hD || hora < hA) : (hora >= hD && hora < hA);
+  return { dormindo, classeAnimacao: dormindo ? "prumi-dormindo-zzz" : "" };
+}
+
+// G97. Gerador de missões diárias com recompensas em gotas
+function gerarMissoesDiariasAleatorias(dataSeed = "2026-10-27") {
+  const pool = [
+    { id: "m_agua", desc: "Bater a meta de água antes das 20h", recompensa: 25 },
+    { id: "m_foco", desc: "Completar 45 minutos de foco no timer", recompensa: 30 },
+    { id: "m_tarefas", desc: "Concluir 3 tarefas prioritárias", recompensa: 35 },
+    { id: "m_habito", desc: "Completar todos os hábitos do dia", recompensa: 20 },
+    { id: "m_diario", desc: "Fechar o dia com uma nota no diário", recompensa: 15 }
+  ];
+  let hash = 0;
+  for (let i = 0; i < dataSeed.length; i++) hash = (hash * 31 + dataSeed.charCodeAt(i)) % pool.length;
+  const m1 = pool[hash % pool.length];
+  const m2 = pool[(hash + 1) % pool.length];
+  const m3 = pool[(hash + 2) % pool.length];
+  return [m1, m2, m3];
+}
+
+// G98. Recompensa e títulos honorários em conquistas
+function calcularRecompensaConquista(conquistaId, jaDesbloqueada = false) {
+  if (jaDesbloqueada) return { liberada: false, recompensaGotas: 0 };
+  const recompensas = {
+    produtivo: { gotas: 150, titulo: "Mestre da Execução" },
+    oasis: { gotas: 100, titulo: "Hidratado Supremo" },
+    monge_foco: { gotas: 120, titulo: "Mente Inabalável" }
+  };
+  const r = recompensas[conquistaId] || { gotas: 50, titulo: "Conquistador" };
+  return { liberada: true, recompensaGotas: r.gotas, titulo: r.titulo };
+}
+
+// G99. Mini-jogo rápido para pausa ativa de Pomodoro
+function gerarMiniJogoPausaFoco(semente = 1) {
+  const jogos = [
+    { nome: "Respiração Guiada (4-7-8)", duracaoMin: 3, tipo: "respiracao" },
+    { nome: "Alongamento Rápido de Ombros", duracaoMin: 3, tipo: "fisico" },
+    { nome: "Descanso Visual 20-20-20", duracaoMin: 2, tipo: "olhos" }
+  ];
+  const idx = Math.abs(parseInt(semente, 10) || 0) % jogos.length;
+  return jogos[idx];
+}
+
+// G100. Emblema vetorial comemorativo de metas concluídas
+function gerarSeloComemorativoMeta(titulo = "Meta Batida", valor = "100%", mascoteHumor = "party") {
+  return {
+    titulo,
+    valor,
+    humor: mascoteHumor,
+    classeHtml: "selo-comemorativo-emblema",
+    dataCriacao: new Date().toISOString()
+  };
+}
