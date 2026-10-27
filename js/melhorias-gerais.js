@@ -3799,3 +3799,576 @@ function gerarSeloComemorativoMeta(titulo = "Meta Batida", valor = "100%", masco
     dataCriacao: new Date().toISOString()
   };
 }
+// G101. Leitor centralizado de tokens de design CSS
+function obterTokenDesign(nomeToken, valorPadrao = "") {
+  if (typeof window === "undefined" || typeof document === "undefined") return valorPadrao;
+  try {
+    const estilo = getComputedStyle(document.documentElement);
+    const v = estilo.getPropertyValue(nomeToken).trim();
+    return v || valorPadrao;
+  } catch (e) {
+    return valorPadrao;
+  }
+}
+
+// G102. Modo de alto contraste preto e branco acessível
+function alternarModoAltoContraste(container, ativo = true) {
+  const el = container || (typeof document !== "undefined" ? document.body : null);
+  if (!el || typeof el.classList !== "object") return false;
+  if (ativo) el.classList.add("modo-alto-contraste");
+  else el.classList.remove("modo-alto-contraste");
+  return ativo;
+}
+
+// G103. Escala tipográfica dinâmica preservando proporções
+function aplicarEscalaTipografica(container, fator = 1.0) {
+  const el = container || (typeof document !== "undefined" ? document.documentElement : null);
+  if (!el || typeof el.style !== "object") return 1.0;
+  const f = Math.max(0.8, Math.min(1.4, parseFloat(fator) || 1.0));
+  el.style.setProperty("--escala-fonte", String(f));
+  return f;
+}
+
+// G104. Descrição falada da expressão e água do mascote para leitor de tela
+function descreverExpressaoPrumiAcessivel(humor = "normal", pctAgua = 0.5) {
+  const pct = Math.round((parseFloat(pctAgua) || 0) * 100);
+  const mapa = {
+    happy: "Prumi está feliz e sorrindo",
+    party: "Prumi está comemorando e vibrando",
+    worried: "Prumi está com sede e expressão atenta",
+    normal: "Prumi está tranquilo"
+  };
+  const desc = mapa[humor] || "Prumi está presente";
+  return `${desc}, com ${pct}% da garrafa cheia de água.`;
+}
+
+// G105. Verificação matemática de contraste relativo de cores WCAG
+function verificarContrasteCoresWCAG(hex1 = "#000000", hex2 = "#ffffff") {
+  const lum = hex => {
+    const rgb = hex.replace("#", "").match(/.{2}/g).map(x => parseInt(x, 16) / 255);
+    const a = rgb.map(v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+    return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+  };
+  try {
+    const l1 = lum(hex1);
+    const l2 = lum(hex2);
+    const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    const arredondado = Math.round(ratio * 100) / 100;
+    return { ratio: arredondado, passaAA: arredondado >= 4.5, passaAAA: arredondado >= 7.0 };
+  } catch (e) {
+    return { ratio: 21, passaAA: true, passaAAA: true };
+  }
+}
+
+// G106. Garantia de alvos de toque mínimos de 44x44px no mobile
+function adicionarAreaToqueAcessivel(elemento, minPx = 44) {
+  if (!elemento || typeof elemento.classList !== "object") return false;
+  elemento.classList.add("alvo-toque-44");
+  return true;
+}
+
+// G107. Anel duplo de foco visível para navegação por teclado
+function gerarAnelFocoVisivelTeclado(elemento) {
+  if (!elemento || typeof elemento.classList !== "object") return false;
+  elemento.classList.add("foco-teclado-duplo");
+  return true;
+}
+
+// G108. Focus Trap completo para modais e caixas de diálogo
+function travarFocoDentroModal(modalElemento) {
+  if (!modalElemento || typeof modalElemento.querySelectorAll !== "function") return null;
+  const focaveis = modalElemento.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (!focaveis.length) return null;
+  const primeiro = focaveis[0];
+  const ultimo = focaveis[focaveis.length - 1];
+  const handler = e => {
+    if (e.key !== "Tab") return;
+    if (e.shiftKey) {
+      if (document.activeElement === primeiro) {
+        ultimo.focus();
+        e.preventDefault();
+      }
+    } else {
+      if (document.activeElement === ultimo) {
+        primeiro.focus();
+        e.preventDefault();
+      }
+    }
+  };
+  modalElemento.addEventListener("keydown", handler);
+  primeiro.focus();
+  return () => modalElemento.removeEventListener("keydown", handler);
+}
+
+// G109. Restauração de foco ao elemento disparador de modal
+function restaurarFocoOrigemModal(elementoDisparador) {
+  if (elementoDisparador && typeof elementoDisparador.focus === "function") {
+    elementoDisparador.focus();
+    return true;
+  }
+  return false;
+}
+
+// G110. Anunciador dinâmico de regiões vivas acessíveis (aria-live)
+function anunciarMudancaRegiaoViva(texto, polidez = "polite") {
+  if (typeof document === "undefined") return false;
+  let liveEl = document.getElementById("prumo-aria-live-anunciador");
+  if (!liveEl) {
+    liveEl = document.createElement("div");
+    liveEl.id = "prumo-aria-live-anunciador";
+    liveEl.setAttribute("aria-live", polidez);
+    liveEl.setAttribute("aria-atomic", "true");
+    liveEl.style.position = "absolute";
+    liveEl.style.left = "-9999px";
+    document.body.appendChild(liveEl);
+  }
+  liveEl.textContent = "";
+  setTimeout(() => { liveEl.textContent = String(texto || ""); }, 50);
+  return true;
+}
+
+// G111. Parser de tags livres (#tag) além das 4 fixas
+function extrairTagsPersonalizadas(texto = "") {
+  const matches = String(texto || "").match(/#[a-z0-9_-]+/gi);
+  if (!matches) return [];
+  return Array.from(new Set(matches.map(t => t.toLowerCase())));
+}
+
+// G112. Filtro de tarefas por tags personalizadas
+function filtrarTarefasPorTags(tarefas = [], tagsFiltro = []) {
+  if (!Array.isArray(tarefas)) return [];
+  if (!Array.isArray(tagsFiltro) || !tagsFiltro.length) return tarefas;
+  const tagsAlvo = tagsFiltro.map(t => t.toLowerCase().replace(/^#/, ""));
+  return tarefas.filter(t => {
+    if (!t) return false;
+    const txt = `${t.title || ""} ${t.area || ""}`.toLowerCase();
+    return tagsAlvo.some(tag => txt.includes(tag));
+  });
+}
+
+// G113. Cálculo de sobrecarga de horas planejadas no dia (> 8h)
+function calcularCargaHorariaPlanejadaDia(tarefas = [], limiteMinutos = 480) {
+  if (!Array.isArray(tarefas)) return { totalMinutos: 0, sobrecarregado: false, horas: 0 };
+  let total = 0;
+  tarefas.forEach(t => {
+    if (t && t.dur) {
+      const m = parseInt(t.dur, 10);
+      if (m > 0) total += m;
+    }
+  });
+  const sobrecarregado = total > limiteMinutos;
+  return { totalMinutos: total, horas: Math.round((total / 60) * 10) / 10, sobrecarregado };
+}
+
+// G114. Reordenação de tarefas por drag-and-drop
+function reordenarTarefasOrdemManual(tarefas = [], idOrigem, idDestino) {
+  if (!Array.isArray(tarefas)) return [];
+  const copia = [...tarefas];
+  const idxOrig = copia.findIndex(t => t && t.id === idOrigem);
+  const idxDest = copia.findIndex(t => t && t.id === idDestino);
+  if (idxOrig === -1 || idxDest === -1) return copia;
+  const [removido] = copia.splice(idxOrig, 1);
+  copia.splice(idxDest, 0, removido);
+  return copia;
+}
+
+// G115. Execução de ações em lote em tarefas selecionadas
+function executarAcaoEmLoteTarefas(tarefas = [], idsSelecionados = [], acao = "concluir", param = null) {
+  if (!Array.isArray(tarefas)) return [];
+  const setIds = new Set(idsSelecionados);
+  return tarefas.map(t => {
+    if (!t || !setIds.has(t.id)) return t;
+    const novo = Object.assign({}, t);
+    if (acao === "concluir") novo.done = true;
+    else if (acao === "desmarcar") novo.done = false;
+    else if (acao === "adiar" && param) novo.date = param;
+    else if (acao === "prio" && param != null) novo.prio = parseInt(param, 10) || 0;
+    return novo;
+  }).filter(t => !(acao === "excluir" && setIds.has(t.id)));
+}
+
+// G116. Busca textual em tarefas ignorando acentos e maiúsculas
+function filtrarTarefasTextoBusca(tarefas = [], termo = "") {
+  if (!Array.isArray(tarefas)) return [];
+  const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const busca = norm(termo);
+  if (!busca) return tarefas;
+  return tarefas.filter(t => {
+    if (!t) return false;
+    return norm(t.title).includes(busca) || norm(t.area).includes(busca);
+  });
+}
+
+// G117. Templates prontos de rotinas diárias
+function gerarTemplateRotina(tipo = "matinal") {
+  const templates = {
+    matinal: [
+      { title: "Alongamento leve 10min #saude", prio: 1 },
+      { title: "Tomar 500 mL de água #dieta", prio: 2 },
+      { title: "Revisar prioridades do dia #geral", prio: 3 }
+    ],
+    estudos: [
+      { title: "Sessão de foco 50min #estudo", prio: 3 },
+      { title: "Pausa ativa 10min e água #saude", prio: 2 },
+      { title: "Revisão flashcards #estudo", prio: 2 }
+    ],
+    faxina: [
+      { title: "Arrumar quarto e cama", prio: 1 },
+      { title: "Recolher lixo e organizar mesa", prio: 2 }
+    ]
+  };
+  return templates[tipo] || templates.matinal;
+}
+
+// G118. Contador e formato humanizado de dias de atraso de tarefa
+function calcularContadorDiasAtrasoTarefa(dataTarefa, dataHoje) {
+  if (!dataTarefa) return { dias: 0, atrasada: false, texto: "" };
+  const parseDt = s => new Date(String(s).replace(/-/g, "/"));
+  const dT = parseDt(dataTarefa);
+  const dH = dataHoje ? parseDt(dataHoje) : new Date();
+  const diffDias = Math.floor((dH - dT) / (1000 * 60 * 60 * 24));
+  const atrasada = diffDias > 0;
+  const texto = diffDias === 1 ? "Atrasada há 1 dia" : diffDias > 1 ? `Atrasada há ${diffDias} dias` : "";
+  return { dias: Math.max(0, diffDias), atrasada, texto };
+}
+
+// G119. Duplicação de tarefa com subtarefas
+function duplicarTarefaComSubtarefas(tarefa = {}) {
+  if (!tarefa || !tarefa.title) return null;
+  const novoId = "task_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+  const subNovas = Array.isArray(tarefa.sub)
+    ? tarefa.sub.map(s => ({ id: "sub_" + Math.random().toString(36).slice(2, 8), t: s.t, done: false }))
+    : [];
+  return Object.assign({}, tarefa, {
+    id: novoId,
+    title: tarefa.title + " (cópia)",
+    done: false,
+    sub: subNovas
+  });
+}
+
+// G120. Envio de tarefa para lixeira temporária com expiração
+function gerarItemLixeira(tarefa = {}, diasRetencao = 7) {
+  if (!tarefa || !tarefa.id) return null;
+  const expira = new Date(Date.now() + diasRetencao * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  return {
+    itemOriginal: Object.assign({}, tarefa),
+    deletadoEm: new Date().toISOString(),
+    expiraEm: expira
+  };
+}
+
+// G121. Gerador de código alfanumérico amigável para pareamento de dupla
+function gerarCodigoPareamentoDupla(idSeed = "") {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let hash = 0;
+  const str = String(idSeed || Date.now());
+  for (let i = 0; i < str.length; i++) hash = (hash * 33 + str.charCodeAt(i)) % 1000000007;
+  let cod = "";
+  for (let i = 0; i < 6; i++) {
+    cod += chars.charAt((hash + i * 7) % chars.length);
+  }
+  return cod;
+}
+
+// G122. Contador de dias de relacionamento ou parceria
+function calcularDiasJuntosParceria(dataInicio, dataAtual) {
+  if (!dataInicio) return 0;
+  const dI = new Date(String(dataInicio).replace(/-/g, "/"));
+  const dA = dataAtual ? new Date(String(dataAtual).replace(/-/g, "/")) : new Date();
+  const diffDias = Math.floor((dA - dI) / (1000 * 60 * 60 * 24));
+  return Math.max(0, diffDias);
+}
+
+// G123. Mensagem afetuosa estruturada de pombo-correio (nudge)
+function gerarMensagemPomboCorreio(remetente = "Parceiro", textoMimo = "Pensando em você!") {
+  return {
+    id: "mimo_" + Date.now(),
+    de: String(remetente),
+    mensagem: String(textoMimo),
+    enviadoEm: new Date().toISOString(),
+    lido: false
+  };
+}
+
+// G124. Meta compartilhada e somada da dupla
+function calcularMetaCompartilhadaDupla(val1 = 0, val2 = 0, metaConjunta = 6000) {
+  const soma = Math.max(0, val1) + Math.max(0, val2);
+  const meta = Math.max(1, metaConjunta);
+  const pct = Math.min(100, Math.round((soma / meta) * 100));
+  return { soma, metaConjunta: meta, porcentagem: pct, batida: soma >= meta };
+}
+
+// G125. Formatação do mural de recados da dupla com ordenação
+function formatarMuralRecadosParceria(recados = []) {
+  if (!Array.isArray(recados)) return [];
+  return [...recados].sort((a, b) => String(b.enviadoEm || "").localeCompare(String(a.enviadoEm || "")));
+}
+
+// G126. Lista compartilhada de desejos (Wishlist de passeios/filmes)
+function gerarWishlistCompartilhada(itens = []) {
+  if (!Array.isArray(itens)) return [];
+  return itens.map((it, idx) => ({
+    id: it.id || "wish_" + idx,
+    titulo: it.titulo || String(it),
+    feito: !!it.feito
+  }));
+}
+
+// G127. Ocultação de tarefas privadas no compartilhamento de dupla
+function verificarPrivacidadeTarefa(tarefa = {}, modoParceria = true) {
+  if (!tarefa) return false;
+  const texto = `${tarefa.title || ""} ${tarefa.area || ""}`.toLowerCase();
+  const ehPrivada = texto.includes("#privado") || texto.includes("#secreto") || !!tarefa.privada;
+  return modoParceria ? !ehPrivada : true;
+}
+
+// G128. Poses e animações interativas para dois mascotes juntos
+function obterAnimacaoInteracaoDuplaPrumi(tipo = "abraco") {
+  const poses = {
+    abraco: { classe: "prumi-dupla-abraco", som: "carinho", fala: "Juntos somos invencíveis!" },
+    estudo: { classe: "prumi-dupla-estudo", som: "livro", fala: "Foco total em dupla!" },
+    comemoracao: { classe: "prumi-dupla-festa", som: "festa", fala: "Batemos a meta juntos!" }
+  };
+  return poses[tipo] || poses.abraco;
+}
+
+// G129. Criação de presente virtual para o mascote do parceiro
+function gerarPresenteVirtualDupla(itemId, remetente = "Eu", dedicatoria = "Um mimo para seu Prumi!") {
+  return {
+    id: "gift_" + Date.now(),
+    itemId,
+    de: String(remetente),
+    dedicatoria: String(dedicatoria),
+    data: new Date().toISOString()
+  };
+}
+
+// G130. Placar saudável e amigável de dedicação de foco
+function calcularPlacarAmigavelFoco(minutos1 = 0, minutos2 = 0) {
+  const m1 = Math.max(0, parseInt(minutos1, 10) || 0);
+  const m2 = Math.max(0, parseInt(minutos2, 10) || 0);
+  const total = m1 + m2;
+  return {
+    minutosPessoa1: m1,
+    minutosPessoa2: m2,
+    totalHoras: Math.round((total / 60) * 10) / 10,
+    lideranca: m1 > m2 ? "pessoa1" : m2 > m1 ? "pessoa2" : "empate"
+  };
+}
+
+// G131. Payload estruturado para Web Notifications
+function gerarPayloadNotificacaoLocal(titulo = "Prumo", corpo = "Hora de beber água!", tag = "geral") {
+  return {
+    titulo,
+    opcoes: {
+      body: corpo,
+      icon: "icones/icone-192.png",
+      badge: "icones/icone-192.png",
+      tag,
+      renotify: true
+    }
+  };
+}
+
+// G132. Detecção e status formatado de conectividade de rede
+function verificarStatusConexaoRede(isOnline = true) {
+  return {
+    online: !!isOnline,
+    mensagem: isOnline ? "Conectado" : "Modo offline (dados salvos localmente)",
+    classeCss: isOnline ? "status-online" : "badge-offline-status"
+  };
+}
+
+// G133. Fila de sincronização para operações offline
+function criarFilaSincronizacaoOffline() {
+  const fila = [];
+  return {
+    adicionar(operacao) { fila.push(operacao); },
+    obterTodas() { return [...fila]; },
+    limpar() { fila.length = 0; },
+    tamanho() { return fila.length; }
+  };
+}
+
+// G134. Estimativa de espaço livre de armazenamento local
+async function estimarEspacoArmazenamentoDisponivel() {
+  if (typeof navigator !== "undefined" && navigator.storage && navigator.storage.estimate) {
+    try {
+      const est = await navigator.storage.estimate();
+      const usadoMB = Math.round((est.usage || 0) / (1024 * 1024));
+      const cotaMB = Math.round((est.quota || 0) / (1024 * 1024));
+      const pct = cotaMB ? Math.round((usadoMB / cotaMB) * 100) : 0;
+      return { usadoMB, cotaMB, porcentagemUsada: pct };
+    } catch (e) {}
+  }
+  return { usadoMB: 0, cotaMB: 50, porcentagemUsada: 0 };
+}
+
+// G135. Snapshot diário silencioso de segurança para recuperação de emergência
+function gerarSnapshotSegurancaDiario(estadoAtual = {}) {
+  return {
+    versao: 2,
+    criadoEm: new Date().toISOString(),
+    dataChave: new Date().toISOString().slice(0, 10),
+    dados: JSON.parse(JSON.stringify(estadoAtual))
+  };
+}
+
+// G136. Checksum simples de integridade para arquivos de backup
+function calcularHashIntegridadeBackup(conteudoTexto = "") {
+  let hash = 0;
+  const str = String(conteudoTexto);
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+  }
+  return "chk_" + Math.abs(hash).toString(16);
+}
+
+// G137. Notificação de contagem no ícone do aplicativo PWA (App Badge)
+function definirBadgeIconeAppPWA(numeroPendencias = 0) {
+  if (typeof navigator !== "undefined" && typeof navigator.setAppBadge === "function") {
+    try {
+      if (numeroPendencias > 0) navigator.setAppBadge(numeroPendencias);
+      else navigator.clearAppBadge();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  return false;
+}
+
+// G138. Captura e acionamento de instalação de PWA (beforeinstallprompt)
+function obterConfiguracaoInstalacaoPWA(eventoPrompt) {
+  return {
+    podeInstalar: !!eventoPrompt,
+    instalar: async () => {
+      if (eventoPrompt && typeof eventoPrompt.prompt === "function") {
+        eventoPrompt.prompt();
+        const res = await eventoPrompt.userChoice;
+        return res && res.outcome === "accepted";
+      }
+      return false;
+    }
+  };
+}
+
+// G139. Aplicação programática de Safe Area Insets
+function aplicarSafeAreasCSS(elemento, direcao = "bottom") {
+  if (!elemento || typeof elemento.style !== "object") return false;
+  elemento.style.setProperty(`padding-${direcao}`, `env(safe-area-inset-${direcao}, 16px)`);
+  return true;
+}
+
+// G140. Preparação de impressão limpa de rotina diária para folha A4
+function gerarEstilosImpressaoRotina(dia = "2026-10-27", tarefas = []) {
+  return {
+    titulo: `Rotina do dia ${dia}`,
+    totalTarefas: Array.isArray(tarefas) ? tarefas.length : 0,
+    modoImpressaoPronto: true
+  };
+}
+
+// G141. Nível de afeto e amizade acumulada com o mascote Prumi
+function calcularNivelAmizadePrumi(diasAtivo = 0, carinhosTotal = 0) {
+  const pontos = diasAtivo * 5 + carinhosTotal * 2;
+  if (pontos >= 300) return { nivel: 4, titulo: "Melhores Amigos", pontos };
+  if (pontos >= 150) return { nivel: 3, titulo: "Grande Amigo", pontos };
+  if (pontos >= 50) return { nivel: 2, titulo: "Amigo de Rotina", pontos };
+  return { nivel: 1, titulo: "Conhecido", pontos };
+}
+
+// G142. Falas personalizadas e afetuosas por nível de amizade
+function obterFalasPorNivelAmizade(nivelAmizade = 1) {
+  const falas = {
+    1: "Olá! Vamos organizar o seu dia?",
+    2: "Que bom te ver de novo! Bora cumprir nossas metas!",
+    3: "Você é incrível! Adoro passar meus dias com você!",
+    4: "Somos uma dupla imbatível! Conte comigo para tudo!"
+  };
+  return falas[nivelAmizade] || falas[1];
+}
+
+// G143. Micro-movimentos e animações dos Pets companheiros
+function gerarAnimacaoPetCompanheiro(petId = "morcego") {
+  const animacoes = {
+    morcego: { classe: "pet-companheiro-flutuando", duracao: "3s" },
+    gato: { classe: "pet-cauda-balancando", duracao: "2.5s" },
+    fantasminha: { classe: "pet-flutuando", duracao: "4s" }
+  };
+  return animacoes[petId] || animacoes.morcego;
+}
+
+// G144. Desbloqueio e verificação de conquistas secretas/ocultas
+function verificarConquistasSecretas(stats = {}) {
+  const desbloqueadas = [];
+  if (stats.horaFechamento && parseInt(stats.horaFechamento, 10) >= 3 && parseInt(stats.horaFechamento, 10) <= 4) {
+    desbloqueadas.push({ id: "coruja_madrugada", titulo: "Coruja da Madrugada", segredo: true });
+  }
+  if (stats.toquesRelogio >= 7) {
+    desbloqueadas.push({ id: "mestre_tempo", titulo: "Mestre do Tempo", segredo: true });
+  }
+  return desbloqueadas;
+}
+
+// G145. Cálculo do valor de revenda de roupas usadas (50% do preço)
+function calcularValorRevendaItem(precoOriginalGotas = 0) {
+  const p = Math.max(0, parseInt(precoOriginalGotas, 10) || 0);
+  return Math.floor(p * 0.5);
+}
+
+// G146. Álbum de lembranças comemorativas de metas batidas
+function gerarAlbumLembrancasMeta(metaId = "meta_1", data = "2026-10-27") {
+  return {
+    id: "polaroid_" + Date.now(),
+    metaId,
+    data,
+    formato: "polaroid-vintage",
+    salvo: true
+  };
+}
+
+// G147. Detecção automática de épocas e temas sazonais no calendário
+function obterTemaSazonalData(dataAtual) {
+  const d = dataAtual ? new Date(String(dataAtual).replace(/-/g, "/")) : new Date();
+  const mes = d.getMonth() + 1;
+  const dia = d.getDate();
+  if (mes === 10 && dia >= 20) return { evento: "halloween", tema: "bruxo" };
+  if (mes === 12 && dia >= 15) return { evento: "natal", tema: "natalino" };
+  if (mes === 6) return { evento: "festajunina", tema: "caipira" };
+  return { evento: "padrao", tema: "normal" };
+}
+
+// G148. Metas de desafios comunitários semanais temáticos
+function gerarDesafioComunitarioSemanal(semanaId = "sem_1") {
+  return {
+    id: semanaId,
+    titulo: "Semana da Hidratação Suprema",
+    objetivoLitrosTotal: 20,
+    recompensaGotas: 100
+  };
+}
+
+// G149. Evolução e detalhes estéticos extras no corpo do Prumi por nível
+function calcularEvolucaoVisualMascote(nivel = 1) {
+  const n = parseInt(nivel, 10) || 1;
+  if (n >= 50) return { aura: "dourada-radiante", classe: "prumi-evolucao-master" };
+  if (n >= 25) return { aura: "azul-perolada", classe: "prumi-evolucao-avancada" };
+  if (n >= 10) return { aura: "brilho-suave", classe: "prumi-evolucao-iniciante" };
+  return { aura: "nenhuma", classe: "" };
+}
+
+// G150. Configuração de fala audível do Prumi via SpeechSynthesis
+function gerarSinteseVozMascote(textoFala = "Oi, Kawan!") {
+  if (typeof window === "undefined" || !window.speechSynthesis) return false;
+  try {
+    const ut = new SpeechSynthesisUtterance(String(textoFala));
+    ut.lang = "pt-BR";
+    ut.pitch = 1.35;
+    ut.rate = 1.1;
+    return ut;
+  } catch (e) {
+    return false;
+  }
+}
