@@ -1,0 +1,218 @@
+/*
+  melhorias-cognitivas.css - Acessibilidade Universal (WCAG 2.2 AAA), Design Cognitivo e Foco Profundo
+  Fundamentado na literatura cientifica de UX, Carga Cognitiva, Acessibilidade e Neurociencia:
+  - WCAG 2.2 AAA: Alvos de toque minimos de 44x44px (Target Size 2.5.8), Contraste 7:1
+  - Focus Ring de Alta Visibilidade (Focus Appearance 2.4.13)
+  - Reducao da Carga Cognitiva Extrinseca (Sweller) e Protecao da Atencao (Cal Newport)
+  - Suporte total a prefers-reduced-motion e navegacao sem mouse
+*/
+
+/* ==========================================================================
+   01. ACESSIBILIDADE WCAG 2.2 AAA & FOCUS RING VISIVEL
+   ========================================================================== */
+
+/* Anel de foco altamente visivel para navegacao por teclado (WCAG 2.4.13) */
+:focus-visible {
+  outline: 3px solid var(--accent, #6366f1) !important;
+  outline-offset: 3px !important;
+  border-radius: 6px;
+  box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.25) !important;
+}
+
+/* Alvos de toque minimos acessiveis de 44x44px para dedos e mobilidade (WCAG 2.5.8) */
+.btn, .check, .icon, button, .chip-bt, .tab-btn {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modo Alto Contraste (WCAG 1.4.6 Contrast Enhanced 7:1) */
+body.alto-contraste {
+  --text: #000000 !important;
+  --bg: #ffffff !important;
+  --card: #ffffff !important;
+  --border: #000000 !important;
+  --muted: #222222 !important;
+}
+body.dark.alto-contraste {
+  --text: #ffffff !important;
+  --bg: #000000 !important;
+  --card: #0c0c0c !important;
+  --border: #ffffff !important;
+  --muted: #dddddd !important;
+}
+
+/* Respeito estrito a sensibilidade vestibular (prefers-reduced-motion) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   02. DESIGN COGNITIVO & MODO DEEP WORK (CAL NEWPORT / KAHNEMAN)
+   ========================================================================== */
+
+/* Modo Foco Profundo Monotarefa: Oculta distracoes e protege o Sistema 2 */
+body.modo-deep-work-ativo nav.tabs,
+body.modo-deep-work-ativo .bot,
+body.modo-deep-work-ativo #pets-passeio,
+body.modo-deep-work-ativo .bloco-secundario {
+  opacity: 0.08 !important;
+  pointer-events: none !important;
+  filter: blur(4px) !important;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+.painel-deep-work-foco {
+  position: relative;
+  max-width: 620px;
+  margin: 20px auto;
+  padding: 32px;
+  background: var(--card, #fff);
+  border: 2px solid var(--accent, #6366f1);
+  border-radius: 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  z-index: 50;
+}
+
+.deep-work-titulo {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text, #111);
+  margin-bottom: 8px;
+}
+
+.deep-work-sub {
+  font-size: 14px;
+  color: var(--muted, #666);
+  margin-bottom: 24px;
+}
+
+/* ==========================================================================
+   03. MOTOR DE ESTUDO ATIVO: CAIXAS DE REPETICAO ESPACADA (LEITNER BOX)
+   ========================================================================== */
+
+.grade-leitner-box {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.caixa-leitner-item {
+  background: var(--card, #fff);
+  border: 1px solid var(--border, rgba(0,0,0,0.1));
+  border-radius: 16px;
+  padding: 14px 10px;
+  text-align: center;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  position: relative;
+}
+
+.caixa-leitner-item:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent, #6366f1);
+}
+
+.caixa-leitner-nivel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted, #777);
+  margin-bottom: 4px;
+}
+
+.caixa-leitner-contagem {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent, #6366f1);
+}
+
+.caixa-leitner-dias {
+  font-size: 10px;
+  color: var(--muted, #888);
+  margin-top: 4px;
+}
+
+/* Cartao de Active Recall (Pergunta / Resposta com Cortina Oculta) */
+.card-active-recall {
+  background: var(--card, #fff);
+  border: 1px solid var(--border, rgba(0,0,0,0.1));
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.card-ar-pergunta {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text, #111);
+  margin-bottom: 12px;
+}
+
+.card-ar-resposta {
+  background: var(--bg, #f5f5f7);
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text, #222);
+  cursor: pointer;
+  user-select: none;
+  transition: filter 0.3s ease, background 0.3s ease;
+}
+
+.card-ar-resposta.oculta {
+  filter: blur(8px);
+  opacity: 0.5;
+}
+.card-ar-resposta.oculta:hover {
+  filter: blur(6px);
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   04. PAUSAS ATIVAS & ERGONOMIA COGNITIVA (REGRA 20-20-20)
+   ========================================================================== */
+
+.alerta-pausa-ergonomica {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: var(--card, #fff);
+  border: 2px solid #10b981;
+  border-radius: 18px;
+  padding: 16px;
+  max-width: 320px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  animation: slide-in-pausa 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slide-in-pausa {
+  from { transform: translateX(50px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Regiao ARIA Live invisivel para leitores de tela */
+.sr-only-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
