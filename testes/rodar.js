@@ -126,6 +126,7 @@ const servidor = http.createServer((req, res) => {
     ["Cinemática de Pets Nível Triple-AAA", () => require("./pets-cinematica-aaa")(url)],
     ["Pets Masterpiece Triple-AAA (Jiggle, Rigging e Partículas)", () => require("./pets-masterpiece-aaa")(url)],
     ["500 Melhorias Cognitivas, WCAG 2.2 e Leitner Box", () => require("./melhorias-cognitivas")(url)],
+    ["Paisagens Sonoras WebAudio e Tunelamento dos Pets", () => require("./audio-paisagens")(url)],
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
     ["Quarto por Mundo", () => require("./quarto-mundos")(url)],

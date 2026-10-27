@@ -30,9 +30,15 @@ function camadaPasseio() {
 }
 /** Linha do "chão": logo acima da barra de abas. */
 function chaoPasseio() {
+  const H = window.innerHeight;
   const tabs = document.getElementById("tabs");
-  const topo = tabs ? tabs.getBoundingClientRect().top : innerHeight;
-  return Math.max(120, Math.min(innerHeight, topo) - PET_TAM * 0.82);
+  if (tabs) {
+    const r = tabs.getBoundingClientRect();
+    if (r.top > 200 && r.top <= H) {
+      return Math.round(r.top - PET_TAM * 0.85);
+    }
+  }
+  return Math.round(H - PET_TAM - 14);
 }
 const larguraTela = () => document.documentElement.clientWidth || innerWidth;
 
@@ -129,7 +135,22 @@ function podeSubirEmCards(pet) {
   return ['papagaio', 'coruja', 'gato', 'coala'].includes(pet.especie);
 }
 
-function subirNoCard(a) {
+function atravessarAtrasDaPagina(a, dir = 1) {
+  const W = larguraTela();
+  const alvoX = dir > 0 ? W + 45 : -PET_TAM - 45;
+  andarAte(a, alvoX, chaoPasseio(), () => {
+    a.el.classList.add("atras-da-tela");
+    a.x = dir > 0 ? -PET_TAM - 35 : W + 35;
+    posicionar(a, false);
+    setTimeout(() => {
+      a.el.classList.remove("atras-da-tela");
+      const destinoEntrada = dir > 0 ? 30 + Math.random() * 80 : W - PET_TAM - (30 + Math.random() * 80);
+      andarAte(a, destinoEntrada, chaoPasseio(), () => reagir(a, "parado", 1800), { vel: 1.2 });
+    }, 900);
+  }, { vel: 1.3 });
+}
+
+function subirNoCard(a) { return false; }
   if (!podeSubirEmCards(a.pet)) return false;
   const card = cardParaSubir();
   if (!card) return false;
@@ -237,6 +258,7 @@ function decidir(a) {
   if (r < sono * 0.5) return reagir(a, "deitado", 5000 + Math.random() * 6000);
   if (r < sono * 0.5 + 0.06) return reagir(a, Math.random() < 0.5 ? "bocejando" : "espreguicando", 1800);
   if (r < sono * 0.5 + 0.06 + pers.curioso * 0.5 && !rolouAgora() && subirNoCard(a)) return;
+  if (r < 0.22) return atravessarAtrasDaPagina(a, Math.random() < 0.5 ? 1 : -1);
   if (r < 0.75) return andarAte(a, 8 + Math.random() * (W - PET_TAM - 16));
   if (r < 0.88) return reagir(a, "sentado", 3000 + Math.random() * 4000);
   if (pet.personalidade === "agitado") return reagir(a, "pulando", 900);
