@@ -458,6 +458,53 @@ button.btn:active,
   scroll-snap-type: x mandatory;
 }
 
+/* 73. Classes utilitárias consolidadas */
+.flex-centro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.texto-truncado-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.texto-truncado-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.oculto-acessivel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.gap-suave {
+  gap: 8px;
+}
+
+/* 79. Seletores CSS diretos e de alta performance */
+.prumo-lista-otimizada {
+  contain: content;
+  content-visibility: auto;
+}
+
+.prumo-camada-gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particula-desintegracao,
   .prumi-squash,

@@ -927,3 +927,161 @@ function verificarConformidadeCSP(htmlStr) {
   const padroesProibidos = [/on\w+\s*=/i, /<script[^>]*>/i, /javascript:\s*/i];
   return !padroesProibidos.some(reg => reg.test(htmlStr));
 }
+
+// 71. Lookup em O(1) com Map
+function obterItemLookupMap(lista, chave) {
+  const k = chave || "id";
+  const mapa = new Map();
+  if (!Array.isArray(lista)) return mapa;
+  for (let i = 0; i < lista.length; i++) {
+    const item = lista[i];
+    if (item && item[k] !== undefined) {
+      mapa.set(item[k], item);
+    }
+  }
+  return mapa;
+}
+
+// 72. Padronização de ações com namespace
+function formatarAcaoNamespace(namespace, acao) {
+  const ns = String(namespace || "app")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "_");
+  const ac = String(acao || "acao")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "_");
+  return `${ns}:${ac}`;
+}
+
+// 74. Defer de tarefas com requestIdleCallback
+function executarQuandoOcioso(cb, timeoutMs) {
+  if (typeof window !== "undefined" && typeof window.requestIdleCallback === "function") {
+    return window.requestIdleCallback(cb, { timeout: timeoutMs || 2000 });
+  }
+  return setTimeout(() => {
+    cb({
+      didTimeout: false,
+      timeRemaining: () => 50
+    });
+  }, 1);
+}
+
+function cancelarQuandoOcioso(id) {
+  if (typeof window !== "undefined" && typeof window.cancelIdleCallback === "function") {
+    return window.cancelIdleCallback(id);
+  }
+  return clearTimeout(id);
+}
+
+// 75. Debounce para inputs de texto com cancelamento
+function criarDebounce(fn, delayMs) {
+  const espera = typeof delayMs === "number" ? delayMs : 200;
+  let timer = null;
+  let ultimaArgs = null;
+  let ultimoThis = null;
+
+  function debounced(...args) {
+    ultimaArgs = args;
+    ultimoThis = this;
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = null;
+      fn.apply(ultimoThis, ultimaArgs);
+    }, espera);
+  }
+
+  debounced.cancelar = function () {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  };
+
+  debounced.agora = function () {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+      fn.apply(ultimoThis, ultimaArgs);
+    }
+  };
+
+  return debounced;
+}
+
+// 76. Error Boundary leve para módulos
+function executarComRecuperacao(fn, fallback, contexto) {
+  try {
+    return fn();
+  } catch (err) {
+    if (typeof contexto === "string") {
+      // Registro seguro sem interromper
+    }
+    if (typeof fallback === "function") {
+      return fallback(err);
+    }
+    return fallback !== undefined ? fallback : null;
+  }
+}
+
+// 77. Tipagem JSDoc com @typedef nos modelos centrais
+/**
+ * @typedef {Object} ModeloTarefa
+ * @property {string} id - Identificador único
+ * @property {string} titulo - Título da tarefa
+ * @property {boolean} feita - Status de conclusão
+ * @property {number} [prio] - Prioridade de 1 a 3
+ * @property {string} [data] - Data limite ISO (YYYY-MM-DD)
+ */
+
+/**
+ * @typedef {Object} ModeloHabito
+ * @property {string} id - Identificador do hábito
+ * @property {string} titulo - Nome do hábito
+ * @property {number} frequencia - Meta semanal de dias
+ * @property {number} sequencia - Dias seguidos concluídos
+ */
+
+/**
+ * @typedef {Object} ModeloPet
+ * @property {string} especie - Espécie do pet (gato, cao, raposa, etc.)
+ * @property {string} nome - Nome carinhoso
+ * @property {number} afeicao - Pontos de carinho
+ * @property {string} humor - Estado de espírito atual
+ */
+
+/**
+ * @typedef {Object} ModeloMundo
+ * @property {string} id - Identificador do mundo (gamer, otaku, etc.)
+ * @property {string} nome - Nome exibido
+ * @property {string} tema - Nome da paleta visual
+ */
+
+// 78. Benchmark de tempo de execução com performance.now
+function medirTempoExecucao(fn, repeticoes) {
+  const reps = Math.max(1, repeticoes || 1);
+  const temPerf = typeof performance !== "undefined" && typeof performance.now === "function";
+  const inicio = temPerf ? performance.now() : Date.now();
+  for (let i = 0; i < reps; i++) {
+    fn(i);
+  }
+  const fim = temPerf ? performance.now() : Date.now();
+  const duracaoTotalMs = Math.max(0, fim - inicio);
+  return {
+    duracaoTotalMs,
+    duracaoMediaMs: duracaoTotalMs / reps,
+    repeticoes: reps
+  };
+}
+
+// 80. Otimização de fontes com font-display: swap
+function garantirFontDisplaySwap(cssText) {
+  if (typeof cssText !== "string") return "";
+  return cssText.replace(/@font-face\s*\{([^}]+)\}/gi, (match, corpo) => {
+    if (!/font-display\s*:/i.test(corpo)) {
+      return `@font-face {\n  font-display: swap;${corpo}}`;
+    }
+    return match;
+  });
+}
