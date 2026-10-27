@@ -2963,3 +2963,119 @@ function tratarAtalhoTecladoGeral(evento, callbackAba, callbackNova, callbackFec
 
   return null;
 }
+// G41. Fatiamento em chunks de listas longas de tarefas para renderização fluida
+function fatiarListaTarefasVisiveis(lista, pagina = 1, porPagina = 20) {
+  if (!Array.isArray(lista)) return [];
+  const p = Math.max(1, parseInt(pagina, 10) || 1);
+  const qtd = Math.max(1, parseInt(porPagina, 10) || 20);
+  const inicio = (p - 1) * qtd;
+  return lista.slice(inicio, inicio + qtd);
+}
+
+// G42. Efeito de descompressão elástica ao puxar para atualizar (Pull-to-refresh)
+function aplicarEfeitoPullParaAtualizar(container, offsetY) {
+  if (!container || typeof container.style !== "object") return 0;
+  if (verificarPreferenciaMovimentoReduzido()) return 0;
+  const dist = Math.max(0, Math.min(80, offsetY || 0));
+  const escala = 1 + dist * 0.0015;
+  container.style.transform = `translateY(${dist}px) scale(${escala})`;
+  container.classList.add("pull-atualizar-indicador");
+  return dist;
+}
+
+// G43. Vibração tátil sutil (Haptic Feedback) com navigator.vibrate
+function dispararVibracaoTatil(tipo = "suave") {
+  if (typeof navigator === "undefined" || typeof navigator.vibrate !== "function") return false;
+  try {
+    if (tipo === "suave") return navigator.vibrate(10);
+    if (tipo === "conclusao") return navigator.vibrate([15, 30, 20]);
+    if (tipo === "alerta") return navigator.vibrate([30, 40, 30]);
+    return navigator.vibrate(15);
+  } catch (e) {
+    return false;
+  }
+}
+
+// G44. Sanitização defensiva contra injeções de HTML, SVG e caracteres perigosos
+function sanitizarTextoSeguro(texto) {
+  if (texto == null) return "";
+  return String(texto)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/`/g, "&#96;");
+}
+
+// G45. Validação rigorosa de URLs para links e imagens de perfil
+function validarUrlSegura(url) {
+  if (!url || typeof url !== "string") return false;
+  const limpa = url.trim();
+  if (!limpa) return false;
+  // Permite protocolos seguros https:, http:, mailto: ou imagens base64/data
+  const padraoSeguro = /^(https?:\/\/|mailto:[^@\s]+@[^@\s]+\.[^@\s]+|data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,)/i;
+  return padraoSeguro.test(limpa);
+}
+
+// G46. Indicador pulsante de contagem regressiva crítica no Pomodoro (< 60s)
+function aplicarPulsoContagemCritica(elRelogio, segundosRestantes) {
+  if (!elRelogio || typeof elRelogio.classList !== "object") return false;
+  const s = parseInt(segundosRestantes, 10) || 0;
+  if (s > 0 && s <= 60 && !verificarPreferenciaMovimentoReduzido()) {
+    elRelogio.classList.add("pomodoro-critico-pulso");
+    return true;
+  }
+  elRelogio.classList.remove("pomodoro-critico-pulso");
+  return false;
+}
+
+// G47. Contador de caracteres restantes em notas e títulos com alerta aos 90%
+function atualizarContadorCaracteres(inputEl, maximo = 60) {
+  if (!inputEl) return { restantes: maximo, critico: false };
+  const atual = (inputEl.value || "").length;
+  const max = Math.max(1, parseInt(maximo, 10) || 60);
+  const restantes = Math.max(0, max - atual);
+  const critico = restantes <= Math.ceil(max * 0.1);
+  if (inputEl.classList) {
+    if (critico) inputEl.classList.add("contador-caracteres-aviso");
+    else inputEl.classList.remove("contador-caracteres-aviso");
+  }
+  return { restantes, critico };
+}
+
+// G48. Suporte a tema escuro/claro com transição suave sem piscar
+function aplicarTransicaoModoAparencia(elemento, modo) {
+  if (!elemento || typeof elemento.classList !== "object") return modo;
+  elemento.classList.add("transicao-tema-suave");
+  if (modo === "light" || modo === "claro") {
+    elemento.setAttribute("data-tema-modo", "light");
+  } else {
+    elemento.setAttribute("data-tema-modo", "dark");
+  }
+  setTimeout(() => elemento.classList.remove("transicao-tema-suave"), 350);
+  return modo;
+}
+
+// G49. Calculadora de meta de hidratação por peso corporal e atividade
+function calcularMetaAguaPorPeso(pesoKg, nivelAtividade = "moderado") {
+  const peso = Math.max(30, Math.min(250, parseFloat(pesoKg) || 70));
+  // Base médica padrão: 35 mL por kg corporal
+  let meta = peso * 35;
+  if (nivelAtividade === "intenso") meta += 600;
+  else if (nivelAtividade === "leve") meta -= 200;
+  // Arredonda para múltiplos de 50 mL
+  return Math.round(meta / 50) * 50;
+}
+
+// G50. Indicador amigável de tarefas recorrentes com badge de frequência
+function obterBadgeFrequenciaTarefa(tipoRepeticao) {
+  const r = String(tipoRepeticao || "").trim().toLowerCase();
+  const mapa = {
+    daily: { rotulo: "Todo dia", classe: "badge-frequencia-chip", icone: "🔄" },
+    weekdays: { rotulo: "Dias úteis", classe: "badge-frequencia-chip", icone: "💼" },
+    weekly: { rotulo: "Toda semana", classe: "badge-frequencia-chip", icone: "📅" },
+    monthly: { rotulo: "Todo mês", classe: "badge-frequencia-chip", icone: "🗓️" }
+  };
+  return mapa[r] || { rotulo: "Única", classe: "", icone: "" };
+}
