@@ -1,0 +1,188 @@
+/*
+  pets-masterpiece-aaa.css - Masterpiece de Animacao Triple-AAA para os Pets do Prumo
+  Baseado nos principios da Disney/Pixar e rigging esqueletico de jogos de alta fidelidade:
+  - Conservation of Volume (quando a altura estica, a largura comprime na mesma proporcao)
+  - Secondary Motion com mola amortecida de 3 estagios para caudas e orelhas
+  - Marcha esqueletica articulada de 4 patas com flexao de articulação
+  - Jiggle Physics e deformacao de gelatina ao toque
+  - Nuvenzinhas de poeira e aura de carinho
+*/
+
+/* ==========================================================================
+   01. RIGGING ANATOMICO & CONSERVATION OF VOLUME
+   ========================================================================== */
+
+.pet-svg {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  overflow: visible !important;
+}
+
+/* Corpo: Marcha Organica com Balanço de Quadril (Hip Sway) */
+.pet-svg .pet-corpo > ellipse:first-child,
+.pet-svg .pet-corpo > path[d*="M22 26"],
+.pet-svg .pet-corpo > ellipse[cx="22"],
+.pet-svg .pet-corpo > ellipse[cx="24"] {
+  transform-origin: 22px 26px;
+  animation: corpo-hip-sway-aaa 2.6s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  will-change: transform;
+}
+
+@keyframes corpo-hip-sway-aaa {
+  0%, 100% {
+    transform: scale(1, 1) rotate(0deg) translateY(0);
+  }
+  25% {
+    /* Expiracao: comprime 2% na vertical, expande 2% na horizontal para manter volume */
+    transform: scale(1.025, 0.975) rotate(-1deg) translateY(0.4px);
+  }
+  50% {
+    transform: scale(1, 1) rotate(0deg) translateY(0);
+  }
+  75% {
+    /* Inspiracao: estica 3% na vertical, comprime 3% na horizontal */
+    transform: scale(0.97, 1.03) rotate(1.2deg) translateY(-0.8px);
+  }
+}
+
+/* Cabeca Viva: Lidera o Movimento com Delay de Inercia */
+.pet-svg .cabeca,
+.pet-svg circle[cx="34"],
+.pet-svg circle[cx="33"],
+.pet-svg circle[cx="31"],
+.pet-svg circle[cx="32"] {
+  transform-origin: 34px 20px;
+  animation: cabeca-inercia-aaa 3.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes cabeca-inercia-aaa {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  30% { transform: rotate(2deg) translateY(-0.5px); }
+  65% { transform: rotate(-2.5deg) translateY(0.3px); }
+  85% { transform: rotate(1deg) translateY(-0.2px); }
+}
+
+/* ==========================================================================
+   02. JIGGLE PHYSICS: CAUDA & ORELHAS (TWO-STAGE DAMPED SPRING)
+   ========================================================================== */
+
+/* Cauda: Chicoteio Elástico Sinusoidal Multi-Fase */
+.pet-svg .cauda {
+  transform-origin: 10px 24px;
+  animation: cauda-chicote-aaa 1.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite alternate !important;
+  will-change: transform;
+}
+
+@keyframes cauda-chicote-aaa {
+  0% { transform: rotate(-18deg) skewX(-6deg) scale(0.98); }
+  35% { transform: rotate(-4deg) skewX(-1deg) scale(1.02); }
+  70% { transform: rotate(14deg) skewX(5deg) scale(0.99); }
+  100% { transform: rotate(22deg) skewX(8deg) scale(1.03); }
+}
+
+/* Orelhas: Mola Dupla com Tremor de Antecipacao */
+.pet-svg .orelhas,
+.pet-svg ellipse[cx="29"],
+.pet-svg ellipse[cx="31"],
+.pet-svg ellipse[cx="36"],
+.pet-svg path[d*="M28 12"] {
+  transform-origin: 29px 15px;
+  animation: orelhas-mola-aaa 3.8s cubic-bezier(0.25, 1.4, 0.5, 1) infinite;
+  will-change: transform;
+}
+
+@keyframes orelhas-mola-aaa {
+  0%, 75%, 100% { transform: rotate(0deg) scale(1); }
+  78% { transform: rotate(-8deg) scale(0.94, 1.06); } /* Puxa pra tras */
+  82% { transform: rotate(6deg) scale(1.05, 0.95); }  /* Salta pra frente */
+  86% { transform: rotate(-3deg) scale(0.98, 1.02); } /* Amortecimento 1 */
+  90% { transform: rotate(1deg) scale(1); }           /* Amortecimento 2 */
+}
+
+/* ==========================================================================
+   03. MARCHA DINAMICA DE SOLO (PASSADAS RITMICAS ARTICULADAS)
+   ========================================================================== */
+
+/* Andando no Solo: Alternancia Natural das 4 Patas */
+.pet-svg.pose-andando .perna.p1 {
+  animation: passo-dianteiro-1 0.5s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+.pet-svg.pose-andando .perna.p2 {
+  animation: passo-dianteiro-2 0.5s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+.pet-svg.pose-andando .perna.p3 {
+  animation: passo-traseiro-1 0.5s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+.pet-svg.pose-andando .perna.p4 {
+  animation: passo-traseiro-2 0.5s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+
+@keyframes passo-dianteiro-1 {
+  from { transform: rotate(-20deg) translateY(-1px); }
+  to { transform: rotate(22deg) translateY(0); }
+}
+@keyframes passo-dianteiro-2 {
+  from { transform: rotate(22deg) translateY(0); }
+  to { transform: rotate(-20deg) translateY(-1px); }
+}
+@keyframes passo-traseiro-1 {
+  from { transform: rotate(18deg) translateY(0); }
+  to { transform: rotate(-18deg) translateY(-1px); }
+}
+@keyframes passo-traseiro-2 {
+  from { transform: rotate(-18deg) translateY(-1px); }
+  to { transform: rotate(18deg) translateY(0); }
+}
+
+/* ==========================================================================
+   04. FISICA DE GELATINA NO CLIQUE (DAMPED HARMONIC OSCILLATOR)
+   ========================================================================== */
+
+.pet-jelly-click {
+  animation: pet-jelly-wobble 0.65s cubic-bezier(0.25, 1.5, 0.5, 1) forwards !important;
+}
+
+@keyframes pet-jelly-wobble {
+  0% { transform: scale(1, 1); }
+  20% { transform: scale(1.32, 0.72) translateY(3px); }  /* Impacto inicial profundo */
+  45% { transform: scale(0.82, 1.24) translateY(-8px); } /* Rebote vertical elastico */
+  65% { transform: scale(1.12, 0.92) translateY(1px); }  /* Oscilacao 2 */
+  82% { transform: scale(0.96, 1.04) translateY(-2px); } /* Oscilacao 3 */
+  100% { transform: scale(1, 1) translateY(0); }
+}
+
+/* ==========================================================================
+   05. NUVENS DE POEIRA DE SOLO (FOOTSTEP DUST PUFFS)
+   ========================================================================== */
+
+.poeira-passo-solo {
+  position: fixed;
+  pointer-events: none;
+  z-index: 34;
+  width: 14px;
+  height: 8px;
+  background: radial-gradient(ellipse at center, rgba(160, 160, 160, 0.55) 0%, transparent 75%);
+  border-radius: 50%;
+  animation: poeira-dissipar-aaa 0.45s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes poeira-dissipar-aaa {
+  0% { transform: scale(0.3) translate(0, 0); opacity: 0.8; }
+  50% { transform: scale(1.4) translate(calc(var(--dir, 1) * -8px), -4px); opacity: 0.5; }
+  100% { transform: scale(2.2) translate(calc(var(--dir, 1) * -16px), -8px); opacity: 0; }
+}
+
+/* ==========================================================================
+   06. AURA DE EXTURBIANCIA E FELICIDADE PURA NO CARINHO
+   ========================================================================== */
+
+.pet-extase-carinho {
+  filter: drop-shadow(0 0 16px rgba(236, 72, 153, 0.65)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.9)) !important;
+  transition: filter 0.3s ease;
+}
