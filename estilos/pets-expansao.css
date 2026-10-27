@@ -98,3 +98,98 @@
   0% { transform: rotate(-8deg); }
   100% { transform: rotate(12deg); }
 }
+
+
+/* ========================================================
+   LOTES 301 A 400: HABILIDADES, PASSEIOS, FENG SHUI,
+   GENÉTICA MÁGICA E EFEITOS SENSORIAIS DOS PETS
+   ======================================================== */
+
+/* Árvore de talentos e habilidades */
+.arvore-talentos-pet-svg {
+  width: 100%;
+  max-width: 320px;
+  height: 220px;
+  background: var(--surface, #fff);
+  border-radius: 12px;
+  border: 1px solid var(--line, #e2e8f0);
+}
+.no-talento-desbloqueado {
+  fill: #ffd700;
+  stroke: #b45309;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+}
+.no-talento-bloqueado {
+  fill: var(--sunken, #cbd5e1);
+  stroke: var(--line, #94a3b8);
+  stroke-width: 1.5;
+}
+
+/* Polaroids de passeios e aventuras */
+.polaroid-passeio-card {
+  background: #ffffff;
+  padding: 10px 10px 20px 10px;
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  transform: rotate(1deg);
+}
+.polaroid-passeio-foto {
+  width: 100%;
+  height: 140px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 2px;
+}
+
+/* Aura cósmica orbital com pequenas luas */
+.aura-cosmica-pet {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 215, 0, 0.5);
+  animation: rotacaoCosmicaAnim 12s linear infinite;
+  pointer-events: none;
+}
+@keyframes rotacaoCosmicaAnim {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Efeito de gotículas escorrendo na janela chuvosa */
+.janela-chuvosa-efeito {
+  position: relative;
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.gota-janela-escorrendo {
+  position: absolute;
+  width: 2px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 1px;
+  animation: escorreGotaAnim 1.8s linear infinite;
+}
+@keyframes escorreGotaAnim {
+  0% { transform: translateY(-20px); opacity: 0; }
+  30% { opacity: 0.8; }
+  100% { transform: translateY(180px); opacity: 0; }
+}
+
+/* Pegada fosforescente no escuro */
+.pegada-fosforescente-noite {
+  position: absolute;
+  font-size: 16px;
+  color: #a7f3d0;
+  text-shadow: 0 0 6px #10b981, 0 0 12px #34d399;
+  animation: pulsarFosforescenteAnim 2s ease-in-out infinite alternate;
+}
+@keyframes pulsarFosforescenteAnim {
+  0% { opacity: 0.4; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1.05); }
+}

@@ -110,6 +110,8 @@ const servidor = http.createServer((req, res) => {
     ["Social e Modo Dupla: Expansão Lote 4 (Itens 151 a 200)", () => require("./social-lote4")(url)],
     ["Pets e Mascotes: Expansão Lote 1 (Itens 201 a 250)", () => require("./pets-lote1")(url)],
     ["Pets e Mascotes: Expansão Lote 2 (Itens 251 a 300)", () => require("./pets-lote2")(url)],
+    ["Pets e Mascotes: Expansão Lote 3 (Itens 301 a 350)", () => require("./pets-lote3")(url)],
+    ["Pets e Mascotes: Expansão Lote 4 (Itens 351 a 400)", () => require("./pets-lote4")(url)],
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
     ["Quarto por Mundo", () => require("./quarto-mundos")(url)],
