@@ -1720,3 +1720,125 @@ html.transicao-tema-ativa * {
   text-align: center;
   color: #fff;
 }
+/* 201 a 250. Inteligência de rotina, sono REM, loja dinâmica, parcerias e microanimações */
+.card-neumorfico-suave {
+  background: var(--surface, #141622);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.25), -2px -2px 6px rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+}
+
+.borda-neon-pulsante {
+  border: 1px solid var(--neon-cor, #00f0ff);
+  box-shadow: 0 0 8px var(--neon-cor, #00f0ff);
+  animation: neonPulsoAnim 2s infinite alternate;
+}
+@keyframes neonPulsoAnim {
+  0% { box-shadow: 0 0 4px var(--neon-cor, #00f0ff); }
+  100% { box-shadow: 0 0 14px var(--neon-cor, #00f0ff); }
+}
+
+.card-flip-3d {
+  perspective: 1000px;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.card-flip-3d.virado {
+  transform: rotateY(180deg);
+}
+
+.zoom-hover-suave {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.4, 1.2), box-shadow 0.2s ease;
+}
+.zoom-hover-suave:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.item-raridade-comum { border-color: var(--line, #282c3f); }
+.item-raridade-raro { border-color: #007bff; box-shadow: 0 0 6px rgba(0, 123, 255, 0.3); }
+.item-raridade-epico { border-color: #9c27b0; box-shadow: 0 0 8px rgba(156, 39, 176, 0.4); }
+.item-raridade-lendario { border-color: #ffd700; box-shadow: 0 0 12px rgba(255, 215, 0, 0.6); }
+
+.chuva-particula-queda {
+  position: absolute;
+  pointer-events: none;
+  animation: chuvaQuedaAnim 2.5s linear infinite;
+}
+@keyframes chuvaQuedaAnim {
+  0% { transform: translateY(-10px); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translateY(160px); opacity: 0; }
+}
+
+
+/* ========================================================
+   LOTES 26 A 30: UI, MICROINTERACOES E ESTILOS FINAIS
+   ======================================================== */
+.efeito-vidro-fosco {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.micro-vibracao-shake {
+  animation: vibracaoShakeAnim 0.35s ease-in-out;
+}
+@keyframes vibracaoShakeAnim {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+.ripple-efeito {
+  position: relative;
+  overflow: hidden;
+}
+.ripple-efeito::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(0);
+  animation: ondaRipple 0.6s linear;
+  pointer-events: none;
+}
+@keyframes ondaRipple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+.bateria-emocional-barra {
+  height: 8px;
+  border-radius: 4px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+.bateria-emocional-preenchimento {
+  height: 100%;
+  transition: width 0.4s ease, background-color 0.4s ease;
+}
+
+.confete-animado {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  z-index: 9999;
+  animation: quedaConfete 2s ease-out forwards;
+}
+@keyframes quedaConfete {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(350px) rotate(720deg); opacity: 0; }
+}
+
+.badge-sync-offline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
