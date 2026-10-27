@@ -500,3 +500,123 @@ function mascararDadoSensivel(str, visiveisInic = 3, visiveisFim = 3) {
   const fim = str.slice(-visiveisFim);
   return `${inicio}***${fim}`;
 }
+
+// 41. Criação de iframe isolado e seguro para conteúdo externo
+function criarIframeSeguro(url, titulo = "Visualização Externa") {
+  if (typeof document === "undefined") return null;
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute("sandbox", "allow-scripts allow-forms");
+  iframe.setAttribute("referrerpolicy", "no-referrer");
+  iframe.setAttribute("title", titulo);
+  if (validarURLLinkSeguro(url)) {
+    iframe.src = url;
+  }
+  return iframe;
+}
+
+// 42. Validação rigorosa de cores CSS injetadas
+function validarCorHexSegura(cor) {
+  if (typeof cor !== "string") return false;
+  return /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(cor.trim());
+}
+
+// 43. Silenciamento de logs em produção
+function silenciarConsoleProducao(forcar = false) {
+  if (typeof window === "undefined" || typeof console === "undefined") return;
+  const ehLocal =
+    window.location &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.protocol === "file:");
+  if (forcar || !ehLocal) {
+    console.log = () => {};
+    console.info = () => {};
+  }
+}
+
+// 44. Controle de taxa (Rate Limiting) local para ações críticas
+const mapaRateLimit = {};
+function verificarLimiteTaxa(chave, maxTentativas = 3, janelaMs = 1000) {
+  const agora = Date.now();
+  if (!mapaRateLimit[chave]) mapaRateLimit[chave] = [];
+  mapaRateLimit[chave] = mapaRateLimit[chave].filter(t => agora - t < janelaMs);
+  if (mapaRateLimit[chave].length >= maxTentativas) {
+    return false;
+  }
+  mapaRateLimit[chave].push(agora);
+  return true;
+}
+
+// 45. Proteção contra Clickjacking
+function protegerContraClickjacking() {
+  if (typeof window === "undefined") return true;
+  try {
+    if (window.top !== window.self) {
+      window.top.location = window.self.location;
+      return false;
+    }
+  } catch (_) {
+    return false;
+  }
+  return true;
+}
+
+// 46. Sanitização de células CSV contra CSV Injection
+function sanitizarCelulaCSV(valor) {
+  if (typeof valor !== "string") valor = String(valor || "");
+  const charsPerigosos = ["=", "+", "-", "@", "\t", "\r"];
+  if (charsPerigosos.some(c => valor.startsWith(c))) {
+    return `'${valor}`;
+  }
+  return valor;
+}
+
+// 47. Solicitação contextual de notificações
+function solicitarNotificacaoContextual(onAprovado) {
+  if (typeof Notification === "undefined") return;
+  if (Notification.permission === "granted") {
+    if (typeof onAprovado === "function") onAprovado();
+  } else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(p => {
+      if (p === "granted" && typeof onAprovado === "function") {
+        onAprovado();
+      }
+    });
+  }
+}
+
+// 48. Comparação de tempo constante para PINs e tokens
+function compararTempoConstante(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+// 49. Limpeza segura de sessão e caches
+function limparSessaoSegura() {
+  if (typeof localStorage !== "undefined") {
+    const chavesSensiveis = ["prumo_token", "prumo_auth", "prumo_sync_key"];
+    chavesSensiveis.forEach(k => localStorage.removeItem(k));
+  }
+  if (typeof sessionStorage !== "undefined") {
+    sessionStorage.clear();
+  }
+  return true;
+}
+
+// 50. Validação estrita de formato de data ISO (YYYY-MM-DD)
+function validarFormatoDataISO(dataStr) {
+  if (typeof dataStr !== "string") return false;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dataStr);
+  if (!m) return false;
+  const ano = parseInt(m[1], 10);
+  const mes = parseInt(m[2], 10);
+  const dia = parseInt(m[3], 10);
+  if (mes < 1 || mes > 12 || dia < 1 || dia > 31) return false;
+  const diasMes = new Date(ano, mes, 0).getDate();
+  return dia <= diasMes;
+}

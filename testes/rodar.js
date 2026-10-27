@@ -62,6 +62,7 @@ const servidor = http.createServer((req, res) => {
     ["Melhorias Gerais: Lote 2 (Itens 11 a 20)", () => require("./melhorias-lote2")(url)],
     ["Melhorias Gerais: Lote 3 (Itens 21 a 30)", () => require("./melhorias-lote3")(url)],
     ["Melhorias Gerais: Lote 4 (Itens 31 a 40)", () => require("./melhorias-lote4")(url)],
+    ["Melhorias Gerais: Lote 5 (Itens 41 a 50)", () => require("./melhorias-lote5")(url)],
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
     ["Quarto por Mundo", () => require("./quarto-mundos")(url)],
