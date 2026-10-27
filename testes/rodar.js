@@ -123,6 +123,7 @@ const servidor = http.createServer((req, res) => {
     ["Top 20 Referências por Personalidade (20 x 16+)", () => require("./referencias-mundos")(url)],
     ["Averiguação Divertida da Leitura (Pet & Estante)", () => require("./leitura-averiguacao")(url)],
     ["Aprimoramento Visual Supremo (2.5D, Filtros e Física)", () => require("./visual-supremo")(url)],
+    ["Cinemática de Pets Nível Triple-AAA", () => require("./pets-cinematica-aaa")(url)],
     ["Estante", () => require("./estante")(url)],
     ["Quarto (decoração nova)", () => require("./quarto")(url)],
     ["Quarto por Mundo", () => require("./quarto-mundos")(url)],

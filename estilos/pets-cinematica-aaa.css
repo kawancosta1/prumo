@@ -1,0 +1,257 @@
+/*
+  pets-cinematica-aaa.css - Motor de Animacao de Pets Nivel Jogos Triple-AAA
+  Inspirado nos 12 principios da animacao tradicional (Disney/Ghibli/Nintendo):
+  - Secondary Motion & Overlapping Action (cauda, orelhas e asas com inercia)
+  - Squash & Stretch com antecipacao e settling bounce
+  - Respiracao toracica asimetrica viva
+  - Piscar de olhos anatomico com micro-dilatacao de pupila
+  - Eye tracking e ondas de impacto no solo
+*/
+
+/* ==========================================================================
+   01. ESQUELETO VIVO & SECONDARY MOTION (MOVIMENTOS SECUNDARIOS)
+   ========================================================================== */
+
+.pet-svg {
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+/* Corpo: Respiracao Toracica Asimetrica (Inspira rapido, expira devagar) */
+.pet-svg .pet-corpo {
+  transform-origin: 24px 32px;
+  animation: pet-respiracao-toracica-aaa 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+@keyframes pet-respiracao-toracica-aaa {
+  0% { transform: scale(1, 1) translateY(0); }
+  35% { transform: scale(1.025, 0.98) translateY(0.5px); } /* Expiracao relaxada */
+  70% { transform: scale(0.985, 1.03) translateY(-1px); } /* Inspiracao profunda */
+  100% { transform: scale(1, 1) translateY(0); }
+}
+
+/* Cauda: Fisica Pendular Continua com Inercia (Overlapping Wave) */
+.pet-svg .cauda {
+  transform-origin: 10px 24px;
+  animation: pet-cauda-ondulante-aaa 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+  will-change: transform;
+}
+
+@keyframes pet-cauda-ondulante-aaa {
+  0% { transform: rotate(-14deg) skewX(-4deg); }
+  50% { transform: rotate(4deg) skewX(2deg); }
+  100% { transform: rotate(18deg) skewX(6deg); }
+}
+
+/* Orelhas: Micro-Tremor e Escuta Atenta Espontanea */
+.pet-svg .orelhas, .pet-svg path[d*="M27 12"], .pet-svg path[d*="M35 10"] {
+  transform-origin: center bottom;
+  animation: pet-orelhas-atentas-aaa 4.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+@keyframes pet-orelhas-atentas-aaa {
+  0%, 82%, 100% { transform: rotate(0deg); }
+  85% { transform: rotate(-6deg) scale(0.96, 1.04); }
+  88% { transform: rotate(5deg) scale(1.03, 0.97); }
+  92% { transform: rotate(-2deg); }
+}
+
+/* Asas: Batimento Tridimensional com Deslocamento de Vento */
+.pet-svg .asa {
+  transform-origin: 18px 20px;
+  animation: pet-asa-flutuante-aaa 1.4s cubic-bezier(0.3, 0.7, 0.4, 1) infinite alternate;
+  will-change: transform;
+}
+
+@keyframes pet-asa-flutuante-aaa {
+  0% { transform: scaleX(1) rotate(0deg); }
+  100% { transform: scaleX(0.75) rotate(-18deg) translateY(-2px); }
+}
+
+/* Olhos: Piscar Anatomico com Micro-Dilatacao */
+.pet-svg .olho {
+  transform-origin: 37px 15.5px;
+  animation: pet-piscar-realista-aaa 5.5s infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes pet-piscar-realista-aaa {
+  0%, 94%, 98%, 100% { transform: scaleY(1); opacity: 1; }
+  96% { transform: scaleY(0.08); opacity: 0.8; } /* Piscar instantaneo */
+}
+
+/* ==========================================================================
+   02. POSES CINEMATICAS TRIPLE-AAA
+   ========================================================================== */
+
+/* POSE: FELIZ (Salto com Antecipacao, Smear no Ar e Impacto com Onda de Choque) */
+.pet-svg.pose-feliz {
+  animation: pet-salto-triplo-aaa 1.9s cubic-bezier(0.25, 0.8, 0.25, 1) infinite !important;
+}
+
+@keyframes pet-salto-triplo-aaa {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  12% {
+    /* Antecipacao: agacha acumulando energia */
+    transform: scale(1.22, 0.78) translateY(3px);
+  }
+  28% {
+    /* Decolagem: estica o corpo verticalmente */
+    transform: scale(0.85, 1.25) translateY(-22px) rotate(3deg);
+  }
+  42% {
+    /* Hang-Time: micro-flutuacao no topo da parabola */
+    transform: scale(1.02, 0.98) translateY(-25px) rotate(-2deg);
+  }
+  60% {
+    /* Queda acelerada */
+    transform: scale(0.92, 1.15) translateY(-5px);
+  }
+  72% {
+    /* Impacto no chao: squash maximo de aterrissagem */
+    transform: scale(1.28, 0.74) translateY(2px);
+  }
+  86% {
+    /* Quique de recuperacao */
+    transform: scale(0.96, 1.05) translateY(-4px);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+
+/* POSE: BRINCANDO (Rolamento Dinamico & Excitacao com Rabo Acelerado) */
+.pet-svg.pose-brincando {
+  animation: pet-brincadeira-aaa 2.4s ease-in-out infinite !important;
+}
+
+@keyframes pet-brincadeira-aaa {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-8deg) translateY(-6px) scale(1.05, 0.95); }
+  50% { transform: rotate(10deg) translateY(-10px) scale(0.96, 1.06); }
+  75% { transform: rotate(-4deg) translateY(-2px); }
+}
+
+.pet-svg.pose-brincando .cauda {
+  animation-duration: 0.45s !important; /* Rabo abanando frenetico */
+}
+
+/* POSE: CORRENDO (Galope Dinamico de 4 Tempos) */
+.pet-svg.pose-correndo {
+  animation: pet-galope-correndo-aaa 0.65s cubic-bezier(0.35, 0, 0.25, 1) infinite !important;
+}
+
+@keyframes pet-galope-correndo-aaa {
+  0%, 100% { transform: translateY(0) rotate(2deg); }
+  50% { transform: translateY(-7px) rotate(-4deg) scale(1.08, 0.94); }
+}
+
+.pet-svg.pose-correndo .perna.p1, .pet-svg.pose-correndo .perna.p3 {
+  animation: perna-frente-aaa 0.65s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+.pet-svg.pose-correndo .perna.p2, .pet-svg.pose-correndo .perna.p4 {
+  animation: perna-tras-aaa 0.65s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+
+@keyframes perna-frente-aaa {
+  from { transform: rotate(-25deg); }
+  to { transform: rotate(30deg); }
+}
+@keyframes perna-tras-aaa {
+  from { transform: rotate(30deg); }
+  to { transform: rotate(-25deg); }
+}
+
+/* POSE: DORMINDO (Respiração Profunda, Ronrom e Bolhas de Sonho) */
+.pet-svg.pose-dormindo {
+  animation: pet-sono-profundo-aaa 4s ease-in-out infinite alternate !important;
+}
+
+@keyframes pet-sono-profundo-aaa {
+  0% { transform: scale(1, 0.96) translateY(2px); }
+  100% { transform: scale(1.04, 1.01) translateY(0); }
+}
+
+.pet-svg.pose-dormindo .zz text {
+  animation: pet-zz-subindo-aaa 2.8s linear infinite;
+  opacity: 0;
+}
+.pet-svg.pose-dormindo .zz text:nth-child(2) {
+  animation-delay: 1.4s;
+}
+
+@keyframes pet-zz-subindo-aaa {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  30% { opacity: 0.9; }
+  100% { transform: translate(14px, -24px) scale(1.4); opacity: 0; }
+}
+
+/* POSE: COMENDO (Mastigação Rítmica e Bochechas Saltitantes) */
+.pet-svg.pose-comendo {
+  animation: pet-mastigando-aaa 0.4s ease-in-out infinite alternate !important;
+}
+
+@keyframes pet-mastigando-aaa {
+  0% { transform: scale(1, 1); }
+  100% { transform: scale(1.08, 0.93) translateY(1px); }
+}
+
+/* ==========================================================================
+   03. SCREEN JUICE & EFEITOS CINEMATICOS DE IMPACTO
+   ========================================================================== */
+
+/* Faíscas e Corações Cinemáticos que Flutuam com Física ao Receber Carinho */
+.particula-carinho-aaa {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: 20px;
+  animation: flutuar-particula-aaa 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes flutuar-particula-aaa {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% - 40px)) scale(1.3) rotate(var(--rot, 15deg));
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% - 85px)) scale(0.8) rotate(var(--rot, 30deg));
+    opacity: 0;
+  }
+}
+
+/* Onda de Choque no Solo ao Aterrissar */
+.onda-choque-solo-aaa {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 10px;
+  height: 4px;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.8) 0%, rgba(99, 102, 241, 0.4) 50%, transparent 80%);
+  border-radius: 50%;
+  transform: translateX(-50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+  animation: expandir-choque-aaa 0.5s ease-out forwards;
+}
+
+@keyframes expandir-choque-aaa {
+  0% { transform: translateX(-50%) scale(0); opacity: 1; }
+  100% { transform: translateX(-50%) scale(8, 2); opacity: 0; }
+}
+
+/* Aura de Conexão com o Usuário quando o cursor está próximo */
+.pet-palco:hover .pet-svg {
+  filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.45)) drop-shadow(0 8px 18px rgba(0,0,0,0.18));
+}
