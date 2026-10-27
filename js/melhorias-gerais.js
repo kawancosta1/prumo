@@ -2147,3 +2147,194 @@ function iniciarSonsBinaurais(frequenciaBase, diferencaHz) {
     return null;
   }
 }
+
+// 151. Clube do livro compartilhado sem spoilers
+function clubeLivroSemSpoilerHTML(comentarios, paginaAtualUsuario) {
+  const pagUsuario = Math.max(0, parseInt(paginaAtualUsuario, 10) || 0);
+  const lista = Array.isArray(comentarios) ? comentarios : [];
+  let html = "";
+  lista.forEach(c => {
+    const pagComentario = parseInt(c.pagina, 10) || 0;
+    const ehSpoiler = pagComentario > pagUsuario;
+    const autor = sanitizarHTMLSeguro(c.autor || "Leitor");
+    const texto = sanitizarHTMLSeguro(c.texto || "");
+    if (ehSpoiler) {
+      html +=
+        `<div style="margin-bottom:8px; font-size:12px;">` +
+        `<strong>${autor}</strong> (Pág. ${pagComentario}): ` +
+        `<span class="spoiler-oculto" title="Spoiler: clique para ver">${texto}</span>` +
+        `</div>`;
+    } else {
+      html +=
+        `<div style="margin-bottom:8px; font-size:12px;">` +
+        `<strong>${autor}</strong> (Pág. ${pagComentario}): <span>${texto}</span>` +
+        `</div>`;
+    }
+  });
+  return `<div class="clube-livro-comentarios">${html}</div>`;
+}
+
+// 152. Metas de leitura compartilhadas colaborativas
+function metaLeituraColaborativa(metaTotal, paginasLidasMembros) {
+  const meta = Math.max(1, parseInt(metaTotal, 10) || 100);
+  const membros = Array.isArray(paginasLidasMembros) ? paginasLidasMembros : [];
+  const totalLido = membros.reduce((acc, m) => acc + (Number(m.paginas) || 0), 0);
+  const progressoPct = Math.min(100, Math.round((totalLido / meta) * 100));
+
+  let medalha = "Início";
+  if (progressoPct >= 100) medalha = "Diamante 💎";
+  else if (progressoPct >= 75) medalha = "Ouro 🥇";
+  else if (progressoPct >= 50) medalha = "Prata 🥈";
+  else if (progressoPct >= 25) medalha = "Bronze 🥉";
+
+  return {
+    metaTotal: meta,
+    totalLido,
+    progressoPct,
+    medalha
+  };
+}
+
+// 153. Empréstimo de livros com data de devolução
+function registrarEmprestimoLivro(livroId, amigoNome, dataLimite) {
+  const id = String(livroId || "");
+  const amigo = sanitizarHTMLSeguro(amigoNome || "Amigo");
+  const dataHoje = new Date().toISOString().substring(0, 10);
+  const limite = dataLimite || dataHoje;
+  const atrasado = limite < dataHoje;
+  return {
+    livroId: id,
+    amigoNome: amigo,
+    dataLimite: limite,
+    emprestadoEm: dataHoje,
+    atrasado
+  };
+}
+
+// 154. Feed de reações carinhosas com gotas mágicas
+function reagirComGotasAmigo(amigoId, gotas, mensagem) {
+  const qtd = Math.max(1, parseInt(gotas, 10) || 1);
+  const msg = sanitizarHTMLSeguro(mensagem || "Parabéns pelo foco!");
+  return {
+    amigoId: String(amigoId || ""),
+    gotasEnviadas: qtd,
+    mensagem: msg,
+    timestamp: Date.now()
+  };
+}
+
+// 155. Desafio semanal de produtividade em dupla
+function desafioProdutividadeDupla(duplaA, duplaB, metaSemanal) {
+  const ptsA = Math.max(0, (duplaA && duplaA.pontos) || 0);
+  const ptsB = Math.max(0, (duplaB && duplaB.pontos) || 0);
+  const meta = Math.max(1, parseInt(metaSemanal, 10) || 50);
+  const total = ptsA + ptsB;
+  return {
+    totalPontos: total,
+    metaSemanal: meta,
+    atingida: total >= meta,
+    percentual: Math.min(100, Math.round((total / meta) * 100))
+  };
+}
+
+// 156. Calculadora de ingestão ideal de água por peso
+function calcularMetaAguaPeso(pesoKg, nivelAtividade) {
+  const peso = Math.max(20, Math.min(200, Number(pesoKg) || 70));
+  let baseMl = Math.round(peso * 35);
+  const nivel = String(nivelAtividade || "leve").toLowerCase();
+  if (nivel === "moderado") baseMl += 500;
+  if (nivel === "intenso") baseMl += 1000;
+  return {
+    pesoKg: peso,
+    metaDiariaMl: baseMl,
+    coposRecomendados: Math.ceil(baseMl / 250)
+  };
+}
+
+// 157. Busca com pesquisa fonética e aproximada
+function buscaFoneticaAproximada(termo, lista) {
+  const t = String(termo || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  if (!t) return [];
+  const itens = Array.isArray(lista) ? lista : [];
+
+  return itens.filter(item => {
+    const texto = String(typeof item === "string" ? item : item.titulo || item.nome || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    if (texto.includes(t)) return true;
+
+    // Distância Levenshtein leve para palavras de tamanho similar
+    if (Math.abs(texto.length - t.length) <= 2) {
+      let diff = 0;
+      const minLen = Math.min(texto.length, t.length);
+      for (let i = 0; i < minLen; i++) {
+        if (texto[i] !== t[i]) diff++;
+      }
+      diff += Math.abs(texto.length - t.length);
+      return diff <= 2;
+    }
+    return false;
+  });
+}
+
+// 158. Agendamento visual em linha do tempo diária
+function linhaDoTempoTarefasHTML(tarefasComHorario) {
+  const lista = Array.isArray(tarefasComHorario) ? [...tarefasComHorario] : [];
+  lista.sort((a, b) => String(a.hora || "").localeCompare(String(b.hora || "")));
+  let itensHTML = "";
+  lista.forEach(t => {
+    const hora = sanitizarHTMLSeguro(t.hora || "--:--");
+    const titulo = sanitizarHTMLSeguro(t.titulo || "Tarefa");
+    itensHTML +=
+      `<div class="timeline-item">` +
+      `<span class="timeline-hora">${hora}</span> - ` +
+      `<strong>${titulo}</strong>` +
+      `</div>`;
+  });
+  return `<div class="timeline-container">${itensHTML || "<p>Nenhuma tarefa agendada.</p>"}</div>`;
+}
+
+// 159. Notificações inteligentes baseadas no horário de sono
+function horarioPermitidoNotificar(horaAtual, horaDormir, horaAcordar) {
+  const h = Number(horaAtual) || 0;
+  const dormir = Number(horaDormir) !== undefined ? Number(horaDormir) : 23;
+  const acordar = Number(horaAcordar) !== undefined ? Number(horaAcordar) : 7;
+
+  // Janela que cruza meia-noite (ex: 23h às 7h)
+  if (dormir > acordar) {
+    if (h >= dormir || h < acordar) return false;
+  } else {
+    if (h >= dormir && h < acordar) return false;
+  }
+  return true;
+}
+
+// 160. Modo offline total com fila resiliente de sincronização
+function filaOfflineSincronia(filaAtual, novaAcao) {
+  const fila = Array.isArray(filaAtual) ? [...filaAtual] : [];
+  if (!novaAcao || typeof novaAcao !== "object") return fila;
+
+  // Deduplicação idempotente: atualiza ação se for sobre a mesma entidade
+  const idx = fila.findIndex(
+    a => a.tipo === novaAcao.tipo && a.idEntidade && a.idEntidade === novaAcao.idEntidade
+  );
+
+  const acaoFormatada = {
+    ...novaAcao,
+    timestamp: Date.now(),
+    tentativas: 0
+  };
+
+  if (idx >= 0) {
+    fila[idx] = acaoFormatada;
+  } else {
+    fila.push(acaoFormatada);
+  }
+  return fila;
+}

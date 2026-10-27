@@ -830,6 +830,55 @@ a,
   margin-right: 4px;
 }
 
+/* 151. Clube do livro sem spoiler */
+.spoiler-oculto {
+  filter: blur(5px);
+  user-select: none;
+  cursor: pointer;
+  background: #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  transition: filter 0.2s ease;
+}
+
+.spoiler-oculto:hover,
+.spoiler-revelado {
+  filter: none;
+  user-select: text;
+  background: transparent;
+}
+
+/* 158. Linha do tempo diária */
+.timeline-container {
+  position: relative;
+  border-left: 2px solid #cbd5e1;
+  margin-left: 16px;
+  padding-left: 12px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 2px solid #ffffff;
+}
+
+.timeline-hora {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particula-desintegracao,
   .prumi-squash,
