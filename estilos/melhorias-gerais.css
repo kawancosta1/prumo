@@ -575,6 +575,41 @@ textarea:focus-visible {
   }
 }
 
+/* 103. Desativação de arrasto conflitante */
+.conteudo-sem-arrasto-conflitante {
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+/* 106. Modo de alto contraste configurável */
+[data-alto-contraste="true"] {
+  --borda-contraste: 2px solid #000000;
+  filter: contrast(125%);
+}
+
+[data-alto-contraste="true"] button,
+[data-alto-contraste="true"] .card,
+[data-alto-contraste="true"] input {
+  border: var(--borda-contraste) !important;
+}
+
+/* 108. Suporte a modo paisagem em tablets */
+@media (min-width: 768px) and (orientation: landscape) {
+  .grade-dupla-paisagem {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+}
+
+/* 109. Prevenção de double-tap zoom */
+.toque-sem-delay,
+button,
+a,
+.btn {
+  touch-action: manipulation;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particula-desintegracao,
   .prumi-squash,

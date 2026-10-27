@@ -1339,3 +1339,116 @@ function garantirInputmodeNumerico(inputEl) {
   inputEl.setAttribute("inputmode", "numeric");
   inputEl.setAttribute("pattern", "[0-9]*");
 }
+
+// 101. Mensagens de erro claras e orientadas à ação
+function formatarMensagemErroAcao(codigoOuTexto) {
+  const c = String(codigoOuTexto || "").toLowerCase();
+  if (c.includes("network") || c.includes("offline") || c.includes("conexao")) {
+    return "Sem conexão no momento. Seus dados estão salvos aqui e serão sincronizados assim que a internet voltar.";
+  }
+  if (c.includes("auth") || c.includes("senha") || c.includes("login")) {
+    return "Não foi possível entrar. Verifique seu email e senha ou clique em Esqueci a senha.";
+  }
+  if (c.includes("storage") || c.includes("cheio") || c.includes("quota")) {
+    return "Espaço do navegador cheio. Limpe o histórico ou remova itens antigos nos Ajustes.";
+  }
+  return "Algo deu errado. Tente novamente em alguns segundos ou recarregue a página.";
+}
+
+// 102. Feedback sonoro acessível para deficientes visuais
+function tocarSomAcessivel(tipo) {
+  const ctx = obterContextoAudioSeguro();
+  if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    const freq = tipo === "sucesso" ? 660 : tipo === "alerta" ? 330 : 440;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.12);
+  } catch (_) {}
+}
+
+// 103. Desativação de gestos conflitantes com a navegação
+function desativarArrastoConflitante(el) {
+  if (!el || typeof el.classList !== "object") return;
+  el.classList.add("conteudo-sem-arrasto-conflitante");
+}
+
+// 104. Preenchimento automático com atributos autocomplete
+function configurarAutocompleteFormulario(formEl) {
+  if (!formEl || typeof formEl.querySelectorAll !== "function") return;
+  formEl.querySelectorAll("input").forEach(inp => {
+    const tipo = inp.type;
+    const nome = (inp.name || inp.id || "").toLowerCase();
+    if (tipo === "email" || nome.includes("email")) {
+      inp.setAttribute("autocomplete", "email");
+    } else if (tipo === "password") {
+      inp.setAttribute("autocomplete", "current-password");
+    } else if (nome.includes("nome") || nome.includes("name")) {
+      inp.setAttribute("autocomplete", "name");
+    }
+  });
+}
+
+// 105. Barra de progresso com atributos aria
+function atualizarBarraProgressoAria(barraEl, valor, min, max) {
+  if (!barraEl || typeof barraEl.setAttribute !== "function") return;
+  const minimo = typeof min === "number" ? min : 0;
+  const maximo = typeof max === "number" ? max : 100;
+  const val = Math.min(maximo, Math.max(minimo, Number(valor) || 0));
+
+  barraEl.setAttribute("role", "progressbar");
+  barraEl.setAttribute("aria-valuenow", String(val));
+  barraEl.setAttribute("aria-valuemin", String(minimo));
+  barraEl.setAttribute("aria-valuemax", String(maximo));
+}
+
+// 106. Modo de alto contraste configurável
+function alternarAltoContraste(ativo) {
+  if (typeof document === "undefined" || !document.documentElement) return false;
+  if (ativo === undefined) {
+    const atual = document.documentElement.getAttribute("data-alto-contraste") === "true";
+    document.documentElement.setAttribute("data-alto-contraste", String(!atual));
+    return !atual;
+  }
+  document.documentElement.setAttribute("data-alto-contraste", String(Boolean(ativo)));
+  return Boolean(ativo);
+}
+
+// 107. Título dinâmico do documento com pendências
+function atualizarTituloDocumento(secao, notificacoes) {
+  if (typeof document === "undefined") return "";
+  const sec = secao ? ` - ${secao}` : "";
+  const prefixo = typeof notificacoes === "number" && notificacoes > 0 ? `(${notificacoes}) ` : "";
+  const tituloFinal = `${prefixo}Prumo${sec}`;
+  document.title = tituloFinal;
+  return tituloFinal;
+}
+
+// 110. Associação <label for="..."> nos formulários
+function assegurarLabelsFormulario(container) {
+  if (typeof document === "undefined") return 0;
+  const raiz = container || document;
+  const inputs = raiz.querySelectorAll("input:not([id]), select:not([id]), textarea:not([id])");
+  let criados = 0;
+  inputs.forEach((inp, idx) => {
+    const idUnico = `prumo-campo-auto-${Date.now()}-${idx}`;
+    inp.id = idUnico;
+    let label = inp.closest("label");
+    if (!label && inp.parentElement) {
+      label = inp.parentElement.querySelector("label");
+    }
+    if (label && !label.getAttribute("for")) {
+      label.setAttribute("for", idUnico);
+      criados++;
+    }
+  });
+  return criados;
+}
