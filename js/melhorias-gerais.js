@@ -379,3 +379,124 @@ function verificarPreferenciaMovimentoReduzido() {
   if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
+
+// 31. Sanitização estrita com allowlist no renderizador de HTML
+function sanitizarHTMLSeguro(str) {
+  if (typeof str !== "string") return "";
+  // Substitui caracteres perigosos básicos
+  let limpo = str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+  // Permite apenas tags seguras de formatação básica
+  const tagsPermitidas = ["b", "i", "strong", "em", "small", "span"];
+  tagsPermitidas.forEach(tag => {
+    const regAbrir = new RegExp(`&lt;${tag}&gt;`, "gi");
+    const regFechar = new RegExp(`&lt;\\/${tag}&gt;`, "gi");
+    limpo = limpo.replace(regAbrir, `<${tag}>`).replace(regFechar, `</${tag}>`);
+  });
+  return limpo;
+}
+
+// 32. Validação estrita de URLs para imagens e links externos
+function validarURLLinkSeguro(url) {
+  if (typeof url !== "string") return false;
+  const u = url.trim().toLowerCase();
+  if (u.startsWith("javascript:") || u.startsWith("vbscript:") || u.startsWith("data:text/html")) {
+    return false;
+  }
+  return (
+    u.startsWith("https://") ||
+    u.startsWith("http://") ||
+    u.startsWith("mailto:") ||
+    u.startsWith("data:image/")
+  );
+}
+
+// 33. Proteção contra poluição de protótipo (Prototype Pollution)
+function sanitizarObjetoContraPollution(obj) {
+  if (!obj || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) {
+    obj.forEach(item => sanitizarObjetoContraPollution(item));
+    return obj;
+  }
+  const chavesProibidas = ["__proto__", "constructor", "prototype"];
+  for (const k of Object.keys(obj)) {
+    if (chavesProibidas.includes(k)) {
+      delete obj[k];
+      continue;
+    }
+    if (typeof obj[k] === "object" && obj[k] !== null) {
+      sanitizarObjetoContraPollution(obj[k]);
+    }
+  }
+  return obj;
+}
+
+// 34. Auditoria e aplicação de noopener noreferrer em links externos
+function assegurarLinksSeguros(container) {
+  if (!container || typeof container.querySelectorAll !== "function") return;
+  const links = container.querySelectorAll('a[target="_blank"]');
+  links.forEach(a => {
+    a.setAttribute("rel", "noopener noreferrer");
+  });
+}
+
+// 35. Validação rigorosa de payloads de backup
+function validarPayloadBackup(jsonStr) {
+  try {
+    const dados = JSON.parse(jsonStr);
+    if (!dados || typeof dados !== "object" || Array.isArray(dados)) return null;
+    sanitizarObjetoContraPollution(dados);
+    // Estruturas esperadas mínimas do Prumo
+    if (!dados.tasks && !dados.habits && !dados.persona) return null;
+    return dados;
+  } catch (_) {
+    return null;
+  }
+}
+
+// 36. Limitação de tamanho de strings no localStorage
+function limitarStringSegura(str, max = 500) {
+  if (typeof str !== "string") return "";
+  return str.trim().slice(0, max);
+}
+
+// 38. Criptografia simétrica leve para anotações do diário
+function criptografarTextoSimples(txt, chave = "prumo_seguro") {
+  if (typeof txt !== "string" || !txt) return "";
+  let res = "";
+  for (let i = 0; i < txt.length; i++) {
+    const c = txt.charCodeAt(i) ^ chave.charCodeAt(i % chave.length);
+    res += c.toString(16).padStart(4, "0");
+  }
+  return res;
+}
+
+function descriptografarTextoSimples(cifrado, chave = "prumo_seguro") {
+  if (typeof cifrado !== "string" || !cifrado || cifrado.length % 4 !== 0) return "";
+  let res = "";
+  for (let i = 0; i < cifrado.length; i += 4) {
+    const c = parseInt(cifrado.slice(i, i + 4), 16) ^ chave.charCodeAt((i / 4) % chave.length);
+    res += String.fromCharCode(c);
+  }
+  return res;
+}
+
+// 39. Remoção de caracteres de controle e inversão de direção (RLO)
+function limparCaracteresControle(str) {
+  if (typeof str !== "string") return "";
+  // Remove caracteres de controle (exceto \n e \t) e marcas Unicode Bidi (U+202A a U+202E, U+2066 a U+2069)
+  return str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\u202A-\u202E\u2066-\u2069]/g, "").trim();
+}
+
+// 40. Mascaramento automático de dados sensíveis
+function mascararDadoSensivel(str, visiveisInic = 3, visiveisFim = 3) {
+  if (typeof str !== "string") return "";
+  if (str.length <= visiveisInic + visiveisFim) return "***";
+  const inicio = str.slice(0, visiveisInic);
+  const fim = str.slice(-visiveisFim);
+  return `${inicio}***${fim}`;
+}
