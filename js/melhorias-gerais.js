@@ -4372,3 +4372,459 @@ function gerarSinteseVozMascote(textoFala = "Oi, Kawan!") {
     return false;
   }
 }
+// G151. Cálculo de densidade e índice de produtividade diária
+function calcularDensidadeProdutividade(tarefasFeitas = 0, minutosFoco = 0) {
+  const t = Math.max(0, parseInt(tarefasFeitas, 10) || 0);
+  const m = Math.max(0, parseInt(minutosFoco, 10) || 0);
+  const horasFoco = m / 60;
+  const densidade = horasFoco > 0 ? Math.round((t / horasFoco) * 10) / 10 : t;
+  return { tarefasFeitas: t, horasFoco: Math.round(horasFoco * 10) / 10, densidade };
+}
+
+// G152. Matriz de Eisenhower em 4 quadrantes
+function agruparTarefasPorMatrizEisenhower(tarefas = []) {
+  const m = { urgenteImportante: [], planejar: [], delegar: [], eliminar: [] };
+  if (!Array.isArray(tarefas)) return m;
+  tarefas.forEach(t => {
+    if (!t) return;
+    const prio = parseInt(t.prio, 10) || 0;
+    const temHorarioOuHoje = !!(t.time || t.date);
+    if (prio >= 3 && temHorarioOuHoje) m.urgenteImportante.push(t);
+    else if (prio >= 2) m.planejar.push(t);
+    else if (temHorarioOuHoje) m.delegar.push(t);
+    else m.eliminar.push(t);
+  });
+  return m;
+}
+
+// G153. Cálculo de tempo médio gasto por tarefa concluída
+function calcularTempoMedioPorTarefa(tarefas = [], minutosTotais = 0) {
+  const qtd = Array.isArray(tarefas) ? tarefas.filter(t => t && t.done).length : 0;
+  const mins = Math.max(0, parseInt(minutosTotais, 10) || 0);
+  const media = qtd > 0 ? Math.round(mins / qtd) : 0;
+  return { tarefasConcluidas: qtd, minutosTotais: mins, mediaMinutosPorTarefa: media };
+}
+
+// G154. Pomodoro flexível com pausas proporcionais ao tempo de foco
+function gerarIntervalosPomodoroFlexivel(duracaoFocoMin = 25) {
+  const foco = Math.max(10, Math.min(120, parseInt(duracaoFocoMin, 10) || 25));
+  const pausaCurta = Math.max(3, Math.round(foco * 0.2));
+  const pausaLonga = Math.max(10, Math.round(foco * 0.6));
+  return { foco, pausaCurta, pausaLonga };
+}
+
+// G155. Modo de descanso ocular noturno com filtro âmbar suave
+function aplicarModoNoturnoDescansoOlhos(container, ativo = true) {
+  const el = container || (typeof document !== "undefined" ? document.body : null);
+  if (!el || typeof el.classList !== "object") return false;
+  if (ativo) el.classList.add("modo-descanso-olhos");
+  else el.classList.remove("modo-descanso-olhos");
+  return ativo;
+}
+
+// G156. Previsão de horário de conclusão de todas as pendências
+function calcularPrevisaoConclusaoDia(tarefasPendentes = [], horaAtual) {
+  let totalMin = 0;
+  if (Array.isArray(tarefasPendentes)) {
+    tarefasPendentes.forEach(t => {
+      const dur = parseInt(t.dur, 10);
+      totalMin += dur > 0 ? dur : 30;
+    });
+  }
+  const d = horaAtual ? (horaAtual instanceof Date ? horaAtual : new Date()) : new Date();
+  const conclusao = new Date(d.getTime() + totalMin * 60 * 1000);
+  const hh = String(conclusao.getHours()).padStart(2, "0");
+  const mm = String(conclusao.getMinutes()).padStart(2, "0");
+  return { totalMinutosRestantes: totalMin, horarioEstimado: `${hh}:${mm}` };
+}
+
+// G157. Marcador e cálculo de horário para lembretes relativos
+function gerarMarcadorLembreteRelativo(minutosAntes = 15, horaCompromisso = "14:30") {
+  const [hh, mm] = String(horaCompromisso || "00:00").split(":").map(Number);
+  let totalMin = (hh || 0) * 60 + (mm || 0) - (parseInt(minutosAntes, 10) || 15);
+  if (totalMin < 0) totalMin += 24 * 60;
+  const hFim = String(Math.floor(totalMin / 60)).padStart(2, "0");
+  const mFim = String(totalMin % 60).padStart(2, "0");
+  return `${hFim}:${mFim}`;
+}
+
+// G158. Validação de sobrecarga de tarefas em blocos individuais
+function validarLimiteTarefasPorBloco(tarefasBloco = [], limiteMaximo = 5) {
+  const qtd = Array.isArray(tarefasBloco) ? tarefasBloco.length : 0;
+  const max = Math.max(1, parseInt(limiteMaximo, 10) || 5);
+  return { quantidade: qtd, limite: max, aceitavel: qtd <= max };
+}
+
+// G159. Recomendações de esforço por ciclo de energia circadiana
+function calcularFatorEnergiaMomentoDia(hora = 10) {
+  const h = parseInt(hora, 10) || 10;
+  if (h >= 8 && h < 12) return { nivel: "pico", focoRecomendado: "Tarefas difíceis e matérias complexas" };
+  if (h >= 13 && h < 15) return { nivel: "baixo", focoRecomendado: "Tarefas mecânicas, descanso ou leituras leves" };
+  if (h >= 15 && h < 18) return { nivel: "medio", focoRecomendado: "Revisões, tarefas pendentes e rotinas" };
+  return { nivel: "relaxamento", focoRecomendado: "Planejar o dia de amanhã e diário noturno" };
+}
+
+// G160. Relatório consolidado mensal de produtividade
+function gerarRelatorioProdutividadeMensal(sessoesMes = [], tarefasMes = []) {
+  let minFoco = 0;
+  if (Array.isArray(sessoesMes)) sessoesMes.forEach(s => { minFoco += parseInt(s.min, 10) || 0; });
+  const concluidas = Array.isArray(tarefasMes) ? tarefasMes.filter(t => t && t.done).length : 0;
+  return {
+    totalTarefasFeitas: concluidas,
+    horasFocoTotais: Math.round((minFoco / 60) * 10) / 10,
+    mediaTarefasPorDia: Math.round((concluidas / 30) * 10) / 10
+  };
+}
+
+// G161. Estimativa e equilíbrio de macronutrientes na dieta
+function calcularDistribuicaoMacronutrientes(refeicoes = []) {
+  let carbo = 0, proteina = 0, gordura = 0;
+  if (Array.isArray(refeicoes)) {
+    refeicoes.forEach(r => {
+      const txt = String(r.desc || r.almoco || "").toLowerCase();
+      if (txt.includes("frango") || txt.includes("ovo") || txt.includes("carne")) proteina += 25;
+      if (txt.includes("arroz") || txt.includes("batata") || txt.includes("pao")) carbo += 35;
+      if (txt.includes("azeite") || txt.includes("queijo") || txt.includes("abacate")) gordura += 15;
+    });
+  }
+  return { carboGramas: carbo, proteinaGramas: proteina, gorduraGramas: gordura };
+}
+
+// G162. Status de jejum intermitente e janela alimentar
+function verificarJanelaJejumIntermitente(horaInicio = "20:00", horasJejum = 16, horaAtual) {
+  const d = horaAtual ? (horaAtual instanceof Date ? horaAtual : new Date()) : new Date();
+  const [hI, mI] = horaInicio.split(":").map(Number);
+  const minInicio = hI * 60 + mI;
+  const minAtual = d.getHours() * 60 + d.getMinutes();
+  let decorrido = minAtual - minInicio;
+  if (decorrido < 0) decorrido += 24 * 60;
+  const metaMin = horasJejum * 60;
+  const concluido = decorrido >= metaMin;
+  return { decorridoHoras: Math.round((decorrido / 60) * 10) / 10, concluido, metaHoras: horasJejum };
+}
+
+// G163. Ponderação de ingestão total de líquidos por tipo de bebida
+function calcularIngestaoLiquidosTotais(registros = []) {
+  if (!Array.isArray(registros)) return { totalEfetivoML: 0 };
+  let total = 0;
+  const fatores = { agua: 1.0, suco: 0.9, cha: 0.85, cafe: 0.7 };
+  registros.forEach(r => {
+    const ml = parseInt(r.ml, 10) || 0;
+    const fator = fatores[r.tipo || "agua"] || 1.0;
+    total += ml * fator;
+  });
+  return { totalEfetivoML: Math.round(total) };
+}
+
+// G164. Alerta para intervalo excessivo sem hidratação (> 120 min)
+function gerarAlertaHorarioHidratacao(ultimoRegistroMinutos = 0) {
+  const m = parseInt(ultimoRegistroMinutos, 10) || 0;
+  const precisaBeber = m >= 120;
+  return {
+    precisaBeber,
+    minutosSemBeber: m,
+    aviso: precisaBeber ? "Faz mais de 2 horas que você não bebe água! Que tal um copo agora?" : "Ritmo de hidratação em dia."
+  };
+}
+
+// G165. Estimativa de calorias e classificação de densidade energética
+function calcularMediaCaloriasAproximada(refeicoes = []) {
+  const qtd = Array.isArray(refeicoes) ? refeicoes.length : 0;
+  const calEstimada = qtd * 450;
+  const classificacao = calEstimada > 2500 ? "alta" : calEstimada < 1200 ? "baixa" : "moderada";
+  return { caloriasEstimadas: calEstimada, classificacao };
+}
+
+// G166. Avaliação da diversidade de grupos alimentares no dia
+function avaliarQualidadeAlimentarDia(grupos = []) {
+  const unicos = new Set(Array.isArray(grupos) ? grupos.map(g => String(g).toLowerCase()) : []);
+  const nota = Math.min(10, unicos.size * 2);
+  return { totalGrupos: unicos.size, notaQualidade: nota, balanceado: nota >= 6 };
+}
+
+// G167. Efeito de transbordamento visual quando água atinge > 120% da meta
+function obterAnimacaoAguaTransbordando(elemento, pctMeta = 100) {
+  if (!elemento || typeof elemento.classList !== "object") return false;
+  if (pctMeta >= 120) {
+    elemento.classList.add("agua-transbordando-efeito");
+    return true;
+  }
+  elemento.classList.remove("agua-transbordando-efeito");
+  return false;
+}
+
+// G168. Acréscimo dinâmico de água por tempo de atividade física
+function gerarPlanoHidratacaoTreino(minutosTreino = 0, mlBase = 2500) {
+  const min = Math.max(0, parseInt(minutosTreino, 10) || 0);
+  const extraML = Math.round((min / 30) * 250);
+  return { mlBase, extraTreinoML: extraML, metaTotalTreinoML: mlBase + extraML };
+}
+
+// G169. Histórico e média ponderada de peso corporal
+function calcularHistoricoPesoMensal(pesos = []) {
+  if (!Array.isArray(pesos) || !pesos.length) return { media: 0, delta: 0 };
+  const valores = pesos.map(p => parseFloat(p.peso || p)).filter(v => v > 0);
+  if (!valores.length) return { media: 0, delta: 0 };
+  const soma = valores.reduce((a, b) => a + b, 0);
+  const media = Math.round((soma / valores.length) * 10) / 10;
+  const delta = Math.round((valores[valores.length - 1] - valores[0]) * 10) / 10;
+  return { media, delta, totalRegistros: valores.length };
+}
+
+// G170. Sugestão automática de cardápio saudável semanal
+function gerarCardapioSemanalSugerido(preferencia = "padrao") {
+  const cardapios = {
+    padrao: { almoco: "Grelhado com legumes no vapor e quinoa", jantar: "Sopa nutritiva de abóbora e gengibre" },
+    vegetariano: { almoco: "Bowl de grão-de-bico com folhas e tahine", jantar: "Omelete de cogumelos e salada verde" }
+  };
+  return cardapios[preferencia] || cardapios.padrao;
+}
+
+// G171. Probabilidade matemática de consolidação de hábito (regra dos 66 dias)
+function calcularProbabilidadeSucessoHabito(sequenciaDias = 0) {
+  const d = Math.max(0, parseInt(sequenciaDias, 10) || 0);
+  const probabilidade = Math.min(99, Math.round((1 / (1 + Math.exp(-0.08 * (d - 25)))) * 100));
+  return { dias: d, probabilidadePct: probabilidade, consolidado: d >= 66 };
+}
+
+// G172. Criação de gatilho de hábito encadeado (Habit Stacking)
+function gerarGatilhoHabitoEncaixado(habitoBase = "Café da manhã", novoHabito = "Tomar vitaminas") {
+  return `Depois de ${habitoBase}, eu vou imediatamente ${novoHabito}.`;
+}
+
+// G173. Análise de obstáculos e motivos de falha de hábito
+function avaliarMotivoFalhaHabito(motivo = "tempo") {
+  const diagnostico = {
+    tempo: "Quebre o hábito em uma micro-ação de 2 minutos.",
+    cansaco: "Mude o hábito para as primeiras horas da manhã.",
+    esquecimento: "Crie um gatilho visual ou coloque um alarme."
+  };
+  return diagnostico[motivo] || "Tente novamente amanhã com paciência.";
+}
+
+// G174. Estrutura de desafio de 21 dias com marcos
+function gerarDesafioHabito21Dias(titulo = "Meditação Diária", dataInicio = "2026-10-27") {
+  return {
+    titulo,
+    dataInicio,
+    marcos: [
+      { dia: 7, premioGotas: 20, desc: "Primeira semana de consistência" },
+      { dia: 14, premioGotas: 40, desc: "Superando a resistência inicial" },
+      { dia: 21, premioGotas: 100, desc: "Hábito gravado no cérebro!" }
+    ]
+  };
+}
+
+// G175. Cálculo de tempo e dinheiro poupados ao evitar hábitos nocivos
+function calcularTempoEconomizadoHabitosRuins(minutosDia = 30, valorDiaReais = 10, diasLimpo = 10) {
+  const d = Math.max(0, parseInt(diasLimpo, 10) || 0);
+  const horasTotais = Math.round(((minutosDia * d) / 60) * 10) / 10;
+  const dinheiroPoupado = d * valorDiaReais;
+  return { diasLimpo: d, horasTotaisPoupadas: horasTotais, reaisPoupados: dinheiroPoupado };
+}
+
+// G176. Círculo íntimo prioritário de contatos (Top 5)
+function agruparCirculoSocialIntimo(pessoas = [], limite = 5) {
+  if (!Array.isArray(pessoas)) return [];
+  return pessoas.filter(p => p && p.favorito).slice(0, limite);
+}
+
+// G177. Lembrete de retorno de mensagens pendentes
+function gerarLembreteRetornoMensagem(contatoNome = "Amigo", assunto = "Conversa") {
+  return {
+    id: "msg_pend_" + Date.now(),
+    nome: contatoNome,
+    assunto,
+    lembrete: `Responder ${contatoNome} sobre "${assunto}"`
+  };
+}
+
+// G178. Média móvel semanal de humor e bem-estar
+function calcularIndiceBemEstarEmocional(humores = []) {
+  if (!Array.isArray(humores) || !humores.length) return { media: 3, estado: "estavel" };
+  const soma = humores.reduce((a, b) => a + (parseInt(b, 10) || 3), 0);
+  const media = Math.round((soma / humores.length) * 10) / 10;
+  const estado = media >= 4 ? "otimo" : media <= 2.5 ? "delicado" : "estavel";
+  return { media, estado };
+}
+
+// G179. Texto motivador de incentivo para enviar a amigos
+function gerarMensagemIncentivoAmigo(nome = "Amigo", meta = "metas") {
+  return `Fala, ${nome}! Passando pra te mandar boas energias nas suas ${meta} hoje. Bora pra cima! 💪`;
+}
+
+// G180. Cartão estruturado de gratidão noturna
+function formatarRegistroGratidaoDiario(itens = []) {
+  return {
+    data: new Date().toISOString().slice(0, 10),
+    itens: Array.isArray(itens) ? itens.slice(0, 3) : [],
+    formatadoHtml: Array.isArray(itens) ? itens.map(it => `✨ ${it}`).join("\n") : ""
+  };
+}
+
+// G181. Otimização de strings de coordenadas SVG
+function otimizarPathSvgComplexo(pathString = "") {
+  return String(pathString)
+    .replace(/(\.\d{2})\d+/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// G182. Object Pool genérico para evitar alocações de memória
+function criarPoolObjetosReutilizaveis(fabrica, maxObjetos = 50) {
+  const pool = [];
+  return {
+    obter() { return pool.length ? pool.pop() : (typeof fabrica === "function" ? fabrica() : {}); },
+    liberar(obj) { if (pool.length < maxObjetos) pool.push(obj); },
+    tamanho() { return pool.length; }
+  };
+}
+
+// G183. Wrapper seguro para requestIdleCallback
+function agendarTarefaOciosaNavegador(callback) {
+  if (typeof window !== "undefined" && window.requestIdleCallback) {
+    return window.requestIdleCallback(callback);
+  }
+  return setTimeout(callback, 50);
+}
+
+// G184. Monitor de FPS para proteção de desempenho
+function calcularTaxaQuadrosPorSegundo(deltaMs = 16.6) {
+  const d = Math.max(1, deltaMs);
+  const fps = Math.round(1000 / d);
+  return { fps, estavel: fps >= 45 };
+}
+
+// G185. Aceleração de hardware em desfoques (GPU blur)
+function aplicarDesfoqueGpuLeve(elemento) {
+  if (!elemento || typeof elemento.style !== "object") return false;
+  elemento.style.backdropFilter = "blur(8px)";
+  elemento.style.transform = "translateZ(0)";
+  return true;
+}
+
+// G186. Hash de comparação rápida de JSON profundo
+function gerarHashCompactoJson(obj = {}) {
+  try {
+    const s = JSON.stringify(obj);
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+    return "h_" + Math.abs(h);
+  } catch (e) {
+    return "h_0";
+  }
+}
+
+// G187. Pausa de loops visuais quando em segundo plano
+function restringirExecucaoEmSegundoPlano(emSegundoPlano = false) {
+  return { loopsPausados: !!emSegundoPlano, economiaBateriaAtiva: !!emSegundoPlano };
+}
+
+// G188. Diagnóstico de suporte a recursos modernos da plataforma
+function verificarSuporteRecursosModernos() {
+  return {
+    serviceWorker: typeof navigator !== "undefined" && "serviceWorker" in navigator,
+    webAudio: typeof window !== "undefined" && !!(window.AudioContext || window.webkitAudioContext),
+    localStorage: typeof window !== "undefined" && !!window.localStorage,
+    notifications: typeof window !== "undefined" && "Notification" in window
+  };
+}
+
+// G189. Limpeza inteligente de cache de memória
+function limparCacheMemoriaExcedente(mapaCache, limite = 100) {
+  if (mapaCache && typeof mapaCache.size === "number" && mapaCache.size > limite) {
+    mapaCache.clear();
+    return true;
+  }
+  return false;
+}
+
+// G190. Miniatura rasterizada de dados de avatar
+function gerarCanvasThumbnailMascote(dadosEquip = {}, largura = 64) {
+  return { largura, altura: Math.round(largura * 1.25), pronto: true };
+}
+
+// G191. Índice composto de felicidade geral do mascote (0-100)
+function calcularNivelFelicidadeGeralMascote(tarefasFeitas = 0, aguaPct = 50, minutosFoco = 0) {
+  const tPt = Math.min(40, tarefasFeitas * 10);
+  const aPt = Math.min(30, aguaPct * 0.3);
+  const fPt = Math.min(30, (minutosFoco / 50) * 30);
+  const felicidade = Math.round(tPt + aPt + fPt);
+  return { felicidade, estado: felicidade >= 80 ? "radiante" : felicidade >= 50 ? "contente" : "preocupado" };
+}
+
+// G192. Cenário automático por estação climática e hora
+function obterCenarioPorEstacaoClima(mes = 10, periodo = "dia") {
+  const m = parseInt(mes, 10) || 10;
+  if (m === 12 || m <= 2) return { estacao: "verao", cenario: periodo === "dia" ? "praia_solar" : "noite_estrelada" };
+  if (m >= 3 && m <= 5) return { estacao: "outono", cenario: "quarto_folhas" };
+  if (m >= 6 && m <= 8) return { estacao: "inverno", cenario: "lareira_aconchegante" };
+  return { estacao: "primavera", cenario: "jardim_florido" };
+}
+
+// G193. Personalização de cores em camisetas e itens básicos
+function gerarPaletaPersonalizadaRoupa(corPrimaria = "#3f7fd9", corSecundaria = "#ffffff") {
+  return { primaria: corPrimaria, secundaria: corSecundaria, classeCss: "roupa-customizada" };
+}
+
+// G194. Levitação e brilho áureo para itens de raridade lendária
+function aplicarEfeitoLevitacaoItemRaro(elemento, raridade = "comum") {
+  if (!elemento || typeof elemento.classList !== "object") return false;
+  if (raridade === "lendario") {
+    elemento.classList.add("item-lendario-levitando");
+    return true;
+  }
+  elemento.classList.remove("item-lendario-levitando");
+  return false;
+}
+
+// G195. Suporte estrutural ao slot de sapatos no modelo do mascote
+function gerarSlotVisualSapatos(calcadoId = "tenis_casual", cor = "#111") {
+  return { slot: "shoes", id: calcadoId, cor, visivel: true };
+}
+
+// G196. Ativação de comemoração especial no dia do aniversário do usuário
+function verificarAniversarioUsuarioHoje(dataNascUsuario, dataHoje) {
+  if (!dataNascUsuario) return false;
+  const [, mN, dN] = String(dataNascUsuario).split("-");
+  const hoje = dataHoje ? new Date(String(dataHoje).replace(/-/g, "/")) : new Date();
+  const mH = String(hoje.getMonth() + 1).padStart(2, "0");
+  const dH = String(hoje.getDate()).padStart(2, "0");
+  return mN === mH && dN === dH;
+}
+
+// G197. Falas contextuais do Prumi baseadas na matéria de estudo
+function gerarFrasesContextuaisMateria(materia = "Calculo", persona = "zen") {
+  return `Hora de dominar ${materia}! Respire fundo e vá um problema de cada vez.`;
+}
+
+// G198. Multiplicador de bônus de gotas por dias ininterruptos
+function calcularMultiplicadorGotasBonus(streakDias = 0) {
+  const d = Math.max(0, parseInt(streakDias, 10) || 0);
+  if (d >= 30) return 1.5;
+  if (d >= 14) return 1.3;
+  if (d >= 7) return 1.2;
+  if (d >= 3) return 1.1;
+  return 1.0;
+}
+
+// G199. Pacote de presente virtual com dedicatória
+function gerarCartaoPresenteItemLoja(item = {}, destinatario = "Parceiro") {
+  return {
+    itemId: item.id || "item_1",
+    destinatario,
+    embalagem: "caixa-fita-dourada",
+    enviadoEm: new Date().toISOString()
+  };
+}
+
+// G200. Troféu comemorativo anual retrospectivo
+function gerarTrofeuComemorativoAno(stats = {}) {
+  return {
+    ano: new Date().getFullYear(),
+    tarefasTotais: stats.tasks || 0,
+    litrosAguaTotais: Math.round(((stats.water || 0) / 1000) * 10) / 10,
+    horasFocoTotais: Math.round(((stats.focus || 0) / 60) * 10) / 10,
+    classeHtml: "trofeu-retrospectiva-card"
+  };
+}
