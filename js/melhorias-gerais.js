@@ -620,3 +620,129 @@ function validarFormatoDataISO(dataStr) {
   const diasMes = new Date(ano, mes, 0).getDate();
   return dia <= diasMes;
 }
+
+// 51. Limitação de intervalo de datas contra loops infinitos
+function limitarIntervaloDatas(inicioStr, fimStr, maxDias = 365) {
+  if (!validarFormatoDataISO(inicioStr) || !validarFormatoDataISO(fimStr)) return null;
+  const ini = new Date(inicioStr);
+  const fim = new Date(fimStr);
+  if (fim < ini) return null;
+  const diff = Math.round((fim - ini) / 864e5);
+  if (diff > maxDias) {
+    const fimAjustado = new Date(ini.getTime() + maxDias * 864e5);
+    return {
+      inicio: inicioStr,
+      fim: fimAjustado.toISOString().slice(0, 10),
+      dias: maxDias
+    };
+  }
+  return { inicio: inicioStr, fim: fimStr, dias: diff };
+}
+
+// 52. Anonimização estrita do payload de feedback
+function anonimizarPayloadFeedback(obj) {
+  if (!obj || typeof obj !== "object") return {};
+  const msgLimpa = sanitizarHTMLSeguro(limitarStringSegura(obj.mensagem || "", 1000));
+  return {
+    tipo: limitarStringSegura(obj.tipo || "geral", 30),
+    mensagem: msgLimpa,
+    versao: "2.0",
+    plataforma: typeof navigator !== "undefined" ? navigator.platform || "web" : "web",
+    hora: new Date().toISOString()
+  };
+}
+
+// 53. Proteção e congelamento de objetos estáticos
+function protegerObjetosEstaticos(obj) {
+  if (!obj || typeof obj !== "object") return obj;
+  Object.freeze(obj);
+  Object.keys(obj).forEach(k => {
+    if (typeof obj[k] === "object" && obj[k] !== null && !Object.isFrozen(obj[k])) {
+      protegerObjetosEstaticos(obj[k]);
+    }
+  });
+  return obj;
+}
+
+// 54. Detecção de preenchimento automatizado por bots (Honeypot)
+function verificarHoneypot(campoValor) {
+  return typeof campoValor === "string" && campoValor.trim().length > 0;
+}
+
+// 55. Modal de confirmação em duas etapas para ações destrutivas
+function modalConfirmacaoDupla(titulo, texto, onConfirmar) {
+  if (typeof document === "undefined") return;
+  const m = document.createElement("div");
+  m.className = "modal-overlay";
+  m.setAttribute("role", "alertdialog");
+  m.innerHTML = `<div class="card sub sunken" style="max-width:340px;margin:20vh auto;padding:16px;background:var(--surface)">
+    <b>⚠️ ${esc(titulo)}</b>
+    <p class="note" style="margin:8px 0">${esc(texto)}</p>
+    <div class="row" style="justify-content:flex-end;gap:8px;margin-top:12px">
+      <button class="btn small" data-btn-cancela>Cancelar</button>
+      <button class="btn small danger" data-btn-confirma>Confirmar e Apagar</button>
+    </div>
+  </div>`;
+  m.querySelector("[data-btn-cancela]").onclick = () => m.remove();
+  m.querySelector("[data-btn-confirma]").onclick = () => {
+    m.remove();
+    if (typeof onConfirmar === "function") onConfirmar();
+  };
+  document.body.appendChild(m);
+}
+
+// 56. Atualização cirúrgica do DOM sem repaint global completo
+function atualizarElementoSeletivo(seletor, novoHTML) {
+  if (typeof document === "undefined") return false;
+  const el = document.querySelector(seletor);
+  if (!el) return false;
+  if (el.innerHTML !== novoHTML) {
+    el.innerHTML = novoHTML;
+    return true;
+  }
+  return false;
+}
+
+// 57. Barramento de eventos desacoplado para módulos do estado
+const barramentoEventos = {};
+function ouvirEventoEstado(evento, callback) {
+  if (!barramentoEventos[evento]) barramentoEventos[evento] = [];
+  barramentoEventos[evento].push(callback);
+  return () => {
+    barramentoEventos[evento] = barramentoEventos[evento].filter(cb => cb !== callback);
+  };
+}
+
+function dispararEventoEstado(evento, dados) {
+  if (!barramentoEventos[evento]) return;
+  barramentoEventos[evento].forEach(cb => {
+    try {
+      cb(dados);
+    } catch (_) {}
+  });
+}
+
+// 58. Virtual scrolling leve para listas longas
+function calcularItensVisiveis(totalItens, scrollTop = 0, itemHeight = 44, containerHeight = 400) {
+  const inicio = Math.max(0, Math.floor(scrollTop / itemHeight) - 2);
+  const visiveis = Math.ceil(containerHeight / itemHeight) + 4;
+  const fim = Math.min(totalItens, inicio + visiveis);
+  const deslocamentoY = inicio * itemHeight;
+  return { inicio, fim, deslocamentoY, totalAltura: totalItens * itemHeight };
+}
+
+// 59. Catálogo de símbolos SVG reutilizáveis
+function obterSimboloSVGReutilizavel(simboloId) {
+  return `<svg class="ico-reutilizavel" aria-hidden="true"><use href="#${simboloId}"/></svg>`;
+}
+
+// 60. Ciclo de vida formal para módulos de mundos
+const CICLO_VIDA_MUNDOS = {};
+function registrarCicloVidaMundo(nomeMundo, ganchos = {}) {
+  CICLO_VIDA_MUNDOS[nomeMundo] = {
+    mount: typeof ganchos.mount === "function" ? ganchos.mount : () => {},
+    update: typeof ganchos.update === "function" ? ganchos.update : () => {},
+    unmount: typeof ganchos.unmount === "function" ? ganchos.unmount : () => {}
+  };
+  return CICLO_VIDA_MUNDOS[nomeMundo];
+}
