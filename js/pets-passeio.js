@@ -1,4 +1,4 @@
-/*
+﻿/*
   Passeio dos pets pelas páginas (dados e desenho em js/pets.js).
   Cada pet é um "agente" numa camada fixa por cima do app:
   - anda pela beirada de baixo da tela, senta, deita, sobe em cima dos cards e segue onde você toca;
@@ -123,7 +123,14 @@ function cardParaSubir() {
   );
   return cards.length ? cards[Math.floor(Math.random() * cards.length)] : null;
 }
+function podeSubirEmCards(pet) {
+  if (!pet || !pet.especie) return false;
+  // Animais pesados e terrestres (vaca, boi, cachorro, etc.) NUNCA sobem no meio da tela
+  return ['papagaio', 'coruja', 'gato', 'coala'].includes(pet.especie);
+}
+
 function subirNoCard(a) {
+  if (!podeSubirEmCards(a.pet)) return false;
   const card = cardParaSubir();
   if (!card) return false;
   const r0 = card.getBoundingClientRect();
@@ -219,9 +226,11 @@ function decidir(a) {
   if (a.ancora) return reagir(a, Math.random() < 0.5 ? "sentado" : "parado", 3000);
   const r = Math.random();
   const sono = pers.sono * (pet.especie === "coala" ? 2.2 : 1);
-  // jeitos de cada espécie
-  if (pet.especie === "vaca" && r < 0.18) return pastar(a);
-  if (pet.especie === "boi" && r < 0.12) return corrida(a);
+  // jeitos de cada espécie (animais terrestres mantêm-se no chão com comportamentos realistas)
+  if (pet.especie === "vaca" && r < 0.25) return pastar(a);
+  if (pet.especie === "boi" && r < 0.15) return pastar(a);
+  if (pet.especie === "cachorro" && r < 0.28) return farejarChao(a);
+  if ((pet.especie === "coelho" || pet.especie === "hamster") && r < 0.25) return roerChao(a);
   if (pet.especie === "coala" && r < 0.16 && !rolouAgora() && pendurarNoCard(a)) return;
   // na aba Prumi: senta do lado do Prumi
   if (tab === "prumi" && r > 0.85 && !rolouAgora() && sentarNoPrumi(a)) return;
@@ -235,6 +244,18 @@ function decidir(a) {
 }
 
 /* ---------- jeitos de cada espécie ---------- */
+function farejarChao(a) {
+  const dx = (Math.random() - 0.5) * 90;
+  const nx = Math.max(12, Math.min(larguraTela() - PET_TAM - 12, a.x + dx));
+  andarAte(a, nx, chaoPasseio(), () => reagir(a, "farejando", 3200), { vel: 0.7 });
+}
+
+function roerChao(a) {
+  const dx = (Math.random() - 0.5) * 60;
+  const nx = Math.max(12, Math.min(larguraTela() - PET_TAM - 12, a.x + dx));
+  andarAte(a, nx, chaoPasseio(), () => reagir(a, "comendo", 2600), { vel: 1.3 });
+}
+
 function pastar(a) {
   andarAte(a, 8 + Math.random() * (larguraTela() - PET_TAM - 16), chaoPasseio(), () => {
     reagir(a, "pastando", 4500);
