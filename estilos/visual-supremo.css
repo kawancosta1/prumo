@@ -326,3 +326,187 @@ body.dark .bot {
     transform: rotate(360deg);
   }
 }
+
+/* ==========================================================================
+   04. ANIMACAO RUBBER HOSE 1930S, CUPHEAD & CHIAROSCURO RIGOROSO
+   ========================================================================== */
+
+/* Balanço Rítmico Contínuo (Idle Rubber Hose dos anos 1930) */
+.prumi-idle-1930s,
+.pet-rubberhose-idle {
+  transform-origin: bottom center;
+  animation: idle-rubberhose-1930s 1.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate !important;
+  animation-name: idle-rubberhose-1930s !important;
+  will-change: transform;
+}
+
+@keyframes idle-rubberhose-1930s {
+  0% {
+    transform: scale(1.04, 0.94) translateY(0);
+  }
+  50% {
+    transform: scale(0.96, 1.04) translateY(-5px);
+  }
+  100% {
+    transform: scale(1.02, 0.98) translateY(0);
+  }
+}
+
+/* Micro Frame-Boil de Celulóide Vintage (2 quadros em loop) */
+.frame-boil-1930s {
+  animation: frame-boil-celuloide 0.22s steps(2, jump-none) infinite !important;
+  animation-name: frame-boil-celuloide !important;
+}
+
+@keyframes frame-boil-celuloide {
+  0% {
+    filter: drop-shadow(0.5px 0 0 rgba(0, 0, 0, 0.4));
+  }
+  50% {
+    filter: drop-shadow(-0.5px 0.5px 0 rgba(0, 0, 0, 0.4));
+  }
+  100% {
+    filter: drop-shadow(0.5px -0.5px 0 rgba(0, 0, 0, 0.4));
+  }
+}
+
+/* Poeira de Pulo e Aterrissagem (Dust Puff Anos 30) */
+.dust-puff-1930s {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+  animation: poeira-vintage-expande 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  animation-name: poeira-vintage-expande !important;
+  will-change: transform, opacity;
+}
+
+@keyframes poeira-vintage-expande {
+  0% {
+    transform: scale(0.3) translateY(0);
+    opacity: 0.9;
+  }
+  60% {
+    transform: scale(1.15) translateY(-8px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.4) translateY(-14px);
+    opacity: 0;
+  }
+}
+
+/* Carimbo com Recuo Elástico e Squash */
+.carimbo-conquista-animado {
+  transform-origin: center center;
+  animation: carimbo-impacto-1930s 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+  animation-name: carimbo-impacto-1930s !important;
+}
+
+@keyframes carimbo-impacto-1930s {
+  0% {
+    transform: scale(1.6) rotate(-15deg);
+    opacity: 0;
+  }
+  45% {
+    transform: scale(0.9, 1.12) rotate(2deg);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.08, 0.94) rotate(-3deg);
+  }
+  100% {
+    transform: scale(1) rotate(-1deg);
+    opacity: 1;
+  }
+}
+
+/* Transição Circular Iris-In / Iris-Out Vintage */
+.iris-wipe-1930s {
+  position: fixed;
+  inset: 0;
+  background-color: #0b0d12;
+  z-index: 99999;
+  pointer-events: none;
+  clip-path: circle(150% at var(--iris-x, 50%) var(--iris-y, 50%));
+  transition: clip-path 0.38s cubic-bezier(0.77, 0, 0.175, 1);
+  will-change: clip-path;
+}
+.iris-wipe-1930s.fechando {
+  clip-path: circle(0% at var(--iris-x, 50%) var(--iris-y, 50%));
+}
+
+/* Chiaroscuro: Rim Light no Modo Escuro */
+body.dark .chiaroscuro-rim-light,
+.dark .chiaroscuro-rim-light {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 8px 24px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Chiaroscuro: Níveis de Elevação Tátil em Duas Camadas */
+.chiaroscuro-elevacao-1 {
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.08),
+    0 4px 12px rgba(15, 23, 42, 0.05);
+}
+.chiaroscuro-elevacao-2 {
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.09),
+    0 10px 24px rgba(15, 23, 42, 0.08);
+}
+.chiaroscuro-elevacao-3 {
+  box-shadow:
+    0 4px 6px rgba(15, 23, 42, 0.1),
+    0 16px 36px rgba(15, 23, 42, 0.11);
+}
+.chiaroscuro-elevacao-4 {
+  box-shadow:
+    0 8px 12px rgba(15, 23, 42, 0.12),
+    0 32px 64px rgba(15, 23, 42, 0.16);
+}
+
+body.dark .chiaroscuro-elevacao-1,
+.dark .chiaroscuro-elevacao-1 {
+  background-color: #1a1727;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 4px 14px rgba(0, 0, 0, 0.45);
+}
+body.dark .chiaroscuro-elevacao-2,
+.dark .chiaroscuro-elevacao-2 {
+  background-color: #211d33;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 8px 26px rgba(0, 0, 0, 0.6);
+}
+body.dark .chiaroscuro-elevacao-3,
+.dark .chiaroscuro-elevacao-3 {
+  background-color: #29243f;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 16px 40px rgba(0, 0, 0, 0.72);
+}
+body.dark .chiaroscuro-elevacao-4,
+.dark .chiaroscuro-elevacao-4 {
+  background-color: #322b4d;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 28px 60px rgba(0, 0, 0, 0.85);
+}
+
+/* Acessibilidade: Respeito a Prefers-Reduced-Motion */
+@media (prefers-reduced-motion: reduce) {
+  .prumi-idle-1930s,
+  .pet-rubberhose-idle,
+  .frame-boil-1930s,
+  .carimbo-conquista-animado {
+    animation: none !important;
+  }
+  .dust-puff-1930s {
+    display: none !important;
+  }
+  .iris-wipe-1930s {
+    display: none !important;
+  }
+}
