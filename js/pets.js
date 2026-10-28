@@ -55,6 +55,23 @@ const ESPECIES_PET = {
     sonho: "semente",
     comida: "sementinhas"
   },
+  coruja: {
+    nome: "Corujinha",
+    mundo: "feiticeiro",
+    cores: [
+      ["sábia", "#8D6E63"],
+      ["neves", "#FAFAFA"],
+      ["astral", "#455A64"]
+    ],
+    som: "uu-uu",
+    sonho: "pergaminho",
+    comida: "sementes mágicas",
+    especial: {
+      id: "magia",
+      nome: "Faíscas Mágicas",
+      desc: "Lê pergaminhos antigos e solta faíscas mágicas de sabedoria."
+    }
+  },
   morcego: {
     nome: "Morceguinho",
     mundo: "emo",
@@ -493,7 +510,9 @@ function petSVG(x, { pose = "parado", tam = 48, visitante = false } = {}) {
     ? `<rect x="10" y="-2" width="28" height="7" rx="2" fill="#FFF8E1" stroke="#8D6E63" stroke-width=".6"/><text x="24" y="3.4" text-anchor="middle" font-size="4.4" fill="#5D4037">visita</text>`
     : "";
   const escala = ESCALA_FASE[fasePet(x)] || 1;
-  return `<svg class="pet-svg pose-${pose} pers-${x.personalidade}" viewBox="-4 -8 54 50" width="${tam}" height="${Math.round((tam * 50) / 54)}" aria-hidden="true"><g transform="translate(24 38) scale(${escala}) translate(-24 -38)"><g class="pet-corpo">${cauda}${pernas}${corpo}${x.acess.roupa ? roupaPetSVG(x.acess.roupa) : ""}${orelhas}${cabeca}${extra}${olho}${bochecha}${boca}${acess}${estiloMundoPet(x)}</g>${zz}${coracao}${objeto}</g>${placa}</svg>`;
+  const sprite1930 = typeof renderPet1930 === "function" ? renderPet1930(e, pose) : null;
+  const corpoConteudo = sprite1930 || `${cauda}${pernas}${corpo}${x.acess.roupa ? roupaPetSVG(x.acess.roupa) : ""}${orelhas}${cabeca}${extra}${olho}${bochecha}${boca}`;
+  return `<svg class="pet-svg pose-${pose} pers-${x.personalidade}" viewBox="-4 -8 54 50" width="${tam}" height="${Math.round((tam * 50) / 54)}" aria-hidden="true"><g transform="translate(24 38) scale(${escala}) translate(-24 -38)"><g class="pet-corpo">${corpoConteudo}${acess}${estiloMundoPet(x)}</g>${zz}${coracao}${objeto}</g>${placa}</svg>`;
 }
 
 function acessoriosSVG(x) {
