@@ -1,4 +1,4 @@
-/*
+﻿/*
   Tela de Ajustes.
 */
 "use strict";
@@ -85,6 +85,17 @@ function viewAjustes() {
     <textarea id="exportbox" hidden readonly aria-label="Backup em texto"></textarea>
   </section>
   <section class="block">
+    <h2 class="h2">Gestao e Valuation (M&A)</h2>
+    <div class="setbox">
+      <div class="setrow">
+        <div class="lbl">
+          <b>Metricas de Negocio & Valuation do App</b>
+          <span class="note">Painel executivo com valuation de R$ 30k+, margens operacionais e simulador de faturamento para proprietarios e investidores.</span>
+        </div>
+        <button class="btn small primary" data-act="abrir-valuation">Abrir Painel</button>
+      </div>
+    </div>
+  </section>
     <h2 class="h2">Como usar a captura rápida</h2>
     <div class="card" style="font-size:14px">
       <span><b>Datas:</b> hoje, amanhã, depois de amanhã, segunda… domingo, 25/12, dia 15</span>

@@ -1,0 +1,300 @@
+/* ===================================================================
+   valuation-metrics.css - Painel Executivo do Proprietário & Métricas M&A
+   =================================================================== */
+
+.modal-valuation-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 29, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: valFadeIn 0.25s ease-out;
+}
+
+@keyframes valFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-valuation-card {
+  background: #ffffff;
+  color: #1e293b;
+  width: 100%;
+  max-width: 820px;
+  max-height: 90vh;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .modal-valuation-card {
+  background: #0f172a;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+.val-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%);
+}
+
+.dark .val-header {
+  border-color: #1e293b;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.val-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.val-badge-audit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #10b981;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.val-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #64748b;
+  padding: 4px 8px;
+  border-radius: 8px;
+  line-height: 1;
+}
+
+.val-close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+
+.dark .val-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.val-body {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Hero de Valuation */
+.val-hero-box {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+}
+
+.val-hero-info h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.85;
+}
+
+.val-hero-info .val-price {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-top: 4px;
+}
+
+.val-hero-info p {
+  margin: 6px 0 0 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.val-hero-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.val-stat-pill {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+}
+
+.val-stat-pill span {
+  display: block;
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+.val-stat-pill strong {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Grid de Métricas Principais */
+.val-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.val-card-metric {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dark .val-card-metric {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.val-card-metric .metric-label {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dark .val-card-metric .metric-label {
+  color: #94a3b8;
+}
+
+.val-card-metric .metric-value {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.dark .val-card-metric .metric-value {
+  color: #f8fafc;
+}
+
+.val-card-metric .metric-sub {
+  font-size: 0.75rem;
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* Simulador de Receita do Investidor */
+.val-simulator-box {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.dark .val-simulator-box {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.val-simulator-box h4 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.val-slider-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.val-slider-control input[type="range"] {
+  width: 100%;
+  accent-color: #3b82f6;
+}
+
+.val-sim-results {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  background: #ffffff;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.dark .val-sim-results {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.val-sim-results div span {
+  font-size: 0.75rem;
+  color: #64748b;
+  display: block;
+}
+
+.val-sim-results div strong {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #2563eb;
+  display: block;
+}
+
+.dark .val-sim-results div strong {
+  color: #60a5fa;
+}
+
+/* Botões de Ação do Painel */
+.val-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.dark .val-footer-actions {
+  border-color: #334155;
+}
