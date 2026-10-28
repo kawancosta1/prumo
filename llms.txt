@@ -1,0 +1,14 @@
+# Prumo
+
+> Prumo é uma aplicação web de produtividade, organização de rotinas, acompanhamento de hábitos saudáveis, estante de leituras e cuidados com pets virtuais interativos inspirados na arte clássica dos anos 1930.
+
+## Recursos Principais
+- **Rotina e Hábitos Diários**: Registro de hábitos, hidratação diária, tarefas, blocos de foco e estudos.
+- **Estante de Leituras**: Catálogo de livros lidos, páginas decoradas, metas semanais e leitura compartilhada.
+- **Pets Interativos Anos 30**: Adoção e cuidados com mascotes virtuais animados (Gatinho, Cachorro, Coelho, Hamster, Coruja e Mini Dragão) com animações inspiradas no estilo Cuphead e Fleischer.
+- **Mundos e Personalidades**: Temas visuais e sonoros temáticos (Feiticeiro, Bruxo, Zen, Rock, Emo, Otaku, Cleanboy e outros).
+- **Privacidade e LGPD**: Funcionamento local no dispositivo e sincronização em nuvem via Firebase com respeito total à LGPD.
+
+## Links Oficiais
+- [Prumo Web](https://prumo-66d76.web.app/)
+- [Política de Privacidade](https://prumo-66d76.web.app/privacidade)

@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://prumo-66d76.web.app/sitemap.xml
+Host: prumo-66d76.web.app
