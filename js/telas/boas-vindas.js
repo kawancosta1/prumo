@@ -1,4 +1,4 @@
-﻿/*
+/*
   Boas-vindas (primeira vez que abre).
 */
 "use strict";
@@ -72,7 +72,10 @@ function onbHTML() {
 function renderOnb() {
   const el = document.getElementById("onb");
   if (!el) return;
-  // Se o usuario ja esta usando o app (onboarded), nunca interrompe com popup de entrada
+  // Tela de entrada (Google ou email) vem antes de tudo: js/telas/entrar.js
+  if (appReady && typeof precisaEntrar === "function" && precisaEntrar()) return mostrarEntrar(el);
+  entrarDesenhado = "";
+  el.setAttribute("aria-label", "Boas-vindas");
   if (S.onboarded) {
     if (!el.hidden) {
       el.classList.add("out");
@@ -83,10 +86,6 @@ function renderOnb() {
     }
     return;
   }
-  // Tela de entrada (Google ou email) vem antes de tudo: js/telas/entrar.js
-  if (appReady && typeof precisaEntrar === "function" && precisaEntrar()) return mostrarEntrar(el);
-  entrarDesenhado = "";
-  el.setAttribute("aria-label", "Boas-vindas");
 
   // Se o usuário já possui dados ou conta ativa com histórico, o personagem já existe: não força onboarding
   if (

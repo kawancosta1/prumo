@@ -24,8 +24,8 @@ module.exports = async url => {
         const temShoes = svg.includes("prumi-shoes");
         const temCintura = svg.includes("prumi-cintura-ext");
         const temPernas = svg.includes("prumi-pernas");
-        const temSombra = svg.includes("ellipse cx=\"60\" cy=\"156\"");
-        const viewBoxCorreto = svg.includes("viewBox=\"0 -6 120 162\"");
+        const temSombra = svg.includes('ellipse cx="60" cy="156"');
+        const viewBoxCorreto = svg.includes('viewBox="0 -6 120 162"');
         return temShoes && temCintura && temPernas && temSombra && viewBoxCorreto;
       })()
     `);
