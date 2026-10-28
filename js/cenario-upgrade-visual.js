@@ -303,6 +303,33 @@
     };
   }
 
+  // Interceptar e orquestrar a renderização dos cômodos da Casa (Sótão, Sala, etc.)
+  const casaOriginal = window.casaSVG;
+  if (typeof casaOriginal === "function") {
+    window.casaSVG = function (d) {
+      const svgBase = casaOriginal(d);
+      if (!svgBase || typeof svgBase !== "string") return svgBase;
+
+      // Se for quarto, quartoSVG já cuidou do processamento
+      if (svgBase.includes("quarto-svg") && !svgBase.includes("casa-")) {
+        return svgBase;
+      }
+
+      // Injeta defs globais caso o cômodo ainda não possua
+      let svgAprimorado = svgBase;
+      if (!svgAprimorado.includes("sombra-suave-direcional")) {
+        const HMatch = /viewBox="0 0 \d+ (\d+)"/.exec(svgBase);
+        const H = HMatch ? parseInt(HMatch[1], 10) : 300;
+        const W = 360;
+        const chaoY = H - 64;
+        const defs = gerarDefsCenario("casa_up", W, H, chaoY);
+        svgAprimorado = svgAprimorado.replace(/(<svg[^>]+>)/, `$1${defs}`);
+      }
+
+      return svgAprimorado;
+    };
+  }
+
   // Exportar utilitários para testes e reuso
   window.gerarDefsCenario = gerarDefsCenario;
   window.gerarCamadaLuzJanela = gerarCamadaLuzJanela;

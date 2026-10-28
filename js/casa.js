@@ -57,8 +57,30 @@ const escurecer = (hex, f = 0.75) =>
         .padStart(2, "0")
     )
     .join("");
-const piso = (w, h, cor, linha) =>
-  `<rect width="${w}" height="${h}" fill="${cor}"/>${Array.from({ length: Math.ceil(h / 12) }, (_, i) => `<path d="M0 ${i * 12}H${w}" stroke="${linha}"/>`).join("")}${Array.from({ length: 24 }, (_, i) => `<path d="M${(i * 67) % w} ${Math.floor(i / 6) * 12}v12" stroke="${linha}"/>`).join("")}`;
+function pisoVolumetrico(w, h, cor, linha) {
+  const altT = 12;
+  const numTabuas = Math.ceil(h / altT);
+  let tabuas = "";
+  for (let i = 0; i < numTabuas; i++) {
+    const y = i * altT;
+    const variacao = i % 2 === 0 ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)";
+    tabuas += `<rect x="0" y="${y}" width="${w}" height="${altT}" fill="${cor}"/>`;
+    tabuas += `<rect x="0" y="${y}" width="${w}" height="${altT}" fill="${variacao}"/>`;
+    tabuas += `<line x1="0" y1="${y + 0.8}" x2="${w}" y2="${y + 0.8}" stroke="#FFFFFF" stroke-opacity="0.20" stroke-width="0.8"/>`;
+    tabuas += `<line x1="0" y1="${y + altT}" x2="${w}" y2="${y + altT}" stroke="${linha}" stroke-width="1.2" stroke-opacity="0.75"/>`;
+    const vx = (i * 79) % Math.max(10, w - 80);
+    tabuas += `<path d="M${vx} ${y + 5}Q${vx + 34} ${y + 2.5} ${vx + 68} ${y + 6.5}" stroke="${linha}" stroke-opacity="0.28" stroke-width="0.7" fill="none"/>`;
+  }
+  for (let i = 0; i < 24; i++) {
+    const row = Math.floor(i / 6);
+    const y = row * altT;
+    const x = ((i * 67) + (row % 2 ? 33 : 0)) % w;
+    tabuas += `<line x1="${x}" y1="${y}" x2="${x}" y2="${y + altT}" stroke="${linha}" stroke-width="1.2" stroke-opacity="0.65"/>`;
+    tabuas += `<line x1="${x + 0.8}" y1="${y}" x2="${x + 0.8}" y2="${y + altT}" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="0.6"/>`;
+  }
+  return `<g class="piso-volumetrico">${tabuas}<rect width="${w}" height="${h}" fill="rgba(0,0,0,0.08)" pointer-events="none"/></g>`;
+}
+const piso = (w, h, cor, linha) => pisoVolumetrico(w, h, cor, linha);
 const vasoPlanta = (x, y, s = 1, cor = "#C4683A") =>
   `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-8 0H8L6 14H-6Z" fill="${cor}" stroke="#141416" stroke-width="1"/><path d="M0 0Q-10 -12 -14 -20M0 0Q2 -16 -2 -26M0 0Q10 -10 14 -18" stroke="#3F7A3A" stroke-width="2.4" fill="none" stroke-linecap="round"/><ellipse cx="-14" cy="-20" rx="5" ry="3" fill="#5FA05A" transform="rotate(-30 -14 -20)"/><ellipse cx="-2" cy="-26" rx="3" ry="5" fill="#5FA05A"/><ellipse cx="14" cy="-18" rx="5" ry="3" fill="#5FA05A" transform="rotate(30 14 -18)"/></g>`;
 const caneca = (x, y, cor = "#E0312F") =>
@@ -324,14 +346,230 @@ const COMODOS = [
     },
     desenho: c => {
       const { W, chaoY, op, id } = c;
-      return `<rect width="${W}" height="${chaoY}" fill="#D9C4A0"/>${Array.from({ length: 18 }, (_, i) => `<path d="M${i * 20} 0V${chaoY}" stroke="#C4AC84"/>`).join("")}
-        <path d="M0 0H${W}V40L0 ${chaoY - 40}Z" fill="#8C6A4A"/>${Array.from({ length: 10 }, (_, i) => `<path d="M${i * 40} ${chaoY - 40 - i * ((chaoY - 80) / 9)}L${i * 40} 0" stroke="#6E4E30" stroke-width="3"/>`).join("")}
-        <g transform="translate(250 30)"><clipPath id="${id}j"><circle r="26"/></clipPath><g clip-path="url(#${id}j)"><rect x="-26" y="-26" width="52" height="52" fill="${CEUS[horaDoCeu()][0]}"/>${horaDoCeu() === "noite" ? `<circle cx="8" cy="-8" r="6" fill="#F2EAD3"/>` : `<circle cx="8" cy="-8" r="7" fill="#FFE27A"/>`}</g><circle r="26" fill="none" stroke="#6E4E30" stroke-width="5"/><path d="M-26 0H26M0 -26V26" stroke="#6E4E30" stroke-width="3"/></g>
-        <g transform="translate(0 ${chaoY})">${piso(W, 64, "#A8845A", "#8C6A4A")}</g>
-        <g transform="translate(150 ${chaoY - 34})"><rect width="56" height="38" rx="4" fill="#6E4A2A" stroke="#3A2A1E" stroke-width="1.4"/><path d="M0 12H56" stroke="#3A2A1E" stroke-width="2"/><rect x="24" y="8" width="8" height="10" rx="1" fill="#E8C24A" stroke="#3A2A1E"/><path d="M8 0V38M48 0V38" stroke="#E8C24A" stroke-width="2"/></g>
-        <path d="M150 0V30" stroke="#3A3A44" stroke-width="1.4"/><circle class="lampada-casa" cx="150" cy="36" r="6" fill="#FFE9A8"/>
-        <ellipse cx="80" cy="${chaoY + 6}" rx="62" ry="26" fill="${op.puff}" stroke="#141416" stroke-width="1.4"/><path d="M30 ${chaoY + 2}Q80 ${chaoY - 14} 130 ${chaoY + 2}" fill="none" stroke="${escurecer(op.puff, 0.7)}" stroke-width="2"/>
-        ${c.leitor(50, chaoY - 66, 60)}${c.estante()}`;
+      const hora = horaDoCeu();
+      const isNoite = hora === "noite";
+      const isTarde = hora === "tarde";
+      const puffCor = op.puff || "#6A4A8C";
+      const puffEscuro = escurecer(puffCor, 0.65);
+      const puffLuz = escurecer(puffCor, 1.25) || "#FFFFFF";
+      const ceuCores = CEUS[hora] || CEUS.dia;
+
+      const beamGrad = isNoite
+        ? `<stop offset="0%" stop-color="#C7D2FE" stop-opacity="0.32"/><stop offset="50%" stop-color="#818CF8" stop-opacity="0.14"/><stop offset="100%" stop-color="#4F46E5" stop-opacity="0"/>`
+        : isTarde
+          ? `<stop offset="0%" stop-color="#FBD38D" stop-opacity="0.45"/><stop offset="50%" stop-color="#F28C5B" stop-opacity="0.18"/><stop offset="100%" stop-color="#FF7A45" stop-opacity="0"/>`
+          : `<stop offset="0%" stop-color="#FFF8E7" stop-opacity="0.42"/><stop offset="45%" stop-color="#FFEAA7" stop-opacity="0.22"/><stop offset="85%" stop-color="#FDCB6E" stop-opacity="0.06"/><stop offset="100%" stop-color="#FAD390" stop-opacity="0"/>`;
+      const moteColor = isNoite ? "#E0E7FF" : isTarde ? "#FED7AA" : "#FEF08A";
+
+      const defs = `
+        <defs>
+          <linearGradient id="${id}-parede-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#C2A882"/>
+            <stop offset="25%" stop-color="#DFCCAA"/>
+            <stop offset="85%" stop-color="#D5BF9D"/>
+            <stop offset="100%" stop-color="#B8A07A"/>
+          </linearGradient>
+          <linearGradient id="${id}-telhado-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#6E4E30"/>
+            <stop offset="50%" stop-color="#825C38"/>
+            <stop offset="100%" stop-color="#553A22"/>
+          </linearGradient>
+          <linearGradient id="${id}-eave-sombra" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1E140A" stop-opacity="0.40"/>
+            <stop offset="100%" stop-color="#1E140A" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="${id}-beam-janela" x1="100%" y1="0%" x2="0%" y2="100%">
+            ${beamGrad}
+          </linearGradient>
+          <radialGradient id="${id}-janela-halo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="${isNoite ? "#C7D2FE" : "#FFF3D0"}" stop-opacity="0.38"/>
+            <stop offset="60%" stop-color="${isNoite ? "#818CF8" : "#FFEAA7"}" stop-opacity="0.14"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="${id}-janela-ceu" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${ceuCores[0]}"/>
+            <stop offset="100%" stop-color="${ceuCores[1]}"/>
+          </linearGradient>
+          <radialGradient id="${id}-lamp-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFF7CD" stop-opacity="0.65"/>
+            <stop offset="30%" stop-color="#FDE047" stop-opacity="0.35"/>
+            <stop offset="65%" stop-color="#EAB308" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#CA8A04" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="${id}-bau-tampa" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#9C6B3E"/>
+            <stop offset="35%" stop-color="#80542C"/>
+            <stop offset="100%" stop-color="#50331A"/>
+          </linearGradient>
+          <linearGradient id="${id}-bau-corpo" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#5A391D"/>
+            <stop offset="30%" stop-color="#7A4E2A"/>
+            <stop offset="75%" stop-color="#694121"/>
+            <stop offset="100%" stop-color="#4E2F16"/>
+          </linearGradient>
+          <radialGradient id="${id}-puff-vol" cx="65%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+            <stop offset="25%" stop-color="${puffCor}"/>
+            <stop offset="75%" stop-color="${puffEscuro}"/>
+            <stop offset="100%" stop-color="${escurecer(puffEscuro, 0.75)}"/>
+          </radialGradient>
+          <clipPath id="${id}j"><circle cx="250" cy="30" r="26"/></clipPath>
+        </defs>
+      `;
+
+      const tabuasParede = Array.from({ length: 18 }, (_, i) => {
+        const x = i * 20;
+        const knot = i % 4 === 1
+          ? `<circle cx="${x + 10}" cy="${60 + (i * 27) % (chaoY - 100)}" r="1.8" fill="#B59972" opacity="0.6"/>
+             <ellipse cx="${x + 10}" cy="${60 + (i * 27) % (chaoY - 100)}" rx="3.5" ry="5" fill="none" stroke="#A88B64" stroke-width="0.6" opacity="0.5"/>`
+          : "";
+        return `
+          <line x1="${x}" y1="0" x2="${x}" y2="${chaoY}" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="0.8"/>
+          <line x1="${x + 0.8}" y1="0" x2="${x + 0.8}" y2="${chaoY}" stroke="#A68C66" stroke-opacity="0.45" stroke-width="1.2"/>
+          ${knot}
+        `;
+      }).join("");
+
+      const rafters = Array.from({ length: 10 }, (_, i) => {
+        const rx = i * 40;
+        const ry = chaoY - 40 - i * ((chaoY - 80) / 9);
+        return `
+          <polygon points="${rx},${ry} ${rx + 7},${ry - 4} ${rx + 7},0 ${rx},0" fill="#442D18" opacity="0.85"/>
+          <polygon points="${rx + 7},${ry - 4} ${rx + 11},${ry - 7} ${rx + 11},0 ${rx + 7},0" fill="#845D38"/>
+          <line x1="${rx + 7}" y1="${ry - 4}" x2="${rx + 7}" y2="0" stroke="#B88A58" stroke-width="0.9" opacity="0.85"/>
+        `;
+      }).join("");
+
+      const celestial = isNoite
+        ? `<circle cx="258" cy="22" r="7" fill="#F4EEDC"/><circle cx="261" cy="20" r="6" fill="${ceuCores[0]}"/>
+           <circle cx="242" cy="24" r="1.1" fill="#FFFFFF" opacity="0.8"/>
+           <circle cx="255" cy="40" r="0.9" fill="#FFFFFF" opacity="0.75"/>
+           <circle cx="238" cy="35" r="1.3" fill="#FFFFFF" opacity="0.9"/>`
+        : isTarde
+          ? `<circle cx="254" cy="28" r="8" fill="#FF7A45"/><circle cx="254" cy="28" r="14" fill="#FFB088" opacity="0.3"/>`
+          : `<circle cx="254" cy="26" r="7.5" fill="#FFE27A"/><circle cx="254" cy="26" r="15" fill="#FFE27A" opacity="0.25"/>`;
+
+      const janelaRedonda = `
+        <g class="sotao-janela-grupo">
+          <circle cx="250" cy="30" r="38" fill="url(#${id}-janela-halo)"/>
+          <circle cx="250" cy="30" r="30" fill="#4A331E" stroke="#322213" stroke-width="1.2"/>
+          <circle cx="250" cy="30" r="28" fill="#75502E"/>
+          <g clip-path="url(#${id}j)">
+            <rect x="220" y="0" width="60" height="60" fill="url(#${id}-janela-ceu)"/>
+            ${celestial}
+            <polygon points="234,14 246,14 238,46 226,46" fill="#FFFFFF" opacity="0.22"/>
+            <polygon points="252,14 266,14 256,46 242,46" fill="#FFFFFF" opacity="0.14"/>
+          </g>
+          <circle cx="250" cy="30" r="26" fill="none" stroke="#5E4024" stroke-width="5"/>
+          <circle cx="250" cy="30" r="28.5" fill="none" stroke="#2B1A0C" stroke-width="1" opacity="0.65"/>
+          <circle cx="250" cy="30" r="23.5" fill="none" stroke="#A87E54" stroke-width="0.8" opacity="0.8"/>
+          <path d="M224 30H276M250 4V56" stroke="#462E19" stroke-width="3.4"/>
+          <path d="M224 29.2H276M249.2 4V56" stroke="#B88E62" stroke-width="0.8" opacity="0.85"/>
+        </g>
+      `;
+
+      const feixeLuz = `
+        <g class="sotao-feixe-grupo" pointer-events="none">
+          <polygon points="250,30 274,44 190,${chaoY + 12} 18,${chaoY + 12}" fill="url(#${id}-beam-janela)" class="cenario-feixe-luz"/>
+          <polygon points="242,26 260,34 140,${chaoY + 8} 45,${chaoY + 8}" fill="url(#${id}-beam-janela)" opacity="0.6" class="cenario-feixe-luz"/>
+          <ellipse cx="115" cy="${chaoY + 18}" rx="85" ry="16" fill="${isNoite ? '#818CF8' : '#FFEAA7'}" opacity="${isNoite ? 0.08 : 0.16}"/>
+          <g class="sotao-motes">
+            <circle cx="228" cy="58" r="1.3" fill="${moteColor}" class="cenario-poeira-mote" style="animation-delay:0s"/>
+            <circle cx="204" cy="85" r="1.0" fill="${moteColor}" class="cenario-poeira-mote" style="animation-delay:1.5s"/>
+            <circle cx="178" cy="115" r="1.5" fill="${moteColor}" class="cenario-poeira-mote" style="animation-delay:0.8s"/>
+            <circle cx="145" cy="142" r="1.2" fill="${moteColor}" class="cenario-poeira-mote" style="animation-delay:2.4s"/>
+            <circle cx="120" cy="170" r="1.4" fill="${moteColor}" class="cenario-poeira-mote" style="animation-delay:1.1s"/>
+            <circle cx="95" cy="195" r="1.1" fill="${moteColor}" class="cenario-poeira-mote" style="animation-delay:3.2s"/>
+            <circle cx="160" cy="165" r="0.9" fill="${moteColor}" class="cenario-poeira-mote" style="animation-delay:1.9s"/>
+          </g>
+        </g>
+      `;
+
+      const lampada = `
+        <g class="sotao-lampada-grupo">
+          <path d="M150 0 Q149.5 15 150 30" stroke="#1E1E24" stroke-width="1.6" fill="none"/>
+          <rect x="146" y="27" width="8" height="5" rx="1" fill="#C59B27" stroke="#684E0B" stroke-width="0.8"/>
+          <line x1="146" y1="29" x2="154" y2="29" stroke="#E6C458" stroke-width="0.6"/>
+          <circle cx="150" cy="38" r="32" fill="url(#${id}-lamp-glow)" pointer-events="none"/>
+          <circle cx="150" cy="37" r="7" fill="#FFEAA7" stroke="#D97706" stroke-width="0.9" class="lampada-casa"/>
+          <circle cx="148" cy="35" r="2.2" fill="#FFFFFF" opacity="0.65"/>
+          <path d="M148.5 35.5 Q150 34 151.5 35.5 Q150 38 148.5 39.5" fill="none" stroke="#D97706" stroke-width="0.8"/>
+        </g>
+      `;
+
+      const bauX = 150, bauY = chaoY - 34;
+      const bau = `
+        <g class="sotao-bau-grupo" transform="translate(${bauX} ${bauY})">
+          <ellipse cx="28" cy="37" rx="34" ry="7" fill="#120A05" opacity="0.55"/>
+          <polygon points="-6,36 28,34 62,36 50,42 -14,42" fill="#120A05" opacity="0.25"/>
+          <rect x="0" y="11" width="56" height="26" rx="2" fill="url(#${id}-bau-corpo)" stroke="#2D1A0B" stroke-width="1.2"/>
+          <line x1="1" y1="19" x2="55" y2="19" stroke="#3D2411" stroke-width="1"/>
+          <line x1="1" y1="20" x2="55" y2="20" stroke="#9C6B3E" stroke-width="0.6" opacity="0.5"/>
+          <line x1="1" y1="28" x2="55" y2="28" stroke="#3D2411" stroke-width="1"/>
+          <line x1="1" y1="29" x2="55" y2="29" stroke="#9C6B3E" stroke-width="0.6" opacity="0.5"/>
+          <path d="M-2 11 Q28 0 58 11 Z" fill="url(#${id}-bau-tampa)" stroke="#2D1A0B" stroke-width="1.2"/>
+          <path d="M0 11 Q28 2 56 11" fill="none" stroke="#C48E55" stroke-width="1.4" opacity="0.8"/>
+          <path d="M-2 11 H58" stroke="#241407" stroke-width="2"/>
+          <rect x="8" y="2" width="7" height="34" fill="#C59B27" stroke="#4A3405" stroke-width="0.8"/>
+          <line x1="9" y1="2" x2="9" y2="36" stroke="#FDE047" stroke-width="0.8" opacity="0.8"/>
+          <circle cx="11.5" cy="5" r="1.1" fill="#4A3405"/><circle cx="11.5" cy="5" r="0.7" fill="#FDE047"/>
+          <circle cx="11.5" cy="18" r="1.1" fill="#4A3405"/><circle cx="11.5" cy="18" r="0.7" fill="#FDE047"/>
+          <circle cx="11.5" cy="30" r="1.1" fill="#4A3405"/><circle cx="11.5" cy="30" r="0.7" fill="#FDE047"/>
+          <rect x="41" y="2" width="7" height="34" fill="#C59B27" stroke="#4A3405" stroke-width="0.8"/>
+          <line x1="42" y1="2" x2="42" y2="36" stroke="#FDE047" stroke-width="0.8" opacity="0.8"/>
+          <circle cx="44.5" cy="5" r="1.1" fill="#4A3405"/><circle cx="44.5" cy="5" r="0.7" fill="#FDE047"/>
+          <circle cx="44.5" cy="18" r="1.1" fill="#4A3405"/><circle cx="44.5" cy="18" r="0.7" fill="#FDE047"/>
+          <circle cx="44.5" cy="30" r="1.1" fill="#4A3405"/><circle cx="44.5" cy="30" r="0.7" fill="#FDE047"/>
+          <rect x="23" y="7" width="10" height="13" rx="1.5" fill="#EAB308" stroke="#5A4004" stroke-width="0.9"/>
+          <rect x="24" y="8" width="8" height="5" fill="#FDE047"/>
+          <circle cx="28" cy="14" r="1.3" fill="#241407"/>
+          <polygon points="27.4,14 28.6,14 29,17.5 27,17.5" fill="#241407"/>
+          <path d="M-2 22 Q-6 24 -2 27" stroke="#241407" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M58 22 Q62 24 58 27" stroke="#241407" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        </g>
+      `;
+
+      const puff = `
+        <g class="sotao-puff-grupo">
+          <ellipse cx="80" cy="${chaoY + 14}" rx="68" ry="22" fill="#0E0C16" opacity="0.5"/>
+          <ellipse cx="80" cy="${chaoY + 12}" rx="62" ry="16" fill="#0E0C16" opacity="0.3"/>
+          <ellipse cx="80" cy="${chaoY + 6}" rx="64" ry="28" fill="url(#${id}-puff-vol)" stroke="#1C1824" stroke-width="1.5"/>
+          <ellipse cx="82" cy="${chaoY - 4}" rx="46" ry="16" fill="${puffLuz}" opacity="0.22"/>
+          <path d="M26 ${chaoY + 8} Q55 ${chaoY - 4} 76 ${chaoY + 2}" fill="none" stroke="${puffEscuro}" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M27 ${chaoY + 7} Q55 ${chaoY - 5} 76 ${chaoY + 1}" fill="none" stroke="#FFFFFF" stroke-width="0.8" opacity="0.3"/>
+          <path d="M134 ${chaoY + 8} Q105 ${chaoY - 4} 84 ${chaoY + 2}" fill="none" stroke="${puffEscuro}" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M133 ${chaoY + 7} Q105 ${chaoY - 5} 84 ${chaoY + 1}" fill="none" stroke="#FFFFFF" stroke-width="0.8" opacity="0.3"/>
+          <ellipse cx="80" cy="${chaoY + 1}" rx="22" ry="7" fill="${puffEscuro}" opacity="0.45"/>
+          <path d="M24 ${chaoY + 14} Q80 ${chaoY + 28} 136 ${chaoY + 14}" fill="none" stroke="${puffEscuro}" stroke-width="1.4" stroke-dasharray="3,2.5" opacity="0.7"/>
+        </g>
+      `;
+
+      const sombraEstante = `<rect x="${W - 176}" y="${chaoY - 2}" width="176" height="6" fill="#120A05" opacity="0.4"/>`;
+
+      return `
+        ${defs}
+        <rect width="${W}" height="${chaoY}" fill="url(#${id}-parede-grad)"/>
+        ${tabuasParede}
+        <path d="M0 0H${W}V40L0 ${chaoY - 40}Z" fill="url(#${id}-telhado-grad)"/>
+        <polygon points="0,${chaoY - 40} ${W},40 ${W},56 0,${chaoY - 24}" fill="url(#${id}-eave-sombra)"/>
+        ${rafters}
+        ${janelaRedonda}
+        <g transform="translate(0 ${chaoY})">
+          ${piso(W, 64, "#A8845A", "#7A5634")}
+        </g>
+        <g class="sotao-rodape">
+          <rect x="0" y="${chaoY - 6}" width="${W}" height="6" fill="#6B4727"/>
+          <line x1="0" y1="${chaoY - 6}" x2="${W}" y2="${chaoY - 6}" stroke="#9E6E41" stroke-width="1"/>
+          <rect x="0" y="${chaoY}" width="${W}" height="3" fill="#140D07" opacity="0.45"/>
+        </g>
+        ${sombraEstante}
+        ${bau}
+        ${puff}
+        ${lampada}
+        ${c.leitor(50, chaoY - 66, 60)}
+        ${c.estante()}
+        ${feixeLuz}
+      `;
     }
   },
   {

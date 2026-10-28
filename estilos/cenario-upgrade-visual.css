@@ -76,3 +76,39 @@
 .prumi-leitor:hover {
   filter: drop-shadow(0 2px 8px rgba(59, 130, 246, 0.4));
 }
+
+/* Interações e micro-animações do Sótão e Cômodos da Casa */
+.sotao-bau-grupo {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+  transform-origin: 28px 34px;
+  cursor: pointer;
+}
+
+.sotao-bau-grupo:hover {
+  filter: drop-shadow(0 3px 8px rgba(234, 179, 8, 0.45));
+}
+
+.sotao-puff-grupo {
+  transition: transform 0.2s ease, filter 0.2s ease;
+  transform-origin: 80px 100%;
+}
+
+.sotao-puff-grupo:hover {
+  transform: scale(1.02);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
+}
+
+@keyframes lampadaGlowBreathe {
+  0%, 100% {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 4px rgba(253, 224, 71, 0.6));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.85));
+  }
+}
+
+.lampada-casa {
+  animation: lampadaGlowBreathe 4s ease-in-out infinite;
+}
