@@ -1,0 +1,240 @@
+/* ===================================================================
+   pets-cuphead-shaders.css - Estética Vintage 1930s (Rubber Hose & Celuloide)
+   Inspirado na animação artesanal de Cuphead e Fleischer Studios (1930s)
+   =================================================================== */
+
+/* 1. O Lendário Fleischer Bounce Rítmico (Compasso contínuo de 120 BPM) */
+@keyframes cupheadIdleBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  25% {
+    transform: translateY(1.5px) scale(1.05, 0.94);
+  }
+  50% {
+    transform: translateY(-3.5px) scale(0.96, 1.06);
+  }
+  75% {
+    transform: translateY(0.5px) scale(1.02, 0.98);
+  }
+}
+
+/* 2. Marcha Saltitante Rubber Hose (Jaunty Strut) */
+@keyframes cupheadWalkStrut {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1, 1);
+  }
+  25% {
+    transform: translateY(-4px) rotate(4deg) scale(0.95, 1.06);
+  }
+  50% {
+    transform: translateY(1px) rotate(0deg) scale(1.06, 0.93);
+  }
+  75% {
+    transform: translateY(-5px) rotate(-4deg) scale(0.95, 1.07);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1, 1);
+  }
+}
+
+/* 3. Balanço de Cauda em Chicote Elástico Rubber Hose */
+@keyframes cupheadCaudaWhip {
+  0%, 100% {
+    transform: rotate(0deg) scaleX(1);
+  }
+  25% {
+    transform: rotate(18deg) scaleX(1.12);
+  }
+  50% {
+    transform: rotate(-8deg) scaleX(0.95);
+  }
+  75% {
+    transform: rotate(24deg) scaleX(1.16);
+  }
+}
+
+/* 4. Tremor Orgânico de Nanquim à Mão (Hand-inked Jitter a 12fps) */
+@keyframes handInkedJitter {
+  0%   { filter: url("#cuphead-ink-filter-1"); }
+  33%  { filter: url("#cuphead-ink-filter-2"); }
+  66%  { filter: url("#cuphead-ink-filter-3"); }
+  100% { filter: url("#cuphead-ink-filter-1"); }
+}
+
+/* Aplicação aos agentes e SVGs dos pets */
+.pet-agente {
+  will-change: transform;
+  transform-origin: bottom center;
+}
+
+/* Ativação do Fleischer Bounce no pet parado */
+.pet-agente .pet-svg.pose-parado,
+.pet-agente .pet-svg.pose-sentado {
+  animation: cupheadIdleBounce 0.72s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: 50% 90%;
+}
+
+/* Ativação da marcha elástica ao andar ou correr */
+.pet-agente .pet-svg.pose-andando {
+  animation: cupheadWalkStrut 0.44s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+.pet-agente .pet-svg.pose-correndo {
+  animation: cupheadWalkStrut 0.28s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+/* Cauda elástica nos pets */
+.pet-svg .cauda {
+  transform-origin: 10px 24px;
+  animation: cupheadCaudaWhip 0.6s ease-in-out infinite;
+}
+
+/* Efeito de virada elástica com antecipação (Spin de 360 graus suave) */
+.pet-agente.girando-elastico {
+  animation: cupheadSpinElastic 0.36s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cupheadSpinElastic {
+  0% {
+    transform: scale(1, 1) rotate(0deg);
+  }
+  40% {
+    transform: scale(0.7, 1.25) rotate(180deg);
+  }
+  100% {
+    transform: scale(1, 1) rotate(360deg);
+  }
+}
+
+/* Cambalhota do Truque Cuphead */
+.pet-agente.cambalhota-cuphead {
+  animation: cupheadFlipTrick 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes cupheadFlipTrick {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1, 1);
+  }
+  20% {
+    transform: translateY(4px) scale(1.2, 0.8);
+  }
+  50% {
+    transform: translateY(-55px) rotate(180deg) scale(0.9, 1.15);
+  }
+  80% {
+    transform: translateY(-10px) rotate(360deg) scale(1.1, 0.9);
+  }
+  100% {
+    transform: translateY(0) rotate(360deg) scale(1, 1);
+  }
+}
+
+/* Nuvenzinhas de Poeira Retrô (Dust Puffs) de 1930 */
+.cuphead-dust-cloud {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f8fafc 40%, #cbd5e1 80%, rgba(203, 213, 225, 0) 100%);
+  border: 1.5px solid rgba(15, 23, 42, 0.6);
+  animation: cupheadDustPuff 0.45s ease-out forwards;
+}
+
+@keyframes cupheadDustPuff {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.3) translate(0, 0);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2) translate(var(--dx, -8px), -6px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6) translate(var(--dx, -14px), -12px);
+  }
+}
+
+/* Estrelinhas de Sucesso Cartoon dos anos 1930 */
+.cuphead-star-burst {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: 16px;
+  animation: cupheadStarPop 0.55s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes cupheadStarPop {
+  0% {
+    opacity: 1;
+    transform: scale(0.2) translate(0, 0) rotate(0deg);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.3) translate(var(--tx, 15px), var(--ty, -25px)) rotate(180deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5) translate(var(--tx, 25px), var(--ty, -40px)) rotate(360deg);
+  }
+}
+
+/* Bolinha de Brinquedo Quicante com Física de Gravidade */
+.cuphead-toy-ball {
+  position: fixed;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f43f5e, #be123c 70%, #881337);
+  box-shadow: inset -2px -2px 5px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.35);
+  border: 1.8px solid #0f172a;
+  z-index: 9997;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.05s linear;
+}
+
+/* Sombreamento Oval Clássico de Animação Celuloide no Chão */
+.cuphead-ground-shadow {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 9px;
+  background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.15) 55%, transparent 75%);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: width 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* Botão Flutuante de Brincar com o Pet */
+.cuphead-pet-play-badge {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f59e0b;
+  color: #000000;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 12px;
+  border: 1.5px solid #000000;
+  box-shadow: 0 3px 0 #000000;
+  cursor: pointer;
+  white-space: nowrap;
+  animation: cupheadBadgeBob 1s ease-in-out infinite alternate;
+  user-select: none;
+}
+
+@keyframes cupheadBadgeBob {
+  0% { transform: translateX(-50%) translateY(0); }
+  100% { transform: translateX(-50%) translateY(-3px); }
+}
