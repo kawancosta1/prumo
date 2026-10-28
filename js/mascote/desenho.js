@@ -1,4 +1,4 @@
-﻿/*
+/*
   Desenho do Prumi em SVG: corpo, rosto de cada humor, água, roupas por cima.
 */
 "use strict";
@@ -218,19 +218,6 @@ function prumi({
       ${cintura ? `<g class="prumi-cintura-ext" filter="url(#${id}_drop)">${cintura.svg()}</g>` : ""}
       ${legs ? `<g class="prumi-legs-ext" filter="url(#${id}_drop)">${legs.svg()}</g>` : ""}
       ${shoes ? `<g class="prumi-shoes">${shoes.svg()}</g>` : ""}
-      <path class="outline" d="${BODY}"/>${top ? "" : `<path class="shine" d="M34 54Q36 40 49 35"/>`}
-      ${it("neck") ? it("neck").svg() : ""}
-      <g class="arm l"><path class="armp" d="${armL}"/>${wr ? wr.svg(lp[0], lp[1]) : ""}</g>
-      <g class="arm r"><path class="armp" d="${armR}"/>${hand ? hand.svg(hp[0], hp[1]) : ""}</g>
-      ${face}${lashes}${bow}${ck ? ck.svg(mood) : ""}${mo ? mo.svg(mood) : ""}${it("face") ? it("face").svg(mood) : ""}${camadas.rosto}${it("hair") ? it("hair").svg() : ""}${it("hat") ? it("hat").svg() : ""}${extra}
-    </g></g></g></g></svg>;--mink:${skin.ink}` : ""}" viewBox="0 -6 120 154" width="${size}" height="${Math.round(size * 1.28)}" role="img" aria-label="Prumi">
-    <defs><clipPath id="${id}"><path d="${BODY}"/></clipPath><clipPath id="${id}t"><rect x="-20" y="${cordaLonga ? -160 : -6}" width="160" height="${cordaLonga ? 324 : 170}"/></clipPath></defs>
-    ${camadas.fundo}${bgI ? `<g class="bgi">${bgI.svg()}</g>` : ""}${pet ? `<g class="pet">${pet.svg()}</g>` : ""}
-    <g class="entra"><g class="swing"><g clip-path="url(#${id}t)"><g class="hop corda">${str ? str.svg() : `<line class="string" x1="60" y1="-40" x2="60" y2="19"/>`}</g></g><g class="gira"><g class="hop">
-      ${back ? back.svg() : ""}
-      <rect class="cap" x="51.5" y="16.5" width="17" height="10" rx="3.5"/>
-      <path class="body" d="${BODY}"${skin ? ` style="fill:${skin.color}"` : ""}/>
-      <g clip-path="url(#${id})">${skin && skin.svg ? `<g class="pele-extra">${skin.svg()}</g>` : ""}${top ? top.svg() : ""}${cintura ? cintura.svg() : ""}${bottons ? bottons.svg() : ""}<g class="waterg${top ? " wet" : ""}" data-lvl="${lvl}" transform="translate(0 ${lvl})"><g transform="translate(-20 -3)"><path class="wave2" d="${wv}"/></g><path class="wave" d="${wv}"/>${parts}</g>${inner}</g>
       <path class="outline" d="${BODY}"/>${top ? "" : `<path class="shine" d="M34 54Q36 40 49 35"/>`}
       ${it("neck") ? it("neck").svg() : ""}
       <g class="arm l"><path class="armp" d="${armL}"/>${wr ? wr.svg(lp[0], lp[1]) : ""}</g>
