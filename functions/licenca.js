@@ -89,8 +89,25 @@ function assinaturaWebhookValida(segredo, xSignature, xRequestId, dataId) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
+/** Tabela de Preços Internacionais (Stripe Checkout USD) */
+const PRECOS_STRIPE_USD = {
+  mensal: { nome: "Prumo PRO Monthly", valorCents: 499, moeda: "usd", dias: 30 },
+  anual: { nome: "Prumo PRO Annual", valorCents: 3999, moeda: "usd", dias: 365 },
+  vitalicio: { nome: "Prumo PRO Lifetime Founder", valorCents: 7900, moeda: "usd", dias: null }
+};
+
+/** Valida o payload de checkout do Stripe */
+function conferirStripeSession(session) {
+  if (!session || typeof session !== "object") return { ok: false, motivo: "sem sessao" };
+  const ref = lerReferencia(session.client_reference_id);
+  if (!ref) return { ok: false, motivo: "referencia invalida" };
+  if (session.payment_status !== "paid") return { ok: false, motivo: "nao pago" };
+  return { ok: true, ...ref, id: String(session.id || "") };
+}
+
 module.exports = {
   PLANOS,
+  PRECOS_STRIPE_USD,
   planoValido,
   montarReferencia,
   lerReferencia,
@@ -98,5 +115,6 @@ module.exports = {
   licencaDeTeste,
   DIAS_TESTE,
   conferirPagamento,
+  conferirStripeSession,
   assinaturaWebhookValida
 };

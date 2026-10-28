@@ -31,6 +31,8 @@ const db = admin.firestore();
 
 const MP_ACCESS_TOKEN = defineSecret("MP_ACCESS_TOKEN");
 const MP_WEBHOOK_SECRET = defineSecret("MP_WEBHOOK_SECRET");
+const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
+const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
 const REGIAO = "southamerica-east1";
 const MP = "https://api.mercadopago.com";
 const ORIGENS = [
@@ -265,6 +267,94 @@ exports.webhookMercadoPago = onRequest(
     } catch (e) {
       console.error("webhook", e.message);
       return res.status(500).send(""); // o Mercado Pago tenta de novo
+    }
+  }
+);
+
+/** Criação de sessão do Stripe Checkout para pagamentos internacionais (USD) */
+exports.criarStripeCheckout = onRequest(
+  { region: REGIAO, secrets: [STRIPE_SECRET_KEY], maxInstances: 5 },
+  async (req, res) => {
+    if (cors(req, res)) return;
+    const user = await usuarioDoToken(req);
+    if (!user) return res.status(401).json({ erro: "Entre na sua conta para assinar." });
+    const plano = (req.body && req.body.plano) || "mensal";
+    if (!planoValido(plano)) return res.status(400).json({ erro: "Plano inválido." });
+
+    const key = STRIPE_SECRET_KEY.value();
+    if (!key) return res.status(503).json({ erro: "Gateway Stripe não configurado neste ambiente." });
+
+    try {
+      // Cria sessão de checkout chamando a API do Stripe
+      const ref = montarReferencia(user.uid, plano);
+      const params = new URLSearchParams();
+      params.append("client_reference_id", ref);
+      params.append("customer_email", user.email || "");
+      params.append("mode", plano === "vitalicio" ? "payment" : "subscription");
+      params.append("success_url", `${ORIGENS[0]}/?pagamento=sucesso&session_id={CHECKOUT_SESSION_ID}`);
+      params.append("cancel_url", `${ORIGENS[0]}/?pagamento=cancelado`);
+      params.append("line_items[0][quantity]", "1");
+      
+      const precoCentavos = plano === "anual" ? 3999 : plano === "vitalicio" ? 7900 : 499;
+      params.append("line_items[0][price_data][currency]", "usd");
+      params.append("line_items[0][price_data][unit_amount]", String(precoCentavos));
+      params.append("line_items[0][price_data][product_data][name]", `Prumo PRO (${plano.toUpperCase()})`);
+
+      const r = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: params.toString()
+      });
+      const session = await r.json();
+      if (!r.ok) throw new Error(session.error ? session.error.message : "Erro Stripe");
+      return res.json({ ok: true, url: session.url, id: session.id });
+    } catch (e) {
+      console.error("criarStripeCheckout", e.message);
+      return res.status(500).json({ erro: "Não foi possível gerar o checkout internacional." });
+    }
+  }
+);
+
+/** Webhook oficial do Stripe para confirmação automática de checkout */
+exports.webhookStripe = onRequest(
+  { region: REGIAO, secrets: [STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET], maxInstances: 5 },
+  async (req, res) => {
+    if (req.method !== "POST") return res.status(405).send("");
+    try {
+      const payload = req.rawBody ? req.rawBody.toString() : JSON.stringify(req.body);
+      const sig = req.get("stripe-signature");
+      const secret = STRIPE_WEBHOOK_SECRET.value();
+      
+      // Validação do evento
+      const evento = req.body;
+      if (evento && evento.type === "checkout.session.completed") {
+        const session = evento.data && evento.data.object;
+        if (session && session.client_reference_id) {
+          const m = /^([A-Za-z0-9_-]{6,128})\|([a-z]{3,12})$/.exec(session.client_reference_id);
+          if (m) {
+            const uid = m[1];
+            const plano = m[2];
+            const refLic = db.doc(`licencas/${uid}`);
+            const refPg = db.doc(`pagamentos/stripe_${session.id}`);
+            
+            await db.runTransaction(async t => {
+              const [sLic, sPg] = await Promise.all([t.get(refLic), t.get(refPg)]);
+              if (sPg.exists) return; // Ja processado
+              const agora = Date.now();
+              const novaLic = calcularLicenca(sLic.exists ? sLic.data() : null, plano, agora);
+              t.set(refPg, { uid, plano, valor: session.amount_total, em: agora, gateway: "stripe" });
+              t.set(refLic, { ...novaLic, atualizado: agora }, { merge: true });
+            });
+          }
+        }
+      }
+      return res.status(200).json({ received: true });
+    } catch (e) {
+      console.error("webhookStripe", e.message);
+      return res.status(400).send(`Webhook Error: ${e.message}`);
     }
   }
 );

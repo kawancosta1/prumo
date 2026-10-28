@@ -145,6 +145,15 @@ function criarCobrancaPix(plano) {
   return chamarPagamentoApi("criarPix", { plano });
 }
 
+/** Inicia sessão de checkout internacional via Stripe em USD */
+async function iniciarCheckoutStripe(plano = "mensal") {
+  const r = await chamarPagamentoApi("criarStripeCheckout", { plano });
+  if (r && r.url) {
+    window.location.href = r.url;
+  }
+  return r;
+}
+
 /** Começa o teste grátis de 7 dias (o servidor deixa uma vez por conta) */
 function iniciarTesteGratisPro() {
   return chamarPagamentoApi("iniciarTeste", {});

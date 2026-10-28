@@ -1,0 +1,29 @@
+{
+  "appName": "Prumo",
+  "tagline": "Hábitos, Rotina, Leituras e Pets Vintage",
+  "version": "3.5 Enterprise",
+  "primaryColor": "#3F7FD9",
+  "accentColor": "#2340C4",
+  "defaultPersona": "feiticeiro",
+  "supportEmail": "prumi.prumo@gmail.com",
+  "currency": {
+    "default": "BRL",
+    "symbol": "R$",
+    "usdPriceMonthly": 4.99,
+    "brlPriceMonthly": 19.90
+  },
+  "modules": {
+    "pets": true,
+    "bookshelf": true,
+    "habits": true,
+    "focusTimer": true,
+    "social": true,
+    "audioLandscapes": true,
+    "commercialPro": true
+  },
+  "whitelabel": {
+    "enabled": false,
+    "customLogoUrl": null,
+    "tenantId": "default"
+  }
+}

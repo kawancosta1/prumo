@@ -1,4 +1,4 @@
-﻿/*
+/*
   O que acontece quando você clica, envia um formulário ou muda um campo.
 */
 "use strict";
@@ -888,6 +888,12 @@ document.addEventListener("click", e => {
       S.gender = b.dataset.g;
       commit();
       toast("Tratamento atualizado.");
+      break;
+    case "idioma":
+      if (typeof definirIdioma === "function") {
+        definirIdioma(b.dataset.l);
+        toast(b.dataset.l === "en" ? "Language changed to English!" : "Idioma alterado para Português!");
+      }
       break;
     case "persona": {
       if (!id) break;

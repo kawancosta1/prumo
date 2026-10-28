@@ -11,3 +11,6 @@ done
 sed -i "s/const CARIMBO = \"DEV\";/const CARIMBO = \"${carimbo}\";/" sw.js
 grep -q "const CARIMBO = \"${carimbo}\";" sw.js || { echo "::error::não consegui carimbar o sw.js"; exit 1; }
 echo "Carimbo ${carimbo}: $(grep -o "?v=${carimbo}" index.html | wc -l) arquivos no index.html"
+if [ -f .github/minificar.js ]; then
+  node .github/minificar.js
+fi
