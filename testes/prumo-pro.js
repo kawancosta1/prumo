@@ -121,6 +121,78 @@ module.exports = async url => {
       })()
     `);
     ok(resModal, "modalPrumoProHTML renderizou interface de checkout com vantagens, planos e Pix");
+
+    // 10. Simulador de Economia e ROI do Usuário
+    const resRoi = ev(`
+      (() => {
+        const r = calcularEconomiaAnualUsuario(12, 25, 30);
+        return r.horasPoupadasSemana === 3.5 && r.horasPoupadasAno === 182 && r.multiplicadorROI > 20;
+      })()
+    `);
+    ok(resRoi, "calcularEconomiaAnualUsuario calculou ROI expressivo e horas poupadas no ano");
+
+    // 11. Curva de Energia Circadiana Biológica
+    const resCurva = ev(`
+      (() => {
+        const matutino = calcularCurvaEnergiaCircadiana("07:00", "23:00", 9);
+        const noturno = calcularCurvaEnergiaCircadiana("07:00", "23:00", 23);
+        return matutino.nivelEnergia > noturno.nivelEnergia &&
+               matutino.faseNome.includes("Pico") &&
+               noturno.faseNome.includes("Sono");
+      })()
+    `);
+    ok(resCurva, "calcularCurvaEnergiaCircadiana mapeou fases ultradianas de foco e repouso");
+
+    // 12. Algoritmo SuperMemo SM-2 Avançado
+    const resSm2 = ev(`
+      (() => {
+        const rev1 = calcularProximaRevisaoSM2Avancada(5, 0, 2.5, 1);
+        const rev2 = calcularProximaRevisaoSM2Avancada(4, 2, 2.6, 6);
+        const revFalha = calcularProximaRevisaoSM2Avancada(1, 4, 2.5, 30);
+        return rev1.novoIntervaloDias === 1 &&
+               rev2.novoIntervaloDias > 6 &&
+               revFalha.novoIntervaloDias === 1 &&
+               revFalha.novasRepeticoes === 0;
+      })()
+    `);
+    ok(resSm2, "calcularProximaRevisaoSM2Avancada escalonou intervalos ótimos e tratou esquecimento");
+
+    // 13. Matriz de Priorização de Eisenhower
+    const resEisen = ev(`
+      (() => {
+        const tarefas = [
+          { id: "1", title: "Crítica", prio: 3 },
+          { id: "2", title: "Estratégica", prio: 1 },
+          { id: "3", title: "Operacional", prio: 0, time: "14:00" },
+          { id: "4", title: "Supérflua", prio: 0 }
+        ];
+        const m = gerarMatrizEisenhowerTarefas(tarefas);
+        return m.q1.length === 1 && m.q2.length === 1 && m.q3.length === 1 && m.q4.length === 1 && m.estatisticas.pctEstrategico === 25;
+      })()
+    `);
+    ok(resEisen, "gerarMatrizEisenhowerTarefas distribuiu tarefas nos 4 quadrantes estratégicos");
+
+    // 14. Certificado Oficial de Disciplina em SVG
+    const resCert = ev(`
+      (() => {
+        const svg = gerarCertificadoDisciplinaPro({ name: "Kawan Costa" }, 60);
+        return svg.includes("<svg") &&
+               svg.includes("CERTIFICADO OFICIAL") &&
+               svg.includes("Kawan Costa") &&
+               svg.includes("60 dias");
+      })()
+    `);
+    ok(resCert, "gerarCertificadoDisciplinaPro produziu certificado vetorial nobre de maestria");
+
+    // 15. Meta de Água Adaptativa por Biometria e Clima
+    const resAgua = ev(`
+      (() => {
+        const a1 = gerarMetaDiariaAguaAdaptativa(70, "moderado", "temperado");
+        const a2 = gerarMetaDiariaAguaAdaptativa(80, "intenso", "quente");
+        return a1.metaMl === 2950 && a2.metaMl > a1.metaMl && a1.totalCopos === 10;
+      })()
+    `);
+    ok(resAgua, "gerarMetaDiariaAguaAdaptativa calculou hidratação médica precisa por biometria e clima");
   } finally {
     fechar();
   }

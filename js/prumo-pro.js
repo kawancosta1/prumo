@@ -487,6 +487,206 @@ function inicializarPrumoPro() {
   });
 }
 
+// 5. MÓDULOS AVANÇADOS DE ALTO VALOR (EDTECH, SAÚDE & ROI)
+
+/** 1. Simulador de Retorno sobre Investimento (ROI) e Economia de Tempo */
+function calcularEconomiaAnualUsuario(horasEstudoSemana = 10, tarefasSemana = 20, salarioHora = 25) {
+  const hEstudo = Math.max(0, Number(horasEstudoSemana) || 10);
+  const tSemana = Math.max(0, Number(tarefasSemana) || 20);
+  const valorHora = Math.max(10, Number(salarioHora) || 25);
+
+  // Redução média de 3.5 horas semanais perdidas em procrastinação e desorganização
+  const horasPoupadasSemana = 3.5;
+  const horasPoupadasAno = Math.round(horasPoupadasSemana * 52);
+  const valorGeradoAno = horasPoupadasAno * valorHora;
+  const precoAssinatura = 149.0;
+  const multiplicadorROI = Math.round((valorGeradoAno / precoAssinatura) * 10) / 10;
+
+  return {
+    horasEstudoSemana: hEstudo,
+    tarefasSemana: tSemana,
+    horasPoupadasSemana,
+    horasPoupadasAno,
+    valorGeradoAno,
+    precoAssinatura,
+    multiplicadorROI
+  };
+}
+
+/** 2. Mapeamento da Curva de Energia Circadiana Biológica */
+function calcularCurvaEnergiaCircadiana(horaAcordar = "07:00", horaDormir = "23:00", horaAtual = null) {
+  const parseH = str => {
+    const p = String(str || "07:00").split(":");
+    return parseInt(p[0], 10) || 7;
+  };
+  const hAcordar = parseH(horaAcordar);
+  const hDormir = parseH(horaDormir);
+  const h = typeof horaAtual === "number" ? ((horaAtual % 24) + 24) % 24 : new Date().getHours();
+
+  const delta = (h - hAcordar + 24) % 24;
+  let nivelEnergia = 50;
+  let faseNome = "Transição";
+  let atividadeRecomendada = "Organização geral";
+
+  if (delta >= 1 && delta <= 4) {
+    nivelEnergia = 95;
+    faseNome = "Pico de Foco Matinal";
+    atividadeRecomendada = "Deep Work, Resolução de Problemas e Aprendizado Denso";
+  } else if (delta >= 5 && delta <= 7) {
+    nivelEnergia = 60;
+    faseNome = "Vale Pós-Prandial (Digestivo)";
+    atividadeRecomendada = "Tarefas Administrativas Leves, E-mails e Descanso";
+  } else if (delta >= 8 && delta <= 11) {
+    nivelEnergia = 85;
+    faseNome = "Segundo Pico de Foco (Vespertino)";
+    atividadeRecomendada = "Revisões, Exercício Físico e Leitura";
+  } else if (delta >= 12 && delta <= 15) {
+    nivelEnergia = 45;
+    faseNome = "Desaceleração Noturna";
+    atividadeRecomendada = "Higiene do Sono, Ritual de Leitura e Fechamento do Dia";
+  } else {
+    nivelEnergia = 20;
+    faseNome = "Sono Biológico Reparador";
+    atividadeRecomendada = "Descanso Total e Consolidação da Memória";
+  }
+
+  return {
+    hora: h,
+    nivelEnergia,
+    faseNome,
+    atividadeRecomendada
+  };
+}
+
+/** 3. Algoritmo SuperMemo SM-2 Avançado para Estudos e Concursos */
+function calcularProximaRevisaoSM2Avancada(
+  qualidadeResposta = 4,
+  repeticoes = 0,
+  facilidade = 2.5,
+  intervaloAtual = 1
+) {
+  const q = Math.max(0, Math.min(5, parseInt(qualidadeResposta, 10) || 0));
+  const ef = Math.max(1.3, Number(facilidade) || 2.5);
+  const reps = Math.max(0, parseInt(repeticoes, 10) || 0);
+  const intervalo = Math.max(1, parseInt(intervaloAtual, 10) || 1);
+
+  // Fórmula do Ease Factor do SM-2
+  const novaFacilidade = Math.max(
+    1.3,
+    Math.round((ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))) * 100) / 100
+  );
+
+  let novoIntervaloDias = 1;
+  let novasRepeticoes = 0;
+
+  if (q < 3) {
+    // Erro de memorização: reinicia repetições
+    novasRepeticoes = 0;
+    novoIntervaloDias = 1;
+  } else {
+    if (reps === 0) novoIntervaloDias = 1;
+    else if (reps === 1) novoIntervaloDias = 6;
+    else novoIntervaloDias = Math.round(intervalo * novaFacilidade);
+    novasRepeticoes = reps + 1;
+  }
+
+  const d = new Date();
+  d.setDate(d.getDate() + novoIntervaloDias);
+  const dataProximaRevisao = d.toISOString().slice(0, 10);
+
+  return {
+    qualidadeResposta: q,
+    novoIntervaloDias,
+    novaFacilidade,
+    novasRepeticoes,
+    dataProximaRevisao,
+    memorizado: q >= 3
+  };
+}
+
+/** 4. Matriz de Priorização Estratégica de Eisenhower */
+function gerarMatrizEisenhowerTarefas(tarefas = []) {
+  const lista = Array.isArray(tarefas) ? tarefas : [];
+  const q1 = []; // Urgente e Importante (Prio >= 2)
+  const q2 = []; // Não urgente, mas importante (Prio 1) -> Foco Estratégico
+  const q3 = []; // Urgente, mas não importante (Prio 0 com horário)
+  const q4 = []; // Não urgente e não importante
+
+  lista.forEach(t => {
+    if (!t) return;
+    const prio = parseInt(t.prio, 10) || 0;
+    if (prio >= 2) q1.push(t);
+    else if (prio === 1) q2.push(t);
+    else if (t.time) q3.push(t);
+    else q4.push(t);
+  });
+
+  const total = lista.length;
+  const pctEstrategico = total > 0 ? Math.round((q2.length / total) * 100) : 0;
+  const riscoSobrecarga = q1.length > 5;
+
+  return {
+    q1,
+    q2,
+    q3,
+    q4,
+    estatisticas: {
+      total,
+      pctEstrategico,
+      riscoSobrecarga
+    }
+  };
+}
+
+/** 5. Certificado Oficial de Disciplina e Produtividade em SVG */
+function gerarCertificadoDisciplinaPro(estado = null, diasSequencia = 30) {
+  const est = estado || (typeof S !== "undefined" ? S : {});
+  const nome = est.name || "Kawan Costa";
+  const dias = Math.max(1, parseInt(diasSequencia, 10) || 30);
+  const data = new Date().toLocaleDateString("pt-BR");
+
+  return `<svg width="800" height="560" viewBox="0 0 800 560" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Certificado de Disciplina Prumo PRO">
+    <rect width="800" height="560" rx="16" fill="#ffffff" stroke="#d4af37" stroke-width="8"/>
+    <rect x="16" y="16" width="768" height="528" rx="8" fill="#faf8f2" stroke="#d4af37" stroke-width="2" stroke-dasharray="8 6"/>
+    <text x="400" y="90" font-family="'Instrument Sans', sans-serif" font-size="28" font-weight="800" fill="#1e293b" text-anchor="middle" letter-spacing="2">PRUMO PRODUCTIVITY OS</text>
+    <text x="400" y="125" font-family="'Instrument Sans', sans-serif" font-size="14" font-weight="600" fill="#f59e0b" text-anchor="middle" letter-spacing="4">CERTIFICADO OFICIAL DE DISCIPLINA & ALTO DESEMPENHO</text>
+    <text x="400" y="210" font-family="Georgia, serif" font-size="18" font-style="italic" fill="#64748b" text-anchor="middle">Certificamos com honra e distinção que</text>
+    <text x="400" y="270" font-family="'Instrument Sans', sans-serif" font-size="36" font-weight="800" fill="#0f172a" text-anchor="middle">${nome}</text>
+    <text x="400" y="325" font-family="Georgia, serif" font-size="16" fill="#334155" text-anchor="middle">concluiu com êxito a jornada contínua de <tspan font-weight="700" fill="#d97706">${dias} dias ininterruptos</tspan> de foco,</text>
+    <text x="400" y="355" font-family="Georgia, serif" font-size="16" fill="#334155" text-anchor="middle">alcançando maestria no gerenciamento de rotina e consistência comportamental.</text>
+    <circle cx="400" cy="445" r="40" fill="#f59e0b" stroke="#d97706" stroke-width="4"/>
+    <text x="400" y="440" font-family="'Instrument Sans', sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">PRO</text>
+    <text x="400" y="460" font-family="'Instrument Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">⭐ 100%</text>
+    <text x="140" y="490" font-family="'Instrument Sans', sans-serif" font-size="13" font-weight="600" fill="#64748b" text-anchor="middle">Data de Expedição: ${data}</text>
+    <text x="660" y="490" font-family="'Instrument Sans', sans-serif" font-size="13" font-weight="600" fill="#64748b" text-anchor="middle">Registro: PRU-CERT-${dias}D</text>
+  </svg>`;
+}
+
+/** 6. Meta Diária de Água Adaptativa por Biometria e Clima */
+function gerarMetaDiariaAguaAdaptativa(pesoKg = 70, nivelAtividade = "moderado", clima = "temperado") {
+  const peso = Math.max(40, Math.min(150, Number(pesoKg) || 70));
+  const baseMl = peso * 35; // 35 mL por kg (regra recomendada pela OMS)
+  let bonusAtividade = 0;
+  if (nivelAtividade === "intenso") bonusAtividade = 1000;
+  else if (nivelAtividade === "moderado") bonusAtividade = 500;
+
+  let bonusClima = 0;
+  if (clima === "quente") bonusClima = 400;
+  else if (clima === "frio") bonusClima = -200;
+
+  const metaFinal = Math.round((baseMl + bonusAtividade + bonusClima) / 50) * 50;
+  const totalCopos = Math.round(metaFinal / 300);
+
+  return {
+    pesoKg: peso,
+    nivelAtividade,
+    clima,
+    metaMl: metaFinal,
+    totalCopos,
+    coposSugeridos: [200, 300, 500, 750]
+  };
+}
+
 // Inicialização automática
 if (typeof window !== "undefined") {
   window.PLANOS_PRO = PLANOS_PRO;
@@ -506,6 +706,12 @@ if (typeof window !== "undefined") {
   window.modalPrumoProHTML = modalPrumoProHTML;
   window.abrirModalPrumoPro = abrirModalPrumoPro;
   window.inicializarPrumoPro = inicializarPrumoPro;
+  window.calcularEconomiaAnualUsuario = calcularEconomiaAnualUsuario;
+  window.calcularCurvaEnergiaCircadiana = calcularCurvaEnergiaCircadiana;
+  window.calcularProximaRevisaoSM2Avancada = calcularProximaRevisaoSM2Avancada;
+  window.gerarMatrizEisenhowerTarefas = gerarMatrizEisenhowerTarefas;
+  window.gerarCertificadoDisciplinaPro = gerarCertificadoDisciplinaPro;
+  window.gerarMetaDiariaAguaAdaptativa = gerarMetaDiariaAguaAdaptativa;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", inicializarPrumoPro);
@@ -532,6 +738,12 @@ if (typeof module !== "undefined" && module.exports) {
     importarBackupCriptografado,
     modalPrumoProHTML,
     abrirModalPrumoPro,
-    inicializarPrumoPro
+    inicializarPrumoPro,
+    calcularEconomiaAnualUsuario,
+    calcularCurvaEnergiaCircadiana,
+    calcularProximaRevisaoSM2Avancada,
+    gerarMatrizEisenhowerTarefas,
+    gerarCertificadoDisciplinaPro,
+    gerarMetaDiariaAguaAdaptativa
   };
 }
