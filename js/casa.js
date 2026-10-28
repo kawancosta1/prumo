@@ -336,11 +336,21 @@ const COMODOS = [
     desc: "Teto inclinado, janela redonda, baú e um puff fofo.",
     opcoes: {
       puff: {
-        nome: "Puff",
+        nome: "Tapete",
         valores: [
           ["roxo", "#6A4A8C"],
           ["laranja", "#E07A3A"],
           ["cinza", "#7A7A84"]
+        ]
+      },
+      pose: {
+        nome: "Ação do Mago",
+        valores: [
+          ["idle", "Sentado", "Sentado"],
+          ["lendo", "Lendo", "Lendo"],
+          ["bebendo", "Poção", "Poção"],
+          ["dormindo", "Cochilo", "Cochilo"],
+          ["festa", "Festa", "Festa"]
         ]
       }
     },
@@ -348,6 +358,16 @@ const COMODOS = [
       const { W, H, chaoY, op, escolha, id } = c;
       const floorY = Math.round(H * 0.70);
       const corPuff = (escolha && escolha.puff) || "roxo";
+      const poseEscolhida = (escolha && escolha.pose) || "idle";
+      const mapaSpritesMago = {
+        idle: "imagens/cenarios/feiticeiro/mago.png",
+        lendo: "imagens/cenarios/feiticeiro/mago-lendo.png",
+        bebendo: "imagens/cenarios/feiticeiro/mago-bebendo.png",
+        dormindo: "imagens/cenarios/feiticeiro/mago-dormindo.png",
+        festa: "imagens/cenarios/feiticeiro/mago-festa.png"
+      };
+      const spriteMago = mapaSpritesMago[poseEscolhida] || mapaSpritesMago.idle;
+      const mostrarBlink = poseEscolhida === "idle";
       const filtroTapete =
         corPuff === "laranja"
           ? "hue-rotate(120deg) saturate(1.35) brightness(1.08)"
@@ -423,18 +443,22 @@ const COMODOS = [
         </g>
 
         <!-- CAMADA 6: Personagem Feiticeiro 1930s Sentado no Tapete com Rig de Animação Rubber-Hose -->
-        <g class="prumi-leitor mago-1930s-container" data-act="prumi-leitor" style="cursor:pointer">
+        <g class="prumi-leitor mago-1930s-container" data-act="mago-ciclo-pose" style="cursor:pointer">
           <!-- Sombra de contato do personagem sobre o tapete -->
           <ellipse cx="96" cy="${floorY + 34}" rx="31" ry="7.5" fill="#0E0816" opacity="0.58"/>
           <g class="mago-1930s-rig" style="transform-origin: 96px ${floorY + 32}px">
-            <image href="imagens/cenarios/feiticeiro/mago.png" x="52" y="${floorY - 56}" width="88" height="96"/>
-            <!-- Pálpebras animadas para o piscar de olhos clássico anos 1930 -->
+            <image href="${spriteMago}" x="52" y="${floorY - 56}" width="88" height="96"/>
+            ${
+              mostrarBlink
+                ? `<!-- Pálpebras animadas para o piscar de olhos clássico anos 1930 -->
             <g class="mago-1930s-blink" pointer-events="none">
               <ellipse cx="90.5" cy="${floorY - 16.5}" rx="3.2" ry="4.5" fill="#F5D0A9"/>
               <ellipse cx="97.2" cy="${floorY - 15.8}" rx="3.2" ry="4.5" fill="#F5D0A9"/>
               <path d="M87.5 ${floorY - 16} Q90.5 ${floorY - 14} 93.5 ${floorY - 16}" stroke="#14100E" stroke-width="1.2" fill="none"/>
               <path d="M94.2 ${floorY - 15.3} Q97.2 ${floorY - 13.3} 100.2 ${floorY - 15.3}" stroke="#14100E" stroke-width="1.2" fill="none"/>
-            </g>
+            </g>`
+                : ""
+            }
           </g>
         </g>
 
@@ -682,6 +706,24 @@ ACOES_EXTRAS["casa-op"] = b => {
   )
     return;
   casa.opcoes[c.id] = { ...(casa.opcoes[c.id] || {}), [b.dataset.k]: b.dataset.v };
+  commit();
+};
+
+ACOES_EXTRAS["mago-ciclo-pose"] = () => {
+  const casa = minhaCasa();
+  const ordem = ["idle", "lendo", "bebendo", "festa", "dormindo"];
+  const falas = {
+    idle: ["Pronto para mais um capítulo mágico!", "happy"],
+    lendo: ["Estudando os segredos antigos do grimório...", "focus"],
+    bebendo: ["Poção de hidratação pura! Glup, glup!", "drink"],
+    festa: ["Pelas estrelas! Batemos mais uma meta!", "party"],
+    dormindo: ["Zzz... sonhando com bibliotecas infinitas...", "sleepy"]
+  };
+  const atual = (casa.opcoes && casa.opcoes.sotao && casa.opcoes.sotao.pose) || "idle";
+  const prox = ordem[(ordem.indexOf(atual) + 1) % ordem.length];
+  casa.opcoes.sotao = { ...(casa.opcoes.sotao || {}), pose: prox };
+  const [msg, humor] = falas[prox] || falas.idle;
+  if (typeof react === "function") react(humor, msg, 2800);
   commit();
 };
 
