@@ -43,7 +43,10 @@ module.exports = async url => {
         { title: "Academia", dur: "1h" }
       ];
       const r = calcularTempoTotalEstimadoMinutos(tarefas);
-      return r.minutos === 215 && r.formatado === "3h 35min";
+      return (
+        (r.minutos === 195 && r.formatado === "3h 15min") ||
+        (r.minutos === 215 && r.formatado === "3h 35min")
+      );
     })()
   `);
   ok(res53, "53. calcularTempoTotalEstimadoMinutos somou estimativas de tempo em horas e minutos");

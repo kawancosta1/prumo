@@ -1,4 +1,4 @@
-﻿/*
+/*
   Passeio dos pets pelas páginas (dados e desenho em js/pets.js).
   Cada pet é um "agente" numa camada fixa por cima do app:
   - anda pela beirada de baixo da tela, senta, deita, sobe em cima dos cards e segue onde você toca;
@@ -132,25 +132,31 @@ function cardParaSubir() {
 function podeSubirEmCards(pet) {
   if (!pet || !pet.especie) return false;
   // Animais pesados e terrestres (vaca, boi, cachorro, etc.) NUNCA sobem no meio da tela
-  return ['papagaio', 'coruja', 'gato', 'coala'].includes(pet.especie);
+  return ["papagaio", "coruja", "gato", "coala"].includes(pet.especie);
 }
 
 function atravessarAtrasDaPagina(a, dir = 1) {
   const W = larguraTela();
   const alvoX = dir > 0 ? W + 45 : -PET_TAM - 45;
-  andarAte(a, alvoX, chaoPasseio(), () => {
-    a.el.classList.add("atras-da-tela");
-    a.x = dir > 0 ? -PET_TAM - 35 : W + 35;
-    posicionar(a, false);
-    setTimeout(() => {
-      a.el.classList.remove("atras-da-tela");
-      const destinoEntrada = dir > 0 ? 30 + Math.random() * 80 : W - PET_TAM - (30 + Math.random() * 80);
-      andarAte(a, destinoEntrada, chaoPasseio(), () => reagir(a, "parado", 1800), { vel: 1.2 });
-    }, 900);
-  }, { vel: 1.3 });
+  andarAte(
+    a,
+    alvoX,
+    chaoPasseio(),
+    () => {
+      a.el.classList.add("atras-da-tela");
+      a.x = dir > 0 ? -PET_TAM - 35 : W + 35;
+      posicionar(a, false);
+      setTimeout(() => {
+        a.el.classList.remove("atras-da-tela");
+        const destinoEntrada = dir > 0 ? 30 + Math.random() * 80 : W - PET_TAM - (30 + Math.random() * 80);
+        andarAte(a, destinoEntrada, chaoPasseio(), () => reagir(a, "parado", 1800), { vel: 1.2 });
+      }, 900);
+    },
+    { vel: 1.3 }
+  );
 }
 
-function subirNoCard(a) { return false; }
+function subirNoCard(a) {
   if (!podeSubirEmCards(a.pet)) return false;
   const card = cardParaSubir();
   if (!card) return false;

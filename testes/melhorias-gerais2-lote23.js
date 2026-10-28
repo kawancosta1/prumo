@@ -99,7 +99,11 @@ module.exports = async url => {
   const res229 = ev(`
     (() => {
       const m = calcularNivelMaestriaPersonalidade(250);
-      return m.nivel === 3 && m.titulo === "Sbio" && m.progressoProximo === 50;
+      return (
+        m.nivel === 3 &&
+        (m.titulo === "Sábio" || m.titulo === "Sbio") &&
+        m.progressoProximo === 50
+      );
     })()
   `);
   ok(res229, "229. calcularNivelMaestriaPersonalidade computou progresso de personalidade");

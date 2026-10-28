@@ -20,12 +20,23 @@
 }
 
 /* Alvos de toque minimos acessiveis de 44x44px para dedos e mobilidade (WCAG 2.5.8) */
-.btn, .check, .icon, button, .chip-bt, .tab-btn {
+.btn,
+.check,
+.icon,
+button:not(.touch-minimo),
+.chip-bt,
+.tab-btn {
   min-height: 44px;
   min-width: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.touch-minimo,
+button.touch-minimo {
+  min-width: 48px !important;
+  min-height: 48px !important;
 }
 
 /* Modo Alto Contraste (WCAG 1.4.6 Contrast Enhanced 7:1) */
@@ -46,7 +57,9 @@ body.dark.alto-contraste {
 
 /* Respeito estrito a sensibilidade vestibular (prefers-reduced-motion) */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
@@ -66,7 +79,9 @@ body.modo-deep-work-ativo .bloco-secundario {
   opacity: 0.08 !important;
   pointer-events: none !important;
   filter: blur(4px) !important;
-  transition: opacity 0.4s ease, filter 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    filter 0.4s ease;
 }
 
 .painel-deep-work-foco {
@@ -108,11 +123,13 @@ body.modo-deep-work-ativo .bloco-secundario {
 
 .caixa-leitner-item {
   background: var(--card, #fff);
-  border: 1px solid var(--border, rgba(0,0,0,0.1));
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.1));
   border-radius: 16px;
   padding: 14px 10px;
   text-align: center;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s ease;
   position: relative;
 }
 
@@ -144,7 +161,7 @@ body.modo-deep-work-ativo .bloco-secundario {
 /* Cartao de Active Recall (Pergunta / Resposta com Cortina Oculta) */
 .card-active-recall {
   background: var(--card, #fff);
-  border: 1px solid var(--border, rgba(0,0,0,0.1));
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.1));
   border-radius: 18px;
   padding: 20px;
   margin-bottom: 14px;
@@ -169,7 +186,9 @@ body.modo-deep-work-ativo .bloco-secundario {
   color: var(--text, #222);
   cursor: pointer;
   user-select: none;
-  transition: filter 0.3s ease, background 0.3s ease;
+  transition:
+    filter 0.3s ease,
+    background 0.3s ease;
 }
 
 .card-ar-resposta.oculta {
@@ -200,8 +219,14 @@ body.modo-deep-work-ativo .bloco-secundario {
 }
 
 @keyframes slide-in-pausa {
-  from { transform: translateX(50px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 /* Regiao ARIA Live invisivel para leitores de tela */

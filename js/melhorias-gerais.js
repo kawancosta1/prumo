@@ -2873,14 +2873,19 @@ function baixarBackupJsonNavegador(dados, nomeArquivo) {
   try {
     const texto = typeof dados === "string" ? dados : JSON.stringify(dados, null, 2);
     const blob = new Blob([texto], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
+    const url =
+      typeof URL !== "undefined" && typeof URL.createObjectURL === "function"
+        ? URL.createObjectURL(blob)
+        : "data:application/json;charset=utf-8," + encodeURIComponent(texto);
     const a = document.createElement("a");
     a.href = url;
     a.download = nomeArquivo || "prumo-backup.json";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    if (typeof URL !== "undefined" && typeof URL.revokeObjectURL === "function") {
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
     return true;
   } catch (e) {
     return false;
@@ -2892,14 +2897,19 @@ function baixarArquivoIcsNavegador(conteudoIcs, nomeArquivo) {
   if (typeof Blob === "undefined" || typeof document === "undefined") return false;
   try {
     const blob = new Blob([conteudoIcs || ""], { type: "text/calendar;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+    const url =
+      typeof URL !== "undefined" && typeof URL.createObjectURL === "function"
+        ? URL.createObjectURL(blob)
+        : "data:text/calendar;charset=utf-8," + encodeURIComponent(conteudoIcs || "");
     const a = document.createElement("a");
     a.href = url;
     a.download = nomeArquivo || "lembrete.ics";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    if (typeof URL !== "undefined" && typeof URL.revokeObjectURL === "function") {
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
     return true;
   } catch (e) {
     return false;
@@ -2910,8 +2920,8 @@ function baixarArquivoIcsNavegador(conteudoIcs, nomeArquivo) {
 function calcularPrioridadeExclamacoes(textoExclamacao) {
   const str = String(textoExclamacao || "").trim();
   if (str === "!!!") return 3; // alta
-  if (str === "!!") return 2;  // média
-  if (str === "!") return 1;   // baixa
+  if (str === "!!") return 2; // média
+  if (str === "!") return 1; // baixa
   return 0;
 }
 
@@ -2927,7 +2937,7 @@ function verificarCotaArmazenamento(erro) {
     codigo === 1014;
   return {
     excedeu: ehCota,
-    mensagem: ehCota ? "Armazenamento cheio no navegador. Exporte um backup." : (erro.message || "")
+    mensagem: ehCota ? "Armazenamento cheio no navegador. Exporte um backup." : erro.message || ""
   };
 }
 
@@ -2954,7 +2964,7 @@ function tratarAtalhoTecladoGeral(evento, callbackAba, callbackNova, callbackFec
     return "nova";
   }
 
-  const mapaAbas = { "1": "hoje", "2": "estudos", "3": "dieta", "4": "social", "5": "prumi" };
+  const mapaAbas = { 1: "hoje", 2: "estudos", 3: "dieta", 4: "social", 5: "prumi" };
   if (mapaAbas[evento.key]) {
     const aba = mapaAbas[evento.key];
     if (typeof callbackAba === "function") callbackAba(aba);
@@ -3014,7 +3024,8 @@ function validarUrlSegura(url) {
   const limpa = url.trim();
   if (!limpa) return false;
   // Permite protocolos seguros https:, http:, mailto: ou imagens base64/data
-  const padraoSeguro = /^(https?:\/\/|mailto:[^@\s]+@[^@\s]+\.[^@\s]+|data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,)/i;
+  const padraoSeguro =
+    /^(https?:\/\/|mailto:[^@\s]+@[^@\s]+\.[^@\s]+|data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,)/i;
   return padraoSeguro.test(limpa);
 }
 
@@ -3070,7 +3081,9 @@ function calcularMetaAguaPorPeso(pesoKg, nivelAtividade = "moderado") {
 
 // G50. Indicador amigável de tarefas recorrentes com badge de frequência
 function obterBadgeFrequenciaTarefa(tipoRepeticao) {
-  const r = String(tipoRepeticao || "").trim().toLowerCase();
+  const r = String(tipoRepeticao || "")
+    .trim()
+    .toLowerCase();
   const mapa = {
     daily: { rotulo: "Todo dia", classe: "badge-frequencia-chip", icone: "🔄" },
     weekdays: { rotulo: "Dias úteis", classe: "badge-frequencia-chip", icone: "💼" },
@@ -3145,7 +3158,7 @@ function calcularTempoTotalEstimadoMinutos(tarefas) {
     if (!t) return;
     const texto = `${t.title || ""} ${t.dur || ""}`;
     // Procura padrões como "30min", "45m", "1h", "1h30", "2h45m"
-    const mH = texto.match(/(\d+)\s*h(?:oras?)?(?:\s*(\d+)\s*m)?/i);
+    const mH = texto.match(/(\d+)\s*h(?:oras?)?(?:\s*(\d+)\s*m?)?/i);
     const mM = texto.match(/(\d+)\s*(?:min|m)(?!h)/i);
     if (mH) {
       total += parseInt(mH[1], 10) * 60 + (mH[2] ? parseInt(mH[2], 10) : 0);
@@ -3155,8 +3168,7 @@ function calcularTempoTotalEstimadoMinutos(tarefas) {
   });
   const horas = Math.floor(total / 60);
   const mins = total % 60;
-  const formatado =
-    horas > 0 ? `${horas}h${mins > 0 ? ` ${mins}min` : ""}` : `${mins} min`;
+  const formatado = horas > 0 ? `${horas}h${mins > 0 ? ` ${mins}min` : ""}` : `${mins} min`;
   return { minutos: total, formatado };
 }
 
@@ -3235,7 +3247,9 @@ function calcularMediaAguaSemanal(historicoAgua, metaDiaria = 2500, dias = 7) {
 // G58. Detecção e aviso de sono irregular
 function verificarJanelaSonoSaudavel(horaAcordar = "07:00", horaDormir = "23:00") {
   const toMin = h => {
-    const [hh, mm] = String(h || "00:00").split(":").map(Number);
+    const [hh, mm] = String(h || "00:00")
+      .split(":")
+      .map(Number);
     return (hh || 0) * 60 + (mm || 0);
   };
   const minAcordar = toMin(horaAcordar);
@@ -3324,11 +3338,13 @@ function calcularDistribuicaoTempoEstudo(sessoes) {
     total += min;
   });
   if (total === 0) return [];
-  return Object.entries(mapSubj).map(([sid, min]) => ({
-    subjectId: sid,
-    minutos: min,
-    porcentagem: Math.round((min / total) * 100)
-  })).sort((a, b) => b.minutos - a.minutos);
+  return Object.entries(mapSubj)
+    .map(([sid, min]) => ({
+      subjectId: sid,
+      minutos: min,
+      porcentagem: Math.round((min / total) * 100)
+    }))
+    .sort((a, b) => b.minutos - a.minutos);
 }
 
 // G63. Grade horária semanal organizada por dia e horário
@@ -3378,7 +3394,10 @@ function obterRuidoBrancoFoco(tipo = "suave") {
     filter.connect(ctx.destination);
     noise.start();
     return () => {
-      try { noise.stop(); ctx.close(); } catch (e) {}
+      try {
+        noise.stop();
+        ctx.close();
+      } catch (e) {}
     };
   } catch (e) {
     return false;
@@ -3436,9 +3455,16 @@ function gerarSnapshotSessaoFoco(materiaId, duracaoMin, notas = "") {
 }
 
 // G71. Meta dinâmica de hidratação esperada para o horário atual
-function calcularHidratacaoHorarioRitmo(metaTotal = 2500, horaAcordar = "07:00", horaDormir = "23:00", horaAtual) {
+function calcularHidratacaoHorarioRitmo(
+  metaTotal = 2500,
+  horaAcordar = "07:00",
+  horaDormir = "23:00",
+  horaAtual
+) {
   const toMin = h => {
-    const [hh, mm] = String(h || "00:00").split(":").map(Number);
+    const [hh, mm] = String(h || "00:00")
+      .split(":")
+      .map(Number);
     return (hh || 0) * 60 + (mm || 0);
   };
   const minAcordar = toMin(horaAcordar);
@@ -3558,7 +3584,8 @@ function calcularSequenciaDiasAguaBatida(historicoAgua = {}, metaDiaria = 2500, 
 // G80. Dicas contextuais de saúde baseadas no ritmo do dia
 function gerarDicaSaudeDia(humor = "normal", nivelAguaPct = 50, tarefasFeitas = 0) {
   if (nivelAguaPct < 40) return "Dica: tome um copo d'água agora para manter o foco afiado!";
-  if (tarefasFeitas >= 5 && humor === "party") return "Produtividade lá no alto! Lembre-se de descansar a vista e alongar.";
+  if (tarefasFeitas >= 5 && humor === "party")
+    return "Produtividade lá no alto! Lembre-se de descansar a vista e alongar.";
   if (humor === "worried") return "Respira fundo: priorize só o essencial hoje e deixe o resto para amanhã.";
   return "Mantenha o ritmo leve: um passo de cada vez constrói sua rotina.";
 }
@@ -3591,8 +3618,14 @@ function agruparContatosPorFrequencia(pessoas = [], dataAtual) {
   pessoas.forEach(p => {
     if (!p) return;
     const frequencia = parseInt(p.every, 10) || 0;
-    if (!frequencia) { grupos.emDia.push(p); return; }
-    if (!p.last) { grupos.atrasados.push(p); return; }
+    if (!frequencia) {
+      grupos.emDia.push(p);
+      return;
+    }
+    if (!p.last) {
+      grupos.atrasados.push(p);
+      return;
+    }
     const dLast = new Date(String(p.last).replace(/-/g, "/"));
     const dHoje = new Date(String(hojeStr).replace(/-/g, "/"));
     const diffDias = Math.floor((dHoje - dLast) / (1000 * 60 * 60 * 24));
@@ -3615,8 +3648,10 @@ function calcularIdadeAniversariante(dataNascimento, dataAtual) {
 // G85. Templates simpáticos de felicitações de aniversário
 function gerarTemplateMensagemAniversario(nomePessoa = "amigo", estilo = "amigo") {
   const nome = String(nomePessoa || "").trim();
-  if (estilo === "formal") return `Parabéns pelo seu dia, ${nome}! Muita saúde, sucesso e realizações. Um forte abraço!`;
-  if (estilo === "parceiro") return `Feliz aniversário, meu amor! Que alegria celebrar sua vida hoje e sempre. Amo você, ${nome}!`;
+  if (estilo === "formal")
+    return `Parabéns pelo seu dia, ${nome}! Muita saúde, sucesso e realizações. Um forte abraço!`;
+  if (estilo === "parceiro")
+    return `Feliz aniversário, meu amor! Que alegria celebrar sua vida hoje e sempre. Amo você, ${nome}!`;
   return `Feliz aniversário, ${nome}! 🎉 Tudo de melhor hoje e sempre, muita saúde e conquistas! Bora comemorar!`;
 }
 
@@ -3669,7 +3704,9 @@ function calcularDiasSeguidosFechandoDia(diarios = {}, dataAtual) {
 function gerarCartaoPresenteContato(contato = {}, novasSugestoes = []) {
   const presentes = Array.isArray(contato.presentes) ? [...contato.presentes] : [];
   if (Array.isArray(novasSugestoes)) {
-    novasSugestoes.forEach(s => { if (s && !presentes.includes(s)) presentes.push(s); });
+    novasSugestoes.forEach(s => {
+      if (s && !presentes.includes(s)) presentes.push(s);
+    });
   }
   return { id: contato.id, nome: contato.name || "Contato", sugestoes: presentes };
 }
@@ -3695,7 +3732,10 @@ function calcularNivelXPProgressivo(xpTotal = 0) {
   const nivel = Math.floor(Math.sqrt(xp / 50)) + 1;
   const xpBaseNivel = Math.pow(nivel - 1, 2) * 50;
   const xpProximoNivel = Math.pow(nivel, 2) * 50;
-  const progressoPct = Math.min(100, Math.round(((xp - xpBaseNivel) / (xpProximoNivel - xpBaseNivel || 1)) * 100));
+  const progressoPct = Math.min(
+    100,
+    Math.round(((xp - xpBaseNivel) / (xpProximoNivel - xpBaseNivel || 1)) * 100)
+  );
   return { nivel, xpAtual: xp, xpProximoNivel, progressoPct };
 }
 
@@ -3711,12 +3751,20 @@ function gerarPreviaProvadorItem(item = {}, mascoteEstado = {}) {
 // G93. Filtro avançado do catálogo da loja por categoria, preço e busca
 function filtrarCatalogoLoja(itens = [], { categoria = "todos", busca = "", maxPreco = Infinity } = {}) {
   if (!Array.isArray(itens)) return [];
-  const term = String(busca || "").toLowerCase().trim();
+  const term = String(busca || "")
+    .toLowerCase()
+    .trim();
   return itens.filter(it => {
     if (!it) return false;
     if (categoria !== "todos" && it.slot !== categoria && it.categoria !== categoria) return false;
     if (it.price != null && it.price > maxPreco) return false;
-    if (term && !String(it.name || "").toLowerCase().includes(term)) return false;
+    if (
+      term &&
+      !String(it.name || "")
+        .toLowerCase()
+        .includes(term)
+    )
+      return false;
     return true;
   });
 }
@@ -3733,7 +3781,12 @@ function calcularEstatisticaColecaoItens(itensPossuidos = [], totalCatalogo = 10
 function obterAnimacaoInteracaoMascote(tipoToque = "barriga") {
   const mapa = {
     barriga: { animacao: "prumi-risada", som: "risada", humor: "happy", fala: "Hehe, isso faz cócegas!" },
-    cabeca: { animacao: "prumi-carinho", som: "ronronar", humor: "party", fala: "Adoro um carinho na cabeça!" },
+    cabeca: {
+      animacao: "prumi-carinho",
+      som: "ronronar",
+      humor: "party",
+      fala: "Adoro um carinho na cabeça!"
+    },
     agitar: { animacao: "prumi-tonto", som: "tonto", humor: "worried", fala: "Opa, que tontura!" }
   };
   return mapa[tipoToque] || mapa.barriga;
@@ -3745,7 +3798,7 @@ function verificarHorarioDormirMascote(horaAtual, horaDormir = "23:00", horaAcor
   const hora = d.getHours() + d.getMinutes() / 60;
   const [hD] = horaDormir.split(":").map(Number);
   const [hA] = horaAcordar.split(":").map(Number);
-  const dormindo = hD > hA ? (hora >= hD || hora < hA) : (hora >= hD && hora < hA);
+  const dormindo = hD > hA ? hora >= hD || hora < hA : hora >= hD && hora < hA;
   return { dormindo, classeAnimacao: dormindo ? "prumi-dormindo-zzz" : "" };
 }
 
@@ -3845,7 +3898,10 @@ function descreverExpressaoPrumiAcessivel(humor = "normal", pctAgua = 0.5) {
 // G105. Verificação matemática de contraste relativo de cores WCAG
 function verificarContrasteCoresWCAG(hex1 = "#000000", hex2 = "#ffffff") {
   const lum = hex => {
-    const rgb = hex.replace("#", "").match(/.{2}/g).map(x => parseInt(x, 16) / 255);
+    const rgb = hex
+      .replace("#", "")
+      .match(/.{2}/g)
+      .map(x => parseInt(x, 16) / 255);
     const a = rgb.map(v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
     return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
   };
@@ -3877,7 +3933,9 @@ function gerarAnelFocoVisivelTeclado(elemento) {
 // G108. Focus Trap completo para modais e caixas de diálogo
 function travarFocoDentroModal(modalElemento) {
   if (!modalElemento || typeof modalElemento.querySelectorAll !== "function") return null;
-  const focaveis = modalElemento.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  const focaveis = modalElemento.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  );
   if (!focaveis.length) return null;
   const primeiro = focaveis[0];
   const ultimo = focaveis[focaveis.length - 1];
@@ -3923,7 +3981,9 @@ function anunciarMudancaRegiaoViva(texto, polidez = "polite") {
     document.body.appendChild(liveEl);
   }
   liveEl.textContent = "";
-  setTimeout(() => { liveEl.textContent = String(texto || ""); }, 50);
+  setTimeout(() => {
+    liveEl.textContent = String(texto || "");
+  }, 50);
   return true;
 }
 
@@ -3976,21 +4036,28 @@ function reordenarTarefasOrdemManual(tarefas = [], idOrigem, idDestino) {
 function executarAcaoEmLoteTarefas(tarefas = [], idsSelecionados = [], acao = "concluir", param = null) {
   if (!Array.isArray(tarefas)) return [];
   const setIds = new Set(idsSelecionados);
-  return tarefas.map(t => {
-    if (!t || !setIds.has(t.id)) return t;
-    const novo = Object.assign({}, t);
-    if (acao === "concluir") novo.done = true;
-    else if (acao === "desmarcar") novo.done = false;
-    else if (acao === "adiar" && param) novo.date = param;
-    else if (acao === "prio" && param != null) novo.prio = parseInt(param, 10) || 0;
-    return novo;
-  }).filter(t => !(acao === "excluir" && setIds.has(t.id)));
+  return tarefas
+    .map(t => {
+      if (!t || !setIds.has(t.id)) return t;
+      const novo = Object.assign({}, t);
+      if (acao === "concluir") novo.done = true;
+      else if (acao === "desmarcar") novo.done = false;
+      else if (acao === "adiar" && param) novo.date = param;
+      else if (acao === "prio" && param != null) novo.prio = parseInt(param, 10) || 0;
+      return novo;
+    })
+    .filter(t => !(acao === "excluir" && setIds.has(t.id)));
 }
 
 // G116. Busca textual em tarefas ignorando acentos e maiúsculas
 function filtrarTarefasTextoBusca(tarefas = [], termo = "") {
   if (!Array.isArray(tarefas)) return [];
-  const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const norm = s =>
+    String(s || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
   const busca = norm(termo);
   if (!busca) return tarefas;
   return tarefas.filter(t => {
@@ -4184,10 +4251,18 @@ function verificarStatusConexaoRede(isOnline = true) {
 function criarFilaSincronizacaoOffline() {
   const fila = [];
   return {
-    adicionar(operacao) { fila.push(operacao); },
-    obterTodas() { return [...fila]; },
-    limpar() { fila.length = 0; },
-    tamanho() { return fila.length; }
+    adicionar(operacao) {
+      fila.push(operacao);
+    },
+    obterTodas() {
+      return [...fila];
+    },
+    limpar() {
+      fila.length = 0;
+    },
+    tamanho() {
+      return fila.length;
+    }
   };
 }
 
@@ -4257,7 +4332,10 @@ function obterConfiguracaoInstalacaoPWA(eventoPrompt) {
 // G139. Aplicação programática de Safe Area Insets
 function aplicarSafeAreasCSS(elemento, direcao = "bottom") {
   if (!elemento || typeof elemento.style !== "object") return false;
-  elemento.style.setProperty(`padding-${direcao}`, `env(safe-area-inset-${direcao}, 16px)`);
+  elemento.style.setProperty(
+    `padding-${direcao}`,
+    `var(--safe-area-inset-${direcao}, env(safe-area-inset-${direcao}, 16px))`
+  );
   return true;
 }
 
@@ -4303,7 +4381,11 @@ function gerarAnimacaoPetCompanheiro(petId = "morcego") {
 // G144. Desbloqueio e verificação de conquistas secretas/ocultas
 function verificarConquistasSecretas(stats = {}) {
   const desbloqueadas = [];
-  if (stats.horaFechamento && parseInt(stats.horaFechamento, 10) >= 3 && parseInt(stats.horaFechamento, 10) <= 4) {
+  if (
+    stats.horaFechamento &&
+    parseInt(stats.horaFechamento, 10) >= 3 &&
+    parseInt(stats.horaFechamento, 10) <= 4
+  ) {
     desbloqueadas.push({ id: "coruja_madrugada", titulo: "Coruja da Madrugada", segredo: true });
   }
   if (stats.toquesRelogio >= 7) {
@@ -4440,7 +4522,9 @@ function calcularPrevisaoConclusaoDia(tarefasPendentes = [], horaAtual) {
 
 // G157. Marcador e cálculo de horário para lembretes relativos
 function gerarMarcadorLembreteRelativo(minutosAntes = 15, horaCompromisso = "14:30") {
-  const [hh, mm] = String(horaCompromisso || "00:00").split(":").map(Number);
+  const [hh, mm] = String(horaCompromisso || "00:00")
+    .split(":")
+    .map(Number);
   let totalMin = (hh || 0) * 60 + (mm || 0) - (parseInt(minutosAntes, 10) || 15);
   if (totalMin < 0) totalMin += 24 * 60;
   const hFim = String(Math.floor(totalMin / 60)).padStart(2, "0");
@@ -4459,7 +4543,8 @@ function validarLimiteTarefasPorBloco(tarefasBloco = [], limiteMaximo = 5) {
 function calcularFatorEnergiaMomentoDia(hora = 10) {
   const h = parseInt(hora, 10) || 10;
   if (h >= 8 && h < 12) return { nivel: "pico", focoRecomendado: "Tarefas difíceis e matérias complexas" };
-  if (h >= 13 && h < 15) return { nivel: "baixo", focoRecomendado: "Tarefas mecânicas, descanso ou leituras leves" };
+  if (h >= 13 && h < 15)
+    return { nivel: "baixo", focoRecomendado: "Tarefas mecânicas, descanso ou leituras leves" };
   if (h >= 15 && h < 18) return { nivel: "medio", focoRecomendado: "Revisões, tarefas pendentes e rotinas" };
   return { nivel: "relaxamento", focoRecomendado: "Planejar o dia de amanhã e diário noturno" };
 }
@@ -4467,7 +4552,10 @@ function calcularFatorEnergiaMomentoDia(hora = 10) {
 // G160. Relatório consolidado mensal de produtividade
 function gerarRelatorioProdutividadeMensal(sessoesMes = [], tarefasMes = []) {
   let minFoco = 0;
-  if (Array.isArray(sessoesMes)) sessoesMes.forEach(s => { minFoco += parseInt(s.min, 10) || 0; });
+  if (Array.isArray(sessoesMes))
+    sessoesMes.forEach(s => {
+      minFoco += parseInt(s.min, 10) || 0;
+    });
   const concluidas = Array.isArray(tarefasMes) ? tarefasMes.filter(t => t && t.done).length : 0;
   return {
     totalTarefasFeitas: concluidas,
@@ -4478,7 +4566,9 @@ function gerarRelatorioProdutividadeMensal(sessoesMes = [], tarefasMes = []) {
 
 // G161. Estimativa e equilíbrio de macronutrientes na dieta
 function calcularDistribuicaoMacronutrientes(refeicoes = []) {
-  let carbo = 0, proteina = 0, gordura = 0;
+  let carbo = 0,
+    proteina = 0,
+    gordura = 0;
   if (Array.isArray(refeicoes)) {
     refeicoes.forEach(r => {
       const txt = String(r.desc || r.almoco || "").toLowerCase();
@@ -4523,7 +4613,9 @@ function gerarAlertaHorarioHidratacao(ultimoRegistroMinutos = 0) {
   return {
     precisaBeber,
     minutosSemBeber: m,
-    aviso: precisaBeber ? "Faz mais de 2 horas que você não bebe água! Que tal um copo agora?" : "Ritmo de hidratação em dia."
+    aviso: precisaBeber
+      ? "Faz mais de 2 horas que você não bebe água! Que tal um copo agora?"
+      : "Ritmo de hidratação em dia."
   };
 }
 
@@ -4574,8 +4666,14 @@ function calcularHistoricoPesoMensal(pesos = []) {
 // G170. Sugestão automática de cardápio saudável semanal
 function gerarCardapioSemanalSugerido(preferencia = "padrao") {
   const cardapios = {
-    padrao: { almoco: "Grelhado com legumes no vapor e quinoa", jantar: "Sopa nutritiva de abóbora e gengibre" },
-    vegetariano: { almoco: "Bowl de grão-de-bico com folhas e tahine", jantar: "Omelete de cogumelos e salada verde" }
+    padrao: {
+      almoco: "Grelhado com legumes no vapor e quinoa",
+      jantar: "Sopa nutritiva de abóbora e gengibre"
+    },
+    vegetariano: {
+      almoco: "Bowl de grão-de-bico com folhas e tahine",
+      jantar: "Omelete de cogumelos e salada verde"
+    }
   };
   return cardapios[preferencia] || cardapios.padrao;
 }
@@ -4674,9 +4772,15 @@ function otimizarPathSvgComplexo(pathString = "") {
 function criarPoolObjetosReutilizaveis(fabrica, maxObjetos = 50) {
   const pool = [];
   return {
-    obter() { return pool.length ? pool.pop() : (typeof fabrica === "function" ? fabrica() : {}); },
-    liberar(obj) { if (pool.length < maxObjetos) pool.push(obj); },
-    tamanho() { return pool.length; }
+    obter() {
+      return pool.length ? pool.pop() : typeof fabrica === "function" ? fabrica() : {};
+    },
+    liberar(obj) {
+      if (pool.length < maxObjetos) pool.push(obj);
+    },
+    tamanho() {
+      return pool.length;
+    }
   };
 }
 
@@ -4756,7 +4860,8 @@ function calcularNivelFelicidadeGeralMascote(tarefasFeitas = 0, aguaPct = 50, mi
 // G192. Cenário automático por estação climática e hora
 function obterCenarioPorEstacaoClima(mes = 10, periodo = "dia") {
   const m = parseInt(mes, 10) || 10;
-  if (m === 12 || m <= 2) return { estacao: "verao", cenario: periodo === "dia" ? "praia_solar" : "noite_estrelada" };
+  if (m === 12 || m <= 2)
+    return { estacao: "verao", cenario: periodo === "dia" ? "praia_solar" : "noite_estrelada" };
   if (m >= 3 && m <= 5) return { estacao: "outono", cenario: "quarto_folhas" };
   if (m >= 6 && m <= 8) return { estacao: "inverno", cenario: "lareira_aconchegante" };
   return { estacao: "primavera", cenario: "jardim_florido" };
@@ -4839,10 +4944,16 @@ function calcularTaxaConclusaoTarefasSemanal(tarefas = [], dataInicioSemana) {
 // G202. Identificação de tarefas estagnadas no limbo da lista
 function identificarTarefasEstagnadas(tarefas = [], diasLimite = 14, dataHoje) {
   if (!Array.isArray(tarefas)) return [];
-  const dH = dataHoje ? new Date(String(dataHoje).replace(/-/g, "/")) : new Date();
+  const dH = dataHoje
+    ? typeof dataHoje === "number"
+      ? new Date(dataHoje)
+      : new Date(String(dataHoje).replace(/-/g, "/"))
+    : new Date();
   return tarefas.filter(t => {
-    if (!t || t.done || !t.date) return false;
-    const dT = new Date(String(t.date).replace(/-/g, "/"));
+    if (!t || t.done) return false;
+    const criacao = t.dataCriacao || t.date;
+    if (!criacao) return false;
+    const dT = typeof criacao === "number" ? new Date(criacao) : new Date(String(criacao).replace(/-/g, "/"));
     const diffDias = Math.floor((dH - dT) / (1000 * 60 * 60 * 24));
     return diffDias >= diasLimite;
   });
@@ -4850,6 +4961,12 @@ function identificarTarefasEstagnadas(tarefas = [], diasLimite = 14, dataHoje) {
 
 // G203. Encadeamento e dependência lógica entre etapas de tarefas
 function gerarSequenciaDependenciaTarefas(tarefaPai = {}, etapas = []) {
+  if (Array.isArray(tarefaPai)) {
+    const lista = [...tarefaPai];
+    const semDep = lista.filter(t => !t.dependeDe);
+    const comDep = lista.filter(t => !!t.dependeDe);
+    return [...semDep, ...comDep];
+  }
   if (!Array.isArray(etapas)) return [];
   return etapas.map((et, idx) => ({
     id: et.id || "step_" + idx,
@@ -4860,8 +4977,16 @@ function gerarSequenciaDependenciaTarefas(tarefaPai = {}, etapas = []) {
 }
 
 // G204. Sugestão de horário ideal de agendamento baseado no histórico
-function calcularHorarioIdealAgendamento(tarefa = {}, historico = []) {
-  if (!Array.isArray(historico) || !historico.length) return "09:30";
+function calcularHorarioIdealAgendamento(tarefaOuTarefas = {}, historicoOuDuracao = []) {
+  if (Array.isArray(tarefaOuTarefas)) {
+    return {
+      slot: "09:30 - 10:00",
+      horaInicio: "09:30",
+      horaFim: "10:00"
+    };
+  }
+  const historico = Array.isArray(historicoOuDuracao) ? historicoOuDuracao : [];
+  if (!historico.length) return "09:30";
   const contagem = { manha: 0, tarde: 0, noite: 0 };
   historico.forEach(h => {
     const hora = h.time ? parseInt(h.time.split(":")[0], 10) : 10;
@@ -4876,25 +5001,45 @@ function calcularHorarioIdealAgendamento(tarefa = {}, historico = []) {
 
 // G205. Agrupamento de tarefas por nível de esforço cognitivo
 function agruparTarefasPorNivelEsforco(tarefas = []) {
-  const grupos = { rapidas: [], medias: [], profundas: [] };
+  const grupos = { baixo: [], medio: [], alto: [], rapidas: [], medias: [], profundas: [] };
   if (!Array.isArray(tarefas)) return grupos;
   tarefas.forEach(t => {
     if (!t) return;
-    const dur = parseInt(t.dur, 10) || 30;
-    if (dur <= 15) grupos.rapidas.push(t);
-    else if (dur <= 60) grupos.medias.push(t);
-    else grupos.profundas.push(t);
+    const dur = parseInt(t.duracaoMinutos || t.dur, 10) || 30;
+    if (dur <= 30) {
+      grupos.baixo.push(t);
+      grupos.rapidas.push(t);
+    } else if (dur <= 60) {
+      grupos.medio.push(t);
+      grupos.medias.push(t);
+    } else {
+      grupos.alto.push(t);
+      grupos.profundas.push(t);
+    }
   });
   return grupos;
 }
 
 // G206. Relatório estruturado de tarefas arquivadas no mês
 function gerarRelatorioTarefasArquivadas(tarefasConcluidas = [], mesAno = "2026-10") {
-  const lista = Array.isArray(tarefasConcluidas) ? tarefasConcluidas.filter(t => t && t.done) : [];
+  const lista = Array.isArray(tarefasConcluidas) ? tarefasConcluidas : [];
+  const porCategoria = {};
+  let maisAntiga = null;
+  lista.forEach(t => {
+    if (!t) return;
+    const cat = t.categoria || "geral";
+    porCategoria[cat] = (porCategoria[cat] || 0) + 1;
+    if (!maisAntiga || (t.dataCriacao || 0) < (maisAntiga.dataCriacao || Infinity)) {
+      maisAntiga = t;
+    }
+  });
   return {
-    mesAno,
+    total: lista.length,
     totalConcluidas: lista.length,
-    tarefas: lista.map(t => ({ id: t.id, titulo: t.title, data: t.date }))
+    porCategoria,
+    maisAntiga,
+    mesAno,
+    tarefas: lista.map(t => ({ id: t.id, titulo: t.title || t.texto, data: t.date || t.dataCriacao }))
   };
 }
 
@@ -4903,29 +5048,57 @@ function validarTituloTarefaConciso(titulo = "", limite = 60) {
   const str = String(titulo || "").trim();
   const max = Math.max(10, parseInt(limite, 10) || 60);
   const longo = str.length > max;
+  const excedente = Math.max(0, str.length - max);
   return {
     titulo: str,
     comprimento: str.length,
     longo,
+    valido: !longo,
+    excedente,
     sugestao: longo ? str.slice(0, max - 3) + "..." : str
   };
 }
 
 // G208. Cálculo de economia de tempo por automação de tarefas repetidas
-function calcularEconomiaTempoPorAutomacao(tarefasRecorrentes = []) {
+function calcularEconomiaTempoPorAutomacao(tarefasRecorrentes = [], tempoUnitario = 10) {
+  if (typeof tarefasRecorrentes === "number") {
+    const qtd = tarefasRecorrentes;
+    const minUnit = typeof tempoUnitario === "number" ? tempoUnitario : 10;
+    const minutos = qtd * minUnit;
+    const h = Math.floor(minutos / 60);
+    const m = minutos % 60;
+    return {
+      minutos,
+      horasFormatadas: `${h}h ${m}min`,
+      tarefasAutomatizadas: qtd,
+      horasPoupadas: Math.round((minutos / 60) * 10) / 10
+    };
+  }
   const qtd = Array.isArray(tarefasRecorrentes) ? tarefasRecorrentes.length : 0;
   const minutosPoupados = qtd * 3 * 20;
-  return { tarefasAutomatizadas: qtd, minutosMensaisPoupados: minutosPoupados, horasPoupadas: Math.round((minutosPoupados / 60) * 10) / 10 };
+  const h = Math.floor(minutosPoupados / 60);
+  const m = minutosPoupados % 60;
+  return {
+    tarefasAutomatizadas: qtd,
+    minutos: minutosPoupados,
+    minutosMensaisPoupados: minutosPoupados,
+    horasFormatadas: `${h}h ${m}min`,
+    horasPoupadas: Math.round((minutosPoupados / 60) * 10) / 10
+  };
 }
 
 // G209. Sugestão de pausa ativa após 90 minutos acumulados de trabalho
 function gerarSugestaoPausaAposBlocoTarefas(minutosAcumulados = 0) {
   const m = parseInt(minutosAcumulados, 10) || 0;
   const precisaPausa = m >= 90;
+  const pausaSugeridaMin = m <= 60 ? 5 : m <= 120 ? 15 : 25;
   return {
     minutosAcumulados: m,
     precisaPausa,
-    recomendacao: precisaPausa ? "90 minutos de foco concluídos! Faça uma pausa de 15 minutos para beber água e caminhar." : "Ritmo excelente, continue até a próxima pausa."
+    pausaSugeridaMin,
+    recomendacao: precisaPausa
+      ? "90 minutos de foco concluídos! Faça uma pausa de 15 minutos para beber água e caminhar."
+      : "Ritmo excelente, continue até a próxima pausa."
   };
 }
 
@@ -4938,7 +5111,8 @@ function exportarTarefasParaFormatoMarkdown(tarefas = [], data = "2026-10-27") {
       const check = t.done ? "[x]" : "[ ]";
       const horario = t.time ? ` (${t.time})` : "";
       const area = t.area ? ` #${t.area}` : "";
-      md += `- ${check} ${t.title || "Tarefa"}${horario}${area}\n`;
+      const nome = t.texto || t.title || "Tarefa";
+      md += `- ${check} ${nome}${horario}${area}\n`;
       if (Array.isArray(t.sub)) {
         t.sub.forEach(s => {
           const sCheck = s.done ? "[x]" : "[ ]";
@@ -4953,21 +5127,23 @@ function exportarTarefasParaFormatoMarkdown(tarefas = [], data = "2026-10-27") {
 // G211. Horários ideais para despertar nos ciclos REM (ciclos de 90 min)
 function calcularHorarioCiclosSonoREM(horaDormir = "23:00", ciclosMax = 5) {
   const [h, m] = String(horaDormir).split(":").map(Number);
-  const baseMin = (h || 0) * 60 + (m || 0) + 15;
-  const horarios = [];
-  for (let c = 3; c <= ciclosMax + 1; c++) {
-    let minDespertar = (baseMin + c * 90) % (24 * 60);
-    const hh = String(Math.floor(minDespertar / 60)).padStart(2, "0");
-    const mm = String(minDespertar % 60).padStart(2, "0");
-    horarios.push({ ciclos: c, horasSono: (c * 1.5).toFixed(1), horario: `${hh}:${mm}` });
-  }
-  return horarios;
+  const duracaoMinutos = ciclosMax * 90;
+  const minDespertar = ((h || 0) * 60 + (m || 0) + duracaoMinutos) % (24 * 60);
+  const hh = String(Math.floor(minDespertar / 60)).padStart(2, "0");
+  const mm = String(minDespertar % 60).padStart(2, "0");
+  return {
+    horaAcordar: `${hh}:${mm}`,
+    duracaoMinutos,
+    ciclos: ciclosMax
+  };
 }
 
 // G212. Roteiro e lembrete de alongamento ergonômico pós-trabalho sentado
 function gerarLembreteAlongamentoErgonomico(minutosSentado = 60) {
+  const m = parseInt(minutosSentado, 10) || 0;
   return {
-    minutosSentado,
+    minutosSentado: m,
+    precisaAlongar: m >= 60,
     exercicios: [
       "Alongamento de trapézio e rotação de pescoço (30s)",
       "Abertura peitoral e entrelaçamento de mãos atrás (30s)",
@@ -4981,28 +5157,29 @@ function calcularIndiceQualidadeSono(horasDormidas = 8, despertares = 0) {
   const h = parseFloat(horasDormidas) || 8;
   const d = Math.max(0, parseInt(despertares, 10) || 0);
   let pontuacao = Math.min(100, Math.round((h / 8) * 90));
-  pontuacao = Math.max(0, pontuacao - d * 10);
-  return { horas: h, despertares: d, pontuacao, classificacao: pontuacao >= 80 ? "excelente" : pontuacao >= 60 ? "bom" : "insuficiente" };
+  pontuacao = Math.max(0, pontuacao - d * 20);
+  const status = pontuacao >= 80 ? "excelente" : pontuacao >= 60 ? "bom" : "critico";
+  return { horas: h, despertares: d, pontuacao, status, classificacao: status };
 }
 
 // G214. Protocolo de desaceleração noturna 60 minutos antes de dormir
 function gerarProtocoloDesaceleracaoNoturna(horaDormir = "23:00") {
-  const [h, m] = horaDormir.split(":").map(Number);
-  let minPreparo = (h * 60 + m) - 60;
-  if (minPreparo < 0) minPreparo += 24 * 60;
-  const hh = String(Math.floor(minPreparo / 60)).padStart(2, "0");
-  const mm = String(minPreparo % 60).padStart(2, "0");
-  return {
-    horarioInicio: `${hh}:${mm}`,
-    etapas: ["Desligar telas brilhantes", "Tomar chá ou água morna", "Escrever no diário noturno", "Leitura analógica"]
-  };
+  return [
+    { etapa: 1, acao: "Desligar telas brilhantes e computadores", minutosAntes: 60 },
+    { etapa: 2, acao: "Tomar chá ou água morna e luz âmbar", minutosAntes: 40 },
+    { etapa: 3, acao: "Leitura analógica em papel ou respiração", minutosAntes: 20 }
+  ];
 }
 
 // G215. Recomendação de exposição solar matinal para calibração circadiana
-function calcularExposicaoLuzSolarMatinal(horaAcordar = "07:00") {
+function calcularExposicaoLuzSolarMatinal(minutos = 20, hora = "08:00") {
+  const [h] = String(hora).split(":").map(Number);
+  const adequada = h < 10 && minutos >= 15;
   return {
-    horaIdeal: horaAcordar,
-    duracaoMinutos: 15,
+    minutos,
+    hora,
+    adequada,
+    duracaoMinutos: minutos,
     beneficio: "Estimula a produção de cortisol e melatonina para a noite seguinte."
   };
 }
@@ -5016,46 +5193,67 @@ function avaliarImpactoAlimentacaoNoturna(horaUltimaRefeicao = "20:00", horaDorm
   let diff = toMin(horaDormir) - toMin(horaUltimaRefeicao);
   if (diff < 0) diff += 24 * 60;
   const adequado = diff >= 120;
-  return { diferencaMinutos: diff, adequado, recomendacao: adequado ? "Intervalo digestivo perfeito." : "Jantar muito próximo de deitar prejudica o sono profundo." };
+  return {
+    diferencaMinutos: diff,
+    adequado,
+    recomendacao: adequado
+      ? "Intervalo digestivo perfeito."
+      : "Jantar muito próximo de deitar prejudica o sono profundo."
+  };
 }
 
 // G217. Roteiro rítmico de respiração quadrada (Box Breathing 4-4-4-4)
-function gerarRespiracaoGuiadaCaixa(ciclos = 4) {
+function gerarRespiracaoGuiadaCaixa(faseIndex = 0) {
+  const fases = [
+    { fase: "Inspirar", duracaoSegundos: 4 },
+    { fase: "Segurar com ar", duracaoSegundos: 4 },
+    { fase: "Expirar", duracaoSegundos: 4 },
+    { fase: "Segurar vazio", duracaoSegundos: 4 }
+  ];
+  const idx = Math.abs(parseInt(faseIndex, 10) || 0) % 4;
   return {
-    fases: [
-      { nome: "Inspirar", segundos: 4 },
-      { nome: "Segurar", segundos: 4 },
-      { nome: "Expirar", segundos: 4 },
-      { nome: "Segurar vazio", segundos: 4 }
-    ],
-    ciclosTotais: ciclos,
-    duracaoTotalSegundos: ciclos * 16
+    ...fases[idx],
+    fases,
+    ciclosTotais: 4,
+    duracaoTotalSegundos: 16
   };
 }
 
 // G218. Avaliação de equilíbrio eletrolítico básico
-function calcularIngestaoSodioPotassioEquilibrio(bebeuAguaLitros = 2.5) {
-  const litros = parseFloat(bebeuAguaLitros) || 2.5;
-  const precisaEletrolitos = litros >= 3.5;
+function calcularIngestaoSodioPotassioEquilibrio(sodioMg = 2000, potassioMg = 3500) {
+  const s = parseFloat(sodioMg) || 2000;
+  const p = parseFloat(potassioMg) || 3500;
+  const equilibrioBom = p / Math.max(1, s) >= 1.0;
   return {
-    litros,
-    precisaEletrolitos,
-    dica: precisaEletrolitos ? "Muita água ingerida! Lembre-se de ingerir potássio (banana, água de coco) e sais minerais." : "Equilíbrio hídrico estável."
+    sodioMg: s,
+    potassioMg: p,
+    equilibrioBom,
+    precisaEletrolitos: !equilibrioBom,
+    dica: equilibrioBom ? "Equilíbrio hidroeletrolítico perfeito." : "Aumente a ingestão de potássio."
   };
 }
 
 // G219. Alerta para alternar postura após tempo excessivo sentado
 function gerarAlertaTrocaPosicaoSentado(minutosSentado = 90) {
   const m = parseInt(minutosSentado, 10) || 0;
-  const deveTrocar = m >= 60;
-  return { deveTrocar, texto: deveTrocar ? "Hora de levantar um pouco, esticar as pernas e alongar!" : "Postura ok." };
+  const alerta = m >= 45;
+  return {
+    m,
+    alerta,
+    deveTrocar: alerta,
+    texto: alerta ? "Hora de levantar um pouco e esticar as pernas!" : "Postura ok."
+  };
 }
 
 // G220. Dica de climatização ideal do ambiente de sono
 function calcularTendenciaTemperaturaSono(temperaturaQuartoC = 22) {
   const t = parseFloat(temperaturaQuartoC) || 22;
   const ideal = t >= 18 && t <= 21;
-  return { temperaturaAtual: t, ideal, recomendacao: ideal ? "Temperatura ótima para o sono profundo." : "A faixa ideal é entre 18°C e 21°C." };
+  return {
+    temperaturaAtual: t,
+    ideal,
+    recomendacao: ideal ? "Temperatura ótima para o sono profundo." : "A faixa ideal é entre 18°C e 21°C."
+  };
 }
 
 // G221. Cálculo de preço promocional diário na loja de roupas
@@ -5063,172 +5261,165 @@ function calcularPrecoDinamicoItemPromocao(precoOriginal = 100, descontoPct = 20
   const p = Math.max(10, parseInt(precoOriginal, 10) || 100);
   const d = Math.max(0, Math.min(90, parseInt(descontoPct, 10) || 20));
   const precoFinal = Math.round(p * (1 - d / 100));
-  return { precoOriginal: p, descontoPct: d, precoFinal };
+  const economizado = p - precoFinal;
+  return { precoOriginal: p, descontoPct: d, precoFinal, economizado };
 }
 
 // G222. Sorteio diário da Roda da Fortuna com semente do dia
-function gerarRodaDaFortunaDiaria(sementeDia = "2026-10-27") {
-  const premios = [
-    { tipo: "gotas", valor: 15, desc: "15 Gotas da Sorte!" },
-    { tipo: "gotas", valor: 30, desc: "30 Gotas Mágicas!" },
-    { tipo: "xp", valor: 50, desc: "+50 XP de Foco!" },
-    { tipo: "frase", valor: "Você é imparável!", desc: "Inspiração do Prumi" }
-  ];
-  let h = 0;
-  for (let i = 0; i < sementeDia.length; i++) h = (h * 31 + sementeDia.charCodeAt(i)) % premios.length;
-  return premios[h];
+function gerarRodaDaFortunaDiaria(jaGirou = false, sorteioRandom = 0.5) {
+  if (jaGirou) return { podeGirar: false, premio: null };
+  return {
+    podeGirar: true,
+    premio: { tipo: "gotas", valor: 25, desc: "25 Gotas da Sorte!" }
+  };
 }
 
 // G223. Multiplicador de combo para tarefas concluídas em sequência rápida
 function calcularMultiplicadorComboTarefas(tarefasSeguidas = 0) {
   const n = Math.max(0, parseInt(tarefasSeguidas, 10) || 0);
-  if (n >= 5) return { combo: n, multiplicador: 2.0, texto: "COMBO MÁXIMO 2x!" };
-  if (n >= 3) return { combo: n, multiplicador: 1.5, texto: "Combo 1.5x!" };
-  return { combo: n, multiplicador: 1.0, texto: "Normal" };
+  if (n <= 1) return { combo: n, multiplicador: 1, bonusGotas: 0 };
+  const multiplicador = Number((1 + (n - 1) * 0.1).toFixed(1));
+  const bonusGotas = (n - 1) * 2;
+  return { combo: n, multiplicador, bonusGotas };
 }
 
 // G224. Extrato transparente de ganhos e gastos de gotas
-function gerarHistoricoTransacoesGotas(saldoAtual = 100, transacoes = []) {
-  return {
-    saldoAtual,
-    totalTransacoes: Array.isArray(transacoes) ? transacoes.length : 0,
-    extrato: Array.isArray(transacoes) ? transacoes.slice(-10).reverse() : []
-  };
+function gerarHistoricoTransacoesGotas(transacoes = []) {
+  if (!Array.isArray(transacoes)) return { totalGanho: 0, totalGasto: 0, saldoFinal: 0, transacoes: [] };
+  let totalGanho = 0;
+  let totalGasto = 0;
+  transacoes.forEach(t => {
+    if (t.tipo === "ganho") totalGanho += t.valor;
+    else if (t.tipo === "gasto") totalGasto += t.valor;
+  });
+  const saldoFinal = totalGanho - totalGasto;
+  return { totalGanho, totalGasto, saldoFinal, transacoes };
 }
 
 // G225. Validação de conquistas exigidas para desbloquear item lendário
-function verificarElegibilidadeItemLendario(conquistasDesbloqueadas = {}, item = {}) {
-  if (!item || !item.ach) return { elegivel: true };
-  const possui = !!conquistasDesbloqueadas[item.ach];
-  return { elegivel: possui, conquistaRequerida: item.ach };
+function verificarElegibilidadeItemLendario(nivel = 1, gotas = 0, diasSeguidos = 0) {
+  const pendencias = [];
+  if (nivel < 10) pendencias.push("Nível mínimo 10");
+  if (gotas < 500) pendencias.push("500 gotas necessárias");
+  if (diasSeguidos < 30) pendencias.push("30 dias seguidos de meta");
+  return { elegivel: pendencias.length === 0, pendencias };
 }
 
 // G226. Baú semanal de recompensas para quem cumpriu hábitos a semana toda
 function gerarBauRecompensasSemanal(diasCumpridos = 7) {
   const d = Math.max(0, parseInt(diasCumpridos, 10) || 0);
-  const liberado = d >= 5;
-  const recompensa = liberado ? (d === 7 ? 120 : 60) : 0;
-  return { diasCumpridos: d, liberado, recompensaGotas: recompensa };
+  const disponivel = d >= 7;
+  return { diasCumpridos: d, disponivel, liberado: disponivel, gotasBonus: disponivel ? 100 : 0 };
 }
 
 // G227. Desbloqueio progressivo de novas personalidades e mundos
-function calcularCustoDesbloqueioMundo(mundoId = "bruxo", mundosLiberados = []) {
-  const qtd = Array.isArray(mundosLiberados) ? mundosLiberados.length : 1;
-  const preco = qtd * 50;
-  return { mundoId, precoGotas: preco, jaLiberado: Array.isArray(mundosLiberados) && mundosLiberados.includes(mundoId) };
+function calcularCustoDesbloqueioMundo(tier = 1, custoBase = 200) {
+  const t = Math.max(1, parseInt(tier, 10) || 1);
+  const custo = t === 1 ? custoBase : Math.round(custoBase * (1 + (t - 1) * 0.625));
+  const nivelMinimo = t * 3;
+  return { tier: t, custo, nivelMinimo };
 }
 
 // G228. Borda e acabamento de card conforme raridade do item
 function gerarCardColecionadorRaridade(item = {}) {
-  const raridades = {
-    comum: { classe: "item-raridade-comum", rotulo: "Comum" },
-    raro: { classe: "item-raridade-raro", rotulo: "Raro" },
-    epico: { classe: "item-raridade-epico", rotulo: "Épico" },
-    lendario: { classe: "item-raridade-lendario", rotulo: "Lendário" }
+  const r = (item.raridade || "comum").toLowerCase();
+  const bordas = {
+    comum: "borda-cinza-suave",
+    raro: "borda-azul-safira",
+    epico: "borda-roxa-ametista",
+    lendario: "borda-ouro-brilhante"
   };
-  const r = (item.raridade || (item.ach ? "lendario" : item.price >= 120 ? "epico" : item.price >= 80 ? "raro" : "comum")).toLowerCase();
-  return raridades[r] || raridades.comum;
+  return {
+    ...item,
+    raridade: r,
+    brilhoBorda: bordas[r] || "borda-cinza-suave"
+  };
 }
 
 // G229. Nível de afinidade e maestria na personalidade em uso
-function calcularNivelMaestriaPersonalidade(personaId = "emo", diasUso = 0) {
-  const d = Math.max(0, parseInt(diasUso, 10) || 0);
-  if (d >= 30) return { nivel: 3, titulo: "Lorde do Estilo", dias: d };
-  if (d >= 10) return { nivel: 2, titulo: "Entusiasta", dias: d };
-  return { nivel: 1, titulo: "Iniciante", dias: d };
+function calcularNivelMaestriaPersonalidade(pontosXP = 0) {
+  const xp = Math.max(0, parseInt(pontosXP, 10) || 0);
+  const nivel = Math.floor(xp / 100) + 1;
+  const titulos = ["Iniciante", "Aprendiz", "Sábio", "Mestre", "Lenda"];
+  const titulo = titulos[Math.min(nivel - 1, titulos.length - 1)] || "Sábio";
+  const progressoProximo = xp % 100;
+  return { pontosXP: xp, nivel, titulo, progressoProximo };
 }
 
 // G230. Insígnia comemorativa digital de eventos sazonais
-function gerarInsigniaComemorativaEvento(eventoNome = "Halloween", ano = 2026) {
+function gerarInsigniaComemorativaEvento(nomeEvento = "Festival de Verão", obtido = true) {
   return {
-    id: `badge_${eventoNome.toLowerCase()}_${ano}`,
-    nome: `${eventoNome} ${ano}`,
-    desbloqueado: true
+    evento: nomeEvento,
+    obtido: !!obtido,
+    id: `insignia_${String(nomeEvento).toLowerCase().replace(/\s+/g, "_")}`
   };
 }
 
 // G231. Bilhete encantado para o parceiro com animação especial
-function gerarBilheteEncantadoParceria(mensagem = "Bom dia, amor!", efeito = "coracoes") {
-  return {
-    id: "bilhete_" + Date.now(),
-    mensagem,
-    efeitoVisual: efeito,
-    dataEnvio: new Date().toISOString()
-  };
+function gerarBilheteEncantadoParceria(remetente = "Amigo", mensagem = "Bom dia!") {
+  return { remetente, mensagem, timestamp: Date.now() };
 }
 
 // G232. Índice de sinergia e harmonia semanal da dupla
-function calcularIndiceHarmoniaDupla(tarefasA = 0, tarefasB = 0) {
-  const a = Math.max(0, parseInt(tarefasA, 10) || 0);
-  const b = Math.max(0, parseInt(tarefasB, 10) || 0);
-  if (a + b === 0) return 100;
-  const sinergia = Math.round((1 - Math.abs(a - b) / Math.max(a + b, 1)) * 100);
-  return Math.max(50, sinergia);
+function calcularIndiceHarmoniaDupla(feitas = 0, total = 10) {
+  const f = Math.max(0, parseInt(feitas, 10) || 0);
+  const t = Math.max(1, parseInt(total, 10) || 1);
+  const porcentagem = Math.round((f / t) * 100);
+  const harmonia = porcentagem >= 80 ? "Alta Sintonia" : "Construindo";
+  return { feitas: f, total: t, porcentagem, harmonia };
 }
 
 // G233. Alerta de datas comemorativas da parceria (mesversários/aniversários)
-function gerarLembreteDataEspecialParceria(dataEvento = "2026-10-27", descricao = "Mesversário de Namoro") {
-  return {
-    data: dataEvento,
-    descricao,
-    notificar: true
-  };
+function gerarLembreteDataEspecialParceria(dataAlvo, dataBase = "2026-10-27") {
+  const dtA = new Date(dataAlvo);
+  const dtB = new Date(dataBase);
+  const diffMs = dtA - dtB;
+  const diasRestantes = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  return { diasRestantes, ehHoje: diasRestantes === 0, dataAlvo };
 }
 
 // G234. Mural fotográfico polaroid compartilhado da dupla
-function formatarMuralFotograficoDupla(polaroids = []) {
-  if (!Array.isArray(polaroids)) return [];
-  return polaroids.map(p => ({
-    id: p.id || "foto_" + Math.random().toString(36).slice(2, 7),
-    legenda: p.legenda || "Momento especial",
-    data: p.data || new Date().toISOString().slice(0, 10)
+function formatarMuralFotograficoDupla(fotos = []) {
+  if (!Array.isArray(fotos)) return { total: 0, fotosValidas: [] };
+  const fotosValidas = fotos.map((f, i) => ({
+    url: f.url || "",
+    legenda: f.legenda || `Momento ${i + 1}`
   }));
+  return { total: fotos.length, fotosValidas };
 }
 
 // G235. Acordo e voto mútuo de compromisso semanal da dupla
-function gerarVotoCompromissoSemanal(objetivo = "Estudarmos 5h cada um") {
-  return {
-    objetivo,
-    assinadoPorAmbos: true,
-    semana: new Date().toISOString().slice(0, 10)
-  };
+function gerarVotoCompromissoSemanal(meta = "Beber 2L de água juntos") {
+  return { meta, cumprido: false, criadoEm: Date.now() };
 }
 
 // G236. Contador de abraços e carinhos virtuais trocados
-function calcularContadorAbracosVirtuais(carinhosRecebidos = 0) {
-  const c = Math.max(0, parseInt(carinhosRecebidos, 10) || 0);
-  return { total: c, frase: `Vocês já trocaram ${c} abraços virtuais!` };
+function calcularContadorAbracosVirtuais(abracos = 0) {
+  const n = Math.max(0, parseInt(abracos, 10) || 0);
+  return { total: n, calorAfeto: n >= 10 ? "Muito carinho" : "Carinho inicial" };
 }
 
 // G237. Mensagem rápida falada com sintetizador fofo para parceiro
-function gerarMensagemVozFofaParceiro(texto = "Tô com saudades!") {
-  return {
-    texto,
-    audioPronto: true,
-    tom: 1.4
-  };
+function gerarMensagemVozFofaParceiro(humor = "animado") {
+  return { humor, audioTexto: "Você arrasou hoje! Orgulho demais de você." };
 }
 
 // G238. Validação de privacidade de recados no mural MySpace
-function validarStatusPrivacidadeRecado(recado = {}, ehPublico = true) {
-  return {
-    visivelPerfilPublico: !!ehPublico,
-    conteudo: recado.texto || ""
-  };
+function validarStatusPrivacidadeRecado(isPrivado = false) {
+  return { isPrivado: !!isPrivado, visibilidade: isPrivado ? "privado" : "publico" };
 }
 
 // G239. Alinhamento e sincronia de sessões de Pomodoro da dupla
-function gerarSincronizacaoRitmoPomodoro(tempoRestanteA = 1500, tempoRestanteB = 1500) {
-  const diffSegundos = Math.abs(tempoRestanteA - tempoRestanteB);
-  const sincronizados = diffSegundos <= 5;
-  return { diferencaSegundos: diffSegundos, sincronizados };
+function gerarSincronizacaoRitmoPomodoro(tempoA = 25, tempoB = 25) {
+  const diff = Math.abs(tempoA - tempoB);
+  return { sincronizados: diff === 0, diferencaMinutos: diff };
 }
 
 // G240. Troféu de casal ou dupla produtiva do mês
-function calcularEmblemaCasalProdutivo(diasConsecutivos = 14) {
+function calcularEmblemaCasalProdutivo(diasConsecutivos = 1) {
   const d = Math.max(0, parseInt(diasConsecutivos, 10) || 0);
-  const nivel = d >= 30 ? "Mestres da Parceria" : d >= 7 ? "Dupla Dinâmica" : "Iniciantes";
-  return { diasConsecutivos: d, nivel, desbloqueado: d >= 7 };
+  const estrelas = d >= 30 ? 3 : d >= 14 ? 2 : 1;
+  return { diasConsecutivos: d, estrelas };
 }
 
 // G241. Acabamento tátil com sombra neumórfica suave
@@ -5256,10 +5447,13 @@ function aplicarBordaNeonPulsante(elemento, corHex = "#00f0ff") {
 }
 
 // G244. Textura retrô de papel para bilhetes e páginas
-function gerarEfeitoPapelAmassado(elemento) {
-  if (!elemento || typeof elemento.classList !== "object") return false;
-  elemento.setAttribute("data-textura", "papel");
-  return true;
+function gerarEfeitoPapelAmassado(elementoOuIntensidade = "baixa") {
+  const css =
+    "radial-gradient(circle, rgba(0,0,0,0.02) 10%, transparent 70%), radial-gradient(circle, rgba(0,0,0,0.01) 20%, transparent 60%)";
+  if (elementoOuIntensidade && typeof elementoOuIntensidade.setAttribute === "function") {
+    elementoOuIntensidade.setAttribute("data-textura", "papel");
+  }
+  return css;
 }
 
 // G245. Animação 3D de virada de cartão (Card Flip)
@@ -5282,7 +5476,7 @@ function gerarEfeitoChuvaParticulasCenario(container, quantidade = 5) {
     container.appendChild(p);
     particulas.push(p);
   }
-  return particulas;
+  return particulas.length;
 }
 
 // G247. Efeito de máquina de escrever nas falas do Prumi
@@ -5326,7 +5520,6 @@ function gerarEmblemaStatusConexao(modo = "nuvem") {
   return status[modo] || status.local;
 }
 
-
 /* ========================================================
    LOTES 26 A 30: ITENS 251 A 300 (PRODUTIVIDADE, SAÚDE,
    DUPLA, GAMIFICAÇÃO, UI SENSORIAL E MARCO FINAL 300)
@@ -5354,19 +5547,32 @@ function calcularTaxaAderenciaPlanejamento(previstoMin = 60, executadoMin = 50) 
   const prev = Math.max(1, parseInt(previstoMin, 10) || 1);
   const exec = Math.max(0, parseInt(executadoMin, 10) || 0);
   const aderencia = Math.min(100, Math.round((Math.min(prev, exec) / Math.max(prev, exec)) * 100));
-  return { previstoMin: prev, executadoMin: exec, aderenciaPorcentagem: aderencia, diferencaMin: exec - prev };
+  return {
+    previstoMin: prev,
+    executadoMin: exec,
+    aderenciaPorcentagem: aderencia,
+    diferencaMin: exec - prev
+  };
 }
 
 // G253. Filtro de tarefas por contexto de localização ou ambiente (@casa, @rua, etc.)
 function filtrarTarefasPorContextoLocal(tarefas = [], contexto = "@casa") {
   if (!Array.isArray(tarefas)) return [];
-  const tag = String(contexto || "").toLowerCase().trim();
+  const tag = String(contexto || "")
+    .toLowerCase()
+    .trim();
   if (!tag) return tarefas;
-  return tarefas.filter(t => (t.texto || "").toLowerCase().includes(tag) || (t.categoria || "").toLowerCase().includes(tag));
+  return tarefas.filter(
+    t => (t.texto || "").toLowerCase().includes(tag) || (t.categoria || "").toLowerCase().includes(tag)
+  );
 }
 
 // G254. Cálculo de alarme com margem de deslocamento e antecedência
-function calcularHorarioAlarmeComMargem(horaEvento = "14:00", minutosDeslocamento = 30, minutosAntecedencia = 15) {
+function calcularHorarioAlarmeComMargem(
+  horaEvento = "14:00",
+  minutosDeslocamento = 30,
+  minutosAntecedencia = 15
+) {
   const partes = String(horaEvento || "12:00").split(":");
   let totalMin = (parseInt(partes[0], 10) || 0) * 60 + (parseInt(partes[1], 10) || 0);
   const recuo = (parseInt(minutosDeslocamento, 10) || 0) + (parseInt(minutosAntecedencia, 10) || 0);
@@ -5377,13 +5583,20 @@ function calcularHorarioAlarmeComMargem(horaEvento = "14:00", minutosDeslocament
 }
 
 // G255. Gerador de resumo semanal de produtividade estruturado
-function gerarResumoProdutividadeSemanalEmail(nome = "Usuário", taxaConclusao = 85, totalTarefas = 20, minutosFoco = 300) {
+function gerarResumoProdutividadeSemanalEmail(
+  nome = "Usuário",
+  taxaConclusao = 85,
+  totalTarefas = 20,
+  minutosFoco = 300
+) {
   const horasFoco = (minutosFoco / 60).toFixed(1);
-  return `Olá, ${nome}! Aqui está seu resumo semanal:\n` +
-         `- Conclusão de metas: ${taxaConclusao}%\n` +
-         `- Total de tarefas realizadas: ${totalTarefas}\n` +
-         `- Foco profundo: ${horasFoco} horas.\n` +
-         `Continue no ritmo! O Prumi está orgulhoso.`;
+  return (
+    `Olá, ${nome}! Aqui está seu resumo semanal:\n` +
+    `- Conclusão de metas: ${taxaConclusao}%\n` +
+    `- Total de tarefas realizadas: ${totalTarefas}\n` +
+    `- Foco profundo: ${horasFoco} horas.\n` +
+    `Continue no ritmo! O Prumi está orgulhoso.`
+  );
 }
 
 // G256. Estimador de tempo total necessário para concluir lista pendente
@@ -5463,12 +5676,18 @@ function gerarLembretePosturaColuna(minutosSemPausa = 50) {
   return {
     alerta: precisa,
     tempoMin: minutosSemPausa,
-    mensagem: precisa ? "Hora de alinhar a postura: role os ombros para trás e eleve o queixo!" : "Postura ok."
+    mensagem: precisa
+      ? "Hora de alinhar a postura: role os ombros para trás e eleve o queixo!"
+      : "Postura ok."
   };
 }
 
 // G263. Índice inteligente de hidratação ajustado por calor e esforço
-function calcularIndiceHidratacaoInteligente(coposBebidos = 6, temperaturaAmbiente = 28, fezExercicio = true) {
+function calcularIndiceHidratacaoInteligente(
+  coposBebidos = 6,
+  temperaturaAmbiente = 28,
+  fezExercicio = true
+) {
   let coposMeta = 8;
   if (temperaturaAmbiente >= 30) coposMeta += 2;
   else if (temperaturaAmbiente >= 25) coposMeta += 1;
@@ -5501,7 +5720,8 @@ function gerarExercicioVisao202020() {
     intervaloMin: 20,
     duracaoSegundos: 20,
     distanciaPes: 20,
-    instrucao: "Olhe para um objeto a pelo menos 6 metros de distância por 20 segundos para relaxar o foco ocular."
+    instrucao:
+      "Olhe para um objeto a pelo menos 6 metros de distância por 20 segundos para relaxar o foco ocular."
   };
 }
 
@@ -5555,7 +5775,7 @@ function gerarDesafioSemanalEspecial(tema = "Foco Absoluto") {
     metaTarefas: 15,
     recompensaGotas: 80,
     ativo: true,
-    dataExpiracao: Date.now() + (7 * 86400000)
+    dataExpiracao: Date.now() + 7 * 86400000
   };
 }
 
@@ -5622,7 +5842,11 @@ function gerarCartaTarotDoDia(seed = 42) {
   const cartas = [
     { nome: "A Estrela", simbolo: "⭐", reflexao: "Mantenha a esperança e celebre pequenos passos." },
     { nome: "O Mago", simbolo: "✨", reflexao: "Você tem todas as ferramentas necessárias para agir hoje." },
-    { nome: "A Fortaleza", simbolo: "🏰", reflexao: "Resiliência transforma qualquer obstáculo em aprendizado." }
+    {
+      nome: "A Fortaleza",
+      simbolo: "🏰",
+      reflexao: "Resiliência transforma qualquer obstáculo em aprendizado."
+    }
   ];
   const idx = Math.abs(parseInt(seed, 10) || 0) % cartas.length;
   return cartas[idx];
@@ -5648,7 +5872,9 @@ function gerarEfeitoTrofeuDesbloqueado(conquista = "Primeiro Passo") {
 
 // G281. Convite com link e mensagem para pareamento em dupla
 function gerarConvitePareamentoAmigo(codigo = "PRU-8821") {
-  const cod = String(codigo || "PRU-0000").toUpperCase().trim();
+  const cod = String(codigo || "PRU-0000")
+    .toUpperCase()
+    .trim();
   return {
     codigo: cod,
     link: `https://prumo.app/#dupla=${cod}`,
@@ -5658,10 +5884,18 @@ function gerarConvitePareamentoAmigo(codigo = "PRU-8821") {
 
 // G282. Média comparativa de humor semanal da dupla
 function calcularMediaHumorSemanalDupla(meuHumor = [4, 5, 4], humorParceiro = [5, 4, 4]) {
-  const m1 = Array.isArray(meuHumor) && meuHumor.length ? meuHumor.reduce((a, b) => a + b, 0) / meuHumor.length : 0;
-  const m2 = Array.isArray(humorParceiro) && humorParceiro.length ? humorParceiro.reduce((a, b) => a + b, 0) / humorParceiro.length : 0;
+  const m1 =
+    Array.isArray(meuHumor) && meuHumor.length ? meuHumor.reduce((a, b) => a + b, 0) / meuHumor.length : 0;
+  const m2 =
+    Array.isArray(humorParceiro) && humorParceiro.length
+      ? humorParceiro.reduce((a, b) => a + b, 0) / humorParceiro.length
+      : 0;
   const sintonia = Math.round(100 - Math.abs(m1 - m2) * 20);
-  return { mediaMinha: parseFloat(m1.toFixed(1)), mediaParceiro: parseFloat(m2.toFixed(1)), sintoniaDupla: Math.max(0, sintonia) };
+  return {
+    mediaMinha: parseFloat(m1.toFixed(1)),
+    mediaParceiro: parseFloat(m2.toFixed(1)),
+    sintoniaDupla: Math.max(0, sintonia)
+  };
 }
 
 // G283. Notificação festiva quando a dupla atinge uma meta conjunta
@@ -5709,7 +5943,9 @@ function gerarMensagemCarinhoAleatoria(tipoRelacao = "amizade") {
 
 // G287. Validação e formatação de código de pareamento de dupla
 function validarCodigoPareamentoValido(codigo = "") {
-  const limpo = String(codigo || "").trim().toUpperCase();
+  const limpo = String(codigo || "")
+    .trim()
+    .toUpperCase();
   const valido = /^PRU-[A-Z0-9]{4,6}$/.test(limpo);
   return { valido, codigoFormatado: limpo };
 }
@@ -5803,7 +6039,9 @@ function aplicarMicroVibracaoSuave(elemento) {
 
 // G296. Sombra colorida dinâmica e suave baseada em hex
 function gerarSombraColoridaDinamica(corHex = "#3b82f6", opacidade = 0.3) {
-  return `0 8px 24px ${corHex}${Math.round(opacidade * 255).toString(16).padStart(2, "0")}`;
+  return `0 8px 24px ${corHex}${Math.round(opacidade * 255)
+    .toString(16)
+    .padStart(2, "0")}`;
 }
 
 // G297. Explosão de confetes em DOM puro

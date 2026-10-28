@@ -5,73 +5,293 @@
 "use strict";
 
 const EIXOS_COGNITIVOS = [
-  { id: "design_ux", nome: "Design Cognitivo, Leis da UX & Microinterações", autor: "Don Norman / Dan Saffer / Weinschenk" },
-  { id: "acessibilidade", nome: "Acessibilidade Universal & WCAG 2.2 AAA", autor: "W3C WCAG 2.2 / Regine Gilbert / Pickering" },
-  { id: "estudo_ativo", nome: "Estudo Científico, Spaced Repetition & Recall", autor: "Make It Stick / Dunlosky 2013 / Ebbinghaus" },
-  { id: "deep_work", nome: "Produtividade Profunda & Proteção da Atenção", autor: "Cal Newport / Daniel Kahneman / James Clear" },
-  { id: "mascote_socratica", nome: "Tutor Socrático, Afeto & Memória de Longo Prazo", autor: "Barbara Oakley / John Sweller / Csikszentmihalyi" }
+  {
+    id: "design_ux",
+    nome: "Design Cognitivo, Leis da UX & Microinterações",
+    autor: "Don Norman / Dan Saffer / Weinschenk"
+  },
+  {
+    id: "acessibilidade",
+    nome: "Acessibilidade Universal & WCAG 2.2 AAA",
+    autor: "W3C WCAG 2.2 / Regine Gilbert / Pickering"
+  },
+  {
+    id: "estudo_ativo",
+    nome: "Estudo Científico, Spaced Repetition & Recall",
+    autor: "Make It Stick / Dunlosky 2013 / Ebbinghaus"
+  },
+  {
+    id: "deep_work",
+    nome: "Produtividade Profunda & Proteção da Atenção",
+    autor: "Cal Newport / Daniel Kahneman / James Clear"
+  },
+  {
+    id: "mascote_socratica",
+    nome: "Tutor Socrático, Afeto & Memória de Longo Prazo",
+    autor: "Barbara Oakley / John Sweller / Csikszentmihalyi"
+  }
 ];
 
 const TEMAS_EIXOS = {
   design_ux: [
-    { termo: "Affordance Tátil Explícita", autor: "Don Norman (Design of Everyday Things)", p: "Percepção imediata de interatividade sem esforço" },
-    { termo: "Microinteração Trigger-Rules-Feedback", autor: "Dan Saffer (Microinteractions)", p: "Ciclo de resposta clara a cada toque do usuário" },
-    { termo: "Lei de Fitts para Alvos de Clique", autor: "Jon Yablonski (Laws of UX)", p: "Distância e tamanho balanceados para ação sem erros" },
-    { termo: "Lei de Miller e Agrupamento (Chunking)", autor: "George Miller / Weinschenk", p: "Divisão de tarefas em pedaços de no máximo 7 itens" },
-    { termo: "Lei de Hick e Redução de Escolhas", autor: "William Hick", p: "Tempo de decisão minimizado com opções priorizadas" },
-    { termo: "Redução de Carga Cognitiva Extrínseca", autor: "John Sweller (Cognitive Load Theory)", p: "Eliminação de elementos visuais que não ensinam" },
-    { termo: "Espaçamento Harmonioso de 8pt", autor: "Refactoring UI (Wathan & Schoger)", p: "Ritmo vertical consistente para relaxar a leitura" },
-    { termo: "Feedback de Estado com Zero Ambiguidade", autor: "Nielsen Norman Group", p: "Visibilidade imediata do status do sistema" },
-    { termo: "Efeito de Posição Serial na Interface", autor: "Hermann Ebbinghaus", p: "Destaque estratégico do primeiro e último item" },
-    { termo: "Fechamento Gestáltico nas Listas", autor: "Max Wertheimer (Gestalt)", p: "Bordas e alinhamentos percebidos como um todo coeso" }
+    {
+      termo: "Affordance Tátil Explícita",
+      autor: "Don Norman (Design of Everyday Things)",
+      p: "Percepção imediata de interatividade sem esforço"
+    },
+    {
+      termo: "Microinteração Trigger-Rules-Feedback",
+      autor: "Dan Saffer (Microinteractions)",
+      p: "Ciclo de resposta clara a cada toque do usuário"
+    },
+    {
+      termo: "Lei de Fitts para Alvos de Clique",
+      autor: "Jon Yablonski (Laws of UX)",
+      p: "Distância e tamanho balanceados para ação sem erros"
+    },
+    {
+      termo: "Lei de Miller e Agrupamento (Chunking)",
+      autor: "George Miller / Weinschenk",
+      p: "Divisão de tarefas em pedaços de no máximo 7 itens"
+    },
+    {
+      termo: "Lei de Hick e Redução de Escolhas",
+      autor: "William Hick",
+      p: "Tempo de decisão minimizado com opções priorizadas"
+    },
+    {
+      termo: "Redução de Carga Cognitiva Extrínseca",
+      autor: "John Sweller (Cognitive Load Theory)",
+      p: "Eliminação de elementos visuais que não ensinam"
+    },
+    {
+      termo: "Espaçamento Harmonioso de 8pt",
+      autor: "Refactoring UI (Wathan & Schoger)",
+      p: "Ritmo vertical consistente para relaxar a leitura"
+    },
+    {
+      termo: "Feedback de Estado com Zero Ambiguidade",
+      autor: "Nielsen Norman Group",
+      p: "Visibilidade imediata do status do sistema"
+    },
+    {
+      termo: "Efeito de Posição Serial na Interface",
+      autor: "Hermann Ebbinghaus",
+      p: "Destaque estratégico do primeiro e último item"
+    },
+    {
+      termo: "Fechamento Gestáltico nas Listas",
+      autor: "Max Wertheimer (Gestalt)",
+      p: "Bordas e alinhamentos percebidos como um todo coeso"
+    }
   ],
   acessibilidade: [
-    { termo: "Alvo de Toque Mínimo de 44x44px", autor: "WCAG 2.2 - Critério 2.5.8", p: "Facilidade de acionamento por toque e mobilidade reduzida" },
-    { termo: "Focus Ring Dinâmico de Alto Contraste", autor: "WCAG 2.2 - Critério 2.4.13", p: "Indicador visível e nítido de foco por teclado" },
-    { termo: "Contraste de Texto Aprimorado 7:1 (AAA)", autor: "WCAG 2.2 - Critério 1.4.6", p: "Leitura confortável mesmo sob sol ou baixa visão" },
-    { termo: "Suporte Total a Prefers-Reduced-Motion", autor: "W3C Media Queries Level 5", p: "Respeito à sensibilidade vestibular e enjoo visual" },
-    { termo: "Regiões ARIA-Live para Anúncios Sonoros", autor: "WAI-ARIA 1.2", p: "Leitores de tela informam mudanças sem perda de contexto" },
-    { termo: "Navegação por Teclado sem Armadilhas", autor: "WCAG 2.2 - Critério 2.1.2", p: "Ciclo lógico por Tab, Shift+Tab, Enter e Espaço" },
-    { termo: "Espaçamento de Texto Anti-Dislexia", autor: "WCAG 2.2 - Critério 1.4.12", p: "Entrelinhas de 1.5 e entrelinhas de parágrafo 2.0" },
-    { termo: "Rótulos Acessíveis Não Baseados em Cor", autor: "WCAG 2.2 - Critério 1.4.1", p: "Identificação por ícones, texto e forma geométrica" },
-    { termo: "Prevenção de Cliques Acidentais", autor: "WCAG 2.2 - Critério 2.5.2", p: "Acionamento apenas no evento Up (soltar do ponteiro)" },
-    { termo: "Estrutura Semântica de Cabeçalhos H1-H3", autor: "Adam Silver (Form Design Patterns)", p: "Leitura sequencial lógica e navegação por marcos" }
+    {
+      termo: "Alvo de Toque Mínimo de 44x44px",
+      autor: "WCAG 2.2 - Critério 2.5.8",
+      p: "Facilidade de acionamento por toque e mobilidade reduzida"
+    },
+    {
+      termo: "Focus Ring Dinâmico de Alto Contraste",
+      autor: "WCAG 2.2 - Critério 2.4.13",
+      p: "Indicador visível e nítido de foco por teclado"
+    },
+    {
+      termo: "Contraste de Texto Aprimorado 7:1 (AAA)",
+      autor: "WCAG 2.2 - Critério 1.4.6",
+      p: "Leitura confortável mesmo sob sol ou baixa visão"
+    },
+    {
+      termo: "Suporte Total a Prefers-Reduced-Motion",
+      autor: "W3C Media Queries Level 5",
+      p: "Respeito à sensibilidade vestibular e enjoo visual"
+    },
+    {
+      termo: "Regiões ARIA-Live para Anúncios Sonoros",
+      autor: "WAI-ARIA 1.2",
+      p: "Leitores de tela informam mudanças sem perda de contexto"
+    },
+    {
+      termo: "Navegação por Teclado sem Armadilhas",
+      autor: "WCAG 2.2 - Critério 2.1.2",
+      p: "Ciclo lógico por Tab, Shift+Tab, Enter e Espaço"
+    },
+    {
+      termo: "Espaçamento de Texto Anti-Dislexia",
+      autor: "WCAG 2.2 - Critério 1.4.12",
+      p: "Entrelinhas de 1.5 e entrelinhas de parágrafo 2.0"
+    },
+    {
+      termo: "Rótulos Acessíveis Não Baseados em Cor",
+      autor: "WCAG 2.2 - Critério 1.4.1",
+      p: "Identificação por ícones, texto e forma geométrica"
+    },
+    {
+      termo: "Prevenção de Cliques Acidentais",
+      autor: "WCAG 2.2 - Critério 2.5.2",
+      p: "Acionamento apenas no evento Up (soltar do ponteiro)"
+    },
+    {
+      termo: "Estrutura Semântica de Cabeçalhos H1-H3",
+      autor: "Adam Silver (Form Design Patterns)",
+      p: "Leitura sequencial lógica e navegação por marcos"
+    }
   ],
   estudo_ativo: [
-    { termo: "Prática de Recuperação Ativa (Active Recall)", autor: "Karpicke & Roediger (Science 2008)", p: "O ato de forçar a memória constrói conexões neurais" },
-    { termo: "Repetição Espaçada com Caixa de Leitner", autor: "Sebastian Leitner / Ebbinghaus", p: "Intervalos matemáticos (1, 3, 7, 14, 30 dias) contra esquecimento" },
-    { termo: "Estudo Intercalado (Interleaving)", autor: "Make It Stick (Brown, Roediger, McDaniel)", p: "Alternância de disciplinas aumenta a flexibilidade cognitiva" },
-    { termo: "Modo Focado vs Modo Difuso", autor: "Barbara Oakley (Aprendendo a Aprender)", p: "Pausas estratégicas ativam a resolução criativa de problemas" },
-    { termo: "Método de Síntese Feynman", autor: "Richard Feynman", p: "Explicar conceitos complexos com vocabulário simples e direto" },
-    { termo: "Autoavaliação Prévia (Low-Stakes Testing)", autor: "Dunlosky et al. (2013)", p: "Quizzes rápidos antes do estudo orientam o foco" },
-    { termo: "Codificação Dupla (Verbal + Visual)", autor: "Allan Paivio / Caviglioli", p: "União de resumos em texto com ícones e diagramas" },
-    { termo: "Elaboração Interrogativa (Por que isso é assim?)", autor: "Dunlosky et al. (2013)", p: "Questionar a lógica interna do autor aprofunda o sentido" },
-    { termo: "Anotações no Modelo Cornell", autor: "Walter Pauk (Cornell University)", p: "Separação de notas, gatilhos de memória e resumo de 3 linhas" },
-    { termo: "Ilusão de Competência Eliminada", autor: "Barbara Oakley", p: "Fim da releitura passiva em favor de testes com resposta oculta" }
+    {
+      termo: "Prática de Recuperação Ativa (Active Recall)",
+      autor: "Karpicke & Roediger (Science 2008)",
+      p: "O ato de forçar a memória constrói conexões neurais"
+    },
+    {
+      termo: "Repetição Espaçada com Caixa de Leitner",
+      autor: "Sebastian Leitner / Ebbinghaus",
+      p: "Intervalos matemáticos (1, 3, 7, 14, 30 dias) contra esquecimento"
+    },
+    {
+      termo: "Estudo Intercalado (Interleaving)",
+      autor: "Make It Stick (Brown, Roediger, McDaniel)",
+      p: "Alternância de disciplinas aumenta a flexibilidade cognitiva"
+    },
+    {
+      termo: "Modo Focado vs Modo Difuso",
+      autor: "Barbara Oakley (Aprendendo a Aprender)",
+      p: "Pausas estratégicas ativam a resolução criativa de problemas"
+    },
+    {
+      termo: "Método de Síntese Feynman",
+      autor: "Richard Feynman",
+      p: "Explicar conceitos complexos com vocabulário simples e direto"
+    },
+    {
+      termo: "Autoavaliação Prévia (Low-Stakes Testing)",
+      autor: "Dunlosky et al. (2013)",
+      p: "Quizzes rápidos antes do estudo orientam o foco"
+    },
+    {
+      termo: "Codificação Dupla (Verbal + Visual)",
+      autor: "Allan Paivio / Caviglioli",
+      p: "União de resumos em texto com ícones e diagramas"
+    },
+    {
+      termo: "Elaboração Interrogativa (Por que isso é assim?)",
+      autor: "Dunlosky et al. (2013)",
+      p: "Questionar a lógica interna do autor aprofunda o sentido"
+    },
+    {
+      termo: "Anotações no Modelo Cornell",
+      autor: "Walter Pauk (Cornell University)",
+      p: "Separação de notas, gatilhos de memória e resumo de 3 linhas"
+    },
+    {
+      termo: "Ilusão de Competência Eliminada",
+      autor: "Barbara Oakley",
+      p: "Fim da releitura passiva em favor de testes com resposta oculta"
+    }
   ],
   deep_work: [
-    { termo: "Eliminação do Resíduo de Atenção", autor: "Cal Newport (Deep Work)", p: "Zero alternância de telas durante blocos de concentração" },
-    { termo: "Proteção da Energia do Sistema 2", autor: "Daniel Kahneman (Thinking, Fast and Slow)", p: "Poupar o córtex pré-frontal para tarefas analíticas reais" },
-    { termo: "Fricção Zero para Início de Tarefa (2 Min)", autor: "James Clear (Atomic Habits)", p: "Ambiente preparado para começar a estudar sem barreiras" },
-    { termo: "Canal Ótimo de Flow (Desafio vs Habilidade)", autor: "Mihaly Csikszentmihalyi", p: "Equilíbrio entre tédio e ansiedade para imersão total" },
-    { termo: "Regra Ergonômica 20-20-20 de Fadiga Ocular", autor: "Optometria Científica", p: "A cada 20 minutos olhar 20 pés de distância por 20 segundos" },
-    { termo: "Pausa Ativa com Reset Dopaminérgico", autor: "Amishi Jha (Peak Mind)", p: "Micro-descansos conscientes sem telas para restaurar a atenção" },
-    { termo: "Monotarefa com Isolamento de Campo Visual", autor: "Chris Bailey (Hyperfocus)", p: "Ocultar notificações e abas secundárias durante o estudo" },
-    { termo: "Rastreamento do Tempo em Foco Real (Sem Fraude)", autor: "Gloria Mark (Attention Span)", p: "Contagem de minutos com exclusão de pausas e distrações" },
-    { termo: "Rotina de Encerramento Noturno (Shutdown Ritual)", autor: "Cal Newport", p: "Registrar pendências para desligar o cérebro sem ansiedade" },
-    { termo: "Loop Deixa-Rotina-Recompensa Saudável", autor: "Charles Duhigg / James Clear", p: "Gatilho sensorial que antecipa o prazer da tarefa concluída" }
+    {
+      termo: "Eliminação do Resíduo de Atenção",
+      autor: "Cal Newport (Deep Work)",
+      p: "Zero alternância de telas durante blocos de concentração"
+    },
+    {
+      termo: "Proteção da Energia do Sistema 2",
+      autor: "Daniel Kahneman (Thinking, Fast and Slow)",
+      p: "Poupar o córtex pré-frontal para tarefas analíticas reais"
+    },
+    {
+      termo: "Fricção Zero para Início de Tarefa (2 Min)",
+      autor: "James Clear (Atomic Habits)",
+      p: "Ambiente preparado para começar a estudar sem barreiras"
+    },
+    {
+      termo: "Canal Ótimo de Flow (Desafio vs Habilidade)",
+      autor: "Mihaly Csikszentmihalyi",
+      p: "Equilíbrio entre tédio e ansiedade para imersão total"
+    },
+    {
+      termo: "Regra Ergonômica 20-20-20 de Fadiga Ocular",
+      autor: "Optometria Científica",
+      p: "A cada 20 minutos olhar 20 pés de distância por 20 segundos"
+    },
+    {
+      termo: "Pausa Ativa com Reset Dopaminérgico",
+      autor: "Amishi Jha (Peak Mind)",
+      p: "Micro-descansos conscientes sem telas para restaurar a atenção"
+    },
+    {
+      termo: "Monotarefa com Isolamento de Campo Visual",
+      autor: "Chris Bailey (Hyperfocus)",
+      p: "Ocultar notificações e abas secundárias durante o estudo"
+    },
+    {
+      termo: "Rastreamento do Tempo em Foco Real (Sem Fraude)",
+      autor: "Gloria Mark (Attention Span)",
+      p: "Contagem de minutos com exclusão de pausas e distrações"
+    },
+    {
+      termo: "Rotina de Encerramento Noturno (Shutdown Ritual)",
+      autor: "Cal Newport",
+      p: "Registrar pendências para desligar o cérebro sem ansiedade"
+    },
+    {
+      termo: "Loop Deixa-Rotina-Recompensa Saudável",
+      autor: "Charles Duhigg / James Clear",
+      p: "Gatilho sensorial que antecipa o prazer da tarefa concluída"
+    }
   ],
   mascote_socratica: [
-    { termo: "Sabatina Afetiva do Pet Tutor", autor: "Método Socrático / Pedagogia Ativa", p: "O mascote faz perguntas abertas estimulando reflexão" },
-    { termo: "Reforço Positivo Não-Tóxico", autor: "B.F. Skinner / Gamificação Positiva", p: "Comemoração sincera da consistência, não apenas de pontuações" },
-    { termo: "Empatia e Conexão Interpessoal do Avatar", autor: "Clifford Nass (Computers as Social Actors)", p: "Expressões faciais que reagem aos momentos de estudo" },
-    { termo: "Alimentação Literária do Mascote", autor: "Gamificação Narrativa", p: "O pet só come quando o usuário alimenta sua própria mente" },
-    { termo: "Acompanhamento do Ciclo Circadiano", autor: "Cronobiologia do Aprendizado", p: "O pet boceja à noite e desperta cheio de energia pela manhã" },
-    { termo: "Lembrete Afetivo de Repetição Espaçada", autor: "Ebbinghaus + Design Empático", p: "O pet traz uma lição esquecida como se fosse um brinquedo" },
-    { termo: "Estante como Mapa de Conhecimento Duradouro", autor: "Teoria dos Esquemas Cognitivos", p: "Livros ganham auras conforme o nível de retenção atestado" },
-    { termo: "Companhia Silenciosa de Estudo (Body Doubling)", autor: "Psicologia do TDAH e Foco", p: "A presença visual calma do pet ao lado reduz a sensação de isolamento" },
-    { termo: "Apoio Emocional diante da Frustração", autor: "Carol Dweck (Mindset de Crescimento)", p: "O pet encoraja a tentar de novo quando um teste falha" },
-    { termo: "Celebração Sensorial da Conquista Cognitiva", autor: "Neurobiologia da Dopamina", p: "Partículas suaves e carinho coroam a superação de metas" }
+    {
+      termo: "Sabatina Afetiva do Pet Tutor",
+      autor: "Método Socrático / Pedagogia Ativa",
+      p: "O mascote faz perguntas abertas estimulando reflexão"
+    },
+    {
+      termo: "Reforço Positivo Não-Tóxico",
+      autor: "B.F. Skinner / Gamificação Positiva",
+      p: "Comemoração sincera da consistência, não apenas de pontuações"
+    },
+    {
+      termo: "Empatia e Conexão Interpessoal do Avatar",
+      autor: "Clifford Nass (Computers as Social Actors)",
+      p: "Expressões faciais que reagem aos momentos de estudo"
+    },
+    {
+      termo: "Alimentação Literária do Mascote",
+      autor: "Gamificação Narrativa",
+      p: "O pet só come quando o usuário alimenta sua própria mente"
+    },
+    {
+      termo: "Acompanhamento do Ciclo Circadiano",
+      autor: "Cronobiologia do Aprendizado",
+      p: "O pet boceja à noite e desperta cheio de energia pela manhã"
+    },
+    {
+      termo: "Lembrete Afetivo de Repetição Espaçada",
+      autor: "Ebbinghaus + Design Empático",
+      p: "O pet traz uma lição esquecida como se fosse um brinquedo"
+    },
+    {
+      termo: "Estante como Mapa de Conhecimento Duradouro",
+      autor: "Teoria dos Esquemas Cognitivos",
+      p: "Livros ganham auras conforme o nível de retenção atestado"
+    },
+    {
+      termo: "Companhia Silenciosa de Estudo (Body Doubling)",
+      autor: "Psicologia do TDAH e Foco",
+      p: "A presença visual calma do pet ao lado reduz a sensação de isolamento"
+    },
+    {
+      termo: "Apoio Emocional diante da Frustração",
+      autor: "Carol Dweck (Mindset de Crescimento)",
+      p: "O pet encoraja a tentar de novo quando um teste falha"
+    },
+    {
+      termo: "Celebração Sensorial da Conquista Cognitiva",
+      autor: "Neurobiologia da Dopamina",
+      p: "Partículas suaves e carinho coroam a superação de metas"
+    }
   ]
 };
 
@@ -186,13 +406,15 @@ function renderizarGridLeitner() {
 
   return `
     <div class="grade-leitner-box" aria-label="Caixas de Repetição Espaçada Leitner">
-      ${CAIXAS_LEITNER_CONFIG.map((conf, i) => `
+      ${CAIXAS_LEITNER_CONFIG.map(
+        (conf, i) => `
         <div class="caixa-leitner-item" tabindex="0" role="region" aria-label="${conf.nome}: ${contagens[i]} cartões">
           <div class="caixa-leitner-nivel">Nível ${conf.caixa}</div>
           <div class="caixa-leitner-contagem">${contagens[i]}</div>
-          <div class="caixa-leitner-dias">${conf.dias === 1 ? '1 dia' : conf.dias + ' dias'}</div>
+          <div class="caixa-leitner-dias">${conf.dias === 1 ? "1 dia" : conf.dias + " dias"}</div>
         </div>
-      `).join("")}
+      `
+      ).join("")}
     </div>
   `;
 }
@@ -236,7 +458,7 @@ function anunciarParaLeitorDeTela(mensagem) {
   }, 60);
 }
 
-function alternarAltoContraste() {
+function alternarAltoContrasteCognitivo() {
   if (typeof document === "undefined") return;
   const ativo = document.body.classList.toggle("alto-contraste");
   anunciarParaLeitorDeTela(ativo ? "Modo alto contraste ativado." : "Modo alto contraste desativado.");
@@ -263,7 +485,7 @@ if (typeof window !== "undefined") {
   window.ativarModoDeepWork = ativarModoDeepWork;
   window.desativarModoDeepWork = desativarModoDeepWork;
   window.anunciarParaLeitorDeTela = anunciarParaLeitorDeTela;
-  window.alternarAltoContraste = alternarAltoContraste;
+  window.alternarAltoContraste = alternarAltoContrasteCognitivo;
   window.contarMelhoriasCognitivas = contarMelhoriasCognitivas;
   window.obterMelhoriasCognitivas = obterMelhoriasCognitivas;
 }
@@ -280,7 +502,7 @@ if (typeof module !== "undefined" && module.exports) {
     ativarModoDeepWork,
     desativarModoDeepWork,
     anunciarParaLeitorDeTela,
-    alternarAltoContraste,
+    alternarAltoContraste: alternarAltoContrasteCognitivo,
     contarMelhoriasCognitivas,
     obterMelhoriasCognitivas
   };

@@ -6,12 +6,21 @@
 
 // P201. Máquina de Estados Finitos (FSM) de Humor do Mascote (8 estados)
 function inicializarMaquinaEstadosHumorPet(humorInicial = "ocioso") {
-  const estadosValidos = ["ocioso", "focado", "faminto", "sonolento", "radiante", "dengoso", "preocupado", "comemorando"];
+  const estadosValidos = [
+    "ocioso",
+    "focado",
+    "faminto",
+    "sonolento",
+    "radiante",
+    "dengoso",
+    "preocupado",
+    "comemorando"
+  ];
   const estado = estadosValidos.includes(humorInicial) ? humorInicial : "ocioso";
   return {
     estadoAtual: estado,
     historicoTransicoes: [{ estado, timestamp: Date.now() }],
-    transicaoPara: function(novoEstado) {
+    transicaoPara: function (novoEstado) {
       if (estadosValidos.includes(novoEstado) && novoEstado !== this.estadoAtual) {
         this.estadoAtual = novoEstado;
         this.historicoTransicoes.push({ estado: novoEstado, timestamp: Date.now() });
@@ -45,8 +54,18 @@ function interpolarCoordenadasExpressaoSpline(pontoA = 0, pontoB = 10, t = 0.5) 
 function obterMatrizPersonalidadePet(arquetipo = "zen") {
   const personalidades = {
     zen: { paciencia: 95, energia: 40, curiosidade: 60, falaPadrao: "Respire fundo e viva o agora. 🍃" },
-    energico: { paciencia: 40, energia: 95, curiosidade: 85, falaPadrao: "Bora lá! Nenhuma meta vai nos parar hoje! ⚡" },
-    academico: { paciencia: 75, energia: 60, curiosidade: 95, falaPadrao: "Você sabia que estudar em blocos melhora a retenção? 📚" }
+    energico: {
+      paciencia: 40,
+      energia: 95,
+      curiosidade: 85,
+      falaPadrao: "Bora lá! Nenhuma meta vai nos parar hoje! ⚡"
+    },
+    academico: {
+      paciencia: 75,
+      energia: 60,
+      curiosidade: 95,
+      falaPadrao: "Você sabia que estudar em blocos melhora a retenção? 📚"
+    }
   };
   return personalidades[arquetipo] || personalidades.zen;
 }
@@ -58,7 +77,7 @@ function calcularAfetoLongoPrazoPet(diasConvivencia = 30, carinhosTotais = 120) 
   const pontos = Math.min(1000, dias * 10 + car * 2);
   let titulo = "Amigo Inseparável ❤️";
   if (pontos < 200) titulo = "Novo Conhecido 🌱";
-  else if (pontos < 500) titulo = "Companheiro Fiel 🐾";
+  else if (pontos < 700) titulo = "Companheiro Fiel 🐾";
   return { pontosAfeto: pontos, tituloAfeto: titulo, diasJuntos: dias };
 }
 
@@ -96,7 +115,9 @@ function calcularReacaoClimaticaPet(estacao = "inverno", temperatura = 14) {
     temperatura,
     usaCachecol: frio,
     postura: frio ? "encolhidinho" : "aberto_arejado",
-    falaClima: frio ? "Brrr, que friozinho bom para estudar com chá quente!" : "Dia lindo e ensolarado para brilhar!"
+    falaClima: frio
+      ? "Brrr, que friozinho bom para estudar com chá quente!"
+      : "Dia lindo e ensolarado para brilhar!"
   };
 }
 
@@ -105,11 +126,21 @@ function gerarCicloRespiracaoInvoluntaria(tempoMs = 0) {
   const t = (tempoMs % 3600) / 3600;
   const escalaY = 1.0 + 0.03 * Math.sin(t * Math.PI * 2);
   const escalaX = 1.0 - 0.015 * Math.sin(t * Math.PI * 2);
-  return { escalaX: parseFloat(escalaX.toFixed(3)), escalaY: parseFloat(escalaY.toFixed(3)), classe: "pet-respiracao-involuntaria" };
+  return {
+    escalaX: parseFloat(escalaX.toFixed(3)),
+    escalaY: parseFloat(escalaY.toFixed(3)),
+    classe: "pet-respiracao-involuntaria"
+  };
 }
 
 // P211. Modelo físico Spring-Mass para o corpo do pet
-function calcularMassaMolaPet(posAtual = 0, posAlvo = 100, velocidade = 0, rigidez = 0.15, amortecimento = 0.8) {
+function calcularMassaMolaPet(
+  posAtual = 0,
+  posAlvo = 100,
+  velocidade = 0,
+  rigidez = 0.15,
+  amortecimento = 0.8
+) {
   const forcaMola = (posAlvo - posAtual) * rigidez;
   const novaVel = (velocidade + forcaMola) * amortecimento;
   const novaPos = posAtual + novaVel;
@@ -261,7 +292,7 @@ function ajustarIluminacaoQuartoPet(temaEscuro = true, hora = 23) {
   return {
     luzApagada: Boolean(temaEscuro || ehNoite),
     abajurVagalumesAtivo: Boolean(temaEscuro || ehNoite),
-    brilhoAmbiente: (temaEscuro || ehNoite) ? 0.35 : 1.0
+    brilhoAmbiente: temaEscuro || ehNoite ? 0.35 : 1.0
   };
 }
 
@@ -270,7 +301,9 @@ function gerarAvisoMadrugadaCarinhoso(hora = 3) {
   const madrugada = hora >= 1 && hora <= 4;
   return {
     ehMadrugada: madrugada,
-    sussurro: madrugada ? "Shhh... o que faz acordado a essa hora? Descanse seus olhinhos, amanhã é um novo dia. 🌙" : null
+    sussurro: madrugada
+      ? "Shhh... o que faz acordado a essa hora? Descanse seus olhinhos, amanhã é um novo dia. 🌙"
+      : null
   };
 }
 
@@ -462,9 +495,24 @@ function calcularZoomProvadorLoja(slotSelecionado = "cabeca") {
 // P249. Conjunto temático completo de roupas
 function obterConjuntoTematicoCompleto(temaId = "astronauta") {
   const conjuntos = {
-    astronauta: { nome: "Explorador Espacial", cabeca: "Capacete Lunar", corpo: "Traje Espacial", acessorio: "Mini Foguete" },
-    mago: { nome: "Arcanista das Estrelas", cabeca: "Chapéu Pontudo Mágico", corpo: "Manto de Veludo", acessorio: "Varinha de Cristal" },
-    detetive: { nome: "Detetive dos Mistérios", cabeca: "Boina Xadrez", corpo: "Sobretudo Bege", acessorio: "Lupa de Ouro" }
+    astronauta: {
+      nome: "Explorador Espacial",
+      cabeca: "Capacete Lunar",
+      corpo: "Traje Espacial",
+      acessorio: "Mini Foguete"
+    },
+    mago: {
+      nome: "Arcanista das Estrelas",
+      cabeca: "Chapéu Pontudo Mágico",
+      corpo: "Manto de Veludo",
+      acessorio: "Varinha de Cristal"
+    },
+    detetive: {
+      nome: "Detetive dos Mistérios",
+      cabeca: "Boina Xadrez",
+      corpo: "Sobretudo Bege",
+      acessorio: "Lupa de Ouro"
+    }
   };
   return conjuntos[temaId] || conjuntos.astronauta;
 }
@@ -542,7 +590,10 @@ function gerarBalaoDeSabaoInterativo(x = 120, y = 150) {
     y,
     raio: 22,
     estourou: false,
-    estourar: function() { this.estourou = true; return { gotasRecompensa: 1, som: "pop_cristalino" }; }
+    estourar: function () {
+      this.estourou = true;
+      return { gotasRecompensa: 1, som: "pop_cristalino" };
+    }
   };
 }
 
@@ -552,7 +603,9 @@ function gerarTruquePularAro(nivelAfeto = 3) {
   return {
     aptoParaAcrobacia: apto,
     truqueNome: "Salto Mortal pelo Arco de Fogo Mágico 🎪✨",
-    mensagem: apto ? "O pet pulou com graça e perfeição!" : "Requer nível 3 de afeto para treinar este truque."
+    mensagem: apto
+      ? "O pet pulou com graça e perfeição!"
+      : "Requer nível 3 de afeto para treinar este truque."
   };
 }
 
@@ -985,7 +1038,6 @@ function concluirMarcoPets300(versao = "2.2.0") {
   };
 }
 
-
 /* ========================================================
    LOTES 301 A 400: HABILIDADES, PASSEIOS, FENG SHUI,
    GENÉTICA MÁGICA E EFEITOS SENSORIAIS DOS PETS
@@ -1013,7 +1065,11 @@ function desbloquearHabilidadePet(arvore = {}, habilidadeId = "passiva_vigor_agu
   const novaArvore = { ...arvore, pontosDisponiveis: pts - pontosCusto };
   novaArvore.ramos.vigor.habilidades.push(habilidadeId);
   novaArvore.ramos.vigor.nivel++;
-  return { sucesso: true, arvore: novaArvore, mensagem: `Habilidade "${habilidadeId}" desbloqueada com sucesso!` };
+  return {
+    sucesso: true,
+    arvore: novaArvore,
+    mensagem: `Habilidade "${habilidadeId}" desbloqueada com sucesso!`
+  };
 }
 
 // P303. Cálculo de pontos de talento disponíveis conforme conquistas e nível
@@ -1090,7 +1146,7 @@ function gerarEmblemaMestreEspecialidade(ramo = "foco") {
   return {
     titulo: `Mestre Supremo do ${ramo.toUpperCase()} 🌟`,
     ramo,
-    emblemaIcone: ramo === "foco" ? "🎯👑" : (ramo === "serenidade" ? "🍃👑" : "⚡👑")
+    emblemaIcone: ramo === "foco" ? "🎯👑" : ramo === "serenidade" ? "🍃👑" : "⚡👑"
   };
 }
 
@@ -1104,7 +1160,8 @@ function calcularSentimentoCompostoPet(humor = "radiante", afeto = 80, energia =
 // P312. Fala de aconselhamento emocional do pet
 function gerarFalaAconselhamentoEmocional(humorUsuario = "ansioso", pet = "prumi") {
   const falas = {
-    ansioso: "Feche os olhos por 1 minuto comigo. Inspire bem devagar... você não precisa dar conta de tudo hoje.",
+    ansioso:
+      "Feche os olhos por 1 minuto comigo. Inspire bem devagar... você não precisa dar conta de tudo hoje.",
     cansado: "Você deu o seu melhor hoje. Que tal beber uma água fresca e deitar um pouquinho?",
     motivado: "Essa energia é maravilhosa! Estou do seu lado para conquistar o mundo hoje!"
   };
@@ -1125,7 +1182,10 @@ function registrarMomentoMarcantePet(evento = "Terminou o TCC", fotos = ["polaro
 // P314. Cálculo da afinidade mútua diária
 function calcularNivelAfinidadeMutua(interacoesSemana = 25) {
   const pts = Math.min(100, (parseInt(interacoesSemana, 10) || 0) * 4);
-  return { afinidadePorcentagem: pts, sintonia: pts >= 80 ? "Sintonia de Alma 🐾" : "Belo Companheirismo 🌱" };
+  return {
+    afinidadePorcentagem: pts,
+    sintonia: pts >= 80 ? "Sintonia de Alma 🐾" : "Belo Companheirismo 🌱"
+  };
 }
 
 // P315. Animação de olhar de admiração para o tutor
@@ -1153,7 +1213,9 @@ function sugerirAutoCuidadoGentilPet(horasTrabalhadas = 4) {
   return {
     precisaPausa: precisa,
     mimoOferecido: precisa ? "Toalhinha morna e copo d'água fresca 💧" : "Incentivo carinhoso",
-    fala: precisa ? "Você já produziu muito! Faça uma pausa de 10 minutos para cuidar de si." : "Continue no seu ritmo."
+    fala: precisa
+      ? "Você já produziu muito! Faça uma pausa de 10 minutos para cuidar de si."
+      : "Continue no seu ritmo."
   };
 }
 
@@ -1211,7 +1273,8 @@ function calcularDescobertasPasseio(duracaoMin = 30, sorte = 0.8) {
 function gerarRelatorioAventuraPet(passeio = {}) {
   return {
     bioma: passeio.bioma || "Floresta Zen",
-    historia: "Corri atrás de borboletas azuis, bebi água de um riacho transparente e trouxe uma lembrancinha mágica para você!",
+    historia:
+      "Corri atrás de borboletas azuis, bebi água de um riacho transparente e trouxe uma lembrancinha mágica para você!",
     retornouEmSeguranca: true
   };
 }
@@ -1283,7 +1346,10 @@ function gerarDiarioDoExplorador(passeiosRealizados = 5) {
 function calcularPontuacaoFengShuiQuarto(moveisDispostos = []) {
   const qtd = Array.isArray(moveisDispostos) ? moveisDispostos.length : 0;
   const score = Math.min(100, qtd * 18);
-  return { scoreFengShui: score, harmonia: score >= 70 ? "Fluxo de Energia Perfeito ☯️" : "Ambiente em Organização" };
+  return {
+    scoreFengShui: score,
+    harmonia: score >= 70 ? "Fluxo de Energia Perfeito ☯️" : "Ambiente em Organização"
+  };
 }
 
 // P332. Interação do mascote com móveis específicos do quarto
@@ -1331,7 +1397,8 @@ function acenderLareiraAconchegante(ativa = true) {
 // P336. Crescimento da plantinha de interior conforme água do tutor
 function gerarPlantaInteriorCrescimento(aguaDadaCopos = 8) {
   const estagios = ["Brotinho Verde", "Folhas Jovens", "Planta Frondosa", "Vaso com Flores Raras 🌸"];
-  const idx = Math.min(3, Math.floor((parseInt(aguaDadaCopos, 10) || 0) / 2));
+  const copos = parseInt(aguaDadaCopos, 10) || 0;
+  const idx = copos >= 8 ? 3 : copos >= 5 ? 2 : copos >= 2 ? 1 : 0;
   return { estagioNome: estagios[idx], alturaCm: 10 + idx * 8 };
 }
 
@@ -1407,7 +1474,10 @@ function gerarAcessorioPersonalizadoArtesanal(tipo = "coleira", cor = "#4F6E4B",
 // P345. Validação de compatibilidade de acessórios para evitar sobreposição feia
 function calcularCompatibilidadeCosmetica(chapeu = "cartola", oculos = "oculos_sol") {
   const incompativel = chapeu === "capacete_astronauta" && oculos === "oculos_sol";
-  return { compativel: !incompativel, aviso: incompativel ? "Capacete já cobre os olhos!" : "Combinação harmônica." };
+  return {
+    compativel: !incompativel,
+    aviso: incompativel ? "Capacete já cobre os olhos!" : "Combinação harmônica."
+  };
 }
 
 // P346. Asinhas mágicas translúcidas com bater suave
@@ -1607,7 +1677,9 @@ function calcularNivelGulaPet(comidasDadasHoje = 12) {
   const cheia = parseInt(comidasDadasHoje, 10) >= 10;
   return {
     barriguinhaCheia: cheia,
-    falaEngracada: cheia ? "Ufa, minha barriguinha tá redondinha! Que tal fazermos digestão lendo um livro?" : "Adoro petiscos saudáveis!"
+    falaEngracada: cheia
+      ? "Ufa, minha barriguinha tá redondinha! Que tal fazermos digestão lendo um livro?"
+      : "Adoro petiscos saudáveis!"
   };
 }
 
@@ -1678,7 +1750,9 @@ function calcularProbabilidadeAcertoBrincadeira(escolha = "esquerda", correta = 
   const acertou = escolha === correta;
   return {
     acertou,
-    mensagem: acertou ? "Aee! Você adivinhou certinho! Ganhou +3 gotas! 🎉" : "Quase! A gotinha estava na outra patinha! Hihi 🐾"
+    mensagem: acertou
+      ? "Aee! Você adivinhou certinho! Ganhou +3 gotas! 🎉"
+      : "Quase! A gotinha estava na outra patinha! Hihi 🐾"
   };
 }
 
@@ -1888,7 +1962,8 @@ function gerarAnimacaoPetTocandoSininhoAlarme() {
 // P398. Carta de boa noite no mural
 function gerarCartaDespedidaDoDiaPet() {
   return {
-    mensagem: "Obrigado por ter cuidado tão bem de mim hoje. Vá dormir em paz, amanhã estaremos juntos de novo!",
+    mensagem:
+      "Obrigado por ter cuidado tão bem de mim hoje. Vá dormir em paz, amanhã estaremos juntos de novo!",
     icone: "🌙🐾"
   };
 }

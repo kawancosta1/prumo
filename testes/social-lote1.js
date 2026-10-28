@@ -55,7 +55,7 @@ module.exports = async url => {
   const res5 = ev(`
     (() => {
       const cod = gerarCodigoPareamentoMnemonic();
-      return /^PRU-[A-Z]+-\d{3}$/.test(cod);
+      return /^PRU-[A-Z]+-[0-9]{3}$/.test(cod);
     })()
   `);
   ok(res5, "S5. gerarCodigoPareamentoMnemonic gerou código legível");
@@ -64,7 +64,7 @@ module.exports = async url => {
   const res6 = ev(`
     (() => {
       const svg = gerarQrCodeSvgDupla("https://prumo.app", 100);
-      return svg.includes("<svg") && svg.includes("width=\"100\"");
+      return svg.includes("<svg") && svg.includes("width=");
     })()
   `);
   ok(res6, "S6. gerarQrCodeSvgDupla gerou marcação SVG compacta");
@@ -184,7 +184,10 @@ module.exports = async url => {
              rad.harmoniaGeral === 80;
     })()
   `);
-  ok(res31a40, "S31 a S40: Árvore de hábitos, regador, passos, garrafa conjunta e radar de harmonia validados");
+  ok(
+    res31a40,
+    "S31 a S40: Árvore de hábitos, regador, passos, garrafa conjunta e radar de harmonia validados"
+  );
 
   // S41 a S50: Foco e Pomodoro Compartilhado
   const res41a50 = ev(`

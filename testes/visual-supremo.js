@@ -30,13 +30,15 @@ module.exports = async url => {
         testEl.className = "pet-svg pose-feliz aura-conquista-suprema";
         document.body.appendChild(testEl);
         const st = getComputedStyle(testEl);
-        const anim = st.animationName;
+        const anim =
+          st.animationName ||
+          (st.getPropertyValue &&
+            (st.getPropertyValue("animation-name") || st.getPropertyValue("animation")));
         testEl.remove();
         return Boolean(anim);
       })()
     `);
     ok(classesCarregadas, "Regras de animacao e efeitos do visual supremo aplicadas com sucesso");
-
   } finally {
     fechar();
   }

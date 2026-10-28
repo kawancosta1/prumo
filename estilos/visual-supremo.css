@@ -9,13 +9,17 @@
    ========================================================================== */
 
 /* Olhos dos Pets com Brilho Especular e Profundidade */
-.pet-svg .pet-olho, .pet-svg circle[fill="#111"], .pet-svg circle[fill="#000"] {
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+.pet-svg .pet-olho,
+.pet-svg circle[fill="#111"],
+.pet-svg circle[fill="#000"] {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
   position: relative;
 }
 
 /* Sombra de Contato Dinamica no Chao */
-.pet-palco, .pet-agente, .pet-previa {
+.pet-palco,
+.pet-agente,
+.pet-previa {
   position: relative;
 }
 .pet-svg {
@@ -37,43 +41,80 @@
 }
 
 @keyframes sombra-chao-elastica {
-  0% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(0.7) translateY(4px); opacity: 0.35; }
-  100% { transform: scale(1); opacity: 0.8; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(0.7) translateY(4px);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
 }
 
 /* Animacao de Pulo Expressivo com Squash & Stretch */
-.pet-svg.pose-feliz, .pet-svg.pose-brincando {
+.pet-svg.pose-feliz,
+.pet-svg.pose-brincando {
+  animation-name: pet-squash-stretch !important;
   animation: pet-squash-stretch 1.8s cubic-bezier(0.28, 0.84, 0.42, 1) infinite !important;
   transform-origin: bottom center;
 }
 
 @keyframes pet-squash-stretch {
-  0%, 100% { transform: scale(1, 1) translateY(0); }
-  20% { transform: scale(1.15, 0.82) translateY(2px); } /* Squash no chao */
-  45% { transform: scale(0.88, 1.18) translateY(-14px); } /* Stretch no ar */
-  70% { transform: scale(1.05, 0.95) translateY(0); }
-  85% { transform: scale(0.98, 1.02) translateY(-2px); }
+  0%,
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+  20% {
+    transform: scale(1.15, 0.82) translateY(2px);
+  } /* Squash no chao */
+  45% {
+    transform: scale(0.88, 1.18) translateY(-14px);
+  } /* Stretch no ar */
+  70% {
+    transform: scale(1.05, 0.95) translateY(0);
+  }
+  85% {
+    transform: scale(0.98, 1.02) translateY(-2px);
+  }
 }
 
 /* Cauda e Orelhas com Fisica Pendular Organica */
-.pet-svg .pet-cauda, .pet-corpo > path[d*="Q"]:first-child {
+.pet-svg .pet-cauda,
+.pet-corpo > path[d*="Q"]:first-child {
   animation: cauda-ondulante 2.4s ease-in-out infinite alternate;
   transform-origin: left bottom;
 }
 @keyframes cauda-ondulante {
-  0% { transform: rotate(-8deg); }
-  100% { transform: rotate(14deg); }
+  0% {
+    transform: rotate(-8deg);
+  }
+  100% {
+    transform: rotate(14deg);
+  }
 }
 
-.pet-svg .pet-orelha, .pet-svg path[d*="M16 14"], .pet-svg path[d*="M32 14"] {
+.pet-svg .pet-orelha,
+.pet-svg path[d*="M16 14"],
+.pet-svg path[d*="M32 14"] {
   animation: orelha-atenta 3s ease-in-out infinite;
   transform-origin: center bottom;
 }
 @keyframes orelha-atenta {
-  0%, 90%, 100% { transform: rotate(0deg); }
-  93% { transform: rotate(-5deg); }
-  96% { transform: rotate(4deg); }
+  0%,
+  90%,
+  100% {
+    transform: rotate(0deg);
+  }
+  93% {
+    transform: rotate(-5deg);
+  }
+  96% {
+    transform: rotate(4deg);
+  }
 }
 
 /* ==========================================================================
@@ -85,7 +126,8 @@
 }
 
 .prumi .body {
-  filter: drop-shadow(inset 0 4px 8px rgba(255, 255, 255, 0.4)) drop-shadow(inset 0 -6px 12px rgba(0, 0, 0, 0.08));
+  filter: drop-shadow(inset 0 4px 8px rgba(255, 255, 255, 0.4))
+    drop-shadow(inset 0 -6px 12px rgba(0, 0, 0, 0.08));
 }
 
 /* Agua interna com reflexo curvo e iluminacao subaquatica */
@@ -104,8 +146,14 @@
   animation: pulso-brilho-cristal 4s ease-in-out infinite alternate;
 }
 @keyframes pulso-brilho-cristal {
-  0% { opacity: 0.6; stroke-width: 4.8; }
-  100% { opacity: 0.95; stroke-width: 6; }
+  0% {
+    opacity: 0.6;
+    stroke-width: 4.8;
+  }
+  100% {
+    opacity: 0.95;
+    stroke-width: 6;
+  }
 }
 
 /* Bochechas coradas com difusao de luz suave */
@@ -115,8 +163,14 @@
   animation: blush-respiro 3s ease-in-out infinite alternate;
 }
 @keyframes blush-respiro {
-  0% { transform: scale(0.9); opacity: 0.35; }
-  100% { transform: scale(1.15); opacity: 0.55; }
+  0% {
+    transform: scale(0.9);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0.55;
+  }
 }
 
 /* ==========================================================================
@@ -124,20 +178,24 @@
    ========================================================================== */
 
 /* Livro com Profundidade Realistica e Nervuras no Dorso */
-.livro-lombada-real, .estante-item-livro {
+.livro-lombada-real,
+.estante-item-livro {
   border-radius: 4px 6px 6px 4px;
-  box-shadow: 
-    -2px 0 3px rgba(0, 0, 0, 0.35) inset, /* Chanfro da dobra */
-    2px 0 3px rgba(255, 255, 255, 0.25) inset, /* Luz especular */
-    3px 6px 16px rgba(0, 0, 0, 0.22); /* Sombra projetada */
+  box-shadow:
+    -2px 0 3px rgba(0, 0, 0, 0.35) inset,
+    /* Chanfro da dobra */ 2px 0 3px rgba(255, 255, 255, 0.25) inset,
+    /* Luz especular */ 3px 6px 16px rgba(0, 0, 0, 0.22); /* Sombra projetada */
   position: relative;
   overflow: hidden;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+  transition:
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.28s ease;
 }
 
-.livro-lombada-real:hover, .estante-item-livro:hover {
+.livro-lombada-real:hover,
+.estante-item-livro:hover {
   transform: translateY(-8px) scale(1.03) rotate(-1deg);
-  box-shadow: 
+  box-shadow:
     -2px 0 4px rgba(0, 0, 0, 0.4) inset,
     3px 0 4px rgba(255, 255, 255, 0.4) inset,
     6px 14px 28px rgba(0, 0, 0, 0.35);
@@ -153,8 +211,12 @@
   animation: brilho-foil-metal 4s linear infinite;
 }
 @keyframes brilho-foil-metal {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
 /* Prateleira com Veios de Madeira Nobre e Encaixes de Latao */
@@ -164,7 +226,7 @@
   background: linear-gradient(180deg, #8a5a36 0%, #683e20 40%, #4a2811 100%);
   border-radius: 4px;
   position: relative;
-  box-shadow: 
+  box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.35),
     0 12px 24px rgba(0, 0, 0, 0.18);
 }
@@ -184,21 +246,27 @@
    ========================================================================== */
 
 /* Cartoes de Alta Fidelidade (iOS Squircle com Borda de Cristal) */
-.card, .mv-cartao-personalidade, .top, .bot {
+.card,
+.mv-cartao-personalidade,
+.top,
+.bot {
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.45);
-  box-shadow: 
+  box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.02),
     0 8px 16px rgba(0, 0, 0, 0.04),
     0 20px 40px rgba(0, 0, 0, 0.06);
 }
 
-body.dark .card, body.dark .mv-cartao-personalidade, body.dark .top, body.dark .bot {
+body.dark .card,
+body.dark .mv-cartao-personalidade,
+body.dark .top,
+body.dark .bot {
   background: rgba(24, 20, 36, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
+  box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.2),
     0 8px 24px rgba(0, 0, 0, 0.35);
 }
@@ -206,21 +274,21 @@ body.dark .card, body.dark .mv-cartao-personalidade, body.dark .top, body.dark .
 /* Botoes com Borda Chanfrada Superior de Luz */
 .btn.primary {
   background: linear-gradient(180deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 88%, #000) 100%);
-  box-shadow: 
+  box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.3) inset,
     0 -1px 0 rgba(0, 0, 0, 0.2) inset,
     0 4px 12px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .btn.primary:hover {
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.4) inset,
     0 8px 20px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 /* Checkbox com Efeito Radial de Conclusao */
 .check {
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
   border: 2px solid var(--border);
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -232,6 +300,15 @@ body.dark .card, body.dark .mv-cartao-personalidade, body.dark .top, body.dark .
 /* Efeito de Aura Dourada para Itens Especiais */
 .aura-conquista-suprema {
   position: relative;
+  animation: pulso-aura-suprema 3s ease-in-out infinite alternate;
+}
+@keyframes pulso-aura-suprema {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.02);
+  }
 }
 .aura-conquista-suprema::before {
   content: "";
@@ -245,5 +322,7 @@ body.dark .card, body.dark .mv-cartao-personalidade, body.dark .top, body.dark .
   animation: giro-aura-cosmica 6s linear infinite;
 }
 @keyframes giro-aura-cosmica {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

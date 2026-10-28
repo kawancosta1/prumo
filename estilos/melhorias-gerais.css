@@ -506,9 +506,10 @@ button.btn:active,
 }
 
 /* 87. Áreas de toque mínimas de 48px em mobile */
-.touch-minimo {
-  min-width: 48px;
-  min-height: 48px;
+.touch-minimo,
+button.touch-minimo {
+  min-width: 48px !important;
+  min-height: 48px !important;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -550,8 +551,8 @@ textarea:focus-visible {
     padding-right: 4px;
   }
   .touch-minimo {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 48px;
+    min-height: 48px;
   }
 }
 
@@ -1488,15 +1489,24 @@ html.transicao-tema-ativa * {
   animation: pomodoroCriticoAnim 1s ease-in-out infinite alternate;
 }
 @keyframes pomodoroCriticoAnim {
-  0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(220, 53, 69, 0.3)); }
-  100% { transform: scale(1.04); filter: drop-shadow(0 0 8px rgba(220, 53, 69, 0.8)); }
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(220, 53, 69, 0.3));
+  }
+  100% {
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 8px rgba(220, 53, 69, 0.8));
+  }
 }
 .contador-caracteres-aviso {
   color: var(--err, #e05252) !important;
   font-weight: 700;
 }
 .transicao-tema-suave {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
 .badge-frequencia-chip {
   display: inline-flex;
@@ -1509,10 +1519,24 @@ html.transicao-tema-ativa * {
   color: var(--muted, #949ab0);
 }
 /* 51 a 60. Áudio sintético, gradientes de hábitos, períodos do dia e subtarefas */
-.habito-gradiente-bronze { color: #cd7f32 !important; border-color: rgba(205, 127, 50, 0.4) !important; }
-.habito-gradiente-prata { color: #c0c0c0 !important; border-color: rgba(192, 192, 192, 0.4) !important; }
-.habito-gradiente-ouro { color: #ffd700 !important; border-color: rgba(255, 215, 0, 0.5) !important; text-shadow: 0 0 6px rgba(255, 215, 0, 0.3); }
-.habito-gradiente-diamante { color: #70d6ff !important; border-color: rgba(112, 214, 255, 0.6) !important; text-shadow: 0 0 8px rgba(112, 214, 255, 0.5); }
+.habito-gradiente-bronze {
+  color: #cd7f32 !important;
+  border-color: rgba(205, 127, 50, 0.4) !important;
+}
+.habito-gradiente-prata {
+  color: #c0c0c0 !important;
+  border-color: rgba(192, 192, 192, 0.4) !important;
+}
+.habito-gradiente-ouro {
+  color: #ffd700 !important;
+  border-color: rgba(255, 215, 0, 0.5) !important;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+}
+.habito-gradiente-diamante {
+  color: #70d6ff !important;
+  border-color: rgba(112, 214, 255, 0.6) !important;
+  text-shadow: 0 0 8px rgba(112, 214, 255, 0.5);
+}
 
 .modo-foco-estrito-ativo .tabs,
 .modo-foco-estrito-ativo .top .right,
@@ -1520,7 +1544,9 @@ html.transicao-tema-ativa * {
   opacity: 0.15;
   pointer-events: none;
   filter: grayscale(0.8);
-  transition: opacity 0.4s ease, filter 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    filter 0.4s ease;
 }
 
 .periodo-secao-titulo {
@@ -1548,28 +1574,84 @@ html.transicao-tema-ativa * {
   transition: width 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
 }
 /* 61 a 100. Estudos SM-2, saúde e hidratação, vida social e gamificação do Prumi */
-.sm2-botoes-container { display: flex; gap: 8px; margin-top: 10px; }
-.sm2-btn-facil { background: rgba(40, 167, 69, 0.15); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.3); }
-.sm2-btn-bom { background: rgba(0, 123, 255, 0.15); color: #007bff; border: 1px solid rgba(0, 123, 255, 0.3); }
-.sm2-btn-dificil { background: rgba(220, 53, 69, 0.15); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.3); }
+.sm2-botoes-container {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.sm2-btn-facil {
+  background: rgba(40, 167, 69, 0.15);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+.sm2-btn-bom {
+  background: rgba(0, 123, 255, 0.15);
+  color: #007bff;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+}
+.sm2-btn-dificil {
+  background: rgba(220, 53, 69, 0.15);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
 
-.pomodoro-ciclos-pills { display: flex; gap: 6px; align-items: center; }
-.pomodoro-ciclo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line, #282c3f); }
-.pomodoro-ciclo-dot.ativo { background: var(--accent, #3f7fd9); box-shadow: 0 0 6px var(--accent, #3f7fd9); }
+.pomodoro-ciclos-pills {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.pomodoro-ciclo-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--line, #282c3f);
+}
+.pomodoro-ciclo-dot.ativo {
+  background: var(--accent, #3f7fd9);
+  box-shadow: 0 0 6px var(--accent, #3f7fd9);
+}
 
-.grade-aulas-slot { border-left: 3px solid var(--accent, #3f7fd9); padding-left: 8px; margin-block: 6px; }
+.grade-aulas-slot {
+  border-left: 3px solid var(--accent, #3f7fd9);
+  padding-left: 8px;
+  margin-block: 6px;
+}
 
-.agua-heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-.agua-heatmap-dia { aspect-ratio: 1; border-radius: 4px; background: var(--surface2, #202433); display: flex; align-items: center; justify-content: center; font-size: 10px; }
-.agua-heatmap-dia.meta-100 { background: rgba(63, 127, 217, 0.85); color: #fff; }
-.agua-heatmap-dia.meta-50 { background: rgba(63, 127, 217, 0.4); }
+.agua-heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.agua-heatmap-dia {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background: var(--surface2, #202433);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+.agua-heatmap-dia.meta-100 {
+  background: rgba(63, 127, 217, 0.85);
+  color: #fff;
+}
+.agua-heatmap-dia.meta-50 {
+  background: rgba(63, 127, 217, 0.4);
+}
 
 .prumi-dormindo-zzz {
   animation: prumiZzzAnim 2.5s ease-in-out infinite;
 }
 @keyframes prumiZzzAnim {
-  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.9; }
-  50% { transform: translateY(3px) rotate(-1.5deg); opacity: 1; }
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(3px) rotate(-1.5deg);
+    opacity: 1;
+  }
 }
 
 .provador-loja-preview {
@@ -1675,21 +1757,51 @@ html.transicao-tema-ativa * {
   animation: petFlutuandoAnim 3s ease-in-out infinite alternate;
 }
 @keyframes petFlutuandoAnim {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-6px); }
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-6px);
+  }
 }
 
 @media print {
-  body { background: #fff !important; color: #000 !important; }
-  .tabs, .top, .sync, #gear, .btn, form { display: none !important; }
-  .wrap { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
-  .list li { border-bottom: 1px solid #ccc !important; color: #000 !important; }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .tabs,
+  .top,
+  .sync,
+  #gear,
+  .btn,
+  form {
+    display: none !important;
+  }
+  .wrap {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .list li {
+    border-bottom: 1px solid #ccc !important;
+    color: #000 !important;
+  }
 }
 /* 151 a 200. Eisenhower, descanso ocular, jejuador, matriz de hábitos e raridades */
-.eisenhower-quadrante-urgente-importante { border-left: 4px solid #dc3545; }
-.eisenhower-quadrante-planejar { border-left: 4px solid #007bff; }
-.eisenhower-quadrante-delegar { border-left: 4px solid #ffc107; }
-.eisenhower-quadrante-eliminar { border-left: 4px solid #6c757d; opacity: 0.7; }
+.eisenhower-quadrante-urgente-importante {
+  border-left: 4px solid #dc3545;
+}
+.eisenhower-quadrante-planejar {
+  border-left: 4px solid #007bff;
+}
+.eisenhower-quadrante-delegar {
+  border-left: 4px solid #ffc107;
+}
+.eisenhower-quadrante-eliminar {
+  border-left: 4px solid #6c757d;
+  opacity: 0.7;
+}
 
 .modo-descanso-olhos {
   filter: sepia(0.25) hue-rotate(-15deg);
@@ -1700,16 +1812,26 @@ html.transicao-tema-ativa * {
   animation: aguaTransbordaAnim 1.8s ease-in-out infinite alternate;
 }
 @keyframes aguaTransbordaAnim {
-  0% { filter: drop-shadow(0 0 4px rgba(63, 127, 217, 0.4)); }
-  100% { filter: drop-shadow(0 0 12px rgba(63, 127, 217, 0.9)); }
+  0% {
+    filter: drop-shadow(0 0 4px rgba(63, 127, 217, 0.4));
+  }
+  100% {
+    filter: drop-shadow(0 0 12px rgba(63, 127, 217, 0.9));
+  }
 }
 
 .item-lendario-levitando {
   animation: itemLendarioAnim 2.8s ease-in-out infinite alternate;
 }
 @keyframes itemLendarioAnim {
-  0% { transform: translateY(0); filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3)); }
-  100% { transform: translateY(-5px); filter: drop-shadow(0 6px 12px rgba(255, 215, 0, 0.7)); }
+  0% {
+    transform: translateY(0);
+    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+  }
+  100% {
+    transform: translateY(-5px);
+    filter: drop-shadow(0 6px 12px rgba(255, 215, 0, 0.7));
+  }
 }
 
 .trofeu-retrospectiva-card {
@@ -1723,7 +1845,9 @@ html.transicao-tema-ativa * {
 /* 201 a 250. Inteligência de rotina, sono REM, loja dinâmica, parcerias e microanimações */
 .card-neumorfico-suave {
   background: var(--surface, #141622);
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.25), -2px -2px 6px rgba(255, 255, 255, 0.03);
+  box-shadow:
+    4px 4px 10px rgba(0, 0, 0, 0.25),
+    -2px -2px 6px rgba(255, 255, 255, 0.03);
   border-radius: 12px;
 }
 
@@ -1733,8 +1857,12 @@ html.transicao-tema-ativa * {
   animation: neonPulsoAnim 2s infinite alternate;
 }
 @keyframes neonPulsoAnim {
-  0% { box-shadow: 0 0 4px var(--neon-cor, #00f0ff); }
-  100% { box-shadow: 0 0 14px var(--neon-cor, #00f0ff); }
+  0% {
+    box-shadow: 0 0 4px var(--neon-cor, #00f0ff);
+  }
+  100% {
+    box-shadow: 0 0 14px var(--neon-cor, #00f0ff);
+  }
 }
 
 .card-flip-3d {
@@ -1747,16 +1875,29 @@ html.transicao-tema-ativa * {
 }
 
 .zoom-hover-suave {
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.4, 1.2), box-shadow 0.2s ease;
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.8, 0.4, 1.2),
+    box-shadow 0.2s ease;
 }
 .zoom-hover-suave:hover {
   transform: translateY(-2px) scale(1.02);
 }
 
-.item-raridade-comum { border-color: var(--line, #282c3f); }
-.item-raridade-raro { border-color: #007bff; box-shadow: 0 0 6px rgba(0, 123, 255, 0.3); }
-.item-raridade-epico { border-color: #9c27b0; box-shadow: 0 0 8px rgba(156, 39, 176, 0.4); }
-.item-raridade-lendario { border-color: #ffd700; box-shadow: 0 0 12px rgba(255, 215, 0, 0.6); }
+.item-raridade-comum {
+  border-color: var(--line, #282c3f);
+}
+.item-raridade-raro {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+}
+.item-raridade-epico {
+  border-color: #9c27b0;
+  box-shadow: 0 0 8px rgba(156, 39, 176, 0.4);
+}
+.item-raridade-lendario {
+  border-color: #ffd700;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+}
 
 .chuva-particula-queda {
   position: absolute;
@@ -1764,11 +1905,18 @@ html.transicao-tema-ativa * {
   animation: chuvaQuedaAnim 2.5s linear infinite;
 }
 @keyframes chuvaQuedaAnim {
-  0% { transform: translateY(-10px); opacity: 0; }
-  20% { opacity: 0.8; }
-  100% { transform: translateY(160px); opacity: 0; }
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(160px);
+    opacity: 0;
+  }
 }
-
 
 /* ========================================================
    LOTES 26 A 30: UI, MICROINTERACOES E ESTILOS FINAIS
@@ -1785,9 +1933,18 @@ html.transicao-tema-ativa * {
   animation: vibracaoShakeAnim 0.35s ease-in-out;
 }
 @keyframes vibracaoShakeAnim {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-4px); }
-  40%, 80% { transform: translateX(4px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-4px);
+  }
+  40%,
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 .ripple-efeito {
@@ -1804,7 +1961,10 @@ html.transicao-tema-ativa * {
   pointer-events: none;
 }
 @keyframes ondaRipple {
-  to { transform: scale(4); opacity: 0; }
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
 }
 
 .bateria-emocional-barra {
@@ -1815,7 +1975,9 @@ html.transicao-tema-ativa * {
 }
 .bateria-emocional-preenchimento {
   height: 100%;
-  transition: width 0.4s ease, background-color 0.4s ease;
+  transition:
+    width 0.4s ease,
+    background-color 0.4s ease;
 }
 
 .confete-animado {
@@ -1827,8 +1989,14 @@ html.transicao-tema-ativa * {
   animation: quedaConfete 2s ease-out forwards;
 }
 @keyframes quedaConfete {
-  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(350px) rotate(720deg); opacity: 0; }
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(350px) rotate(720deg);
+    opacity: 0;
+  }
 }
 
 .badge-sync-offline {

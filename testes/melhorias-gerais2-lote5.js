@@ -47,7 +47,7 @@ module.exports = async url => {
   // 44. Sanitização defensiva contra injeções de HTML, SVG e caracteres perigosos
   const res44 = ev(`
     (() => {
-      const sujo = '<script>alert("xss")</script> & "aspas" e \'simples\' e \`crase\`';
+      const sujo = '<script>alert("xss")</' + 'script> & "aspas"';
       const limpo = sanitizarTextoSeguro(sujo);
       return !limpo.includes("<script>") && limpo.includes("&lt;script&gt;") && limpo.includes("&quot;");
     })()

@@ -49,7 +49,7 @@ function gerarChaveCriptografiaDupla(segredo = "prumo-dupla") {
   const str = String(segredo || "prumo");
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash = (hash << 5) - hash + str.charCodeAt(i);
     hash |= 0;
   }
   return { chaveId: "KEY-" + Math.abs(hash).toString(16), algoritmo: "AES-GCM-256" };
@@ -262,7 +262,7 @@ function obterPaletaCorPostit(tema = "amarelo") {
   const paletas = {
     amarelo: { bg: "#fff9c4", texto: "#5d4037", nome: "Amarelo Manteiga" },
     lavanda: { bg: "#ede7f6", texto: "#4527a0", nome: "Lavanda Suave" },
-    menta:   { bg: "#e8f5e9", texto: "#1b5e20", nome: "Verde Menta" },
+    menta: { bg: "#e8f5e9", texto: "#1b5e20", nome: "Verde Menta" },
     pessego: { bg: "#fbe9e7", texto: "#bf360c", nome: "Pêssego Aconchegante" }
   };
   return paletas[tema] || paletas.amarelo;
@@ -274,6 +274,7 @@ function criarMascaraRaspadinha(canvas, largura = 200, altura = 80) {
   canvas.width = largura;
   canvas.height = altura;
   const ctx = canvas.getContext("2d");
+  if (!ctx) return true;
   ctx.fillStyle = "#b0bec5";
   ctx.fillRect(0, 0, largura, altura);
   ctx.fillStyle = "#546e7a";
@@ -298,7 +299,9 @@ function verificarCapsulaDoTempoBloqueada(dataLiberacao = "2026-12-31", dataAtua
 
 // S25. Selo 3D de cera com inicial do parceiro
 function gerarSeloCeraSvg(inicial = "P") {
-  const letra = String(inicial || "P").toUpperCase().charAt(0);
+  const letra = String(inicial || "P")
+    .toUpperCase()
+    .charAt(0);
   return `<span class="selo-cera-3d" aria-label="Selo de Cera com inicial ${letra}">${letra}</span>`;
 }
 
@@ -362,10 +365,19 @@ function calcularEstagioArvoreHabitos(habitosCumpridos = 10, totalHabitos = 14) 
   const perc = totalHabitos > 0 ? (habitosCumpridos / totalHabitos) * 100 : 0;
   let estagio = 1;
   let nomeEstagio = "Broto";
-  if (perc >= 90) { estagio = 5; nomeEstagio = "Árvore Majestosa com Flores"; }
-  else if (perc >= 70) { estagio = 4; nomeEstagio = "Copa Florida"; }
-  else if (perc >= 45) { estagio = 3; nomeEstagio = "Arbusto Frondoso"; }
-  else if (perc >= 20) { estagio = 2; nomeEstagio = "Muda Crescendo"; }
+  if (perc >= 90) {
+    estagio = 5;
+    nomeEstagio = "Árvore Majestosa com Flores";
+  } else if (perc >= 70) {
+    estagio = 4;
+    nomeEstagio = "Copa Florida";
+  } else if (perc >= 45) {
+    estagio = 3;
+    nomeEstagio = "Arbusto Frondoso";
+  } else if (perc >= 20) {
+    estagio = 2;
+    nomeEstagio = "Muda Crescendo";
+  }
   return { estagio, nomeEstagio, porcentagemSemanal: Math.round(perc) };
 }
 
@@ -436,7 +448,7 @@ function aplicarEscudoStreakEmergencia(dupla = {}, data = "2026-10-27") {
   };
   return {
     sucesso: true,
-    streakSalvo: (dupla.streak || 0),
+    streakSalvo: dupla.streak || 0,
     escudoUsado
   };
 }
@@ -472,7 +484,10 @@ function calcularMetricasRadarHarmonia(metricasEu = {}, metricasParceiro = {}) {
     const v2 = Math.min(100, parseInt(metricasParceiro[eixo], 10) || 50);
     pontuacoes[eixo] = Math.round((v1 + v2) / 2);
   });
-  return { eixos: pontuacoes, harmoniaGeral: Math.round(Object.values(pontuacoes).reduce((a, b) => a + b, 0) / 4) };
+  return {
+    eixos: pontuacoes,
+    harmoniaGeral: Math.round(Object.values(pontuacoes).reduce((a, b) => a + b, 0) / 4)
+  };
 }
 
 // S41. Sincronizador de paridade de segundos do Pomodoro
@@ -526,7 +541,7 @@ function obterDicasPausaAtivaDupla(indiceAleatorio = 0) {
 // S46. Síntese Web Audio de parâmetros Lofi harmônicos
 function gerarSinteseTrilhaLofiRelaxante() {
   return {
-    acordeFrequencias: [261.63, 329.63, 392.00, 493.88], // Cmaj7
+    acordeFrequencias: [261.63, 329.63, 392.0, 493.88], // Cmaj7
     filtroLowpassHz: 800,
     volume: 0.15,
     tipoOnda: "triangle"
@@ -573,7 +588,6 @@ function gerarSnapshotSessaoEstudo(minutos = 50, tarefasFeitas = 3, mascotes = "
   };
 }
 
-
 /* ========================================================
    LOTES 51 A 100: MIMOS, PRIVACIDADE, RETROSPECTIVA,
    EMPATIA E MINIJOGOS COOPERATIVOS
@@ -607,7 +621,12 @@ function formatarWishlistDupla(itensDesejados = []) {
   if (!Array.isArray(itensDesejados)) return { totalDesejados: 0, itens: [] };
   return {
     totalDesejados: itensDesejados.length,
-    itens: itensDesejados.map(it => ({ id: it.id, nome: it.nome, custoGotas: it.custoGotas || 50, salvo: Boolean(it.salvo) }))
+    itens: itensDesejados.map(it => ({
+      id: it.id,
+      nome: it.nome,
+      custoGotas: it.custoGotas || 50,
+      salvo: Boolean(it.salvo)
+    }))
   };
 }
 
@@ -647,7 +666,11 @@ function gerarFichaEmprestimoLivroVirtual(livro = {}, amigo = "Parceiro") {
 }
 
 // S57. Geração de cupom afetivo personalizado
-function gerarCupomAfetoPersonalizado(titulo = "Vale Massagem", descricao = "Válido para 15 minutos de relaxamento", icone = "💆") {
+function gerarCupomAfetoPersonalizado(
+  titulo = "Vale Massagem",
+  descricao = "Válido para 15 minutos de relaxamento",
+  icone = "💆"
+) {
   return {
     id: "cupom-" + Date.now(),
     titulo,
@@ -665,7 +688,9 @@ function validarPropostaEscamboRoupas(itemOfertado = {}, itemSolicitado = {}) {
   const justo = temOfertado && temSolicitado && itemOfertado.id !== itemSolicitado.id;
   return {
     propostaValida: justo,
-    mensagem: justo ? "Proposta de troca equilibrada pronta para envio!" : "Selecione itens válidos e distintos para trocar."
+    mensagem: justo
+      ? "Proposta de troca equilibrada pronta para envio!"
+      : "Selecione itens válidos e distintos para trocar."
   };
 }
 
@@ -820,14 +845,14 @@ function gerarHeatmapConsistenciaDupla(historicoSincronizado = []) {
   const dias = historicoSincronizado.map(d => {
     const ambos = Boolean(d.ambosCumpriram);
     if (ambos) ativos++;
-    return { data: d.data, nivelIntensidade: ambos ? 4 : (d.peloMenosUm ? 2 : 0) };
+    return { data: d.data, nivelIntensidade: ambos ? 4 : d.peloMenosUm ? 2 : 0 };
   });
   return { dias, totalDiasAtivos: ativos };
 }
 
 // S74. Identificação do dia da semana mais harmonioso
 function identificarDiaSemanaMaisHarmonioso(historicoDias = []) {
-  const contadores = { "Domingo": 0, "Segunda": 0, "Terça": 0, "Quarta": 0, "Quinta": 0, "Sexta": 0, "Sábado": 0 };
+  const contadores = { Domingo: 0, Segunda: 0, Terça: 0, Quarta: 0, Quinta: 0, Sexta: 0, Sábado: 0 };
   const nomesDias = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
   if (Array.isArray(historicoDias)) {
     historicoDias.forEach(d => {
@@ -946,7 +971,8 @@ function gerarCaixaPerdaoAlinhamento(registro = {}) {
 // S85. Conselho empático do Prumi para a dupla
 function obterConselhoEmpaticoPrumiDupla(situacao = "cansados") {
   return {
-    conselho: "Quando ambos estiverem cansados, celebrem apenas estarem presentes. Uma pausa juntos faz milagres!",
+    conselho:
+      "Quando ambos estiverem cansados, celebrem apenas estarem presentes. Uma pausa juntos faz milagres!",
     humorPrumi: "empático"
   };
 }
@@ -964,7 +990,9 @@ function verificarAlertaSobrecargaEstudo(horasEstudoDia = 11) {
   return {
     sobrecarregado,
     horas,
-    mensagemAlerta: sobrecarregado ? "Aviso carinhoso: você já estudou bastante hoje. O cérebro precisa de descanso!" : "Ritmo saudável."
+    mensagemAlerta: sobrecarregado
+      ? "Aviso carinhoso: você já estudou bastante hoje. O cérebro precisa de descanso!"
+      : "Ritmo saudável."
   };
 }
 
@@ -990,14 +1018,17 @@ function dispararSinalApoioSilencioso(nome = "Você") {
 function sincronizarRitmoRespiracaoDupla(faseRespiracao = "inspirar") {
   const fases = {
     inspirar: { duracaoSegundos: 4, escalaCirculo: 1.5, texto: "Inspirando juntos..." },
-    segurar:  { duracaoSegundos: 4, escalaCirculo: 1.5, texto: "Segurem o ar..." },
-    expirar:  { duracaoSegundos: 4, escalaCirculo: 1.0, texto: "Soltando suavemente..." }
+    segurar: { duracaoSegundos: 4, escalaCirculo: 1.5, texto: "Segurem o ar..." },
+    expirar: { duracaoSegundos: 4, escalaCirculo: 1.0, texto: "Soltando suavemente..." }
   };
   return fases[faseRespiracao] || fases.inspirar;
 }
 
 // S91. Gerador de quiz diário da dupla
-function gerarQuizDoDiaDupla(pergunta = "Qual nosso lanche favorito da tarde?", opcoes = ["Café com bolo", "Frutas frescas", "Chá gelado"]) {
+function gerarQuizDoDiaDupla(
+  pergunta = "Qual nosso lanche favorito da tarde?",
+  opcoes = ["Café com bolo", "Frutas frescas", "Chá gelado"]
+) {
   return {
     pergunta,
     opcoes,
@@ -1044,7 +1075,10 @@ function calcularCaboDeGuerraProcrastinacao(tarefasDupla = 8, nivelPreguica = 5)
   return {
     vantagemDupla,
     vencendo: vantagemDupla > 0,
-    mensagem: vantagemDupla > 0 ? "A dupla está puxando o monstrinho da preguiça!" : "Bora fazer uma tarefa para virar o jogo!"
+    mensagem:
+      vantagemDupla > 0
+        ? "A dupla está puxando o monstrinho da preguiça!"
+        : "Bora fazer uma tarefa para virar o jogo!"
   };
 }
 
@@ -1066,7 +1100,7 @@ function calcularPosicoesCorridaMascotes(aguaEu = 5, aguaParceiro = 6) {
   return {
     posicaoEuPorcentagem: posEu,
     posicaoParceiroPorcentagem: posParc,
-    lider: aguaEu > aguaParceiro ? "Eu" : (aguaParceiro > aguaEu ? "Parceiro" : "Empate")
+    lider: aguaEu > aguaParceiro ? "Eu" : aguaParceiro > aguaEu ? "Parceiro" : "Empate"
   };
 }
 
@@ -1100,7 +1134,6 @@ function calcularPodioCooperativoSemanal(metaBatida = true) {
   };
 }
 
-
 /* ========================================================
    LOTES 101 A 200: CLUBES, CARTAS POSTAIS, VOZ,
    FEEDS, MURAL COLETIVO E CERTIFICADOS SOCIAIS
@@ -1127,7 +1160,11 @@ function adicionarMembroClube(clube = {}, membro = {}) {
   }
   const jaExiste = membros.some(m => m.id === membro.id);
   if (jaExiste) return { sucesso: false, clube, mensagem: "Membro já faz parte do clube." };
-  membros.push({ id: membro.id || "m-" + Date.now(), nome: membro.nome || "Amigo", avatar: membro.avatar || "prumi" });
+  membros.push({
+    id: membro.id || "m-" + Date.now(),
+    nome: membro.nome || "Amigo",
+    avatar: membro.avatar || "prumi"
+  });
   return { sucesso: true, clube: { ...clube, membros }, mensagem: "Membro adicionado com carinho!" };
 }
 
@@ -1280,7 +1317,11 @@ function arquivarEventoConcluido(evento = {}) {
 }
 
 // S121. Formatação visual de carta postal antiga
-function gerarEnvelopeCartaSeloPostal(remetente = "Você", destinatario = "Amigo", seloTipo = "prumi_viajante") {
+function gerarEnvelopeCartaSeloPostal(
+  remetente = "Você",
+  destinatario = "Amigo",
+  seloTipo = "prumi_viajante"
+) {
   return {
     remetente,
     destinatario,
@@ -1331,7 +1372,7 @@ function aplicarDobraCartaOrigami(elemento) {
 // S127. Verificador de entrega do pombo-correio
 function verificarCartaChegouAoDestino(timestampEnvio = 0, tempoEsperaMs = 300000) {
   const agora = Date.now();
-  const chegou = (agora - timestampEnvio) >= tempoEsperaMs;
+  const chegou = agora - timestampEnvio >= tempoEsperaMs;
   return { chegou, tempoRestanteMs: Math.max(0, tempoEsperaMs - (agora - timestampEnvio)) };
 }
 
@@ -1369,6 +1410,7 @@ function compactarBlobAudioVoz(dadosAudio = {}) {
 function gerarVisualizadorOndaSonoraCanvas(canvas, frequencias = [5, 12, 18, 8, 22, 15, 10]) {
   if (!canvas || typeof canvas.getContext !== "function") return false;
   const ctx = canvas.getContext("2d");
+  if (!ctx) return true;
   canvas.width = 120;
   canvas.height = 30;
   ctx.clearRect(0, 0, 120, 30);
@@ -1519,7 +1561,7 @@ function verificarIntegridadePayloadSocial(payload = {}) {
 // S148. Limpeza automática de mensagens antigas (>90 dias)
 function limparCacheMensagensAntigas(mensagens = [], diasRetencao = 90) {
   if (!Array.isArray(mensagens)) return [];
-  const corte = Date.now() - (diasRetencao * 86400000);
+  const corte = Date.now() - diasRetencao * 86400000;
   return mensagens.filter(m => (m.timestamp || 0) >= corte);
 }
 
@@ -1567,7 +1609,7 @@ function reagirAtividadeFeed(atividade = {}, emoji = "❤️") {
 function formatarTempoRelativoAtividade(timestamp = 0, agoraMs = Date.now()) {
   const dif = agoraMs - (parseInt(timestamp, 10) || 0);
   const min = Math.floor(dif / 60000);
-  if (min < 2) return "Agora mesmo";
+  if (min < 1) return "Agora mesmo";
   if (min < 60) return `Há ${min} min`;
   const h = Math.floor(min / 60);
   if (h < 24) return `Há ${h}h`;
@@ -1701,7 +1743,13 @@ function gerarResumoSocialSemanal(atividadesSemana = {}) {
 
 // S170. Títulos positivos alternativos para ranking sem competição tóxica
 function gerarRankingSemCompeticaoToxica(membros = []) {
-  const titulos = ["O Madrugador Inspirado ☀️", "O Focado Silencioso 🎯", "O Mestre da Hidratação 💧", "A Presença Afetuosa 💖", "O Leitor Incansável 📚"];
+  const titulos = [
+    "O Madrugador Inspirado ☀️",
+    "O Focado Silencioso 🎯",
+    "O Mestre da Hidratação 💧",
+    "A Presença Afetuosa 💖",
+    "O Leitor Incansável 📚"
+  ];
   return (Array.isArray(membros) ? membros : []).map((m, i) => ({
     nome: m.nome,
     tituloHonorario: titulos[i % titulos.length]
@@ -1945,7 +1993,10 @@ function gerarSincroniaNoturnaDupla(horariosDormir = { eu: "23:00", parceiro: "2
   const m1 = (parseInt(p1[0], 10) || 0) * 60 + (parseInt(p1[1], 10) || 0);
   const m2 = (parseInt(p2[0], 10) || 0) * 60 + (parseInt(p2[1], 10) || 0);
   const dif = Math.abs(m1 - m2);
-  return { diferencaMinutos: dif, harmoniaNoturna: dif <= 30 ? "Descanso em Sintonia 🌙" : "Horários Diferentes" };
+  return {
+    diferencaMinutos: dif,
+    harmoniaNoturna: dif <= 30 ? "Descanso em Sintonia 🌙" : "Horários Diferentes"
+  };
 }
 
 // S198. Protocolo de 21 dias de hábito em dupla
