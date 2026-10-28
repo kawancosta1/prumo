@@ -202,6 +202,13 @@ service cloud.firestore {
         && request.resource.data.atualizado is number;
     }
 
+    // Licença do Prumo PRO: a pessoa só lê a própria. Quem escreve é o servidor (functions/index.js,
+    // conta de serviço, que não passa por estas regras). Cobranças e pagamentos ficam fechados.
+    match /licencas/{uid} {
+      allow read: if souEu(uid);
+      allow write: if false;
+    }
+
     // Tudo o que não está listado acima fica fechado
     match /{caminho=**} {
       allow read, write: if false;

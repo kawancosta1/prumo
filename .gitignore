@@ -4,3 +4,4 @@ testes/node_modules/
 testes/package-lock.json
 
 testes/*/package-lock.json
+functions/node_modules/

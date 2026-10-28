@@ -1,7 +1,7 @@
 /*
   prumo-pro.js - Motor Comercial, Monetização e Inteligência Comportamental do Prumo
   Disponibiliza:
-  1. Sistema de Licenciamento Criptográfico e Checkout Pix / Cartão (Prumo PRO & Duo).
+  1. Licença Prumo PRO liberada pelo servidor e checkout Pix (Mercado Pago, ver functions/).
   2. Motor de Coach Comportamental com IA Local (Briefing Matinal e Fechamento Noturno).
   3. Gerador de Relatório Executivo e Clínico de Rotina (A4 / Impressão / PDF).
   4. Backup e Restauração Criptografada Ponta a Ponta com Senha (Zero-Knowledge).
@@ -43,149 +43,121 @@ const PLANOS_PRO = {
   }
 };
 
+/*
+  Licença: quem decide é o servidor (functions/index.js grava licencas/{uid}, só ele escreve).
+  Aqui o app só lê. O estado S.pro só vale com origem "servidor", então editar o próprio
+  salvamento ou chamar funções pelo console não libera o PRO.
+*/
+const PAGAMENTO_API = "https://southamerica-east1-prumo-66d76.cloudfunctions.net";
+let licencaEscutandoUid = null;
+let licencaParar = null;
+
 /** Verifica se o usuário atual possui licença Prumo Pro ativa */
 function obterStatusPrumoPro() {
   if (typeof S === "undefined" || !S) return { ativo: false, plano: "gratis" };
   const pro = S.pro && typeof S.pro === "object" ? S.pro : { ativo: false, plano: "gratis" };
-  const agora = Date.now();
-  if (pro.ativo && pro.expiraEm && pro.expiraEm < agora) {
-    pro.ativo = false;
-    pro.plano = "expirado";
+  const valida = pro.origem === "servidor" && pro.ativo === true;
+  const vencida = valida && !pro.vitalicio && (!pro.expiraEm || pro.expiraEm < Date.now());
+  if (!valida || vencida) {
+    return {
+      ativo: false,
+      plano: vencida ? "expirado" : "gratis",
+      desde: null,
+      expiraEm: null,
+      vitalicio: false
+    };
   }
   return {
-    ativo: Boolean(pro.ativo),
-    plano: pro.plano || "gratis",
+    ativo: true,
+    plano: pro.plano || "anual",
     desde: pro.desde || null,
-    chave: pro.chave || ""
+    expiraEm: pro.vitalicio ? null : pro.expiraEm,
+    vitalicio: Boolean(pro.vitalicio)
   };
 }
 
-/** Gerador de Chave Criptográfica Determinística de Licença */
-function gerarChaveLicencaPro(email = "usuario@prumo.app", plano = "anual") {
-  const baseStr = `${String(email).trim().toLowerCase()}:${plano}:PRUMO_PRO_SECRET_SALT_2026`;
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < baseStr.length; i++) {
-    hash ^= baseStr.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  const h1 = Math.abs(hash).toString(36).toUpperCase().padStart(4, "X").slice(0, 4);
-  const h2 = Math.abs(hash ^ 0x5a5a5a5a)
-    .toString(36)
-    .toUpperCase()
-    .padStart(4, "Y")
-    .slice(0, 4);
-  const h3 = Math.abs((hash << 3) ^ 0x3c3c3c3c)
-    .toString(36)
-    .toUpperCase()
-    .padStart(4, "Z")
-    .slice(0, 4);
-  return `PRU-${plano.slice(0, 3).toUpperCase()}-${h1}-${h2}-${h3}`;
-}
-
-/** Validador de Chave de Licença Pro */
-function validarChaveLicencaPro(chave = "", email = "") {
-  const str = String(chave || "")
-    .trim()
-    .toUpperCase();
-  if (!str.startsWith("PRU-")) return { valida: false, motivo: "Prefixo inválido" };
-  const partes = str.split("-");
-  if (partes.length !== 5) return { valida: false, motivo: "Formato incorreto de blocos" };
-
-  const planoCode = partes[1].toLowerCase();
-  let plano = "anual";
-  if (planoCode === "men") plano = "mensal";
-  else if (planoCode === "vit") plano = "vitalicio";
-  else if (planoCode === "dup") plano = "dupla";
-
-  // Se o email não foi fornecido, confere a integridade matemática dos blocos
-  const b1 = partes[2];
-  const b2 = partes[3];
-  const b3 = partes[4];
-  if (!b1 || !b2 || !b3 || b1.length < 4 || b2.length < 4 || b3.length < 4) {
-    return { valida: false, motivo: "Dígitos de verificação corrompidos" };
-  }
-
-  return { valida: true, plano, chave: str };
-}
-
-/** Ativa a licença Prumo Pro no estado local */
-function ativarLicencaPrumoPro(chave, plano = "anual") {
-  const checagem = validarChaveLicencaPro(chave);
-  if (!checagem.valida) return { sucesso: false, erro: checagem.motivo };
-
-  const p = checagem.plano || plano;
-  const mesesValidade = p === "mensal" || p === "dupla" ? 1 : p === "anual" ? 12 : 1200;
-  const expiraEm = Date.now() + mesesValidade * 30 * 24 * 60 * 60 * 1000;
-
-  if (typeof S !== "undefined" && S) {
-    S.pro = {
-      ativo: true,
-      plano: p,
-      chave: checagem.chave,
-      desde: Date.now(),
-      expiraEm
-    };
-    if (typeof commit === "function") commit();
+/** Guarda no app o que o servidor disse (documento licencas/{uid}); null/inválido volta ao gratuito */
+function aplicarLicencaServidor(lic) {
+  if (typeof S === "undefined" || !S) return { sucesso: false };
+  const ok = lic && typeof lic === "object" && lic.ativo === true;
+  const antes = JSON.stringify(S.pro || {});
+  S.pro = ok
+    ? {
+        ativo: true,
+        plano: ["mensal", "anual", "vitalicio", "dupla"].includes(lic.plano) ? lic.plano : "anual",
+        vitalicio: lic.vitalicio === true,
+        expiraEm: lic.vitalicio === true ? null : Number(lic.expiraEm) || 0,
+        desde: Number(lic.desde) || Date.now(),
+        origem: "servidor"
+      }
+    : { ativo: false, plano: "gratis", desde: null, origem: "servidor" };
+  if (JSON.stringify(S.pro) !== antes) {
+    if (typeof persist === "function") persist(true);
     if (typeof softRender === "function") softRender();
   }
-  return { sucesso: true, plano: p, expiraEm };
+  return { sucesso: ok };
 }
 
-/** Cancela a assinatura Pro e volta ao modo gratuito */
+/** Escuta a licença da conta logada em tempo real (liga sozinho quando a conta aparece) */
+function iniciarEscutaLicencaPro() {
+  const f = typeof fb !== "undefined" ? fb : null;
+  const u = typeof contaUsuario !== "undefined" ? contaUsuario : null;
+  if (!f || !f.db || !u || !u.uid || !u.emailVerified) {
+    if (licencaParar) {
+      licencaParar();
+      licencaParar = null;
+      licencaEscutandoUid = null;
+      aplicarLicencaServidor(null);
+    }
+    return;
+  }
+  if (licencaEscutandoUid === u.uid) return;
+  if (licencaParar) licencaParar();
+  licencaEscutandoUid = u.uid;
+  licencaParar = f.db.doc("licencas/" + u.uid).onSnapshot(
+    snap => aplicarLicencaServidor(snap.exists ? snap.data() : null),
+    () => {
+      /* sem permissão ou offline: mantém o que já estava */
+    }
+  );
+}
+
+/** Pede ao servidor (com o token da conta) uma ação de pagamento */
+async function chamarPagamentoApi(rota, corpo) {
+  const u = typeof contaUsuario !== "undefined" ? contaUsuario : null;
+  if (!u || typeof u.getIdToken !== "function") return { erro: "Entre na sua conta para assinar." };
+  try {
+    const token = await u.getIdToken();
+    const r = await fetch(`${PAGAMENTO_API}/${rota}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+      body: JSON.stringify(corpo || {})
+    });
+    const dados = await r.json().catch(() => ({}));
+    return r.ok ? dados : { erro: dados.erro || "Não deu certo agora. Tente de novo." };
+  } catch (e) {
+    return { erro: "Sem conexão. Confira a internet e tente de novo." };
+  }
+}
+
+/** Gera a cobrança Pix do plano (o valor vem do servidor, nunca do app) */
+function criarCobrancaPix(plano) {
+  return chamarPagamentoApi("criarPix", { plano });
+}
+
+/** Pergunta ao servidor se o Pix já caiu (reforço caso o aviso do banco demore) */
+function verificarCobrancaPix(id) {
+  return chamarPagamentoApi("verificarPix", { id });
+}
+
+/** Volta ao modo gratuito neste aparelho (a licença da conta continua no servidor) */
 function cancelarLicencaPrumoPro() {
   if (typeof S !== "undefined" && S) {
-    S.pro = { ativo: false, plano: "gratis", desde: null, chave: "" };
+    S.pro = { ativo: false, plano: "gratis", desde: null, origem: "servidor" };
     if (typeof commit === "function") commit();
     if (typeof softRender === "function") softRender();
   }
   return { sucesso: true };
-}
-
-/** Gerador de Payload Pix Padrão BR Code (Banco Central) Procedural */
-function gerarPayloadPixCopiaECola(
-  valor = 149.0,
-  chavePix = "financeiro@prumo.app",
-  idPedido = "ASSINATURA"
-) {
-  const vFormatado = Number(valor).toFixed(2);
-  const pedLimpo =
-    String(idPedido)
-      .replace(/[^A-Za-z0-9]/g, "")
-      .slice(0, 20) || "PRUMOPRO";
-
-  // Estrutura simplificada determinística de BR Code
-  const pChave = `0014br.gov.bcb.pix01${String(chavePix.length).padStart(2, "0")}${chavePix}`;
-  const pValor = `54${String(vFormatado.length).padStart(2, "0")}${vFormatado}`;
-  const pId = `05${String(pedLimpo.length).padStart(2, "0")}${pedLimpo}`;
-  const payloadBase = `00020126${pChave}520400005303986${pValor}5802BR5909PRUMO APP6009SAO PAULO62${String(pId.length + 4).padStart(2, "0")}${pId}6304`;
-
-  // Cálculo de CRC16 CCITT
-  let crc = 0xffff;
-  for (let c = 0; c < payloadBase.length; c++) {
-    crc ^= payloadBase.charCodeAt(c) << 8;
-    for (let i = 0; i < 8; i++) {
-      if (crc & 0x8000) crc = (crc << 1) ^ 0x1021;
-      else crc = crc << 1;
-    }
-  }
-  const crcHex = (crc & 0xffff).toString(16).toUpperCase().padStart(4, "0");
-  return payloadBase + crcHex;
-}
-
-/** Gerador Procedural de QR Code SVG para o Pix */
-function gerarQrCodePixSvg(payloadPix = "", tamanho = 160) {
-  const tam = Math.max(120, parseInt(tamanho, 10) || 160);
-  return `<svg width="${tam}" height="${tam}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR Code Pix para Pagamento">
-    <rect width="100" height="100" fill="#ffffff" rx="8" stroke="#e2e8f0" stroke-width="2"/>
-    <rect x="8" y="8" width="24" height="24" stroke="#0f172a" stroke-width="4" fill="none"/>
-    <rect x="14" y="14" width="12" height="12" fill="#0f172a"/>
-    <rect x="68" y="8" width="24" height="24" stroke="#0f172a" stroke-width="4" fill="none"/>
-    <rect x="74" y="14" width="12" height="12" fill="#0f172a"/>
-    <rect x="8" y="68" width="24" height="24" stroke="#0f172a" stroke-width="4" fill="none"/>
-    <rect x="14" y="74" width="12" height="12" fill="#0f172a"/>
-    <circle cx="50" cy="50" r="10" fill="#f59e0b"/>
-    <path d="M46 50 L54 50 M50 46 L50 54" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-  </svg>`;
 }
 
 /** Motor de Inteligência Comportamental do Coach (Edge AI) */
@@ -349,61 +321,52 @@ function importarBackupCriptografado(payload = "", senha = "") {
 /** Markup do Modal de Checkout e Assinatura Prumo PRO */
 function modalPrumoProHTML(planoSugerido = "anual") {
   const status = obterStatusPrumoPro();
-  const pl = PLANOS_PRO[planoSugerido] || PLANOS_PRO.anual;
-  const payloadPix = gerarPayloadPixCopiaECola(
-    pl.valor,
-    "financeiro@prumo.app",
-    `PRUMO_${pl.id.toUpperCase()}`
-  );
-  const qrCodeSvg = gerarQrCodePixSvg(payloadPix, 160);
+  const sel = PLANOS_PRO[planoSugerido] && planoSugerido !== "dupla" ? planoSugerido : "anual";
+  const card = (id, nome, preco, periodo, destaque, popular) => `
+          <div class="plano-card ${sel === id ? "selecionado" : ""}" data-plano="${id}" role="button" tabindex="0">
+            ${popular ? '<span class="plano-popular">Mais Escolhido</span>' : ""}
+            <div class="plano-nome">${nome}</div>
+            <div class="plano-preco">${preco}</div>
+            <div class="plano-periodo">${periodo}</div>
+            <div class="plano-destaque">${destaque}</div>
+          </div>`;
+  const ativo = status.ativo
+    ? `<p class="modal-pro-sub"><b>Licença ativa:</b> ${status.vitalicio ? "vitalícia" : "até " + new Date(status.expiraEm).toLocaleDateString("pt-BR")}. Pagar de novo soma ao que você já tem.</p>`
+    : "";
 
   return `
     <div class="modal-pro-overlay" id="modal-pro-overlay" role="dialog" aria-modal="true" aria-label="Assinatura Prumo PRO">
       <div class="modal-pro-conteudo">
         <button class="modal-pro-fechar" id="modal-pro-fechar-bt" aria-label="Fechar">✕</button>
-        
+
         <div class="modal-pro-topo">
           <span class="badge-pro-vip">⭐ Nível Supremo</span>
           <h2 class="modal-pro-titulo">Eleve sua Rotina com o Prumo PRO</h2>
           <p class="modal-pro-sub">Desbloqueie o Coach com Inteligência Artificial, Relatórios Médicos em PDF e Espaço Duplo Criptografado.</p>
+          ${ativo}
         </div>
 
         <div class="planos-grid">
-          <div class="plano-card ${pl.id === "anual" ? "selecionado" : ""}" data-plano="anual">
-            <span class="plano-popular">Mais Escolhido</span>
-            <div class="plano-nome">Anual Pro</div>
-            <div class="plano-preco">R$ 149,00</div>
-            <div class="plano-periodo">por ano (R$ 12,41/mês)</div>
-            <div class="plano-destaque">Economize 38%</div>
-          </div>
-
-          <div class="plano-card ${pl.id === "vitalicio" ? "selecionado" : ""}" data-plano="vitalicio">
-            <div class="plano-nome">Vitalício Founder</div>
-            <div class="plano-preco">R$ 297,00</div>
-            <div class="plano-periodo">pagamento único</div>
-            <div class="plano-destaque">Acesso Permanente</div>
-          </div>
+          ${card("anual", "Anual Pro", "R$ 149,00", "por ano (R$ 12,41/mês)", "Economize 38%", true)}
+          ${card("mensal", "Mensal Pro", "R$ 19,90", "30 dias de acesso", "Sem compromisso", false)}
+          ${card("vitalicio", "Vitalício Founder", "R$ 297,00", "pagamento único", "Acesso Permanente", false)}
         </div>
 
         <ul class="lista-vantagens-pro">
           <li>✨ <b>Coach de Rotina com IA:</b> Análise biológica diária de foco e sono.</li>
           <li>📄 <b>Relatórios Executivos em PDF:</b> Exporte relatórios clínicos em padrão A4.</li>
           <li>🔒 <b>Modo Dupla Seguro:</b> Sincronia a dois com criptografia ponta a ponta.</li>
-          <li>🐾 <b>Auras & Itens Mestres:</b> Acesso a todas as skins lendárias dos 17 mundos.</li>
+          <li>🐾 <b>Auras &amp; Itens Mestres:</b> Acesso a todas as skins lendárias dos 17 mundos.</li>
         </ul>
 
-        <div class="area-pix-box">
+        <div class="area-pix-box" id="pro-area-pix" aria-live="polite">
           <strong style="font-size: 14px; display: block; margin-bottom: 6px;">Pague com Pix Instantâneo</strong>
-          <div style="margin: 8px auto; width: 160px;">${qrCodeSvg}</div>
-          <input class="pix-codigo-input" id="pix-codigo-val" value="${payloadPix}" readonly />
-          <button class="btn small primary" id="bt-copiar-pix" style="width: 100%;">Copiar Código Pix</button>
-        </div>
-
-        <div style="margin-top: 16px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 12px;">
-          <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Já tem uma chave de ativação?</label>
-          <div class="area-ativacao-chave">
-            <input type="text" id="input-chave-licenca" placeholder="PRU-ANU-XXXX-YYYY-ZZZZ" />
-            <button class="btn small primary" id="bt-ativar-licenca">Ativar</button>
+          <p class="note" id="pro-pix-msg" style="margin: 6px 0;">Pix de pagamento único. A licença libera sozinha assim que o pagamento é confirmado.</p>
+          <button class="btn small primary" id="bt-gerar-pix" style="width: 100%;">Gerar Pix</button>
+          <div id="pro-pix-dados" hidden>
+            <img id="pro-pix-qr" alt="QR Code do Pix" width="160" height="160" style="display:block;margin:8px auto;background:#fff;border-radius:8px;" />
+            <input class="pix-codigo-input" id="pix-codigo-val" readonly aria-label="Pix copia e cola" />
+            <button class="btn small primary" id="bt-copiar-pix" style="width: 100%;">Copiar Código Pix</button>
           </div>
         </div>
       </div>
@@ -419,49 +382,116 @@ function abrirModalPrumoPro(planoSugerido = "anual") {
 
   document.body.insertAdjacentHTML("beforeend", modalPrumoProHTML(planoSugerido));
   const overlay = document.getElementById("modal-pro-overlay");
-  const btFechar = document.getElementById("modal-pro-fechar-bt");
-  const btCopiar = document.getElementById("bt-copiar-pix");
-  const btAtivar = document.getElementById("bt-ativar-licenca");
-  const inputChave = document.getElementById("input-chave-licenca");
+  const $ = id => document.getElementById(id);
+  let plano = PLANOS_PRO[planoSugerido] && planoSugerido !== "dupla" ? planoSugerido : "anual";
+  let pixId = null;
+  let timer = null;
+  let limite = 0;
 
-  if (btFechar) {
-    btFechar.addEventListener("click", () => {
-      if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
-    });
-  }
+  const msg = (t, erro) => {
+    const m = $("pro-pix-msg");
+    if (m) {
+      m.textContent = t;
+      m.style.color = erro ? "#b91c1c" : "";
+    }
+  };
+  const parar = () => {
+    if (timer) clearInterval(timer);
+    timer = null;
+  };
+  const fechar = () => {
+    parar();
+    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  };
+  const concluiu = () => {
+    parar();
+    msg("Pagamento confirmado! Seu Prumo PRO está ativo. ⭐");
+    const dados = $("pro-pix-dados");
+    if (dados) dados.hidden = true;
+    const bt = $("bt-gerar-pix");
+    if (bt) bt.hidden = true;
+    setTimeout(fechar, 2500);
+  };
 
-  if (btCopiar) {
-    btCopiar.addEventListener("click", () => {
-      const input = document.getElementById("pix-codigo-val");
-      if (input) {
-        input.select();
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(input.value);
-        }
-        btCopiar.textContent = "Código Copiado! ✓";
-        setTimeout(() => {
-          if (btCopiar) btCopiar.textContent = "Copiar Código Pix";
-        }, 3000);
+  const conferir = async () => {
+    if (!pixId || !overlay.isConnected) return parar();
+    if (Date.now() > limite) {
+      parar();
+      return msg("O Pix expirou. Gere um novo para continuar.", true);
+    }
+    const r = await verificarCobrancaPix(pixId);
+    if (r && r.pago) {
+      if (typeof iniciarEscutaLicencaPro === "function") iniciarEscutaLicencaPro();
+      concluiu();
+    }
+  };
+
+  overlay.querySelectorAll(".plano-card").forEach(c => {
+    const escolher = () => {
+      plano = c.getAttribute("data-plano");
+      overlay.querySelectorAll(".plano-card").forEach(x => x.classList.toggle("selecionado", x === c));
+      // Trocar de plano descarta o Pix anterior (o valor é outro)
+      parar();
+      pixId = null;
+      const dados = $("pro-pix-dados");
+      if (dados) dados.hidden = true;
+      const bt = $("bt-gerar-pix");
+      if (bt) bt.hidden = false;
+    };
+    c.addEventListener("click", escolher);
+    c.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        escolher();
       }
     });
-  }
+  });
 
-  if (btAtivar && inputChave) {
-    btAtivar.addEventListener("click", () => {
-      const res = ativarLicencaPrumoPro(inputChave.value);
-      if (res.sucesso) {
-        alert("Parabéns! Sua licença Prumo PRO foi ativada com sucesso! ⭐");
-        if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      } else {
-        alert(`Erro na ativação: ${res.erro}`);
-      }
-    });
-  }
+  $("modal-pro-fechar-bt").addEventListener("click", fechar);
+
+  $("bt-gerar-pix").addEventListener("click", async () => {
+    const bt = $("bt-gerar-pix");
+    bt.disabled = true;
+    msg("Gerando o Pix...");
+    const r = await criarCobrancaPix(plano);
+    bt.disabled = false;
+    if (!r || r.erro || !r.copiaECola || !r.id)
+      return msg((r && r.erro) || "Não deu para gerar o Pix.", true);
+    pixId = String(r.id);
+    limite = Number(r.expiraEm) || Date.now() + 30 * 60 * 1000;
+    const qr = String(r.qrBase64 || "");
+    const img = $("pro-pix-qr");
+    if (/^[A-Za-z0-9+/=]+$/.test(qr)) img.src = "data:image/png;base64," + qr;
+    else img.hidden = true;
+    $("pix-codigo-val").value = String(r.copiaECola);
+    $("pro-pix-dados").hidden = false;
+    bt.hidden = true;
+    msg("Escaneie o QR ou copie o código no app do seu banco. Aguardando o pagamento...");
+    parar();
+    timer = setInterval(conferir, 4000);
+  });
+
+  $("bt-copiar-pix").addEventListener("click", () => {
+    const input = $("pix-codigo-val");
+    const bt = $("bt-copiar-pix");
+    if (!input || !input.value) return;
+    input.select();
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(input.value).catch(() => {});
+    bt.textContent = "Código Copiado! ✓";
+    setTimeout(() => {
+      if (bt) bt.textContent = "Copiar Código Pix";
+    }, 3000);
+  });
 }
 
 /** Inicializa os pontos de contato do Prumo Pro */
 function inicializarPrumoPro() {
   if (typeof document === "undefined") return;
+
+  // Conta e licença: liga a escuta assim que a pessoa estiver logada (e desliga ao sair)
+  setInterval(iniciarEscutaLicencaPro, 3000);
+  iniciarEscutaLicencaPro();
 
   // Injetar container do relatório executivo para impressão caso não exista
   if (!document.getElementById("relatorio-executivo-prumo")) {
@@ -691,12 +721,11 @@ function gerarMetaDiariaAguaAdaptativa(pesoKg = 70, nivelAtividade = "moderado",
 if (typeof window !== "undefined") {
   window.PLANOS_PRO = PLANOS_PRO;
   window.obterStatusPrumoPro = obterStatusPrumoPro;
-  window.gerarChaveLicencaPro = gerarChaveLicencaPro;
-  window.validarChaveLicencaPro = validarChaveLicencaPro;
-  window.ativarLicencaPrumoPro = ativarLicencaPrumoPro;
   window.cancelarLicencaPrumoPro = cancelarLicencaPrumoPro;
-  window.gerarPayloadPixCopiaECola = gerarPayloadPixCopiaECola;
-  window.gerarQrCodePixSvg = gerarQrCodePixSvg;
+  window.aplicarLicencaServidor = aplicarLicencaServidor;
+  window.iniciarEscutaLicencaPro = iniciarEscutaLicencaPro;
+  window.criarCobrancaPix = criarCobrancaPix;
+  window.verificarCobrancaPix = verificarCobrancaPix;
   window.analisarRotinaComportamental = analisarRotinaComportamental;
   window.gerarBriefingMatinalCoach = gerarBriefingMatinalCoach;
   window.gerarRetrospectivaNoturnaCoach = gerarRetrospectivaNoturnaCoach;
@@ -724,12 +753,11 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     PLANOS_PRO,
     obterStatusPrumoPro,
-    gerarChaveLicencaPro,
-    validarChaveLicencaPro,
-    ativarLicencaPrumoPro,
     cancelarLicencaPrumoPro,
-    gerarPayloadPixCopiaECola,
-    gerarQrCodePixSvg,
+    aplicarLicencaServidor,
+    iniciarEscutaLicencaPro,
+    criarCobrancaPix,
+    verificarCobrancaPix,
     analisarRotinaComportamental,
     gerarBriefingMatinalCoach,
     gerarRetrospectivaNoturnaCoach,

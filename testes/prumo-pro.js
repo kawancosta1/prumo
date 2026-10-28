@@ -13,47 +13,51 @@ module.exports = async url => {
     `);
     ok(resStatus, "obterStatusPrumoPro iniciou no modo gratuito seguro");
 
-    // 2. Geração e validação de chaves criptográficas de licença
-    const resChave = ev(`
+    // 2. A licença só vale se veio do servidor
+    const resLic = ev(`
       (() => {
-        const chaveAnual = gerarChaveLicencaPro("kawan@prumo.app", "anual");
-        const checagemValida = validarChaveLicencaPro(chaveAnual);
-        const checagemFalsa = validarChaveLicencaPro("CHAVE-FALSA-123");
-        return chaveAnual.startsWith("PRU-ANU-") && checagemValida.valida === true && checagemFalsa.valida === false;
+        const futuro = Date.now() + 5 * 864e5;
+        aplicarLicencaServidor({ ativo: true, plano: "anual", expiraEm: futuro });
+        const a = obterStatusPrumoPro();
+        aplicarLicencaServidor({ ativo: true, plano: "vitalicio", vitalicio: true });
+        const v = obterStatusPrumoPro();
+        aplicarLicencaServidor({ ativo: true, plano: "anual", expiraEm: Date.now() - 1000 });
+        const venc = obterStatusPrumoPro();
+        aplicarLicencaServidor({ ativo: true, plano: "hacker", expiraEm: futuro });
+        const estranho = obterStatusPrumoPro();
+        aplicarLicencaServidor(null);
+        const g = obterStatusPrumoPro();
+        return a.ativo && a.plano === "anual" && a.expiraEm === futuro &&
+               v.ativo && v.vitalicio && v.expiraEm === null &&
+               !venc.ativo && venc.plano === "expirado" &&
+               estranho.plano === "anual" && !g.ativo && g.plano === "gratis";
       })()
     `);
-    ok(resChave, "gerarChaveLicencaPro e validarChaveLicencaPro geraram e validaram tokens determinísticos");
+    ok(resLic, "licença do servidor libera, vence, aceita vitalício e volta ao gratuito");
 
-    // 3. Ativação e cancelamento de licença no estado
-    const resAtivacao = ev(`
+    // 3. Estado forjado no próprio aparelho não libera o PRO
+    const resForja = ev(`
       (() => {
-        const chaveVit = gerarChaveLicencaPro("founder@prumo.app", "vitalicio");
-        const ativ = ativarLicencaPrumoPro(chaveVit);
-        const stAtivo = obterStatusPrumoPro();
-        const canc = cancelarLicencaPrumoPro();
-        const stCanc = obterStatusPrumoPro();
-        return ativ.sucesso && stAtivo.ativo === true && stAtivo.plano === "vitalicio" && canc.sucesso && stCanc.ativo === false;
+        S.pro = { ativo: true, plano: "vitalicio", vitalicio: true, chave: "PRU-VIT-AAAA-BBBB-CCCC" };
+        const forjado = obterStatusPrumoPro().ativo;
+        cancelarLicencaPrumoPro();
+        return forjado === false && obterStatusPrumoPro().ativo === false;
       })()
     `);
-    ok(resAtivacao, "ativarLicencaPrumoPro e cancelarLicencaPrumoPro controlaram status e expiração");
+    ok(resForja, "S.pro sem origem do servidor (chave digitada ou editada) não libera o PRO");
 
-    // 4. Geração de Payload Pix padrão Banco Central (BR Code) e CRC16
-    const resPix = ev(`
-      (() => {
-        const payload = gerarPayloadPixCopiaECola(149.00, "financeiro@prumo.app", "PEDIDO123");
-        return payload.startsWith("000201") && payload.includes("br.gov.bcb.pix") && payload.includes("financeiro@prumo.app") && payload.length > 50;
-      })()
+    // 4. Sem conta, o app não consegue cobrar e avisa
+    const resSemConta = await ev(`
+      criarCobrancaPix("anual").then(r => typeof r.erro === "string" && r.erro.includes("conta"))
     `);
-    ok(resPix, "gerarPayloadPixCopiaECola estruturou código Pix compatível com apps bancários");
+    ok(resSemConta, "criar cobrança sem conta pede para entrar");
 
-    // 5. Geração de QR Code SVG procedural
-    const resQr = ev(`
-      (() => {
-        const svg = gerarQrCodePixSvg("payload_teste", 150);
-        return svg.includes("<svg") && svg.includes('width="150"') && svg.includes("QR Code Pix");
-      })()
+    // 5. O app não carrega mais chave de licença nem Pix de mentira
+    const resLimpo = ev(`
+      typeof gerarChaveLicencaPro === "undefined" && typeof validarChaveLicencaPro === "undefined" &&
+      typeof gerarPayloadPixCopiaECola === "undefined" && typeof gerarQrCodePixSvg === "undefined"
     `);
-    ok(resQr, "gerarQrCodePixSvg gerou marcação vetorial leve para leitura de câmera");
+    ok(resLimpo, "sem gerador de chave local nem QR/Pix de mentira no app");
 
     // 6. Motor de inteligência comportamental (Edge AI Coach)
     const resCoach = ev(`
@@ -114,13 +118,34 @@ module.exports = async url => {
     const resModal = ev(`
       (() => {
         const m = modalPrumoProHTML("anual");
+        const planos = (m.match(/data-plano="/g) || []).length;
         return m.includes("Eleve sua Rotina com o Prumo PRO") &&
-               m.includes("Anual Pro") &&
-               m.includes("Pague com Pix Instantâneo") &&
-               m.includes("PRU-ANU-");
+               m.includes("Anual Pro") && m.includes("Mensal Pro") && m.includes("Vitalício Founder") &&
+               planos === 3 && m.includes("Gerar Pix") && !m.includes("PRU-ANU-") && !m.includes("financeiro@prumo.app");
       })()
     `);
-    ok(resModal, "modalPrumoProHTML renderizou interface de checkout com vantagens, planos e Pix");
+    ok(resModal, "modalPrumoProHTML mostra 3 planos e Gerar Pix, sem chave digitada nem Pix fixo");
+
+    // 9b. Fluxo do modal: gerar Pix, mostrar QR e confirmar pagamento
+    const resFluxo = await ev(`
+      (async () => {
+        const original = { c: window.criarCobrancaPix, v: window.verificarCobrancaPix };
+        let pedido = null;
+        window.criarCobrancaPix = async plano => { pedido = plano; return { id: "1234567890", copiaECola: "00020126PIXTESTE", qrBase64: "iVBORw0KGgo=", expiraEm: Date.now() + 60000 }; };
+        window.verificarCobrancaPix = async () => ({ pago: true });
+        abrirModalPrumoPro("anual");
+        document.querySelector('.plano-card[data-plano="mensal"]').click();
+        document.getElementById("bt-gerar-pix").click();
+        await new Promise(r => setTimeout(r, 30));
+        const mostrou = !document.getElementById("pro-pix-dados").hidden &&
+          document.getElementById("pix-codigo-val").value === "00020126PIXTESTE" &&
+          document.getElementById("pro-pix-qr").src.startsWith("data:image/png;base64,");
+        document.getElementById("modal-pro-fechar-bt").click();
+        window.criarCobrancaPix = original.c; window.verificarCobrancaPix = original.v;
+        return pedido === "mensal" && mostrou && !document.getElementById("modal-pro-overlay");
+      })()
+    `);
+    ok(resFluxo, "modal pede o plano escolhido ao servidor e mostra QR e copia e cola");
 
     // 10. Simulador de Economia e ROI do Usuário
     const resRoi = ev(`
