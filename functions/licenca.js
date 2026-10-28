@@ -38,8 +38,22 @@ function calcularLicenca(atual, plano, agora) {
   if (p.dias === null || antes.vitalicio === true) {
     return { ativo: true, plano: p.dias === null ? plano : "vitalicio", vitalicio: true, expiraEm: null };
   }
-  const base = typeof antes.expiraEm === "number" && antes.expiraEm > agora ? antes.expiraEm : agora;
+  // O teste grátis não soma: quem paga começa a contar de agora
+  const base =
+    antes.plano !== "teste" && typeof antes.expiraEm === "number" && antes.expiraEm > agora
+      ? antes.expiraEm
+      : agora;
   return { ativo: true, plano, vitalicio: false, expiraEm: base + p.dias * DIA };
+}
+
+const DIAS_TESTE = 7;
+
+/** Teste grátis de 7 dias (uma vez por conta; quem já tem licença ativa não precisa) */
+function licencaDeTeste(atual, agora) {
+  const a = atual && typeof atual === "object" ? atual : {};
+  if (a.ativo === true && (a.vitalicio === true || (typeof a.expiraEm === "number" && a.expiraEm > agora)))
+    return null;
+  return { ativo: true, plano: "teste", vitalicio: false, expiraEm: agora + DIAS_TESTE * DIA };
 }
 
 /** Confere o pagamento devolvido pela API do Mercado Pago contra o que o servidor esperava. */
@@ -81,6 +95,8 @@ module.exports = {
   montarReferencia,
   lerReferencia,
   calcularLicenca,
+  licencaDeTeste,
+  DIAS_TESTE,
   conferirPagamento,
   assinaturaWebhookValida
 };

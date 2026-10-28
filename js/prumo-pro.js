@@ -84,7 +84,7 @@ function aplicarLicencaServidor(lic) {
   S.pro = ok
     ? {
         ativo: true,
-        plano: ["mensal", "anual", "vitalicio", "dupla"].includes(lic.plano) ? lic.plano : "anual",
+        plano: ["mensal", "anual", "vitalicio", "dupla", "teste"].includes(lic.plano) ? lic.plano : "anual",
         vitalicio: lic.vitalicio === true,
         expiraEm: lic.vitalicio === true ? null : Number(lic.expiraEm) || 0,
         desde: Number(lic.desde) || Date.now(),
@@ -143,6 +143,27 @@ async function chamarPagamentoApi(rota, corpo) {
 /** Gera a cobrança Pix do plano (o valor vem do servidor, nunca do app) */
 function criarCobrancaPix(plano) {
   return chamarPagamentoApi("criarPix", { plano });
+}
+
+/** Começa o teste grátis de 7 dias (o servidor deixa uma vez por conta) */
+function iniciarTesteGratisPro() {
+  return chamarPagamentoApi("iniciarTeste", {});
+}
+
+/** Atalho para o resto do app: abre o PRO se a pessoa ainda não tem; devolve true se já pode usar */
+function exigirPrumoPro() {
+  if (obterStatusPrumoPro().ativo) return true;
+  if (typeof abrirModalPrumoPro === "function") abrirModalPrumoPro("anual");
+  return false;
+}
+
+/** Cartão da aba Hoje para quem ainda não tem PRO: mostra o valor e convida a testar */
+function cartaoCoachBloqueadoHTML() {
+  return `<div class="card-coach-ia coach-bloqueado">
+    <div class="coach-header"><span class="coach-titulo">🤖 Coach de Rotina com IA</span><span class="badge-pro-vip">PRO</span></div>
+    <div class="coach-texto">Seu briefing de hoje: foco sugerido, equilíbrio de rotina e conselho do dia, feitos com os seus dados. Teste 7 dias grátis.</div>
+    <button class="btn small primary" data-act="abrir-pro">Testar 7 dias grátis</button>
+  </div>`;
 }
 
 /** Pergunta ao servidor se o Pix já caiu (reforço caso o aviso do banco demore) */
@@ -318,6 +339,12 @@ function importarBackupCriptografado(payload = "", senha = "") {
   }
 }
 
+/** Frase de valor do modal: quanto tempo e dinheiro o método poupa por ano */
+function textoEconomiaPro() {
+  const r = calcularEconomiaAnualUsuario();
+  return `Quem organiza a rotina poupa cerca de ${r.horasPoupadasAno} horas por ano. Isso vale em torno de R$ ${r.valorGeradoAno.toLocaleString("pt-BR")} do seu tempo, contra R$ 149,00 do plano anual.`;
+}
+
 /** Markup do Modal de Checkout e Assinatura Prumo PRO */
 function modalPrumoProHTML(planoSugerido = "anual") {
   const status = obterStatusPrumoPro();
@@ -330,8 +357,9 @@ function modalPrumoProHTML(planoSugerido = "anual") {
             <div class="plano-periodo">${periodo}</div>
             <div class="plano-destaque">${destaque}</div>
           </div>`;
+  const emTeste = status.ativo && status.plano === "teste";
   const ativo = status.ativo
-    ? `<p class="modal-pro-sub"><b>Licença ativa:</b> ${status.vitalicio ? "vitalícia" : "até " + new Date(status.expiraEm).toLocaleDateString("pt-BR")}. Pagar de novo soma ao que você já tem.</p>`
+    ? `<p class="modal-pro-sub"><b>${emTeste ? "Teste grátis ativo" : "Licença ativa"}:</b> ${status.vitalicio ? "vitalícia" : "até " + new Date(status.expiraEm).toLocaleDateString("pt-BR")}.${emTeste ? "" : " Pagar de novo soma ao que você já tem."}</p>`
     : "";
 
   return `
@@ -351,6 +379,13 @@ function modalPrumoProHTML(planoSugerido = "anual") {
           ${card("mensal", "Mensal Pro", "R$ 19,90", "30 dias de acesso", "Sem compromisso", false)}
           ${card("vitalicio", "Vitalício Founder", "R$ 297,00", "pagamento único", "Acesso Permanente", false)}
         </div>
+
+        ${
+          status.ativo
+            ? ""
+            : `<button class="btn small" id="bt-teste-gratis" style="width:100%;margin-bottom:10px;">Testar 7 dias grátis (sem cartão)</button>`
+        }
+        <p class="note" id="pro-roi" style="margin:0 0 10px;">${textoEconomiaPro()}</p>
 
         <ul class="lista-vantagens-pro">
           <li>✨ <b>Coach de Rotina com IA:</b> Análise biológica diária de foco e sono.</li>
@@ -449,6 +484,26 @@ function abrirModalPrumoPro(planoSugerido = "anual") {
 
   $("modal-pro-fechar-bt").addEventListener("click", fechar);
 
+  const btTeste = $("bt-teste-gratis");
+  if (btTeste) {
+    btTeste.addEventListener("click", async () => {
+      btTeste.disabled = true;
+      msg("Ativando o teste grátis...");
+      const r = await iniciarTesteGratisPro();
+      if (!r || r.erro) {
+        btTeste.disabled = false;
+        return msg((r && r.erro) || "Não deu para iniciar o teste.", true);
+      }
+      if (typeof iniciarEscutaLicencaPro === "function") {
+        licencaEscutandoUid = null; // força ler a licença nova agora
+        iniciarEscutaLicencaPro();
+      }
+      msg("Teste grátis ativado por 7 dias! Aproveite o PRO. ⭐");
+      btTeste.hidden = true;
+      setTimeout(fechar, 2500);
+    });
+  }
+
   $("bt-gerar-pix").addEventListener("click", async () => {
     const bt = $("bt-gerar-pix");
     bt.disabled = true;
@@ -508,6 +563,7 @@ function inicializarPrumoPro() {
     const btImprimir = e.target.closest("[data-act='imprimir-relatorio-executivo']");
     if (btImprimir) {
       e.preventDefault();
+      if (!exigirPrumoPro()) return;
       const container = document.getElementById("relatorio-executivo-prumo");
       if (container) {
         container.innerHTML = gerarRelatorioExecutivoPDF();
@@ -725,6 +781,10 @@ if (typeof window !== "undefined") {
   window.aplicarLicencaServidor = aplicarLicencaServidor;
   window.iniciarEscutaLicencaPro = iniciarEscutaLicencaPro;
   window.criarCobrancaPix = criarCobrancaPix;
+  window.iniciarTesteGratisPro = iniciarTesteGratisPro;
+  window.exigirPrumoPro = exigirPrumoPro;
+  window.cartaoCoachBloqueadoHTML = cartaoCoachBloqueadoHTML;
+  window.textoEconomiaPro = textoEconomiaPro;
   window.verificarCobrancaPix = verificarCobrancaPix;
   window.analisarRotinaComportamental = analisarRotinaComportamental;
   window.gerarBriefingMatinalCoach = gerarBriefingMatinalCoach;
@@ -757,6 +817,10 @@ if (typeof module !== "undefined" && module.exports) {
     aplicarLicencaServidor,
     iniciarEscutaLicencaPro,
     criarCobrancaPix,
+    iniciarTesteGratisPro,
+    exigirPrumoPro,
+    cartaoCoachBloqueadoHTML,
+    textoEconomiaPro,
     verificarCobrancaPix,
     analisarRotinaComportamental,
     gerarBriefingMatinalCoach,

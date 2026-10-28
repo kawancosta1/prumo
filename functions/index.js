@@ -198,6 +198,30 @@ exports.criarPix = onRequest(
   }
 );
 
+exports.iniciarTeste = onRequest({ region: REGIAO, maxInstances: 5 }, async (req, res) => {
+  if (cors(req, res)) return;
+  const user = await usuarioDoToken(req);
+  if (!user) return res.status(401).json({ erro: "Entre na sua conta para testar." });
+  try {
+    const refTeste = db.doc(`testes/${user.uid}`);
+    const refLic = db.doc(`licencas/${user.uid}`);
+    const r = await db.runTransaction(async t => {
+      const [sTeste, sLic] = await Promise.all([t.get(refTeste), t.get(refLic)]);
+      if (sTeste.exists) return { erro: "O teste grátis já foi usado nesta conta.", codigo: 409 };
+      const lic = licencaDeTeste(sLic.exists ? sLic.data() : null, Date.now());
+      if (!lic) return { erro: "Você já tem o PRO ativo.", codigo: 409 };
+      t.set(refTeste, { em: Date.now() });
+      t.set(refLic, { ...lic, desde: Date.now(), atualizado: Date.now() }, { merge: true });
+      return { ok: true, expiraEm: lic.expiraEm };
+    });
+    if (r.erro) return res.status(r.codigo).json({ erro: r.erro });
+    return res.json({ ok: true, expiraEm: r.expiraEm });
+  } catch (e) {
+    console.error("iniciarTeste", e.message);
+    return res.status(500).json({ erro: "Não deu para iniciar o teste agora." });
+  }
+});
+
 exports.verificarPix = onRequest(
   { region: REGIAO, secrets: [MP_ACCESS_TOKEN], maxInstances: 5 },
   async (req, res) => {

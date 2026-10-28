@@ -85,6 +85,22 @@ module.exports = () => {
     );
   });
 
+  teste("teste grátis: 7 dias, uma vez só, e quem tem licença ativa não precisa", () => {
+    const t = L.licencaDeTeste(null, agora);
+    assert.strictEqual(t.plano, "teste");
+    assert.strictEqual(t.expiraEm, agora + 7 * DIA);
+    assert.strictEqual(L.licencaDeTeste({ ativo: true, vitalicio: true }, agora), null);
+    assert.strictEqual(L.licencaDeTeste({ ativo: true, expiraEm: agora + DIA }, agora), null);
+    assert.strictEqual(L.licencaDeTeste({ ativo: false, expiraEm: agora - DIA }, agora).ativo, true);
+  });
+
+  teste("pagar durante o teste não soma o que sobrou do teste", () => {
+    const teste7 = L.licencaDeTeste(null, agora);
+    const pago = L.calcularLicenca(teste7, "mensal", agora + 2 * DIA);
+    assert.strictEqual(pago.plano, "mensal");
+    assert.strictEqual(pago.expiraEm, agora + 2 * DIA + 30 * DIA);
+  });
+
   teste("assinatura do webhook: só a assinada com o segredo passa", () => {
     const segredo = "segredo-de-teste";
     const ts = "1800000000";

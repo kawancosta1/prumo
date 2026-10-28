@@ -72,8 +72,13 @@ function viewHoje() {
     <h1 class="h1">${isToday ? "Hoje" : selDay === addDays(t, 1) ? "Amanhã" : selDay === addDays(t, -1) ? "Ontem" : esc(DIAS[parse(selDay).getDay()].replace(/^./, c => c.toUpperCase()))}<small>${fmtLong(selDay)}</small></h1>
     ${isToday ? (parceriaAtiva() ? parceriaHeroHTML() : heroHTML()) : ""}
     ${
-      isToday && typeof gerarBriefingMatinalCoach === "function"
-        ? `
+      isToday &&
+      typeof gerarBriefingMatinalCoach === "function" &&
+      typeof obterStatusPrumoPro === "function" &&
+      !obterStatusPrumoPro().ativo
+        ? cartaoCoachBloqueadoHTML()
+        : isToday && typeof gerarBriefingMatinalCoach === "function"
+          ? `
       <div class="card-coach-ia">
         <div class="coach-header">
           <span class="coach-titulo">🤖 Coach de Rotina com IA</span>
@@ -83,7 +88,7 @@ function viewHoje() {
         <div class="coach-meta-principal">🎯 ${esc(gerarBriefingMatinalCoach().focoSugerido)}</div>
       </div>
     `
-        : ""
+          : ""
     }
     ${isToday && pedidos.length && !parceriaAtiva() ? `<button class="card pedido" data-tab="social"><span><b>${esc(pedidos[0].nome || "Alguém")}</b> quer juntar o Prumi com o seu. Toque para ver.</span></button>` : ""}
     ${isToday ? `<div class="stats"><span>${textoMundo("tarefas", "Tarefas")} <b>${done}/${tasks.length}</b></span><span>Água <b>${fmtML(waterToday())}</b> de ${fmtML(S.waterGoal)}</span>${habitsToday.length ? `<span>Hábitos <b>${habitsToday.filter(h => habitDone(h, t)).length}/${habitsToday.length}</b></span>` : ""}${S.sessions.some(s => s.date === t) ? `<span>Estudo <b>${fmtMin(S.sessions.filter(s => s.date === t).reduce((a, b) => a + b.min, 0))}</b></span>` : ""}</div>` : tasks.length ? `<div class="stats"><span>${textoMundo("tarefas", "Tarefas")} <b>${done}/${tasks.length}</b></span></div>` : ""}

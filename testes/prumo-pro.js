@@ -218,6 +218,42 @@ module.exports = async url => {
       })()
     `);
     ok(resAgua, "gerarMetaDiariaAguaAdaptativa calculou hidratação médica precisa por biometria e clima");
+
+    // 16. Teste grátis, bloqueio no momento de uso e frase de valor
+    const resBloqueio = ev(`
+      (() => {
+        cancelarLicencaPrumoPro();
+        const m = modalPrumoProHTML("anual");
+        const temBotao = m.includes('id="bt-teste-gratis"') && m.includes("7 dias grátis");
+        const temRoi = m.includes("horas por ano") && m.includes("R$ 149,00");
+        const card = cartaoCoachBloqueadoHTML();
+        const cartaoOk = card.includes("coach-bloqueado") && card.includes('data-act="abrir-pro"');
+        const abriu = exigirPrumoPro() === false && !!document.getElementById("modal-pro-overlay");
+        document.getElementById("modal-pro-fechar-bt").click();
+        aplicarLicencaServidor({ ativo: true, plano: "teste", expiraEm: Date.now() + 864e5 });
+        const liberado = exigirPrumoPro() === true && !document.getElementById("modal-pro-overlay");
+        const semBotao = !modalPrumoProHTML("anual").includes('id="bt-teste-gratis"') && modalPrumoProHTML("anual").includes("Teste grátis ativo");
+        cancelarLicencaPrumoPro();
+        return temBotao && temRoi && cartaoOk && abriu && liberado && semBotao;
+      })()
+    `);
+    ok(resBloqueio, "sem PRO: convida a testar 7 dias e abre o checkout; com teste ativo libera");
+
+    // 17. Aba Hoje: bloqueada sem PRO, completa com PRO
+    const resHoje = ev(`
+      (() => {
+        cancelarLicencaPrumoPro();
+        S.tab = "hoje";
+        softRender();
+        const livre = document.querySelector(".coach-bloqueado") && !document.querySelector(".coach-meta-principal");
+        aplicarLicencaServidor({ ativo: true, plano: "anual", expiraEm: Date.now() + 864e5 });
+        softRender();
+        const pro = !document.querySelector(".coach-bloqueado") && document.querySelector(".coach-meta-principal");
+        cancelarLicencaPrumoPro();
+        return Boolean(livre && pro);
+      })()
+    `);
+    ok(resHoje, "Hoje: coach bloqueado sem PRO e completo com PRO");
   } finally {
     fechar();
   }
