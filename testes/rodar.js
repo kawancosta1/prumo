@@ -116,15 +116,30 @@ const servidor = http.createServer((req, res) => {
     ["Estante e Leitura: Expansão Lote 2 (Itens 451 a 500)", () => require("./estante-lote2")(url)],
     ["Estante e Leitura: Expansão Lote 3 (Itens 501 a 550)", () => require("./estante-lote3")(url)],
     ["Estante e Leitura: Expansão Lote 4 (Itens 551 a 600)", () => require("./estante-lote4")(url)],
-    ["Mundos Visuais: Expansão Lote 1 (Zen, Rock, Emo, Otaku - 400 itens)", () => require("./mundos-visual-lote1")(url)],
-    ["Mundos Visuais: Expansão Lote 2 (Gamer, Prog, Bruxo, Feiticeiro - 400 itens)", () => require("./mundos-visual-lote2")(url)],
-    ["Mundos Visuais: Expansão Lote 3 (Cleanboy, Coach, Forró, Funk - 400 itens)", () => require("./mundos-visual-lote3")(url)],
-    ["Mundos Visuais: Expansão Lote 4 (Pagode, Rap, Sertanejo, Trap, Vovó - 500 itens)", () => require("./mundos-visual-lote4")(url)],
+    [
+      "Mundos Visuais: Expansão Lote 1 (Zen, Rock, Emo, Otaku - 400 itens)",
+      () => require("./mundos-visual-lote1")(url)
+    ],
+    [
+      "Mundos Visuais: Expansão Lote 2 (Gamer, Prog, Bruxo, Feiticeiro - 400 itens)",
+      () => require("./mundos-visual-lote2")(url)
+    ],
+    [
+      "Mundos Visuais: Expansão Lote 3 (Cleanboy, Coach, Forró, Funk - 400 itens)",
+      () => require("./mundos-visual-lote3")(url)
+    ],
+    [
+      "Mundos Visuais: Expansão Lote 4 (Pagode, Rap, Sertanejo, Trap, Vovó - 500 itens)",
+      () => require("./mundos-visual-lote4")(url)
+    ],
     ["Top 20 Referências por Personalidade (20 x 16+)", () => require("./referencias-mundos")(url)],
     ["Averiguação Divertida da Leitura (Pet & Estante)", () => require("./leitura-averiguacao")(url)],
     ["Aprimoramento Visual Supremo (2.5D, Filtros e Física)", () => require("./visual-supremo")(url)],
     ["Cinemática de Pets Nível Triple-AAA", () => require("./pets-cinematica-aaa")(url)],
-    ["Pets Masterpiece Triple-AAA (Jiggle, Rigging e Partículas)", () => require("./pets-masterpiece-aaa")(url)],
+    [
+      "Pets Masterpiece Triple-AAA (Jiggle, Rigging e Partículas)",
+      () => require("./pets-masterpiece-aaa")(url)
+    ],
     ["500 Melhorias Cognitivas, WCAG 2.2 e Leitner Box", () => require("./melhorias-cognitivas")(url)],
     ["Paisagens Sonoras WebAudio e Tunelamento dos Pets", () => require("./audio-paisagens")(url)],
     ["Estante", () => require("./estante")(url)],
@@ -136,7 +151,8 @@ const servidor = http.createServer((req, res) => {
     ["Pets: interações", () => require("./pets-interacao")(url)],
     ["Leitura com amigos", () => require("./juntos")(url)],
     ["Mudança de endereço", () => require("./mudanca")(url)],
-    ["Carteiro dos lembretes", () => require("./carteiro")()]
+    ["Carteiro dos lembretes", () => require("./carteiro")()],
+    ["Módulo Comercial Prumo PRO", () => require("./prumo-pro")(url)]
   ];
   let falhas = 0;
   for (const [nome, rodar] of suites) {

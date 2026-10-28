@@ -29,6 +29,25 @@ function viewAjustes() {
       <div class="setrow"><div class="lbl"><b>Tratamento</b><span class="note">Como o Prumi se refere a você nas falas.</span></div><div class="seg" role="group"><button data-act="gender" data-g="m" aria-pressed="${(S.gender || "m") === "m"}">Ele/Dele</button><button data-act="gender" data-g="f" aria-pressed="${S.gender === "f"}">Ela/Dela</button><button data-act="gender" data-g="n" aria-pressed="${S.gender === "n"}">Neutro</button></div></div>
     </div>
   </section>
+  <section class="block">
+    <h2 class="h2">Prumo PRO ⭐ & Assinatura</h2>
+    <div class="setbox">
+      <div class="setrow">
+        <div class="lbl">
+          <b>Plano & Licença</b>
+          <span class="note">${typeof obterStatusPrumoPro === "function" && obterStatusPrumoPro().ativo ? `Licença Ativa: Plano ${esc(obterStatusPrumoPro().plano.toUpperCase())}` : "Modo Gratuito (Tarefas e Água essenciais)"}</span>
+        </div>
+        <button class="btn small primary" data-act="abrir-pro">${typeof obterStatusPrumoPro === "function" && obterStatusPrumoPro().ativo ? "Gerenciar" : "Desbloquear PRO"}</button>
+      </div>
+      <div class="setrow">
+        <div class="lbl">
+          <b>Relatório Executivo Clínico (PDF)</b>
+          <span class="note">Gera parecer de rotina, sono e equilíbrio formatado para impressão A4.</span>
+        </div>
+        <button class="btn small" data-act="imprimir-relatorio-executivo">Imprimir / Salvar PDF</button>
+      </div>
+    </div>
+  </section>
   ${notificacoesAjustesHTML()}
   ${
     somDoMundo()

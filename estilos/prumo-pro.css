@@ -1,0 +1,373 @@
+/*
+  prumo-pro.css - Módulo Comercial e Executivo de Alta Fidelidade do Prumo
+  Eleva a percepção de valor com acabamento dourado nobre, cartões de inteligência artificial,
+  modal de checkout de alta conversão com Pix instantâneo e layout executivo para impressão médica/terapêutica.
+*/
+
+/* Badge Pro Dourado / Holográfico */
+.badge-pro-vip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #d97706 100%);
+  color: #1a1003 !important;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  box-shadow:
+    0 2px 6px rgba(245, 158, 11, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition:
+    transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.15s ease;
+  user-select: none;
+}
+.badge-pro-vip:hover {
+  transform: scale(1.06);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.5);
+}
+
+/* Card do Coach de Inteligência Comportamental na Aba Hoje */
+.card-coach-ia {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 243, 255, 0.85) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 4px 16px rgba(139, 92, 246, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.05);
+}
+body.dark .card-coach-ia,
+.dark .card-coach-ia {
+  background: linear-gradient(145deg, rgba(30, 24, 48, 0.95) 0%, rgba(20, 16, 35, 0.9) 100%);
+  border-color: rgba(167, 139, 250, 0.2);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.card-coach-ia::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #8b5cf6 0%, #ec4899 100%);
+}
+.coach-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.coach-titulo {
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text, #1e293b);
+}
+.coach-score {
+  font-size: 12px;
+  font-weight: 800;
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+.coach-texto {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-sec, #475569);
+  margin-bottom: 10px;
+}
+.coach-meta-principal {
+  background: rgba(139, 92, 246, 0.08);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text, #1e293b);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Modal de Assinatura e Checkout Prumo PRO */
+.modal-pro-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 13, 18, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: modal-pro-aparece 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modal-pro-aparece {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.modal-pro-conteudo {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 20px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  position: relative;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+body.dark .modal-pro-conteudo,
+.dark .modal-pro-conteudo {
+  background: #191627;
+  color: #f8fafc;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+.modal-pro-fechar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #64748b;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.modal-pro-fechar:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+.modal-pro-topo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.modal-pro-titulo {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 8px 0 4px;
+}
+.modal-pro-sub {
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* Seletor de Planos */
+.planos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media (max-width: 480px) {
+  .planos-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.plano-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+}
+body.dark .plano-card,
+.dark .plano-card {
+  background: #211c34;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.plano-card:hover {
+  border-color: #f59e0b;
+}
+.plano-card.selecionado {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.06);
+  box-shadow: 0 0 0 1px #f59e0b;
+}
+.plano-popular {
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  background: #f59e0b;
+  color: #000;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+.plano-nome {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.plano-preco {
+  font-size: 20px;
+  font-weight: 800;
+  color: #f59e0b;
+}
+.plano-periodo {
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+.plano-destaque {
+  font-size: 11px;
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* Tabela de Vantagens */
+.lista-vantagens-pro {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  font-size: 13px;
+}
+.lista-vantagens-pro li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--text, #334155);
+}
+body.dark .lista-vantagens-pro li,
+.dark .lista-vantagens-pro li {
+  color: #cbd5e1;
+}
+
+/* Área do Pix Copia e Cola */
+.area-pix-box {
+  background: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+body.dark .area-pix-box,
+.dark .area-pix-box {
+  background: #161324;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.pix-codigo-input {
+  width: 100%;
+  padding: 8px;
+  font-family: monospace;
+  font-size: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: #ffffff;
+  color: #0f172a;
+}
+body.dark .pix-codigo-input,
+.dark .pix-codigo-input {
+  background: #0f0d18;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Campo de Ativação por Chave */
+.area-ativacao-chave {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.area-ativacao-chave input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-family: monospace;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   LAYOUT DO RELATÓRIO EXECUTIVO CLÍNICO / ACADÊMICO (@media print)
+   ========================================================================== */
+.relatorio-executivo-container {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .relatorio-executivo-container,
+  .relatorio-executivo-container * {
+    visibility: visible;
+  }
+  .relatorio-executivo-container {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 20mm;
+    font-family:
+      "Instrument Sans",
+      -apple-system,
+      sans-serif;
+  }
+  .relatorio-cabecalho {
+    border-bottom: 2px solid #000;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .relatorio-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .relatorio-secao {
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 6px;
+  }
+  .relatorio-rodape {
+    border-top: 1px solid #ccc;
+    padding-top: 12px;
+    margin-top: 40px;
+    font-size: 11px;
+    text-align: center;
+    color: #555;
+  }
+}

@@ -98,7 +98,8 @@ const blank = () => ({
   people: [],
   habits: [],
   habitLog: {},
-  journal: {}
+  journal: {},
+  pro: { ativo: false, plano: "gratis", desde: null, chave: "" }
 });
 
 let S = blank(),
