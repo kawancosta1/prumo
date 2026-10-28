@@ -149,6 +149,7 @@ const servidor = http.createServer((req, res) => {
     ["Sincronia", () => require("./sincronia")(url)],
     ["Sincronia e Personalidade", () => require("./sincronia-persona")(url)],
     ["Valuation e Metricas de Negocio", () => require("./valuation-metrics")(url)],
+    ["Calcados, Calcas e Sombreamento", () => require("./calcados-calcas")(url)],
     ["Novidades", () => require("./novidades")(url)],
     ["Pets: interações", () => require("./pets-interacao")(url)],
     ["Leitura com amigos", () => require("./juntos")(url)],

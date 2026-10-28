@@ -1,4 +1,4 @@
-/*
+﻿/*
   Formas reaproveitadas para desenhar roupas (camiseta, moletom, boné, chapéu...).
 */
 "use strict";
@@ -158,3 +158,113 @@ const emoBangs = (c, streak) =>
   `<path d="M21 55Q22 21 60 20Q95 21 99 50Q91 44 85 53Q79 67 66 77Q73 61 66 51Q50 41 34 47Q25 49 21 55Z" fill="${c}" ${O}/>${streak ? `<path d="M70 26Q84 32 86 52Q80 62 72 70" stroke="${streak}" stroke-width="5" fill="none" stroke-linecap="round"/>` : ""}`;
 
 const ITEMS = []; // cada arquivo em mundos/ adiciona seus itens aqui
+
+
+/* ---------- Helpers de CalÃ§as e CalÃ§ados com Sombreamento 2.5D ---------- */
+const pantsJeans = (c = "#1E3A8A", pesponto = "#F59E0B") =>
+  `<g class="roupa-jeans">
+    <!-- Base da calÃ§a com caimento anatÃ´mico -->
+    <path d="M26 112H94L90 144H66L60 126L54 144H30Z" fill="${c}" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- Sombra de oclusÃ£o e dobras dos joelhos -->
+    <path d="M30 114H90V118H30Z" fill="#000" opacity=".22"/>
+    <path d="M36 128Q42 132 48 128M72 128Q78 132 84 128" stroke="#000" stroke-opacity=".28" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <!-- Pesponto duplo em linha ocre -->
+    <path d="M28 116H92M58 126V144M62 126V144" stroke="${pesponto}" stroke-width="1.2" stroke-dasharray="3 1.8" fill="none"/>
+    <!-- Bolsos frontais estilizados -->
+    <path d="M30 118Q44 120 42 130M90 118Q76 120 78 130" stroke="${pesponto}" stroke-width="1.2" stroke-dasharray="2.5 1.5" fill="none"/>
+    <!-- Brilho especular sutil na perna esquerda -->
+    <path d="M34 120L36 142" stroke="#fff" stroke-opacity=".18" stroke-width="2" stroke-linecap="round"/>
+  </g>`;
+
+const pantsTactel = (c = "#7C4DFF", faixa = "#FFFFFF") =>
+  `<g class="roupa-tactel">
+    <!-- Caimento solto de bermuda streetwear -->
+    <path d="M24 110H96L92 145H66L60 128L54 145H28Z" fill="${c}" stroke="var(--ink)" stroke-width="2.4" stroke-linejoin="round"/>
+    <!-- Faixas laterais esportivas com relevo -->
+    <path d="M27 112L31 144M93 112L89 144" stroke="${faixa}" stroke-width="3" stroke-linecap="round"/>
+    <!-- ElÃ¡stico franzido da cintura e cordÃ£o -->
+    <path d="M24 110H96V115H24Z" fill="#000" opacity=".18"/>
+    <path d="M58 114V122M62 114V122" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    <!-- Sombra de oclusÃ£o inferior -->
+    <path d="M28 143H54M66 143H92" stroke="#000" stroke-opacity=".25" stroke-width="2"/>
+  </g>`;
+
+const pantsSocial = (c = "#1F2937", vinco = "#374151") =>
+  `<g class="roupa-social">
+    <path d="M28 111H92L89 146H66L60 128L54 146H31Z" fill="${c}" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- Vinco central elegante passado a ferro -->
+    <line x1="42" y1="116" x2="42" y2="144" stroke="${vinco}" stroke-width="1.5" stroke-dasharray="8 2"/>
+    <line x1="78" y1="116" x2="78" y2="144" stroke="${vinco}" stroke-width="1.5" stroke-dasharray="8 2"/>
+    <!-- Cinto de couro fino com fivela prateada -->
+    <rect x="28" y="110" width="64" height="4.5" fill="#111"/>
+    <rect x="56" y="109" width="8" height="6.5" rx="1.5" fill="#E2E8F0" stroke="#475569" stroke-width="1"/>
+  </g>`;
+
+const shoesSneaker = (corCorpo = "#FFFFFF", corSola = "#1E293B", corDetalhe = "#3B82F6") =>
+  `<g class="calcado-sneaker">
+    <!-- Sombra de contato suave no solo -->
+    <ellipse cx="44" cy="154" rx="15" ry="3.8" fill="#000" opacity=".24"/>
+    <ellipse cx="76" cy="154" rx="15" ry="3.8" fill="#000" opacity=".24"/>
+    <!-- PÃ© esquerdo -->
+    <g class="pe-l">
+      <!-- Corpo do tÃªnis com biqueira dinÃ¢mica -->
+      <path d="M30 148 L32 138 Q42 137 46 140 L56 144 L56 151 L30 151 Z" fill="${corCorpo}" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>
+      <!-- Entressola e solado aderente -->
+      <path d="M29 149 H57 V153 H29 Z" fill="${corSola}" stroke="var(--ink)" stroke-width="1.4"/>
+      <!-- Faixa de design / logo dinÃ¢mico -->
+      <path d="M35 144 Q44 141 52 147" stroke="${corDetalhe}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <!-- CadarÃ§o cruzado -->
+      <path d="M38 141 L43 143 M38 144 L43 141" stroke="#334155" stroke-width="1.2"/>
+    </g>
+    <!-- PÃ© direito -->
+    <g class="pe-r">
+      <path d="M90 148 L88 138 Q78 137 74 140 L64 144 L64 151 L90 151 Z" fill="${corCorpo}" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M63 149 H91 V153 H63 Z" fill="${corSola}" stroke="var(--ink)" stroke-width="1.4"/>
+      <path d="M85 144 Q76 141 68 147" stroke="${corDetalhe}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M82 141 L77 143 M82 144 L77 141" stroke="#334155" stroke-width="1.2"/>
+    </g>
+  </g>`;
+
+const shoesAllStar = (cor = "#DC2626") =>
+  `<g class="calcado-allstar">
+    <ellipse cx="44" cy="154" rx="14" ry="3.6" fill="#000" opacity=".22"/>
+    <ellipse cx="76" cy="154" rx="14" ry="3.6" fill="#000" opacity=".22"/>
+    <!-- L -->
+    <path d="M30 147 L33 136 Q43 136 46 139 L56 143 V151 H30 Z" fill="${cor}" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M28 144 Q31 140 35 147 Z" fill="#FFFFFF" stroke="var(--ink)" stroke-width="1.4"/>
+    <rect x="29" y="148" width="28" height="4.5" rx="1" fill="#FFFFFF" stroke="var(--ink)" stroke-width="1.4"/>
+    <line x1="29" y1="150" x2="57" y2="150" stroke="#111" stroke-width="1"/>
+    <!-- R -->
+    <path d="M90 147 L87 136 Q77 136 74 139 L64 143 V151 H90 Z" fill="${cor}" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M92 144 Q89 140 85 147 Z" fill="#FFFFFF" stroke="var(--ink)" stroke-width="1.4"/>
+    <rect x="63" y="148" width="28" height="4.5" rx="1" fill="#FFFFFF" stroke="var(--ink)" stroke-width="1.4"/>
+    <line x1="63" y1="150" x2="91" y2="150" stroke="#111" stroke-width="1"/>
+  </g>`;
+
+const shoesBoots = (cor = "#18181B", metal = "#EF4444") =>
+  `<g class="calcado-coturno">
+    <ellipse cx="44" cy="154" rx="16" ry="4" fill="#000" opacity=".26"/>
+    <ellipse cx="76" cy="154" rx="16" ry="4" fill="#000" opacity=".26"/>
+    <!-- L -->
+    <path d="M28 147 L30 134 H48 L55 142 V152 H28 Z" fill="${cor}" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="27" y="149" width="29" height="5" rx="1" fill="#09090B" stroke="var(--ink)" stroke-width="1.5"/>
+    <path d="M32 154 h3 v-1.5 h-3 z M38 154 h3 v-1.5 h-3 z M44 154 h3 v-1.5 h-3 z" fill="#fff" opacity=".3"/>
+    <path d="M35 137 L43 140 M35 141 L43 144" stroke="${metal}" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- R -->
+    <path d="M92 147 L90 134 H72 L65 142 V152 H92 Z" fill="${cor}" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="64" y="149" width="29" height="5" rx="1" fill="#09090B" stroke="var(--ink)" stroke-width="1.5"/>
+    <path d="M85 154 h3 v-1.5 h-3 z M79 154 h3 v-1.5 h-3 z M73 154 h3 v-1.5 h-3 z" fill="#fff" opacity=".3"/>
+    <path d="M85 137 L77 140 M85 141 L77 144" stroke="${metal}" stroke-width="1.8" stroke-linecap="round"/>
+  </g>`;
+
+const shoesFluffy = (cor = "#FBCFE8") =>
+  `<g class="calcado-pantufa">
+    <ellipse cx="44" cy="154" rx="15" ry="3.5" fill="#000" opacity=".18"/>
+    <ellipse cx="76" cy="154" rx="15" ry="3.5" fill="#000" opacity=".18"/>
+    <!-- L -->
+    <path d="M26 146 Q24 137 38 137 Q52 137 56 145 Q56 152 40 152 Q26 152 26 146 Z" fill="${cor}" stroke="var(--ink)" stroke-width="1.8"/>
+    <circle cx="38" cy="143" r="4.5" fill="#fff" stroke="var(--ink)" stroke-width="1.2"/>
+    <!-- R -->
+    <path d="M94 146 Q96 137 82 137 Q68 137 64 145 Q64 152 80 152 Q94 152 94 146 Z" fill="${cor}" stroke="var(--ink)" stroke-width="1.8"/>
+    <circle cx="82" cy="143" r="4.5" fill="#fff" stroke="var(--ink)" stroke-width="1.2"/>
+  </g>`;

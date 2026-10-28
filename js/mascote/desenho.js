@@ -1,4 +1,4 @@
-/*
+﻿/*
   Desenho do Prumi em SVG: corpo, rosto de cada humor, água, roupas por cima.
 */
 "use strict";
@@ -165,7 +165,9 @@ function prumi({
     ck = it("cheek"),
     lp = up ? [8, 52] : [9, 83],
     cintura = it("waist"),
-    bottons = it("pins");
+    bottons = it("pins"),
+    shoes = it("shoes"),
+    legs = it("legs");
   // Camadas extras que o mundo pode adicionar (ex.: emo-efeitos.js: caixão e óculos de sol)
   const efeitoMundo = vivo && typeof MUNDO_FX !== "undefined" ? MUNDO_FX[p || S.persona] : null;
   const camadas =
@@ -179,7 +181,49 @@ function prumi({
   // --fase: todas as animações contínuas seguem o mesmo relógio (desde que a página abriu).
   // Assim, quando a tela é redesenhada, o Prumi continua o balanço de onde estava em vez de pular pro começo.
   const fase = typeof performance !== "undefined" ? -Math.round(performance.now()) : 0;
-  return `<svg class="prumi m-${mood}${fem ? " fem" : ""}" style="--ws:${tw.spd}s;--fase:${fase}ms${skin ? `;--mink:${skin.ink}` : ""}" viewBox="0 -6 120 154" width="${size}" height="${Math.round(size * 1.28)}" role="img" aria-label="Prumi">
+    const temPernasOuCalcado = !!(shoes || cintura || legs);
+  const pernasSvg = temPernasOuCalcado
+    ? `<g class="prumi-pernas" fill="${skin && skin.color ? skin.color : "#E2EEFC"}" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round">
+        <path d="M41 122 L41 145 Q41 147 45 147 L49 147 Q53 147 53 145 L53 125"/>
+        <path d="M67 125 L67 145 Q67 147 71 147 L75 147 Q79 147 79 145 L79 122"/>
+        <path d="M41 122 Q60 133 79 122 V126 Q60 137 41 126 Z" fill="#000" opacity=".22" stroke="none"/>
+      </g>`
+    : "";
+  const soloSombra = temPernasOuCalcado
+    ? `<ellipse cx="60" cy="156" rx="36" ry="4.5" fill="#000" opacity=".18"/>`
+    : "";
+
+  return `<svg class="prumi m-${mood}${fem ? " fem" : ""}" style="--ws:${tw.spd}s;--fase:${fase}ms${skin ? `;--mink:${skin.ink}` : ""}" viewBox="0 -6 120 162" width="${size}" height="${Math.round(size * 1.35)}" role="img" aria-label="Prumi">
+    <defs>
+      <clipPath id="${id}"><path d="${BODY}"/></clipPath>
+      <clipPath id="${id}t"><rect x="-20" y="${cordaLonga ? -160 : -6}" width="160" height="${cordaLonga ? 324 : 180}"/></clipPath>
+      <linearGradient id="${id}_shd" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28"/>
+        <stop offset="45%" stop-color="#ffffff" stop-opacity="0.0"/>
+        <stop offset="100%" stop-color="#050a14" stop-opacity="0.22"/>
+      </linearGradient>
+      <filter id="${id}_drop" x="-10%" y="-10%" width="120%" height="130%">
+        <feDropShadow dx="0" dy="2.2" stdDeviation="2.0" flood-color="#090d16" flood-opacity="0.26"/>
+      </filter>
+    </defs>
+    ${camadas.fundo}${bgI ? `<g class="bgi">${bgI.svg()}</g>` : ""}${pet ? `<g class="pet">${pet.svg()}</g>` : ""}
+    <g class="entra"><g class="swing"><g clip-path="url(#${id}t)"><g class="hop corda">${str ? str.svg() : `<line class="string" x1="60" y1="-40" x2="60" y2="19"/>`}</g></g><g class="gira"><g class="hop">
+      ${back ? back.svg() : ""}
+      ${soloSombra}
+      ${pernasSvg}
+      <rect class="cap" x="51.5" y="16.5" width="17" height="10" rx="3.5"/>
+      <path class="body" d="${BODY}"${skin ? ` style="fill:${skin.color}"` : ""}/>
+      <path class="body-shading" d="${BODY}" fill="url(#${id}_shd)" pointer-events="none"/>
+      <g clip-path="url(#${id})">${skin && skin.svg ? `<g class="pele-extra">${skin.svg()}</g>` : ""}${top ? top.svg() : ""}${bottons ? bottons.svg() : ""}<g class="waterg${top ? " wet" : ""}" data-lvl="${lvl}" transform="translate(0 ${lvl})"><g transform="translate(-20 -3)"><path class="wave2" d="${wv}"/></g><path class="wave" d="${wv}"/>${parts}</g>${inner}</g>
+      ${cintura ? `<g class="prumi-cintura-ext" filter="url(#${id}_drop)">${cintura.svg()}</g>` : ""}
+      ${legs ? `<g class="prumi-legs-ext" filter="url(#${id}_drop)">${legs.svg()}</g>` : ""}
+      ${shoes ? `<g class="prumi-shoes">${shoes.svg()}</g>` : ""}
+      <path class="outline" d="${BODY}"/>${top ? "" : `<path class="shine" d="M34 54Q36 40 49 35"/>`}
+      ${it("neck") ? it("neck").svg() : ""}
+      <g class="arm l"><path class="armp" d="${armL}"/>${wr ? wr.svg(lp[0], lp[1]) : ""}</g>
+      <g class="arm r"><path class="armp" d="${armR}"/>${hand ? hand.svg(hp[0], hp[1]) : ""}</g>
+      ${face}${lashes}${bow}${ck ? ck.svg(mood) : ""}${mo ? mo.svg(mood) : ""}${it("face") ? it("face").svg(mood) : ""}${camadas.rosto}${it("hair") ? it("hair").svg() : ""}${it("hat") ? it("hat").svg() : ""}${extra}
+    </g></g></g></g></svg>;--mink:${skin.ink}` : ""}" viewBox="0 -6 120 154" width="${size}" height="${Math.round(size * 1.28)}" role="img" aria-label="Prumi">
     <defs><clipPath id="${id}"><path d="${BODY}"/></clipPath><clipPath id="${id}t"><rect x="-20" y="${cordaLonga ? -160 : -6}" width="160" height="${cordaLonga ? 324 : 170}"/></clipPath></defs>
     ${camadas.fundo}${bgI ? `<g class="bgi">${bgI.svg()}</g>` : ""}${pet ? `<g class="pet">${pet.svg()}</g>` : ""}
     <g class="entra"><g class="swing"><g clip-path="url(#${id}t)"><g class="hop corda">${str ? str.svg() : `<line class="string" x1="60" y1="-40" x2="60" y2="19"/>`}</g></g><g class="gira"><g class="hop">
