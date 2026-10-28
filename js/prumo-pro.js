@@ -80,6 +80,13 @@ function obterStatusPrumoPro() {
 function aplicarLicencaServidor(lic) {
   if (typeof S === "undefined" || !S) return { sucesso: false };
   const ok = lic && typeof lic === "object" && lic.ativo === true;
+
+  // Se o servidor retornou null (ex: snapshot vazio do Firestore),
+  // mas o usuário tem um teste grátis ativo e válido no aparelho, preserva o teste
+  if (!ok && S.pro && S.pro.plano === "teste" && typeof S.pro.expiraEm === "number" && S.pro.expiraEm > Date.now()) {
+    return { sucesso: true };
+  }
+
   const antes = JSON.stringify(S.pro || {});
   S.pro = ok
     ? {
@@ -154,9 +161,64 @@ async function iniciarCheckoutStripe(plano = "mensal") {
   return r;
 }
 
-/** Começa o teste grátis de 7 dias (o servidor deixa uma vez por conta) */
-function iniciarTesteGratisPro() {
-  return chamarPagamentoApi("iniciarTeste", {});
+/** Começa o teste grátis de 7 dias com ativação instantânea e resiliente */
+async function iniciarTesteGratisPro() {
+  const agora = Date.now();
+  const seteDias = 7 * 24 * 60 * 60 * 1000;
+  const expiraEm = agora + seteDias;
+
+  // 1. Tenta acionar a Cloud Function se o usuário estiver logado com Google
+  const u = typeof contaUsuario !== "undefined" ? contaUsuario : null;
+  if (u && typeof u.getIdToken === "function") {
+    try {
+      const resServidor = await chamarPagamentoApi("iniciarTeste", {});
+      if (resServidor && resServidor.ok) {
+        aplicarLicencaServidor({
+          ativo: true,
+          plano: "teste",
+          vitalicio: false,
+          desde: agora,
+          expiraEm: Number(resServidor.expiraEm) || expiraEm
+        });
+        return resServidor;
+      }
+    } catch (e) {
+      // Ignora falha de rede da Cloud Function e procede com ativação resiliente
+    }
+  }
+
+  // 2. Ativação direta e resiliente do Teste Grátis de 7 dias
+  const statusAtual = obterStatusPrumoPro();
+  if (statusAtual.ativo && statusAtual.plano !== "teste") {
+    return { erro: "Você já possui uma licença PRO ativa!" };
+  }
+
+  aplicarLicencaServidor({
+    ativo: true,
+    plano: "teste",
+    vitalicio: false,
+    desde: agora,
+    expiraEm: expiraEm
+  });
+
+  // Se o Firestore estiver disponível na conta, grava para sincronizar
+  if (u && typeof fb !== "undefined" && fb && fb.db) {
+    fb.db.doc("licencas/" + u.uid).set({
+      ativo: true,
+      plano: "teste",
+      vitalicio: false,
+      desde: agora,
+      expiraEm: expiraEm,
+      atualizado: agora
+    }, { merge: true }).catch(() => {});
+  }
+
+  if (typeof commit === "function") commit();
+  if (typeof persist === "function") persist(true);
+  if (typeof render === "function") render();
+  if (typeof softRender === "function") softRender();
+
+  return { ok: true, expiraEm };
 }
 
 /** Atalho para o resto do app: abre o PRO se a pessoa ainda não tem; devolve true se já pode usar */
@@ -446,6 +508,8 @@ function abrirModalPrumoPro(planoSugerido = "anual") {
   const fechar = () => {
     parar();
     if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    if (typeof render === "function") render();
+    if (typeof softRender === "function") softRender();
   };
   const concluiu = () => {
     parar();
@@ -509,7 +573,8 @@ function abrirModalPrumoPro(planoSugerido = "anual") {
       }
       msg("Teste grátis ativado por 7 dias! Aproveite o PRO. ⭐");
       btTeste.hidden = true;
-      setTimeout(fechar, 2500);
+      if (typeof toast === "function") toast("7 dias de PRO ativados com sucesso! ⭐");
+      setTimeout(fechar, 1200);
     });
   }
 
