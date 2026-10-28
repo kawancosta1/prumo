@@ -1,4 +1,4 @@
-﻿/*
+/*
   Formas reaproveitadas para desenhar roupas (camiseta, moletom, boné, chapéu...).
 */
 "use strict";
@@ -15,7 +15,8 @@ const SLOTS_EQ = [
   ["skin", "Pele"],
   ["neck", "Pescoço"],
   ["top", "Roupas"],
-  ["waist", "Cintura"],
+  ["waist", "Calças e Cintura"],
+  ["shoes", "Calçados"],
   ["pins", "Bottons"],
   ["back", "Costas"],
   ["wrist", "Pulso"],
