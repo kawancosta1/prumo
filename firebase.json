@@ -60,7 +60,16 @@
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "public, max-age=604800"
+            "value": "public, max-age=604800, immutable"
+          }
+        ]
+      },
+      {
+        "source": "imagens/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=2592000, immutable"
           }
         ]
       },
