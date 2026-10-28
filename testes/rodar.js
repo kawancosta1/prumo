@@ -151,6 +151,7 @@ const servidor = http.createServer((req, res) => {
     ["Valuation e Metricas de Negocio", () => require("./valuation-metrics")(url)],
     ["Calcados, Calcas e Sombreamento", () => require("./calcados-calcas")(url)],
     ["Pets: Estilo Cuphead e Shaders", () => require("./pets-cuphead")(url)],
+    ["Cenario: Iluminacao e Profundidade 2.5D", () => require("./cenario-upgrade")(url)],
     ["Novidades", () => require("./novidades")(url)],
     ["Pets: interações", () => require("./pets-interacao")(url)],
     ["Leitura com amigos", () => require("./juntos")(url)],

@@ -1,0 +1,78 @@
+/* ===================================================================
+   cenario-upgrade-visual.css - Upgrade Visual e Iluminação do Cenário
+   Estética de Livro de Fantasia e Jogo Indie Premium (2.5D Volumétrico)
+   =================================================================== */
+
+/* Animação suave e mágica das partículas de poeira iluminadas na janela */
+@keyframes cenarioPoeiraFloat {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-8px) translateX(4px);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(-16px) translateX(-2px);
+    opacity: 0.2;
+  }
+}
+
+.cenario-poeira-mote {
+  animation: cenarioPoeiraFloat 4.5s ease-in-out infinite alternate;
+}
+
+.cenario-poeira-mote:nth-child(2n) {
+  animation-duration: 5.8s;
+  animation-delay: 1.2s;
+}
+
+.cenario-poeira-mote:nth-child(3n) {
+  animation-duration: 6.4s;
+  animation-delay: 2.5s;
+}
+
+/* Brilho suave da janela e atmosfera do quarto */
+@keyframes cenarioLuzPulsar {
+  0%, 100% {
+    opacity: 0.28;
+  }
+  50% {
+    opacity: 0.38;
+  }
+}
+
+.cenario-feixe-luz {
+  animation: cenarioLuzPulsar 8s ease-in-out infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Reflexo especular no vidro */
+.cenario-vidro-reflexo {
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Sombra e profundidade do quadro da estante */
+.estante-quadro {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  background: #1e1b18;
+}
+
+.dark .estante-quadro {
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  background: #0d0b0a;
+}
+
+/* Transição suave de interação no pet e leitor dentro do quarto */
+.q-pet-slot:hover {
+  filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.5));
+}
+
+.prumi-leitor:hover {
+  filter: drop-shadow(0 2px 8px rgba(59, 130, 246, 0.4));
+}
