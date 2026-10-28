@@ -147,6 +147,7 @@ const servidor = http.createServer((req, res) => {
     ["Quarto por Mundo", () => require("./quarto-mundos")(url)],
     ["Pets", () => require("./pets")(url)],
     ["Sincronia", () => require("./sincronia")(url)],
+    ["Sincronia e Personalidade", () => require("./sincronia-persona")(url)],
     ["Novidades", () => require("./novidades")(url)],
     ["Pets: interações", () => require("./pets-interacao")(url)],
     ["Leitura com amigos", () => require("./juntos")(url)],

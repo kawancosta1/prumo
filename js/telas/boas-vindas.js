@@ -1,4 +1,4 @@
-/*
+﻿/*
   Boas-vindas (primeira vez que abre).
 */
 "use strict";
@@ -71,6 +71,18 @@ function onbHTML() {
 
 function renderOnb() {
   const el = document.getElementById("onb");
+  if (!el) return;
+  // Se o usuario ja esta usando o app (onboarded), nunca interrompe com popup de entrada
+  if (S.onboarded) {
+    if (!el.hidden) {
+      el.classList.add("out");
+      setTimeout(() => {
+        el.hidden = true;
+        el.classList.remove("out");
+      }, 200);
+    }
+    return;
+  }
   // Tela de entrada (Google ou email) vem antes de tudo: js/telas/entrar.js
   if (appReady && typeof precisaEntrar === "function" && precisaEntrar()) return mostrarEntrar(el);
   entrarDesenhado = "";

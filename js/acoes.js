@@ -1,4 +1,4 @@
-/*
+﻿/*
   O que acontece quando você clica, envia um formulário ou muda um campo.
 */
 "use strict";
@@ -890,14 +890,23 @@ document.addEventListener("click", e => {
       toast("Tratamento atualizado.");
       break;
     case "persona": {
-      if (S.persona === id) break;
+      if (!id) break;
       setPersona(id);
+      S.persona = id;
+      S.onboarded = true;
+      S.semConta = true;
       tryItem = null;
       tryPal = null;
-      applyTheme();
+      applyTheme(id);
       fx.enter = true;
       react("happy", say("cheers"), 4200);
-      toast(`Agora eu sou ${PERSONAS[id].name}!`, false, "happy");
+      const pObj = typeof PERSONAS !== "undefined" && PERSONAS[id] ? PERSONAS[id] : null;
+      toast(pObj ? `Agora eu sou ${pObj.name}!` : `Personalidade ${id} ativada!`, false, "happy");
+      const onbEl = document.getElementById("onb");
+      if (onbEl) {
+        onbEl.hidden = true;
+        onbEl.classList.remove("out");
+      }
       commit();
       break;
     }

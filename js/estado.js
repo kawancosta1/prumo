@@ -1,4 +1,4 @@
-/*
+﻿/*
   Os dados do app (S), como são salvos (navegador + conta Claude) e o estado da tela.
 */
 "use strict";
@@ -158,16 +158,19 @@ function normalize(x) {
   for (const k of ["tasks", "water", "focus", "reviews", "talked", "perfect", "closed", "morcego"])
     b.stats[k] = +b.stats[k] || 0;
   if (!b.equip || typeof b.equip !== "object") b.equip = {};
-  for (const k of Object.keys(b.equip)) if (!ITEM[b.equip[k]]) delete b.equip[k];
-  if (!PERSONAS[b.persona]) b.persona = "zen";
-  {
+  const MUNDOS_VALIDOS = ["zen", "rock", "emo", "otaku", "gamer", "programador", "bruxo", "feiticeiro", "cleanboy", "coach", "forrozeiro", "funkeiro", "pagodeiro", "rapper", "sertanejo", "trapper", "vovo"];
+  if (!b.persona || (typeof PERSONAS !== "undefined" && Object.keys(PERSONAS).length > 0 ? !PERSONAS[b.persona] : !MUNDOS_VALIDOS.includes(b.persona))) {
+    b.persona = "zen";
+  }
+  if (typeof ITEM !== "undefined" && Object.keys(ITEM).length > 20) {
+    for (const k of Object.keys(b.equip)) if (!ITEM[b.equip[k]]) delete b.equip[k];
     const before = (b.owned || []).length;
     b.owned = (b.owned || []).filter(i => ITEM[i] && !ITEM[i].ach);
     b.coins += Math.max(0, before - b.owned.length) * 80;
+    for (const k of Object.keys(b.equip))
+      if (!ITEM[b.equip[k]] || (ITEM[b.equip[k]].p !== b.persona && ITEM[b.equip[k]].p !== "*"))
+        delete b.equip[k];
   }
-  for (const k of Object.keys(b.equip))
-    if (!ITEM[b.equip[k]] || (ITEM[b.equip[k]].p !== b.persona && ITEM[b.equip[k]].p !== "*"))
-      delete b.equip[k];
   if (!b.equipBy || typeof b.equipBy !== "object") b.equipBy = {};
   if (!b.themeBy || typeof b.themeBy !== "object") b.themeBy = {};
   if (!Array.isArray(b.themeOwned)) b.themeOwned = [];
@@ -602,8 +605,13 @@ function receberDaNuvem(d) {
   const passouPorCima = !!(base && base.enviado && linha && !linha.includes(base.enviado));
   const localVazio = !hasData() || (!S.onboarded && remoto && remoto.onboarded);
   if ((!sujo && !passouPorCima) || localVazio) {
-    // só a nuvem mudou, ou este aparelho é novo/sem dados: usa a versão da nuvem
+    const personaAnterior = S && S.persona && S.persona !== "zen" ? S.persona : null;
+    const onboardedAnterior = S && S.onboarded;
+    const semContaAnterior = S && S.semConta;
     S = normalize(remoto);
+    if (personaAnterior && (S.persona === "zen" || !S.persona)) S.persona = personaAnterior;
+    if (onboardedAnterior) S.onboarded = true;
+    if (semContaAnterior) S.semConta = true;
     updatedAt = versao;
     guardarBase(remoto, versao, linha);
     sujo = false;

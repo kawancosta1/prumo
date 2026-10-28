@@ -1,4 +1,4 @@
-/*
+﻿/*
   Tela de entrada: aparece ao abrir o Prumo quando a conta (Firebase) está ligada e ninguém entrou.
   - Entrar com Google
   - Criar conta com email e senha (o Firebase manda um link de confirmação para o email)
@@ -30,7 +30,7 @@ const contaConfirmada = () => !!(contaUsuario && contaUsuario.emailVerified);
 
 /** A tela aparece quando a conta está ligada, o Firebase já respondeu e a pessoa não escolheu ficar sem conta. */
 const precisaEntrar = () =>
-  contaConfigurada() && contaChecada && (contaConfirmada() ? !consentimentoOk() : !S.semConta);
+  contaConfigurada() && contaChecada && (contaConfirmada() ? !consentimentoOk() : (!S.semConta && !S.onboarded));
 
 /** As duas caixinhas: 18 anos + política, e dados de saúde */
 const aceiteHTML = () => `<div class="oaceite">
