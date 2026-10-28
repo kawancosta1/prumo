@@ -47,7 +47,7 @@ A transferência deste ativo para uma nova empresa ou indivíduo é realizada em
 2. **Transferência do Repositório GitHub:**
    - Menu *Settings -> Transfer ownership* no GitHub para a organização ou conta do comprador.
 3. **Configuração de Chaves de Pagamento:**
-   - O comprador atualiza os segredos no Firebase (`MP_ACCESS_TOKEN`, `STRIPE_SECRET_KEY`) com suas próprias credenciais bancárias.
+   - O comprador atualiza os segredos no Firebase (`MP_ACCESS_TOKEN`, `STRIPE_SECRET_KEY`) com suas próprias credenciais bancárias em menos de 5 minutos seguindo o guia dedicado em [SETUP-PAGAMENTOS-COMPRADOR.md](file:///C:/Users/kawan.costa/.gemini/antigravity/scratch/prumo/SETUP-PAGAMENTOS-COMPRADOR.md). Todo faturamento cai 100% direto na conta bancária do comprador.
 4. **Domínio Personalizado:**
    - Adição de domínio próprio (.com ou .com.br) no Firebase Hosting com provisionamento automático de certificado SSL gratuito da Google.
 
