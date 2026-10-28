@@ -266,7 +266,7 @@ function gerarRelatorioExecutivoPDF(estado = null, periodo = "Outubro / 2026") {
     <div class="relatorio-executivo-container" id="relatorio-executivo-prumo">
       <div class="relatorio-cabecalho">
         <div>
-          <h1 style="font-size: 24px; font-weight: 800; margin: 0 0 4px;">PRUMO • RELATÓRIO EXECUTIVO DE ROTINA & CONDUTA</h1>
+          <h2 style="font-size: 24px; font-weight: 800; margin: 0 0 4px;">PRUMO • RELATÓRIO EXECUTIVO DE ROTINA & CONDUTA</h2>
           <p style="margin: 0; font-size: 13px; color: #555;">Documento gerado para fins de acompanhamento pessoal, terapêutico e de mentoria.</p>
         </div>
         <div style="text-align: right;">
