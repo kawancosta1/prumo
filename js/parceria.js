@@ -120,7 +120,7 @@ function iniciarParceria(db, uid) {
   meuId = uid;
   if (!S.codigo) {
     S.codigo = gerarCodigo();
-    persist();
+    persist(true); // silencioso: não disputa com a nuvem na abertura
   }
   publicarPerfil(true);
   ouvirParceiro();

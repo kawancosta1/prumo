@@ -46,7 +46,7 @@ function aceitou() {
     return false;
   }
   S.consentimento = { versao: POLITICA_VERSAO, em: Date.now() };
-  persist();
+  persist(true); // silencioso: guarda o consentimento sem invalidar a base da nuvem
   return true;
 }
 

@@ -140,6 +140,34 @@ module.exports = async url => {
   await espera(80);
   ok(ev("S.tasks.length") === qtd, "restaurar traz os dados de volta");
 
+  // novo aparelho sem dados recebendo conta existente: mantém onboarded e persona da nuvem sem loop
+  // novo aparelho sem dados recebendo conta existente: mantém onboarded e persona da nuvem sem loop
+  const diag = ev(`
+    (() => {
+      S.onboarded = false;
+      S.tasks = [];
+      S.habits = [];
+      sujo = false;
+      base = null;
+      receberDaNuvem({
+        updatedAt: Date.now() + 1000000,
+        state: {
+          ...JSON.parse(JSON.stringify(S)),
+          onboarded: true,
+          name: "Kawan",
+          persona: "rock",
+          tasks: [{ id: "ok1", title: "Tarefa remota", area: "geral", date: today(), done: false, prio: 0, sub: [] }]
+        }
+      });
+      renderOnb();
+      return { onboarded: S.onboarded, name: S.name, persona: S.persona };
+    })()
+  `);
+  ok(
+    diag.onboarded === true && diag.name === "Kawan" && diag.persona === "rock",
+    "aparelho novo recebendo conta existente mantém onboarded = true e persona da nuvem"
+  );
+
   fechar();
   return erros;
 };

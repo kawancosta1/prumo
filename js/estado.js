@@ -341,6 +341,14 @@ function mesclar(b, l, r) {
     const bb = objetoSimples(b) ? b : {};
     const saida = {};
     for (const k of new Set([...Object.keys(l), ...Object.keys(r)])) {
+      if (k === "onboarded" || k === "welcomed") {
+        saida[k] = Boolean(l[k] || r[k]);
+        continue;
+      }
+      if (k === "persona" && l[k] === "zen" && r[k] && r[k] !== "zen") {
+        saida[k] = r[k];
+        continue;
+      }
       const temL = k in l,
         temR = k in r,
         temB = k in bb;
@@ -591,11 +599,13 @@ function receberDaNuvem(d) {
   const remoto = JSON.parse(JSON.stringify(d.state));
   // quem mandou não viu o último envio daqui? (linha da nuvem sem o nosso número)
   const passouPorCima = !!(base && base.enviado && linha && !linha.includes(base.enviado));
-  if (!sujo && !passouPorCima) {
-    // só a nuvem mudou: usa a da nuvem
+  const localVazio = !hasData() || (!S.onboarded && remoto && remoto.onboarded);
+  if ((!sujo && !passouPorCima) || localVazio) {
+    // só a nuvem mudou, ou este aparelho é novo/sem dados: usa a versão da nuvem
     S = normalize(remoto);
     updatedAt = versao;
     guardarBase(remoto, versao, linha);
+    sujo = false;
     lsSet(LS_KEY, JSON.stringify({ state: S, updatedAt, sujo }));
     applyTheme();
     softRender();

@@ -75,6 +75,19 @@ function renderOnb() {
   if (appReady && typeof precisaEntrar === "function" && precisaEntrar()) return mostrarEntrar(el);
   entrarDesenhado = "";
   el.setAttribute("aria-label", "Boas-vindas");
+
+  // Se o usuário já possui dados ou conta ativa com histórico, o personagem já existe: não força onboarding
+  if (
+    !S.onboarded &&
+    (hasData() ||
+      (typeof contaUsuario !== "undefined" &&
+        contaUsuario &&
+        (S.xp > 0 || S.coins > 0 || (S.tasks && S.tasks.length > 0))))
+  ) {
+    S.onboarded = true;
+    persist(true);
+  }
+
   if (S.onboarded || !appReady) {
     if (!el.hidden) {
       el.classList.add("out");

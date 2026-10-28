@@ -76,7 +76,7 @@ async function iniciarConta() {
     }
     if (user && user.displayName && (!S.name || S.name === "Kawan")) {
       S.name = user.displayName.split(" ")[0].slice(0, 30); // o Prumi chama a pessoa pelo primeiro nome
-      persist();
+      persist(true); // silencioso: não gera conflito falso de versão antes da sincronia com a nuvem
     }
     softRender();
     return user ? { db, uid: user.uid } : null;
