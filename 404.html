@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Página não encontrada · Prumo</title>
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" href="icones/icone-192.png">
+  <style>
+    :root {
+      --bg: #F5EFEB;
+      --ink: #1C1917;
+      --accent: #2563EB;
+      --card: #FFFFFF;
+      --line: #E7E0D8;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1C1917;
+        --ink: #F5EFEB;
+        --accent: #60A5FA;
+        --card: #292524;
+        --line: #44403C;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      text-align: center;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 40px 24px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    h1 { font-size: 64px; font-weight: 900; margin-bottom: 8px; color: var(--accent); }
+    h2 { font-size: 20px; margin-bottom: 12px; }
+    p { font-size: 15px; color: #78716C; margin-bottom: 24px; line-height: 1.5; }
+    a.btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    a.btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>404</h1>
+    <h2>Caminho não encontrado</h2>
+    <p>Parece que essa página mudou de lugar ou não existe mais. Que tal voltar para a sua rotina?</p>
+    <a href="./" class="btn">Voltar para o Prumo</a>
+  </div>
+</body>
+</html>
