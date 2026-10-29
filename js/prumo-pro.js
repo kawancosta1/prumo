@@ -421,8 +421,8 @@ function modalPrumoProHTML(planoSugerido = "anual") {
   const status = obterStatusPrumoPro();
   const sel = PLANOS_PRO[planoSugerido] && planoSugerido !== "dupla" ? planoSugerido : "anual";
   const card = (id, nome, preco, periodo, destaque, popular) => `
-          <div class="plano-card ${sel === id ? "selecionado" : ""}" data-plano="${id}" role="button" tabindex="0">
-            ${popular ? '<span class="plano-popular">Mais Escolhido</span>' : ""}
+          <div class="plano-card ${sel === id ? "selecionado" : ""}" data-plano="${id}" data-id="${id}" role="button" tabindex="0">
+            ${popular ? '<span class="plano-popular">Mais Escolhido</span>' : id === "vitalicio" ? '<span class="tag-lifetime-founder">👑 Sem Assinatura</span>' : ""}
             <div class="plano-nome">${nome}</div>
             <div class="plano-preco">${preco}</div>
             <div class="plano-periodo">${periodo}</div>
@@ -459,10 +459,11 @@ function modalPrumoProHTML(planoSugerido = "anual") {
         <p class="note" id="pro-roi" style="margin:0 0 10px;">${textoEconomiaPro()}</p>
 
         <ul class="lista-vantagens-pro">
-          <li>✨ <b>Coach de Rotina com IA:</b> Análise biológica diária de foco e sono.</li>
-          <li>📄 <b>Relatórios Executivos em PDF:</b> Exporte relatórios clínicos em padrão A4.</li>
-          <li>🔒 <b>Modo Dupla Seguro:</b> Sincronia a dois com criptografia ponta a ponta.</li>
-          <li>🐾 <b>Auras &amp; Itens Mestres:</b> Acesso a todas as skins lendárias dos 17 mundos.</li>
+          <li>👥 <b>Modo Corpo Duplo (TDAH):</b> Estude e foque com o seu pet ao lado em tempo real.</li>
+          <li>🌿 <b>Anti-Burnout &amp; Dia de Respiro:</b> Proteja suas sequências de hábitos sem culpa quando precisar descansar.</li>
+          <li>🎧 <b>ASMR Vintage &amp; Vitrola 1930:</b> Paisagens sonoras analógicas sintetizadas no WebAudio.</li>
+          <li>🌸 <b>Cenário Vivo Animal Crossing:</b> Suas metas de água e leitura florescem no seu quarto.</li>
+          <li>👑 <b>Passaporte Vitalício Founder:</b> Compre uma única vez e livre-se de assinaturas para sempre.</li>
         </ul>
 
         <div class="area-pix-box" id="pro-area-pix" aria-live="polite">

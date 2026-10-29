@@ -90,6 +90,7 @@ function viewHoje() {
     `
           : ""
     }
+    ${isToday && typeof isDiaDeRespiro === "function" && isDiaDeRespiro(t) ? renderBannerRespiroHTML(t) : ""}
     ${isToday && pedidos.length && !parceriaAtiva() ? `<button class="card pedido" data-tab="social"><span><b>${esc(pedidos[0].nome || "Alguém")}</b> quer juntar o Prumi com o seu. Toque para ver.</span></button>` : ""}
     ${isToday ? `<div class="stats"><span>${textoMundo("tarefas", "Tarefas")} <b>${done}/${tasks.length}</b></span><span>Água <b>${fmtML(waterToday())}</b> de ${fmtML(S.waterGoal)}</span>${habitsToday.length ? `<span>Hábitos <b>${habitsToday.filter(h => habitDone(h, t)).length}/${habitsToday.length}</b></span>` : ""}${S.sessions.some(s => s.date === t) ? `<span>Estudo <b>${fmtMin(S.sessions.filter(s => s.date === t).reduce((a, b) => a + b.min, 0))}</b></span>` : ""}</div>` : tasks.length ? `<div class="stats"><span>${textoMundo("tarefas", "Tarefas")} <b>${done}/${tasks.length}</b></span></div>` : ""}
     ${tasks.length ? `<div class="progress"><span data-to="${Math.round((done / tasks.length) * 100)}" style="width:${fx.enter ? 0 : lastProg}%"></span></div>` : ""}
@@ -127,7 +128,7 @@ function viewHoje() {
       : ""
   }
   ${revDue.length ? `<section class="block"><h2 class="h2">Revisões de hoje <span class="count">${revDue.length}</span></h2><ul class="list">${revDue.map(reviewRow).join("")}</ul></section>` : ""}
-  ${isToday && habitsToday.length ? `<section class="block"><h2 class="h2">Hábitos <span class="count">${habitsToday.filter(h => habitDone(h, t)).length}/${habitsToday.length}</span></h2><ul class="list">${habitsToday.map(h => habitRow(h, false)).join("")}</ul></section>` : ""}
+  ${isToday && habitsToday.length ? `<section class="block"><h2 class="h2">Hábitos <span class="count">${habitsToday.filter(h => habitDone(h, t)).length}/${habitsToday.length}</span></h2>${typeof isDiaDeRespiro === "function" && !isDiaDeRespiro(t) && typeof renderBannerRespiroHTML === "function" ? renderBannerRespiroHTML(t) : ""}<ul class="list">${habitsToday.map(h => habitRow(h, false)).join("")}</ul></section>` : ""}
   ${isToday ? `<section class="block"><h2 class="h2">Água</h2>${waterWidget(false)}</section>` : ""}
   ${exams.length && isToday ? `<section class="block"><h2 class="h2">Próximas provas</h2><ul class="list">${exams.map(e => `<li><div class="item"><div class="main"><span class="title">${esc(e.title)}</span><span class="meta"><span class="chip" style="--c:${subjColor(e.subjectId)}">${esc(subjName(e.subjectId) || "Sem matéria")}</span><span>·</span><span>${fmtShort(e.date)}</span></span>${typeof planoHojeHTML === "function" ? planoHojeHTML(e) : ""}</div>${dueTag(diffDays(t, e.date))}</div></li>`).join("")}</ul></section>` : ""}
   ${

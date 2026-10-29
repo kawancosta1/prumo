@@ -61,3 +61,15 @@ A transferência deste ativo para uma nova empresa ou indivíduo é realizada em
    - A combinação de gamificação acolhedora com pets dos anos 30 tem baixíssimo custo de aquisição de clientes (CAC) em canais como TikTok e Instagram Reels.
 3. **Licenciamento White-Label B2B:**
    - Revenda do software para escolas, clínicas de terapia ou programas de bem-estar corporativo por contratos anuais de R$ 5.000 a R$ 15.000 por cliente.
+
+---
+
+## 5. Diferenciais Estratégicos Anti-Commodity (Moats de Mercado)
+
+O Prumo se diferencia radicalmente de 99% dos apps de hábitos frios corporativos (Notion, Todoist, Habitica) através de 5 pilares nativos implementados no código:
+
+1. **Anti-Burnout & "Dia de Respiro":** Mecânica exclusiva de proteção de sequências sem culpa ou punição caso o usuário precise descansar.
+2. **Modo Corpo Duplo (*Body Doubling* para TDAH):** Companhia visual e acolhedora em tempo real do pet durante blocos de foco, comprovada para reduzir a procrastinação neurodivergente.
+3. **Experiência Sensorial ASMR Vintage:** Síntese matemática pura no WebAudio (sem arquivos pesados) com estalo de agulha de vinil dos anos 1930, chuva na vidraça e lareira crepitante.
+4. **Cenário Vivo (*Animal Crossing* da Vida Real):** Cada hábito cumprido e meta de hidratação atingida faz a plantinha do quarto florescer dinamicamente em tempo real.
+5. **Passaporte Vitalício (*Founder Lifetime Pass*):** Opção comercial de pagamento único contra a fadiga de assinaturas mensais, gerando alto volume de caixa imediato.

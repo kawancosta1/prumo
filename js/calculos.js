@@ -18,17 +18,18 @@ function waterPace() {
 const habitDue = (h, d) => h.days.includes(wIdx(d));
 
 const habitDone = (h, d) => (S.habitLog[d] || []).includes(h.id);
+const isDiaDeRespiro = d => !!(S && S.respiro && S.respiro[d]);
 
 function habitStreak(h) {
   let d = today(),
     c = 0,
     guard = 0;
-  if (!habitDone(h, d)) d = addDays(d, -1);
+  if (!habitDone(h, d) && !isDiaDeRespiro(d)) d = addDays(d, -1);
   while (guard++ < 400) {
     if (habitDue(h, d)) {
-      if (habitDone(h, d)) c++;
+      if (habitDone(h, d) || isDiaDeRespiro(d)) c++;
       else break;
-    } else if (habitDone(h, d)) c++;
+    } else if (habitDone(h, d) || isDiaDeRespiro(d)) c++;
     d = addDays(d, -1);
   }
   return c;
@@ -37,7 +38,11 @@ function habitStreak(h) {
 function habitMissedYesterday(h) {
   let d = addDays(today(), -1),
     g = 0;
-  while (!habitDue(h, d) && g++ < 7) d = addDays(d, -1);
+  if (isDiaDeRespiro(d)) return false;
+  while (!habitDue(h, d) && g++ < 7) {
+    d = addDays(d, -1);
+    if (isDiaDeRespiro(d)) return false;
+  }
   return !habitDone(h, d) && h.created && h.created <= d;
 }
 

@@ -46,6 +46,7 @@ function viewEstudos() {
         <div class="seg" role="group" aria-label="Duração">${[25, 50, 90].map(g => `<button data-act="goal" data-g="${g}" aria-pressed="${timer.goal === g}" ${busy ? "disabled" : ""}>${g} min</button>`).join("")}</div>
       </div>
       <div class="timerrow ${timer.running ? "rodando" : ""}"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><div class="clock ${over ? "over" : ""}" id="clock">${over ? "+" : ""}${pad(Math.floor(shown / 60))}:${pad(shown % 60)}</div><button class="mslot" data-kind="timer" data-size="64" data-act="poke" aria-label="Prumi"></button></div>
+      ${typeof renderCorpoDuploHTML === "function" ? renderCorpoDuploHTML() : ""}
       <div class="row">
         ${timer.running ? `<button class="btn" data-act="pause">Pausar</button>` : `<button class="btn primary" data-act="start">${timer.acc ? "Continuar" : "Começar"}</button>`}
         <button class="btn" data-act="finish" ${ms < 1000 ? "disabled" : ""}>Concluir e registrar</button>
@@ -53,6 +54,7 @@ function viewEstudos() {
       </div>
       ${timer.acc > 0 && !timer.running && S.persona === "otaku" ? `<div class="intervalo-comercial-anime">📺 <b>Intervalo Comercial do Episódio</b>: hora de esticar os braços e fazer um alongamento ninja!</div>` : ""}
       ${somDoMundo() ? `<div class="row">${botaoSom("chuva", textoMundo("somFocoNome", "Chuva durante o foco"))}</div>` : ""}
+      <div class="row" style="margin-top:8px"><button class="barra-som-asmr" data-act="alternar-asmr">🎧 Som ASMR Vintage</button></div>
       <span class="note">Quando o tempo acaba, toca um aviso e o relógio continua contando o tempo extra. Ao concluir, os minutos vão para a matéria.</span>
     </div>`
         : `<div class="empty"><strong>Cadastre uma matéria primeiro.</strong>Use o campo de matérias mais abaixo, e o cronômetro de foco aparece aqui.</div>`

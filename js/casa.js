@@ -81,8 +81,11 @@ function pisoVolumetrico(w, h, cor, linha) {
   return `<g class="piso-volumetrico">${tabuas}<rect width="${w}" height="${h}" fill="rgba(0,0,0,0.08)" pointer-events="none"/></g>`;
 }
 const piso = (w, h, cor, linha) => pisoVolumetrico(w, h, cor, linha);
-const vasoPlanta = (x, y, s = 1, cor = "#C4683A") =>
-  `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-8 0H8L6 14H-6Z" fill="${cor}" stroke="#141416" stroke-width="1"/><path d="M0 0Q-10 -12 -14 -20M0 0Q2 -16 -2 -26M0 0Q10 -10 14 -18" stroke="#3F7A3A" stroke-width="2.4" fill="none" stroke-linecap="round"/><ellipse cx="-14" cy="-20" rx="5" ry="3" fill="#5FA05A" transform="rotate(-30 -14 -20)"/><ellipse cx="-2" cy="-26" rx="3" ry="5" fill="#5FA05A"/><ellipse cx="14" cy="-18" rx="5" ry="3" fill="#5FA05A" transform="rotate(30 14 -18)"/></g>`;
+const vasoPlanta = (x, y, s = 1, cor = "#C4683A") => {
+  const metaAgua = typeof waterToday === "function" && typeof S !== "undefined" && waterToday() >= (S.waterGoal || 2000);
+  const flores = metaAgua && typeof florzinhasPlantaSVG === "function" ? florzinhasPlantaSVG() : "";
+  return `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-8 0H8L6 14H-6Z" fill="${cor}" stroke="#141416" stroke-width="1"/><path d="M0 0Q-10 -12 -14 -20M0 0Q2 -16 -2 -26M0 0Q10 -10 14 -18" stroke="#3F7A3A" stroke-width="2.4" fill="none" stroke-linecap="round"/><ellipse cx="-14" cy="-20" rx="5" ry="3" fill="#5FA05A" transform="rotate(-30 -14 -20)"/><ellipse cx="-2" cy="-26" rx="3" ry="5" fill="#5FA05A"/><ellipse cx="14" cy="-18" rx="5" ry="3" fill="#5FA05A" transform="rotate(30 14 -18)"/>${flores}</g>`;
+};
 const caneca = (x, y, cor = "#E0312F") =>
   `<g transform="translate(${x} ${y})"><path d="M-5 -8H5V2Q5 5 0 5Q-5 5 -5 2Z" fill="${cor}" stroke="#141416" stroke-width="1"/><path d="M5 -5Q9 -5 9 -2Q9 1 5 1" fill="none" stroke="#141416" stroke-width="1.2"/><path class="vapor-casa" d="M-2 -11Q-4 -15 -2 -19M2 -11Q4 -16 2 -21" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".8"/></g>`;
 const lombadas = (x, y, w, h, seed = 1) => {
