@@ -104,6 +104,70 @@ const lombadas = (x, y, w, h, seed = 1) => {
   return s;
 };
 
+/** Feixe de luz volumétrico dinâmico com partículas de poeira dourada flutuando (estilo Sótão) */
+function feixeLuzVolumetricoSVG({ id, x1, y1, x2, chaoY, hora = horaDoCeu(), motes = 7 }) {
+  const isNoite = hora === "noite";
+  const isTarde = hora === "tarde";
+  const moteColor = isNoite ? "#E0E7FF" : isTarde ? "#FED7AA" : "#FEF08A";
+  const beamGrad = isNoite
+    ? `<stop offset="0%" stop-color="#C7D2FE" stop-opacity="0.32"/><stop offset="50%" stop-color="#818CF8" stop-opacity="0.14"/><stop offset="100%" stop-color="#4F46E5" stop-opacity="0"/>`
+    : isTarde
+      ? `<stop offset="0%" stop-color="#FBD38D" stop-opacity="0.44"/><stop offset="50%" stop-color="#F28C5B" stop-opacity="0.18"/><stop offset="100%" stop-color="#FF7A45" stop-opacity="0"/>`
+      : `<stop offset="0%" stop-color="#FFF8E7" stop-opacity="0.42"/><stop offset="45%" stop-color="#FFEAA7" stop-opacity="0.22"/><stop offset="85%" stop-color="#FDCB6E" stop-opacity="0.06"/><stop offset="100%" stop-color="#FAD390" stop-opacity="0"/>`;
+
+  let motesSvg = "";
+  for (let i = 0; i < motes; i++) {
+    const prog = (i + 1) / (motes + 1);
+    const mx = x1 + (x2 - x1) * prog + ((i % 3) - 1) * 14;
+    const my = y1 + (chaoY - y1) * prog + ((i % 2) - 0.5) * 12;
+    const r = i % 3 === 0 ? 1.4 : i % 2 === 0 ? 1.0 : 1.2;
+    motesSvg += `<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${r}" fill="${moteColor}" class="cenario-poeira-mote" style="animation-delay:${(i * 0.7).toFixed(1)}s"/>`;
+  }
+
+  return `
+    <defs>
+      <linearGradient id="${id}-feixe-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+        ${beamGrad}
+      </linearGradient>
+    </defs>
+    <g class="sotao-feixe-grupo" pointer-events="none">
+      <polygon points="${x1},${y1} ${x1 + 40},${y1} ${x2 + 75},${chaoY + 12} ${x2 - 35},${chaoY + 12}" fill="url(#${id}-feixe-grad)" class="cenario-feixe-luz"/>
+      <polygon points="${x1 + 8},${y1 + 4} ${x1 + 32},${y1 + 4} ${x2 + 45},${chaoY + 8} ${x2 - 10},${chaoY + 8}" fill="url(#${id}-feixe-grad)" opacity="0.6" class="cenario-feixe-luz"/>
+      <ellipse cx="${x2 + 20}" cy="${chaoY + 16}" rx="65" ry="14" fill="${isNoite ? '#818CF8' : '#FFEAA7'}" opacity="${isNoite ? 0.08 : 0.16}"/>
+      <g class="sotao-motes">
+        ${motesSvg}
+      </g>
+    </g>
+  `;
+}
+
+/** Vitrola Vintage 1930 interativa com som analógico para todas as salas */
+function vitrolaVintageCasa(x, y) {
+  return `
+    <g class="sotao-vitrola-canto" transform="translate(${x} ${y})" data-act="vitrola-tocar" style="cursor:pointer;" role="button" tabindex="0" title="Vitrola 1930 (Toque para ouvir o disco de vinil)">
+      <ellipse cx="24" cy="46" rx="16" ry="3.5" fill="#140D07" opacity="0.45"/>
+      <rect x="10" y="36" width="28" height="9" rx="1.5" fill="#4E2711" stroke="#231006" stroke-width="0.8"/>
+      <line x1="13" y1="45" x2="13" y2="47" stroke="#231006" stroke-width="1.6"/>
+      <line x1="35" y1="45" x2="35" y2="47" stroke="#231006" stroke-width="1.6"/>
+      <g transform="translate(0 -6)">
+        ${typeof desenharVitrolaSVG === "function" ? desenharVitrolaSVG({ interativo: false }) : ""}
+      </g>
+    </g>
+  `;
+}
+
+/** Rodapé arquitetônico clássico entalhado */
+function rodapeVintage(w, chaoY, cor = "#4A331E") {
+  return `
+    <g class="sotao-rodape" pointer-events="none">
+      <rect x="0" y="${chaoY - 14}" width="${w}" height="14" fill="${cor}"/>
+      <line x1="0" y1="${chaoY - 14}" x2="${w}" y2="${chaoY - 14}" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="0.8"/>
+      <rect x="0" y="${chaoY - 11}" width="${w}" height="3" fill="#FFFFFF" fill-opacity="0.09"/>
+      <line x1="0" y1="${chaoY}" x2="${w}" y2="${chaoY}" stroke="#140D07" stroke-width="1.2" stroke-opacity="0.75"/>
+    </g>
+  `;
+}
+
 /* ---------- os cômodos ---------- */
 const COMODOS = [
   {
@@ -116,38 +180,156 @@ const COMODOS = [
     id: "sala",
     nome: "Sala",
     preco: 150,
-    desc: "Sofá, abajur de chão e um quadro na parede.",
+    desc: "Sofá vintage, abajur clássico com luz quente e janela com feixe de sol.",
     opcoes: {
       sofa: {
         nome: "Sofá",
         valores: [
-          ["vermelho", "#B23A3A"],
-          ["musgo", "#5E7A3A"],
-          ["azul", "#33558C"],
-          ["mostarda", "#D49A2A"]
+          ["vermelho", "#9E2A2B"],
+          ["musgo", "#4F6D38"],
+          ["azul", "#2B4C7E"],
+          ["mostarda", "#C98A1E"]
         ]
       },
       parede: {
         nome: "Parede",
         valores: [
-          ["areia", "#EADBC4"],
-          ["salvia", "#C9D6C0", "Sálvia"],
-          ["cinza", "#D2D2D8"],
-          ["vinho", "#6E2A35"]
+          ["areia", "#E8D8C0"],
+          ["salvia", "#BFCDB4", "Sálvia"],
+          ["cinza", "#CACAD2"],
+          ["vinho", "#65232D"]
         ]
       }
     },
     desenho: c => {
-      const { W, chaoY, op } = c;
-      const sofa = op.sofa,
-        escuro = escurecer(sofa, 0.72);
-      return `<rect width="${W}" height="${chaoY}" fill="${op.parede}"/><rect y="${chaoY - 14}" width="${W}" height="14" fill="#F2EDE4" stroke="#C9BFAF"/>
-        <g transform="translate(70 30)"><rect width="78" height="56" fill="#3A2A1E"/><rect x="5" y="5" width="68" height="46" fill="#9EC6D8"/><path d="M5 51L28 26L44 40L56 30L73 46V51Z" fill="#5E8C4A"/><circle cx="58" cy="16" r="6" fill="#F2D06B"/></g>
-        <g transform="translate(0 ${chaoY})">${piso(W, 64, "#B98552", "#9C6B3E")}</g>
-        <ellipse cx="100" cy="${chaoY + 30}" rx="90" ry="14" fill="#E9D7B8" stroke="#C9B48E"/>
-        <g transform="translate(40 ${chaoY - 70})"><rect x="8" y="0" width="122" height="44" rx="10" fill="${escuro}"/><rect x="0" y="30" width="138" height="34" rx="9" fill="${sofa}" stroke="#141416" stroke-width="1.4"/><rect x="-4" y="18" width="22" height="46" rx="8" fill="${escuro}" stroke="#141416" stroke-width="1.4"/><rect x="120" y="18" width="22" height="46" rx="8" fill="${escuro}" stroke="#141416" stroke-width="1.4"/><path d="M69 32V60" stroke="${escuro}" stroke-width="1.6"/><rect x="8" y="64" width="6" height="8" fill="#3A2A1E"/><rect x="124" y="64" width="6" height="8" fill="#3A2A1E"/><rect x="96" y="14" width="24" height="20" rx="5" fill="#F2EDE4" stroke="#141416" stroke-width="1" transform="rotate(8 108 24)"/></g>
-        <g transform="translate(20 ${chaoY - 116})"><path d="M-14 0H14L8 22H-8Z" fill="#F2E3B8" stroke="#141416" stroke-width="1.2"/><path d="M0 22V116" stroke="#3A3A44" stroke-width="2.4"/><ellipse cx="0" cy="118" rx="12" ry="3" fill="#3A3A44"/><path d="M-30 50L0 22L30 50" fill="#FFF3C4" opacity=".25"/></g>
-        ${c.leitor(66, chaoY - 118)}${c.estante()}`;
+      const { W, chaoY, op, id } = c;
+      const hora = horaDoCeu();
+      const isNoite = hora === "noite";
+      const isTarde = hora === "tarde";
+      const ceuCores = CEUS[hora] || CEUS.dia;
+      const sofa = op.sofa;
+      const escuro = escurecer(sofa, 0.68);
+      const luzSofa = escurecer(sofa, 1.25) || "#FFFFFF";
+
+      const defs = `
+        <defs>
+          <linearGradient id="${id}-parede-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${escurecer(op.parede, 1.15)}"/>
+            <stop offset="65%" stop-color="${op.parede}"/>
+            <stop offset="100%" stop-color="${escurecer(op.parede, 0.85)}"/>
+          </linearGradient>
+          <linearGradient id="${id}-boiserie-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#EFE6D8"/>
+            <stop offset="100%" stop-color="#D8CCB8"/>
+          </linearGradient>
+          <linearGradient id="${id}-janela-ceu" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${ceuCores[0]}"/>
+            <stop offset="100%" stop-color="${ceuCores[1]}"/>
+          </linearGradient>
+          <radialGradient id="${id}-abajur-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFF7CD" stop-opacity="0.65"/>
+            <stop offset="35%" stop-color="#FDE047" stop-opacity="0.3"/>
+            <stop offset="70%" stop-color="#EAB308" stop-opacity="0.1"/>
+            <stop offset="100%" stop-color="#CA8A04" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+      `;
+
+      let boiserie = "";
+      for (let bx = 16; bx < W - 20; bx += 58) {
+        boiserie += `
+          <rect x="${bx}" y="${chaoY - 60}" width="50" height="44" rx="2" fill="none" stroke="#C4B59D" stroke-width="1.2"/>
+          <rect x="${bx + 3}" y="${chaoY - 57}" width="44" height="38" rx="1.5" fill="none" stroke="#FFFFFF" stroke-width="0.8" stroke-opacity="0.45"/>
+        `;
+      }
+
+      const jw = 74, jh = 76, jx = 210, jy = 16;
+      const janela = `
+        <g class="sala-janela-grupo">
+          <rect x="${jx}" y="${jy}" width="${jw}" height="${jh}" rx="3" fill="#3D2916" stroke="#25170B" stroke-width="1.2"/>
+          <rect x="${jx + 3}" y="${jy + 3}" width="${jw - 6}" height="${jh - 6}" rx="2" fill="url(#${id}-janela-ceu)"/>
+          ${isNoite ? `<circle cx="${jx + 50}" cy="${jy + 22}" r="6" fill="#F4EEDC"/><circle cx="${jx + 53}" cy="${jy + 20}" r="5" fill="${ceuCores[0]}"/>` : `<circle cx="${jx + 50}" cy="${jy + 24}" r="7" fill="${isTarde ? '#FF7A45' : '#FFE27A'}"/>`}
+          <line x1="${jx + jw / 2}" y1="${jy + 3}" x2="${jx + jw / 2}" y2="${jy + jh - 3}" stroke="#5C3F24" stroke-width="2.4"/>
+          <line x1="${jx + 3}" y1="${jy + jh * 0.45}" x2="${jx + jw - 3}" y2="${jy + jh * 0.45}" stroke="#5C3F24" stroke-width="2"/>
+          <path d="M${jx - 4} ${jy - 4} Q${jx + 8} ${jy + jh * 0.4} ${jx - 2} ${jy + jh + 4} L${jx - 8} ${jy + jh + 4} Q${jx - 10} ${jy + jh * 0.5} ${jx - 8} ${jy - 4} Z" fill="#8B2635" stroke="#50121B" stroke-width="0.8"/>
+          <path d="M${jx + jw + 4} ${jy - 4} Q${jx + jw - 8} ${jy + jh * 0.4} ${jx + jw + 2} ${jy + jh + 4} L${jx + jw + 8} ${jy + jh + 4} Q${jx + jw + 10} ${jy + jh * 0.5} ${jx + jw + 8} ${jy - 4} Z" fill="#8B2635" stroke="#50121B" stroke-width="0.8"/>
+          <line x1="${jx - 14}" y1="${jy - 4}" x2="${jx + jw + 14}" y2="${jy - 4}" stroke="#C59B27" stroke-width="2.5"/>
+          <circle cx="${jx - 14}" cy="${jy - 4}" r="3" fill="#D4AF37"/>
+          <circle cx="${jx + jw + 14}" cy="${jy - 4}" r="3" fill="#D4AF37"/>
+        </g>
+      `;
+
+      const quadro = `
+        <g transform="translate(68 24)">
+          <rect width="84" height="60" rx="3" fill="#5A3A1E" stroke="#3A220F" stroke-width="1.8"/>
+          <rect x="3" y="3" width="78" height="54" rx="2" fill="#D4AF37" stroke="#A68018" stroke-width="1.2"/>
+          <rect x="7" y="7" width="70" height="46" fill="#87CEEB"/>
+          <path d="M7 47 L28 24 L48 38 L62 26 L77 44 V53 H7 Z" fill="#4A7C38"/>
+          <path d="M26 36 L40 22 L56 34 L68 25 L77 36 V53 H26 Z" fill="#386228" opacity="0.6"/>
+          <circle cx="62" cy="18" r="6" fill="#FFE87A"/>
+          <polygon points="7,7 28,7 18,53 7,53" fill="#FFFFFF" opacity="0.14"/>
+        </g>
+      `;
+
+      const tapete = `
+        <g transform="translate(100 ${chaoY + 30})">
+          <ellipse cx="0" cy="0" rx="98" ry="16" fill="#4A1E24" stroke="#2D0F14" stroke-width="1.2"/>
+          <ellipse cx="0" cy="0" rx="88" ry="13" fill="#D8C8A8" stroke="#B8A480" stroke-width="0.8"/>
+          <ellipse cx="0" cy="0" rx="76" ry="10" fill="#8B2635"/>
+          <ellipse cx="0" cy="0" rx="60" ry="7" fill="#D8C8A8" opacity="0.85"/>
+        </g>
+      `;
+
+      const sofaSvg = `
+        <g transform="translate(42 ${chaoY - 72})">
+          <rect x="8" y="0" width="124" height="46" rx="10" fill="${escuro}" stroke="#141416" stroke-width="1.4"/>
+          <path d="M38 4V44M68 4V44M98 4V44" stroke="${escurecer(sofa, 0.5)}" stroke-width="1.4" opacity="0.7"/>
+          <rect x="0" y="32" width="140" height="34" rx="9" fill="${sofa}" stroke="#141416" stroke-width="1.4"/>
+          <line x1="4" y1="34" x2="136" y2="34" stroke="${luzSofa}" stroke-width="1" opacity="0.4"/>
+          <rect x="-4" y="20" width="24" height="46" rx="9" fill="${escuro}" stroke="#141416" stroke-width="1.4"/>
+          <rect x="120" y="20" width="24" height="46" rx="9" fill="${escuro}" stroke="#141416" stroke-width="1.4"/>
+          <polygon points="10,66 14,75 8,75" fill="#3A220F"/>
+          <polygon points="130,66 134,75 128,75" fill="#3A220F"/>
+          <path d="M78 30 Q86 46 82 65 L102 65 Q106 46 98 30 Z" fill="#E8DCC0" stroke="#BAAA8A" stroke-width="0.8"/>
+          <rect x="100" y="14" width="26" height="22" rx="6" fill="#F2EDE4" stroke="#141416" stroke-width="1" transform="rotate(8 113 25)"/>
+          <circle cx="113" cy="25" r="2.2" fill="#BAAA8A"/>
+        </g>
+      `;
+
+      const abajur = `
+        <g transform="translate(24 ${chaoY - 118})">
+          <circle cx="0" cy="18" r="38" fill="url(#${id}-abajur-glow)" pointer-events="none"/>
+          <path d="M-15 0 H15 L10 24 H-10 Z" fill="#F8E7B9" stroke="#141416" stroke-width="1.2"/>
+          ${Array.from({ length: 9 }, (_, i) => `<line x1="${-9 + i * 2.2}" y1="24" x2="${-9 + i * 2.2}" y2="28" stroke="#D4AF37" stroke-width="1"/>`).join("")}
+          <path d="M0 24 V118" stroke="#5A4A38" stroke-width="2.6"/>
+          <ellipse cx="0" cy="118" rx="14" ry="3.5" fill="#3D3024" stroke="#1E160E" stroke-width="1"/>
+        </g>
+      `;
+
+      const feixe = feixeLuzVolumetricoSVG({ id, x1: jx + 10, y1: jy + 10, x2: 120, chaoY, hora, motes: 8 });
+      const vitrola = vitrolaVintageCasa(10, chaoY - 48);
+      const rodape = rodapeVintage(W, chaoY, "#4A331E");
+
+      return `
+        ${defs}
+        <rect width="${W}" height="${chaoY}" fill="url(#${id}-parede-grad)"/>
+        <rect x="0" y="0" width="${W}" height="6" fill="#4A331E"/>
+        <line x1="0" y1="6" x2="${W}" y2="6" stroke="#D4AF37" stroke-width="0.8" opacity="0.6"/>
+        <rect x="0" y="${chaoY - 64}" width="${W}" height="50" fill="url(#${id}-boiserie-grad)"/>
+        <line x1="0" y1="${chaoY - 64}" x2="${W}" y2="${chaoY - 64}" stroke="#C4B59D" stroke-width="1.6"/>
+        ${boiserie}
+        ${janela}
+        ${quadro}
+        <g transform="translate(0 ${chaoY})">${piso(W, 64, "#9E6B3E", "#7A4D26")}</g>
+        ${rodape}
+        ${tapete}
+        ${sofaSvg}
+        ${abajur}
+        ${vitrola}
+        ${c.leitor(66, chaoY - 118)}
+        ${c.estante()}
+        ${feixe}
+      `;
     }
   },
   {
@@ -174,32 +356,139 @@ const COMODOS = [
       }
     },
     desenho: c => {
-      const { W, chaoY, op } = c;
-      const az = op.azulejo,
-        arm = op.armario;
+      const { W, chaoY, op, id } = c;
+      const hora = horaDoCeu();
+      const isNoite = hora === "noite";
+      const isTarde = hora === "tarde";
+      const ceuCores = CEUS[hora] || CEUS.dia;
+      const az = op.azulejo, arm = op.armario;
+      const armEscuro = escurecer(arm, 0.7);
+
+      const defs = `
+        <defs>
+          <linearGradient id="${id}-parede-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FDFBF7"/>
+            <stop offset="100%" stop-color="#EFE8DA"/>
+          </linearGradient>
+          <linearGradient id="${id}-janela-ceu" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${ceuCores[0]}"/>
+            <stop offset="100%" stop-color="${ceuCores[1]}"/>
+          </linearGradient>
+          <linearGradient id="${id}-bancada-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#E8E2D5"/>
+            <stop offset="50%" stop-color="#D5CEBF"/>
+            <stop offset="100%" stop-color="#B8B0A0"/>
+          </linearGradient>
+        </defs>
+      `;
+
       let azulejos = "";
-      for (let y = 92; y < chaoY - 70; y += 14)
-        for (let x = 0; x < 214; x += 14)
-          azulejos +=
-            c.escolha.azulejo === "xadrez"
-              ? ((x + y) / 14) % 2 >= 1
-                ? `<rect x="${x}" y="${y}" width="14" height="14" fill="${az}"/>`
-                : ""
-              : c.escolha.azulejo === "portugues"
-                ? `<rect x="${x + 1}" y="${y + 1}" width="12" height="12" fill="none" stroke="${az}" stroke-width=".8"/><circle cx="${x + 7}" cy="${y + 7}" r="3" fill="none" stroke="${az}" stroke-width="1"/>`
-                : `<rect x="${x + 0.5}" y="${y + 0.5}" width="13" height="6" rx="1" fill="${az}" opacity=".55"/><rect x="${x + 7.5}" y="${y + 7.5}" width="13" height="6" rx="1" fill="${az}" opacity=".55"/>`;
-      return `<rect width="${W}" height="${chaoY}" fill="#F6EFE2"/><rect y="92" width="214" height="${chaoY - 162}" fill="#FBFAF6"/>${azulejos}
-        <g transform="translate(20 20)">${[0, 1, 2].map(i => `<rect x="${i * 62}" y="0" width="58" height="56" rx="3" fill="${arm}" stroke="#141416" stroke-width="1.2"/><circle cx="${i * 62 + 50}" cy="46" r="2" fill="#6E6C78"/>`).join("")}</g>
-        <g transform="translate(232 26)"><rect width="74" height="60" fill="#8FC7F2" stroke="#F2EDE4" stroke-width="5"/><path d="M37 0V60M0 30H74" stroke="#F2EDE4" stroke-width="3"/>${vasoPlanta(18, 52, 0.7)}${vasoPlanta(56, 52, 0.6, "#5A8CA8")}</g>
-        <g transform="translate(0 ${chaoY})">${(() => {
-          let s = `<rect width="${W}" height="64" fill="#EDE6D8"/>`;
-          for (let y = 0, i = 0; y < 64; y += 16, i++)
-            for (let x = i % 2 ? 16 : 0; x < W; x += 32)
-              s += `<rect x="${x}" y="${y}" width="16" height="16" fill="#C9C2B2"/>`;
-          return s;
-        })()}</g>
-        <g transform="translate(0 ${chaoY - 70})"><rect x="0" y="0" width="214" height="10" fill="#6E6C78"/><rect x="4" y="10" width="206" height="60" fill="${arm}" stroke="#141416" stroke-width="1.2"/>${[0, 1, 2].map(i => `<rect x="${12 + i * 66}" y="18" width="58" height="44" rx="2" fill="none" stroke="#141416" stroke-width=".8"/><rect x="${36 + i * 66}" y="22" width="10" height="2.4" rx="1" fill="#6E6C78"/>`).join("")}${caneca(40, -1)}<g transform="translate(150 -16)"><rect width="34" height="16" rx="2" fill="#E0312F" stroke="#141416" stroke-width="1"/><path d="M3 4H31M3 9H24" stroke="#F2EDE4" stroke-width="1.4"/></g></g>
-        ${c.leitor(78, chaoY - 128, 58)}${c.estante()}`;
+      for (let y = 92; y < chaoY - 70; y += 14) {
+        for (let x = 0; x < 216; x += 14) {
+          if (c.escolha.azulejo === "xadrez") {
+            if (((x + y) / 14) % 2 >= 1) {
+              azulejos += `<rect x="${x}" y="${y}" width="14" height="14" fill="${az}"/><line x1="${x}" y1="${y}" x2="${x + 14}" y2="${y}" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="0.6"/>`;
+            }
+          } else if (c.escolha.azulejo === "portugues") {
+            azulejos += `<rect x="${x + 1}" y="${y + 1}" width="12" height="12" fill="none" stroke="${az}" stroke-width=".8"/><circle cx="${x + 7}" cy="${y + 7}" r="3" fill="none" stroke="${az}" stroke-width="1"/><circle cx="${x + 7}" cy="${y + 7}" r="0.8" fill="${az}"/>`;
+          } else {
+            azulejos += `<rect x="${x + 0.5}" y="${y + 0.5}" width="13" height="6" rx="1" fill="${az}" opacity=".65"/><line x1="${x + 1}" y1="${y + 1}" x2="${x + 13}" y2="${y + 1}" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="0.5"/><rect x="${x + 7.5}" y="${y + 7.5}" width="13" height="6" rx="1" fill="${az}" opacity=".65"/>`;
+          }
+        }
+      }
+
+      // Janela cottage arqueada
+      const jx = 226, jy = 20, jw = 82, jh = 68;
+      const janela = `
+        <g class="cozinha-janela-grupo">
+          <path d="M${jx} ${jy + jh} V${jy + 20} Q${jx + jw / 2} ${jy - 8} ${jx + jw} ${jy + 20} V${jy + jh} Z" fill="#4A341E" stroke="#2B1A0C" stroke-width="1.4"/>
+          <path d="M${jx + 3} ${jy + jh - 3} V${jy + 21} Q${jx + jw / 2} ${jy - 5} ${jx + jw - 3} ${jy + 21} V${jy + jh - 3} Z" fill="url(#${id}-janela-ceu)"/>
+          ${isNoite ? `<circle cx="${jx + 56}" cy="${jy + 22}" r="6" fill="#F4EEDC"/><circle cx="${jx + 59}" cy="${jy + 20}" r="5" fill="${ceuCores[0]}"/>` : `<circle cx="${jx + 56}" cy="${jy + 24}" r="7" fill="${isTarde ? '#FF7A45' : '#FFE27A'}"/>`}
+          <line x1="${jx + jw / 2}" y1="${jy + 6}" x2="${jx + jw / 2}" y2="${jy + jh - 3}" stroke="#5C3F24" stroke-width="2.2"/>
+          <line x1="${jx + 3}" y1="${jy + 36}" x2="${jx + jw - 3}" y2="${jy + 36}" stroke="#5C3F24" stroke-width="2"/>
+          <!-- Cortina xadrez com nózinho -->
+          <path d="M${jx + 2} ${jy + 16} Q${jx + 16} ${jy + 28} ${jx + 6} ${jy + 46} L${jx + 1} ${jy + 46} Z" fill="#C0392B" opacity="0.8"/>
+          <path d="M${jx + jw - 2} ${jy + 16} Q${jx + jw - 16} ${jy + 28} ${jx + jw - 6} ${jy + 46} L${jx + jw - 1} ${jy + 46} Z" fill="#C0392B" opacity="0.8"/>
+          <!-- Floreira com ervas aromáticas -->
+          <rect x="${jx - 2}" y="${jy + jh - 8}" width="${jw + 4}" height="10" rx="2" fill="#754823" stroke="#3D220E" stroke-width="1"/>
+          ${vasoPlanta(jx + 18, jy + jh - 10, 0.75, "#C4683A")}
+          ${vasoPlanta(jx + 58, jy + jh - 10, 0.65, "#4F7A5A")}
+        </g>
+      `;
+
+      // Armários superiores estilo shaker
+      const armarios = `
+        <g transform="translate(16 16)">
+          ${[0, 1, 2]
+            .map(
+              i => `
+            <g transform="translate(${i * 64} 0)">
+              <rect width="60" height="58" rx="2" fill="${arm}" stroke="#2B1A0C" stroke-width="1.2"/>
+              <rect x="5" y="5" width="50" height="48" rx="1.5" fill="none" stroke="${armEscuro}" stroke-width="1.2"/>
+              <circle cx="52" cy="48" r="2.2" fill="#C59B27" stroke="#684E0B" stroke-width="0.6"/>
+              <line x1="2" y1="2" x2="58" y2="2" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="0.8"/>
+            </g>
+          `
+            )
+            .join("")}
+        </g>
+      `;
+
+      // Piso quadriculado retrô
+      let pisoCozinha = `<g transform="translate(0 ${chaoY})">`;
+      pisoCozinha += `<rect width="${W}" height="64" fill="#E8DEC8"/>`;
+      for (let py = 0, idx = 0; py < 64; py += 16, idx++) {
+        for (let px = idx % 2 ? 16 : 0; px < W; px += 32) {
+          pisoCozinha += `<rect x="${px}" y="${py}" width="16" height="16" fill="#A89A84"/><line x1="${px}" y1="${py}" x2="${px + 16}" y2="${py}" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="0.6"/>`;
+        }
+      }
+      pisoCozinha += `</g>`;
+
+      // Bancada com chaleira fumegante e caneca
+      const bancada = `
+        <g transform="translate(0 ${chaoY - 72})">
+          <rect x="0" y="0" width="218" height="12" rx="1" fill="url(#${id}-bancada-grad)" stroke="#3D2916" stroke-width="1"/>
+          <line x1="0" y1="1" x2="218" y2="1" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="0.8"/>
+          <rect x="4" y="12" width="210" height="60" fill="${arm}" stroke="#2B1A0C" stroke-width="1.2"/>
+          ${[0, 1, 2]
+            .map(
+              i => `
+            <rect x="${14 + i * 68}" y="20" width="58" height="44" rx="2" fill="none" stroke="${armEscuro}" stroke-width="1"/>
+            <rect x="${38 + i * 68}" y="23" width="12" height="2.6" rx="1" fill="#C59B27"/>
+          `
+            )
+            .join("")}
+          ${caneca(42, -1)}
+          <!-- Chaleira retrô de ferro fundido com vapor -->
+          <g transform="translate(156 -18)">
+            <ellipse cx="14" cy="14" rx="12" ry="7" fill="#2E2E34" stroke="#141416" stroke-width="1"/>
+            <path d="M4 14 Q3 4 14 4 Q25 4 24 14 Z" fill="#3D3D45" stroke="#141416" stroke-width="1"/>
+            <path d="M22 8 Q28 6 30 2" stroke="#141416" stroke-width="1.8" fill="none"/>
+            <path class="vapor-casa" d="M30 1 Q28 -4 31 -8 M32 0 Q35 -5 33 -10" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>
+            <path d="M8 4 Q14 -4 20 4" stroke="#C59B27" stroke-width="1.4" fill="none"/>
+          </g>
+        </g>
+      `;
+
+      const feixe = feixeLuzVolumetricoSVG({ id, x1: jx + 10, y1: jy + 10, x2: 120, chaoY, hora, motes: 7 });
+      const vitrola = vitrolaVintageCasa(10, chaoY - 48);
+      const rodape = rodapeVintage(W, chaoY, "#4A331E");
+
+      return `
+        ${defs}
+        <rect width="${W}" height="${chaoY}" fill="url(#${id}-parede-grad)"/>
+        <rect y="92" width="216" height="${chaoY - 164}" fill="#FDFCF8"/>
+        ${azulejos}
+        ${armarios}
+        ${janela}
+        ${pisoCozinha}
+        ${rodape}
+        ${bancada}
+        ${vitrola}
+        ${c.leitor(78, chaoY - 128, 58)}
+        ${c.estante()}
+        ${feixe}
+      `;
     }
   },
   {
@@ -221,21 +510,111 @@ const COMODOS = [
       const { W, chaoY, escolha, id } = c;
       const hora = horaDoCeu();
       const noite = hora === "noite";
-      const verde = noite ? "#2F4A2A" : "#6FAE4F";
-      const tronco = (x, h) =>
-        `<rect x="${x - 6}" y="${chaoY - h}" width="12" height="${h + 10}" fill="#6E4A2A" stroke="#3A2A1E" stroke-width="1"/><circle cx="${x}" cy="${chaoY - h}" r="34" fill="${noite ? "#24452A" : "#4F8F3E"}"/><circle cx="${x - 22}" cy="${chaoY - h + 14}" r="22" fill="${noite ? "#2A5030" : "#5FA04A"}"/><circle cx="${x + 20}" cy="${chaoY - h + 10}" r="24" fill="${noite ? "#2A5030" : "#5FA04A"}"/>`;
+      const isTarde = hora === "tarde";
+      const verdeGrama = noite ? "#1F3A22" : isTarde ? "#528536" : "#5DAA42";
+      const verdeEscuro = escurecer(verdeGrama, 0.7);
+
+      const tronco = (x, h) => `
+        <rect x="${x - 7}" y="${chaoY - h}" width="14" height="${h + 10}" fill="#5A3A1E" stroke="#3A220F" stroke-width="1.2"/>
+        <path d="M${x - 4} ${chaoY - h + 10} Q${x} ${chaoY - 10} ${x - 2} ${chaoY}" stroke="#3A220F" stroke-width="0.8" fill="none" opacity="0.6"/>
+        <circle cx="${x}" cy="${chaoY - h}" r="38" fill="${noite ? "#1A3520" : isTarde ? "#4A7A34" : "#458C36"}"/>
+        <circle cx="${x - 24}" cy="${chaoY - h + 15}" r="26" fill="${noite ? "#23452A" : isTarde ? "#5E9442" : "#55A244"}"/>
+        <circle cx="${x + 22}" cy="${chaoY - h + 12}" r="28" fill="${noite ? "#23452A" : isTarde ? "#5E9442" : "#55A244"}"/>
+        <circle cx="${x}" cy="${chaoY - h - 10}" r="22" fill="${noite ? "#2E5535" : isTarde ? "#6EA84E" : "#68BA52"}"/>
+      `;
+
+      // Varal com lâmpadas vintage (fairy lights) entre as árvores
+      const cordaoLuzes = `
+        <g class="quintal-luzinhas">
+          <path d="M22 ${chaoY - 110} Q115 ${chaoY - 80} 208 ${chaoY - 100}" fill="none" stroke="#2B2B30" stroke-width="1.2"/>
+          ${[0, 1, 2, 3, 4]
+            .map(i => {
+              const lx = 48 + i * 36;
+              const ly = chaoY - 96 + Math.sin((i / 4) * Math.PI) * 14;
+              return `
+              <circle cx="${lx}" cy="${ly + 6}" r="12" fill="#FDE047" opacity="${noite ? 0.35 : 0.15}" class="lampada-casa"/>
+              <circle cx="${lx}" cy="${ly + 6}" r="3.2" fill="#FFEAA7" stroke="#D97706" stroke-width="0.6"/>
+            `;
+            })
+            .join("")}
+        </g>
+      `;
+
       let lugar = "";
-      if (escolha.lugar === "rede")
-        lugar = `${tronco(22, 150)}<rect x="200" y="${chaoY - 96}" width="8" height="106" fill="#6E4A2A" stroke="#3A2A1E"/><path d="M26 ${chaoY - 92}Q115 ${chaoY - 20} 204 ${chaoY - 92}" fill="none" stroke="#3A2A1E" stroke-width="1.2"/><path d="M36 ${chaoY - 84}Q115 ${chaoY - 6} 194 ${chaoY - 84}L196 ${chaoY - 74}Q115 ${chaoY + 6} 34 ${chaoY - 74}Z" fill="#E0312F" stroke="#141416" stroke-width="1.2"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${50 + i * 30} ${chaoY - 66 + Math.abs(i - 2) * -7}V${chaoY - 54 + Math.abs(i - 2) * -7}" stroke="#F2C318" stroke-width="3"/>`).join("")}${c.leitor(84, chaoY - 118, 58)}`;
-      else if (escolha.lugar === "cadeira")
-        lugar = `${tronco(30, 140)}<g transform="translate(70 ${chaoY - 50})"><path d="M0 50L30 0M60 50L44 6" stroke="#8C6A3A" stroke-width="3"/><path d="M8 8L44 4L52 40L18 44Z" fill="#2F6FD6" stroke="#141416" stroke-width="1"/>${[0, 1, 2].map(i => `<path d="M${10 + i * 12} 7L${20 + i * 12} 43" stroke="#F2F2F2" stroke-width="4"/>`).join("")}</g>${c.leitor(78, chaoY - 106, 58)}`;
-      else
-        lugar = `${tronco(30, 140)}<path d="M50 ${chaoY + 12}L190 ${chaoY + 6}L206 ${chaoY + 40}L40 ${chaoY + 46}Z" fill="#E0312F" stroke="#141416" stroke-width="1"/>${[0, 1, 2, 3, 4, 5].map(i => `<path d="M${58 + i * 24} ${chaoY + 11}L${54 + i * 26} ${chaoY + 44}" stroke="#F2F2F2" stroke-width="5" opacity=".8"/>`).join("")}${c.leitor(96, chaoY - 54, 58)}`;
-      return `${ceuSVG(id + "c", W, chaoY + 4, hora)}
-        <g fill="${noite ? "#3A2A1E" : "#C9A06A"}" stroke="#6E4A2A" stroke-width=".8">${Array.from({ length: 20 }, (_, i) => `<path d="M${i * 19} ${chaoY - 40}l8 -8 8 8V${chaoY}H${i * 19}Z"/>`).join("")}<rect y="${chaoY - 28}" width="${W}" height="5"/><rect y="${chaoY - 12}" width="${W}" height="5"/></g>
-        <rect y="${chaoY}" width="${W}" height="64" fill="${verde}"/>${Array.from({ length: 40 }, (_, i) => `<path d="M${(i * 37) % W} ${chaoY + 6 + ((i * 13) % 52)}l2 -6 2 6" stroke="${noite ? "#1F3520" : "#4F8F3E"}" stroke-width="1.2" fill="none"/>`).join("")}
-        ${noite ? Array.from({ length: 6 }, (_, i) => `<circle class="pisca-casa" style="animation-delay:${i * 0.6}s" cx="${40 + i * 50}" cy="${chaoY - 50 + (i % 3) * 18}" r="1.8" fill="#E8F27A"/>`).join("") : ""}
-        ${lugar}${c.estante()}`;
+      if (escolha.lugar === "rede") {
+        lugar = `
+          ${tronco(22, 150)}
+          <rect x="202" y="${chaoY - 98}" width="10" height="108" fill="#5A3A1E" stroke="#3A220F" stroke-width="1.2"/>
+          <!-- Cordas da rede -->
+          <path d="M26 ${chaoY - 92} Q115 ${chaoY - 18} 204 ${chaoY - 92}" fill="none" stroke="#BA9E76" stroke-width="1.6"/>
+          <!-- Tecido da rede com franjas artesanais -->
+          <path d="M34 ${chaoY - 84} Q115 ${chaoY - 4} 196 ${chaoY - 84} L198 ${chaoY - 72} Q115 ${chaoY + 8} 32 ${chaoY - 72} Z" fill="#9E2A2B" stroke="#141416" stroke-width="1.2"/>
+          ${[0, 1, 2, 3, 4]
+            .map(
+              i => `
+            <path d="M${50 + i * 30} ${chaoY - 64 + Math.abs(i - 2) * -7} V${chaoY - 50 + Math.abs(i - 2) * -7}" stroke="#F2C318" stroke-width="3"/>
+          `
+            )
+            .join("")}
+          ${c.leitor(84, chaoY - 116, 58)}
+        `;
+      } else if (escolha.lugar === "cadeira") {
+        lugar = `
+          ${tronco(30, 140)}
+          <g transform="translate(68 ${chaoY - 52})">
+            <path d="M0 52 L32 0 M64 52 L46 6" stroke="#8C6A3A" stroke-width="3.2"/>
+            <path d="M8 8 L46 4 L54 42 L18 46 Z" fill="#2B4C7E" stroke="#141416" stroke-width="1.2"/>
+            ${[0, 1, 2].map(i => `<path d="M${10 + i * 12} 7 L${20 + i * 12} 45" stroke="#FFFFFF" stroke-width="4"/>`).join("")}
+          </g>
+          ${c.leitor(78, chaoY - 106, 58)}
+        `;
+      } else {
+        lugar = `
+          ${tronco(30, 140)}
+          <path d="M48 ${chaoY + 12} L192 ${chaoY + 6} L208 ${chaoY + 42} L38 ${chaoY + 48} Z" fill="#9E2A2B" stroke="#141416" stroke-width="1.2"/>
+          ${[0, 1, 2, 3, 4, 5].map(i => `<path d="M${56 + i * 24} ${chaoY + 11} L${52 + i * 26} ${chaoY + 46}" stroke="#FFFFFF" stroke-width="5" opacity=".85"/>`).join("")}
+          ${c.leitor(96, chaoY - 54, 58)}
+        `;
+      }
+
+      // Cerca rústica de madeira no fundo
+      const cerca = `
+        <g fill="${noite ? "#3A2A1E" : "#C9A06A"}" stroke="#5A3A1E" stroke-width="0.8">
+          ${Array.from({ length: 20 }, (_, i) => `<path d="M${i * 19} ${chaoY - 42} l8 -8 8 8 V${chaoY} H${i * 19} Z"/>`).join("")}
+          <rect y="${chaoY - 30}" width="${W}" height="5"/>
+          <rect y="${chaoY - 14}" width="${W}" height="5"/>
+        </g>
+      `;
+
+      // Gramado vivo com tufos de relva e pedras de jardim
+      const gramado = `
+        <rect y="${chaoY}" width="${W}" height="64" fill="${verdeGrama}"/>
+        <line x1="0" y1="${chaoY}" x2="${W}" y2="${chaoY}" stroke="${verdeEscuro}" stroke-width="1.4"/>
+        ${Array.from({ length: 35 }, (_, i) => `<path d="M${(i * 37) % W} ${chaoY + 8 + ((i * 13) % 48)} l2 -7 2 7" stroke="${verdeEscuro}" stroke-width="1.4" fill="none"/>`).join("")}
+        <!-- Pedras de caminho no jardim -->
+        <ellipse cx="60" cy="${chaoY + 48}" rx="14" ry="6" fill="#A89A84" stroke="#7A6E5C" stroke-width="0.8"/>
+        <ellipse cx="140" cy="${chaoY + 52}" rx="16" ry="7" fill="#A89A84" stroke="#7A6E5C" stroke-width="0.8"/>
+        <ellipse cx="220" cy="${chaoY + 46}" rx="15" ry="6" fill="#A89A84" stroke="#7A6E5C" stroke-width="0.8"/>
+      `;
+
+      const vagalumes = noite
+        ? Array.from({ length: 8 }, (_, i) => `<circle class="pisca-casa" style="animation-delay:${i * 0.5}s" cx="${30 + i * 42}" cy="${chaoY - 55 + (i % 3) * 20}" r="2" fill="#E8F27A"/>`).join("")
+        : "";
+
+      const feixe = feixeLuzVolumetricoSVG({ id, x1: 40, y1: 10, x2: 130, chaoY, hora, motes: 8 });
+      const vitrola = vitrolaVintageCasa(10, chaoY - 48);
+
+      return `
+        ${ceuSVG(id + "c", W, chaoY + 4, hora)}
+        ${cerca}
+        ${gramado}
+        ${vagalumes}
+        ${cordaoLuzes}
+        ${lugar}
+        ${vitrola}
+        ${c.estante()}
+        ${feixe}
+      `;
     }
   },
   {
@@ -264,36 +643,93 @@ const COMODOS = [
     desenho: c => {
       const { W, chaoY, escolha, op, id } = c;
       const hora = horaDoCeu();
-      const ceuH = chaoY - 40;
+      const isNoite = hora === "noite";
+      const isTarde = hora === "tarde";
+      const ceuH = chaoY - 38;
+
       let vista = ceuSVG(id + "v", W, ceuH, hora);
-      if (escolha.vista === "mar")
-        vista += `<rect y="${ceuH - 46}" width="${W}" height="46" fill="${hora === "noite" ? "#1B2E57" : "#3E8CC4"}"/>${[0, 1, 2].map(i => `<path d="M${20 + i * 110} ${ceuH - 30 + i * 8}q8 -4 16 0t16 0" stroke="#fff" stroke-width="1.2" fill="none" opacity=".6"/>`).join("")}<path d="M260 ${ceuH - 46}l10 -14 10 14Z" fill="#F2F2F2"/>`;
-      else if (escolha.vista === "montanhas")
-        vista += `<path d="M0 ${ceuH}L60 ${ceuH - 70}L110 ${ceuH - 30}L170 ${ceuH - 90}L240 ${ceuH - 20}L300 ${ceuH - 64}L360 ${ceuH - 24}V${ceuH}Z" fill="${hora === "noite" ? "#2A3550" : "#6E8CA8"}"/><path d="M150 ${ceuH - 70}L170 ${ceuH - 90}L188 ${ceuH - 70}Z" fill="#F2F2F2"/>`;
-      else
+      if (escolha.vista === "mar") {
+        vista += `
+          <rect y="${ceuH - 46}" width="${W}" height="46" fill="${isNoite ? "#16284E" : isTarde ? "#C45A34" : "#2E7BB8"}"/>
+          ${[0, 1, 2].map(i => `<path d="M${20 + i * 110} ${ceuH - 30 + i * 8} q8 -4 16 0 t16 0" stroke="#FFFFFF" stroke-width="1.2" fill="none" opacity=".6"/>`).join("")}
+          <path d="M260 ${ceuH - 46} l10 -14 10 14 Z" fill="#F2F2F2"/>
+        `;
+      } else if (escolha.vista === "montanhas") {
+        vista += `
+          <path d="M0 ${ceuH} L60 ${ceuH - 74} L110 ${ceuH - 34} L170 ${ceuH - 96} L240 ${ceuH - 24} L300 ${ceuH - 68} L360 ${ceuH - 28} V${ceuH} Z" fill="${isNoite ? "#1F2B44" : isTarde ? "#8C4E3A" : "#557A98"}"/>
+          <path d="M150 ${ceuH - 74} L170 ${ceuH - 96} L188 ${ceuH - 74} Z" fill="#FFFFFF" opacity="0.85"/>
+        `;
+      } else {
         vista += [0, 1, 2, 3, 4, 5, 6, 7, 8]
           .map(i => {
-            const h = 30 + ((i * 37) % 60),
-              x = i * 42;
+            const h = 32 + ((i * 37) % 64), x = i * 42;
             let janelas = "";
-            for (let y = ceuH - h + 6; y < ceuH - 6; y += 10)
-              for (let jx = x + 6; jx < x + 32; jx += 10)
-                janelas += `<rect x="${jx}" y="${y}" width="4" height="5" fill="${hora === "noite" && (jx + y) % 3 ? "#FFE27A" : "rgba(255,255,255,.35)"}"/>`;
-            return `<rect x="${x}" y="${ceuH - h}" width="38" height="${h}" fill="${hora === "noite" ? "#1E2338" : "#7A8396"}"/>${janelas}`;
+            for (let y = ceuH - h + 6; y < ceuH - 6; y += 10) {
+              for (let jx = x + 6; jx < x + 32; jx += 10) {
+                janelas += `<rect x="${jx}" y="${y}" width="4" height="5" fill="${isNoite && (jx + y) % 3 ? "#FFE27A" : "rgba(255,255,255,.3)"}"/>`;
+              }
+            }
+            return `<rect x="${x}" y="${ceuH - h}" width="38" height="${h}" fill="${isNoite ? "#141A2B" : "#657285"}"/>${janelas}`;
           })
           .join("");
-      return `${vista}<rect y="${ceuH}" width="${W}" height="40" fill="#E8DFD0"/>
-        <g stroke="#3A3A44" stroke-width="2.4"><path d="M0 ${chaoY - 54}H${W}"/>${Array.from({ length: 19 }, (_, i) => `<path d="M${i * 20 + 6} ${chaoY - 54}V${chaoY}"/>`).join("")}</g>
-        <g transform="translate(0 ${chaoY})">${(() => {
-          let s = `<rect width="${W}" height="64" fill="#C4683A"/>`;
-          for (let y = 0; y < 64; y += 16)
-            for (let x = (y / 16) % 2 ? -12 : 0; x < W; x += 24)
-              s += `<rect x="${x}" y="${y}" width="24" height="16" fill="none" stroke="#A8522A"/>`;
-          return s;
-        })()}</g>
-        ${vasoPlanta(12, chaoY - 12, 1.3)}${vasoPlanta(196, chaoY - 10, 1.1, "#5A8CA8")}
-        <g transform="translate(46 ${chaoY - 66})"><rect x="6" y="0" width="100" height="48" rx="16" fill="${op.poltrona}" stroke="#141416" stroke-width="1.4"/><rect x="-6" y="30" width="124" height="34" rx="10" fill="${op.poltrona}" stroke="#141416" stroke-width="1.4"/><rect x="-10" y="22" width="22" height="42" rx="9" fill="${escurecer(op.poltrona, 0.8)}" stroke="#141416" stroke-width="1.4"/><rect x="100" y="22" width="22" height="42" rx="9" fill="${escurecer(op.poltrona, 0.8)}" stroke="#141416" stroke-width="1.4"/></g>
-        ${c.leitor(70, chaoY - 112, 60)}${caneca(182, chaoY - 4, "#2F6FD6")}${c.estante()}`;
+      }
+
+      // Guarda-corpo monumental de ferro forjado art-nouveau
+      const gradeado = `
+        <g class="varanda-grade" stroke="#25262E" stroke-width="2.2">
+          <!-- Corrimão de madeira nobre -->
+          <rect x="0" y="${chaoY - 56}" width="${W}" height="7" rx="1.5" fill="#5C3B1E" stroke="#3A220F" stroke-width="1"/>
+          <line x1="0" y1="${chaoY - 50}" x2="${W}" y2="${chaoY - 50}" stroke="#25262E" stroke-width="2.4"/>
+          <line x1="0" y1="${chaoY - 6}" x2="${W}" y2="${chaoY - 6}" stroke="#25262E" stroke-width="2.4"/>
+          ${Array.from({ length: 18 }, (_, i) => `
+            <line x1="${i * 20 + 10}" y1="${chaoY - 50}" x2="${i * 20 + 10}" y2="${chaoY - 6}"/>
+            <!-- Arabesco decorativo -->
+            <circle cx="${i * 20 + 10}" cy="${chaoY - 28}" r="4.5" fill="none" stroke="#25262E" stroke-width="1.4"/>
+          `).join("")}
+        </g>
+      `;
+
+      // Piso de lajotas de terracota clássicas
+      let pisoTerracota = `<g transform="translate(0 ${chaoY})">`;
+      pisoTerracota += `<rect width="${W}" height="64" fill="#B8582E"/>`;
+      for (let y = 0; y < 64; y += 16) {
+        for (let x = (y / 16) % 2 ? -12 : 0; x < W; x += 24) {
+          pisoTerracota += `<rect x="${x}" y="${y}" width="24" height="16" fill="none" stroke="#8A3E1E" stroke-width="1.2"/>`;
+          pisoTerracota += `<line x1="${x + 1}" y1="${y + 1}" x2="${x + 23}" y2="${y + 1}" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="0.8"/>`;
+        }
+      }
+      pisoTerracota += `</g>`;
+
+      // Poltrona de vime com almofadão confortável
+      const poltrona = `
+        <g transform="translate(46 ${chaoY - 68})">
+          <rect x="6" y="0" width="102" height="50" rx="16" fill="${op.poltrona}" stroke="#141416" stroke-width="1.4"/>
+          <rect x="-6" y="32" width="126" height="34" rx="10" fill="${op.poltrona}" stroke="#141416" stroke-width="1.4"/>
+          <!-- Braços de vime com textura -->
+          <rect x="-10" y="24" width="22" height="42" rx="9" fill="${escurecer(op.poltrona, 0.78)}" stroke="#141416" stroke-width="1.4"/>
+          <rect x="102" y="24" width="22" height="42" rx="9" fill="${escurecer(op.poltrona, 0.78)}" stroke="#141416" stroke-width="1.4"/>
+          <!-- Manta de frio jogada -->
+          <path d="M28 28 Q44 48 40 66 L60 66 Q64 48 54 28 Z" fill="#E8DCC0" stroke="#BAAA8A" stroke-width="0.8"/>
+        </g>
+      `;
+
+      const feixe = feixeLuzVolumetricoSVG({ id, x1: 280, y1: 10, x2: 120, chaoY, hora, motes: 8 });
+      const vitrola = vitrolaVintageCasa(10, chaoY - 48);
+
+      return `
+        ${vista}
+        <rect y="${ceuH}" width="${W}" height="38" fill="#E2D8C8"/>
+        ${pisoTerracota}
+        ${gradeado}
+        ${vasoPlanta(12, chaoY - 12, 1.3)}
+        ${vasoPlanta(198, chaoY - 10, 1.15, "#4F7A5A")}
+        ${poltrona}
+        ${vitrola}
+        ${c.leitor(70, chaoY - 112, 60)}
+        ${caneca(184, chaoY - 4, "#2F6FD6")}
+        ${c.estante()}
+        ${feixe}
+      `;
     }
   },
   {
@@ -305,9 +741,9 @@ const COMODOS = [
       parede: {
         nome: "Parede",
         valores: [
-          ["azul", "#C8D6E8"],
-          ["verde", "#2F4A3A"],
-          ["madeira", "#8C6A4A"]
+          ["azul", "#B8CCDE"],
+          ["verde", "#2A4535"],
+          ["madeira", "#7C5A3A"]
         ]
       },
       luz: {
@@ -319,17 +755,107 @@ const COMODOS = [
       }
     },
     desenho: c => {
-      const { W, chaoY, op } = c;
+      const { W, chaoY, op, id } = c;
+      const hora = horaDoCeu();
       const notas = ["#F2C318", "#8FD3FF", "#FF9EB5", "#9FE29A"];
-      return `<rect width="${W}" height="${chaoY}" fill="${op.parede}"/>
-        <g transform="translate(26 26)"><rect width="110" height="70" rx="3" fill="#C9A06A" stroke="#6E4A2A" stroke-width="4"/>${notas.map((n, i) => `<rect x="${10 + i * 24}" y="${10 + (i % 2) * 22}" width="20" height="18" fill="${n}" transform="rotate(${i % 2 ? 4 : -5} ${20 + i * 24} ${19 + (i % 2) * 22})"/><circle cx="${20 + i * 24}" cy="${12 + (i % 2) * 22}" r="1.6" fill="#E0312F"/>`).join("")}<path d="M14 52H60M14 58H48" stroke="#6E4A2A" stroke-width="1.2"/></g>
-        <g transform="translate(0 ${chaoY})">${piso(W, 64, "#8C6A4A", "#6E4E30")}</g>
-        <g transform="translate(14 ${chaoY - 62})"><rect x="0" y="0" width="190" height="10" rx="2" fill="#6E4A2A" stroke="#3A2A1E"/><rect x="6" y="10" width="8" height="62" fill="#6E4A2A"/><rect x="176" y="10" width="8" height="62" fill="#6E4A2A"/><rect x="120" y="10" width="56" height="40" fill="#5E4026" stroke="#3A2A1E"/><path d="M128 24H168M128 36H168" stroke="#3A2A1E"/>
-          <g transform="translate(150 -46)"><path d="M0 46V20L18 6" stroke="#3A3A44" stroke-width="2.4" fill="none"/><path d="M10 -2L30 10L22 18Z" fill="#3A3A44"/><path d="M26 14L60 60H-4Z" fill="${op.luz}" opacity=".3"/><ellipse cx="0" cy="46" rx="10" ry="3" fill="#3A3A44"/></g>
-          <path d="M70 -2L96 -6L122 -2V2H70Z" fill="#FBF7EC" stroke="#141416" stroke-width=".8"/><rect x="34" y="-14" width="22" height="14" fill="#2F6FD6" stroke="#141416" stroke-width=".8"/><rect x="36" y="-22" width="18" height="8" fill="#E0312F" stroke="#141416" stroke-width=".8"/></g>
+
+      const defs = `
+        <defs>
+          <linearGradient id="${id}-parede-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${escurecer(op.parede, 1.12)}"/>
+            <stop offset="100%" stop-color="${op.parede}"/>
+          </linearGradient>
+          <linearGradient id="${id}-boiserie-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#5A3A1E"/>
+            <stop offset="100%" stop-color="#3D2411"/>
+          </linearGradient>
+          <radialGradient id="${id}-banker-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#A7F3D0" stop-opacity="0.7"/>
+            <stop offset="35%" stop-color="#34D399" stop-opacity="0.32"/>
+            <stop offset="70%" stop-color="#059669" stop-opacity="0.1"/>
+            <stop offset="100%" stop-color="#047857" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+      `;
+
+      // Quadro de cortiça clássico com recados
+      const quadroAvisos = `
+        <g transform="translate(24 24)">
+          <rect width="114" height="74" rx="3" fill="#C9A06A" stroke="#4A2E16" stroke-width="4"/>
+          <line x1="2" y1="2" x2="112" y2="2" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="0.8"/>
+          ${notas
+            .map(
+              (n, i) => `
+            <rect x="${12 + i * 24}" y="${10 + (i % 2) * 24}" width="20" height="18" fill="${n}" transform="rotate(${i % 2 ? 4 : -5} ${22 + i * 24} ${19 + (i % 2) * 24})"/>
+            <circle cx="${22 + i * 24}" cy="${12 + (i % 2) * 24}" r="1.8" fill="#E0312F"/>
+          `
+            )
+            .join("")}
+          <path d="M14 56 H64 M14 62 H50" stroke="#5A3A1E" stroke-width="1.2"/>
+        </g>
+      `;
+
+      // Mesa roll-top clássica de carvalho
+      const escrivaninha = `
+        <g transform="translate(14 ${chaoY - 64})">
+          <!-- Tampo da mesa chanfrado -->
+          <rect x="0" y="0" width="194" height="12" rx="2" fill="#5E3E22" stroke="#2B1A0C" stroke-width="1.2"/>
+          <line x1="2" y1="2" x2="192" y2="2" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="0.8"/>
+          <!-- Pés robustos -->
+          <rect x="6" y="12" width="10" height="62" fill="#4E3218" stroke="#2B1A0C" stroke-width="1"/>
+          <rect x="178" y="12" width="10" height="62" fill="#4E3218" stroke="#2B1A0C" stroke-width="1"/>
+          <!-- Gaveteiro clássico com puxadores de concha de latão -->
+          <rect x="120" y="12" width="58" height="42" fill="#442A12" stroke="#2B1A0C" stroke-width="1.2"/>
+          <line x1="120" y1="26" x2="178" y2="26" stroke="#2B1A0C" stroke-width="1"/>
+          <line x1="120" y1="40" x2="178" y2="40" stroke="#2B1A0C" stroke-width="1"/>
+          <ellipse cx="149" cy="19" rx="5" ry="2" fill="#C59B27"/>
+          <ellipse cx="149" cy="33" rx="5" ry="2" fill="#C59B27"/>
+          <ellipse cx="149" cy="47" rx="5" ry="2" fill="#C59B27"/>
+          <!-- Luminária banqueiro clássica (Banker's Lamp) -->
+          <g transform="translate(152 -46)">
+            <circle cx="20" cy="12" r="32" fill="url(#${id}-banker-glow)" pointer-events="none"/>
+            <path d="M0 46 V18 L18 8" stroke="#C59B27" stroke-width="2.6" fill="none"/>
+            <ellipse cx="20" cy="10" rx="14" ry="6" fill="#047857" stroke="#064E3B" stroke-width="1.2"/>
+            <ellipse cx="20" cy="10" rx="11" ry="3.5" fill="#10B981"/>
+            <line x1="16" y1="14" x2="16" y2="22" stroke="#C59B27" stroke-width="0.8"/>
+            <circle cx="16" cy="23" r="1.4" fill="#C59B27"/>
+            <ellipse cx="0" cy="46" rx="10" ry="3.5" fill="#8C6A3A" stroke="#4E3218" stroke-width="1"/>
+          </g>
+          <!-- Livros e papéis sobre a mesa -->
+          <path d="M68 -2 L94 -6 L120 -2 V2 H68 Z" fill="#FDFBF7" stroke="#141416" stroke-width=".8"/>
+          <rect x="32" y="-14" width="24" height="14" fill="#2B4C7E" stroke="#141416" stroke-width=".8"/>
+          <rect x="34" y="-22" width="20" height="8" fill="#9E2A2B" stroke="#141416" stroke-width=".8"/>
+        </g>
+      `;
+
+      // Cadeira giratória de escritório vintage
+      const cadeira = `
+        <g transform="translate(60 ${chaoY - 48})">
+          <rect x="0" y="0" width="58" height="12" rx="4" fill="#3D2916" stroke="#25170B" stroke-width="1.2"/>
+          <path d="M29 12 V44 M10 44 H48" stroke="#25262E" stroke-width="3.2"/>
+        </g>
+      `;
+
+      const feixe = feixeLuzVolumetricoSVG({ id, x1: 220, y1: 15, x2: 130, chaoY, hora, motes: 7 });
+      const vitrola = vitrolaVintageCasa(10, chaoY - 48);
+      const rodape = rodapeVintage(W, chaoY, "#3A220F");
+
+      return `
+        ${defs}
+        <rect width="${W}" height="${chaoY}" fill="url(#${id}-parede-grad)"/>
+        <!-- Boiserie inferior de madeira de lei -->
+        <rect x="0" y="${chaoY - 66}" width="${W}" height="52" fill="url(#${id}-boiserie-grad)"/>
+        <line x1="0" y1="${chaoY - 66}" x2="${W}" y2="${chaoY - 66}" stroke="#2B1A0C" stroke-width="1.6"/>
+        ${quadroAvisos}
+        <g transform="translate(0 ${chaoY})">${piso(W, 64, "#6E4E30", "#4E3218")}</g>
+        ${rodape}
+        ${escrivaninha}
+        ${cadeira}
+        ${vitrola}
         ${c.leitor(66, chaoY - 124, 58)}
-        <g transform="translate(60 ${chaoY - 46})"><rect x="0" y="0" width="56" height="10" rx="4" fill="#3A3A44"/><path d="M28 10V44M10 44H46" stroke="#3A3A44" stroke-width="3"/></g>
-        ${c.estante()}`;
+        ${c.estante()}
+        ${feixe}
+      `;
     }
   },
   {
@@ -589,7 +1115,7 @@ const COMODOS = [
     nome: "Cripta de leitura",
     preco: 250,
     mundo: "emo",
-    desc: "Paredes de pedra, velas e um banco que já foi caixão.",
+    desc: "Paredes de pedra, vitrais góticos, velas e banco vitoriano.",
     opcoes: {
       vitral: {
         nome: "Vitral",
@@ -601,19 +1127,100 @@ const COMODOS = [
       }
     },
     desenho: c => {
-      const { W, chaoY, op } = c;
+      const { W, chaoY, op, id } = c;
+      const hora = horaDoCeu();
+      const vitralCor = op.vitral;
+
+      const defs = `
+        <defs>
+          <linearGradient id="${id}-pedra-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1E1C24"/>
+            <stop offset="100%" stop-color="#14131A"/>
+          </linearGradient>
+          <radialGradient id="${id}-vela-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFD27A" stop-opacity="0.8"/>
+            <stop offset="40%" stop-color="#FF9E3B" stop-opacity="0.35"/>
+            <stop offset="80%" stop-color="#E05615" stop-opacity="0.1"/>
+            <stop offset="100%" stop-color="#991B1B" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="${id}-vitral-beam" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="${vitralCor}" stop-opacity="0.5"/>
+            <stop offset="60%" stop-color="${vitralCor}" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="${vitralCor}" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      `;
+
       let pedras = "";
-      for (let y = 0, i = 0; y < chaoY; y += 22, i++)
-        for (let x = i % 2 ? -20 : 0; x < W; x += 40)
-          pedras += `<rect x="${x + 1}" y="${y + 1}" width="38" height="20" rx="3" fill="#3A3644" stroke="#25222C"/>`;
-      const vela = (x, y, h) =>
-        `<g transform="translate(${x} ${y})"><rect x="-4" y="${-h}" width="8" height="${h}" fill="#F2EAD3" stroke="#141416" stroke-width=".8"/><path d="M-4 ${-h + 4}q2 6 0 10" stroke="#E8DCC0" fill="none"/><path class="chama-casa" d="M0 ${-h - 12}Q5 ${-h - 4} 0 ${-h}Q-5 ${-h - 4} 0 ${-h - 12}Z" fill="#FFB238"/><circle cx="0" cy="${-h - 6}" r="12" fill="#FFB238" opacity=".14"/></g>`;
-      return `<rect width="${W}" height="${chaoY}" fill="#2A2733"/>${pedras}
-        <g transform="translate(150 20)"><path d="M0 70V26Q0 0 30 0Q60 0 60 26V70Z" fill="${op.vitral}" stroke="#141416" stroke-width="3"/><path d="M30 0V70M0 36H60M8 14L52 58M52 14L8 58" stroke="#141416" stroke-width="1.6"/><circle cx="30" cy="30" r="8" fill="#F2EAD3" opacity=".6"/></g>
-        <g transform="translate(0 ${chaoY})"><rect width="${W}" height="64" fill="#1E1B24"/>${Array.from({ length: 12 }, (_, i) => `<path d="M${i * 32} 0V64" stroke="#2A2733"/>`).join("")}</g>
-        <g transform="translate(16 ${chaoY - 40})"><path d="M10 0H150L160 20L150 44H10L0 20Z" fill="#3A2420" stroke="#141416" stroke-width="1.6"/><path d="M14 6H146L154 20L146 38H14L6 20Z" fill="#7A0F24"/><path d="M80 10V32M72 18H88" stroke="#E8C24A" stroke-width="2.4"/></g>
-        ${vela(22, chaoY - 40, 30)}${vela(200, chaoY + 18, 40)}${vela(214, chaoY + 22, 26)}
-        ${c.leitor(54, chaoY - 108, 60)}${c.estante()}`;
+      for (let y = 0, i = 0; y < chaoY; y += 22, i++) {
+        for (let x = i % 2 ? -20 : 0; x < W; x += 40) {
+          pedras += `<rect x="${x + 1}" y="${y + 1}" width="38" height="20" rx="3" fill="#2E2B38" stroke="#1A1822" stroke-width="1.2"/>`;
+          pedras += `<line x1="${x + 2}" y1="${y + 2}" x2="${x + 38}" y2="${y + 2}" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="0.8"/>`;
+        }
+      }
+
+      const vela = (x, y, h) => `
+        <g transform="translate(${x} ${y})">
+          <ellipse cx="0" cy="0" rx="10" ry="3" fill="#0E0D12" opacity="0.6"/>
+          <rect x="-4" y="${-h}" width="8" height="${h}" rx="1" fill="#E8DEC4" stroke="#141416" stroke-width="0.8"/>
+          <path d="M-4 ${-h + 4} Q-1 ${-h + 10} -3 ${-h + 16}" stroke="#D5CAAD" stroke-width="1.2" fill="none"/>
+          <circle cx="0" cy="${-h - 7}" r="24" fill="url(#${id}-vela-glow)" pointer-events="none"/>
+          <path class="chama-casa" d="M0 ${-h - 14} Q5 ${-h - 5} 0 ${-h} Q-5 ${-h - 5} 0 ${-h - 14} Z" fill="#FFC107"/>
+          <circle cx="0" cy="${-h - 6}" r="3" fill="#FFFBEB"/>
+        </g>
+      `;
+
+      const vx = 150, vy = 16;
+      const vitral = `
+        <g class="cripta-vitral">
+          <path d="M${vx} ${vy + 74} V${vy + 26} Q${vx} ${vy} ${vx + 32} ${vy} Q${vx + 64} ${vy} ${vx + 64} ${vy + 26} V${vy + 74} Z" fill="${vitralCor}" stroke="#141416" stroke-width="3.4"/>
+          <path d="M${vx + 32} ${vy} V${vy + 74} M${vx} ${vy + 36} H${vx + 64} M${vx + 8} ${vy + 14} L${vx + 56} ${vy + 62} M${vx + 56} ${vy + 14} L${vx + 8} ${vy + 62}" stroke="#141416" stroke-width="1.8"/>
+          <circle cx="${vx + 32}" cy="${vy + 30}" r="9" fill="#FFFFFF" opacity="0.45"/>
+        </g>
+      `;
+
+      const banco = `
+        <g transform="translate(16 ${chaoY - 42})">
+          <ellipse cx="80" cy="42" rx="76" ry="10" fill="#0E0D12" opacity="0.6"/>
+          <path d="M10 0 H150 L160 20 L150 44 H10 L0 20 Z" fill="#2E1C1A" stroke="#141416" stroke-width="1.6"/>
+          <path d="M14 6 H146 L154 20 L146 38 H14 L6 20 Z" fill="#6A1024"/>
+          <line x1="16" y1="8" x2="144" y2="8" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="0.8"/>
+          <path d="M80 10 V32 M72 18 H88" stroke="#D4AF37" stroke-width="2.6"/>
+        </g>
+      `;
+
+      const feixeMistico = `
+        <g class="sotao-feixe-grupo" pointer-events="none">
+          <polygon points="${vx + 10},${vy + 30} ${vx + 54},${vy + 30} 130,${chaoY + 12} 20,${chaoY + 12}" fill="url(#${id}-vitral-beam)" class="cenario-feixe-luz"/>
+          <g class="sotao-motes">
+            <circle cx="140" cy="65" r="1.3" fill="#F472B6" class="cenario-poeira-mote" style="animation-delay:0s"/>
+            <circle cx="115" cy="95" r="1.1" fill="#C084FC" class="cenario-poeira-mote" style="animation-delay:1.4s"/>
+            <circle cx="85" cy="130" r="1.5" fill="#F472B6" class="cenario-poeira-mote" style="animation-delay:0.7s"/>
+            <circle cx="60" cy="165" r="1.2" fill="#E879F9" class="cenario-poeira-mote" style="animation-delay:2.1s"/>
+          </g>
+        </g>
+      `;
+
+      const vitrola = vitrolaVintageCasa(10, chaoY - 48);
+
+      return `
+        ${defs}
+        <rect width="${W}" height="${chaoY}" fill="url(#${id}-pedra-grad)"/>
+        ${pedras}
+        ${vitral}
+        <g transform="translate(0 ${chaoY})">
+          <rect width="${W}" height="64" fill="#14131A"/>
+          ${Array.from({ length: 12 }, (_, i) => `<line x1="${i * 32}" y1="0" x2="${i * 32}" y2="64" stroke="#25222C" stroke-width="1.2"/><line x1="${i * 32 + 1}" y1="0" x2="${i * 32 + 1}" y2="64" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="0.8"/>`).join("")}
+        </g>
+        ${banco}
+        ${vela(22, chaoY - 42, 32)}
+        ${vela(202, chaoY + 18, 42)}
+        ${vela(218, chaoY + 22, 28)}
+        ${vitrola}
+        ${c.leitor(54, chaoY - 108, 60)}
+        ${c.estante()}
+        ${feixeMistico}
+      `;
     }
   },
   {
@@ -621,38 +1228,114 @@ const COMODOS = [
     nome: "Estúdio",
     preco: 250,
     mundo: "rock",
-    desc: "Espuma acústica, amplificadores e o pedestal do microfone.",
+    desc: "Painéis acústicos, amplificador valvulado e pedestal vintage.",
     opcoes: {
       espuma: {
         nome: "Espuma",
         valores: [
-          ["preta", "#26262E"],
-          ["vermelha", "#7A1F22"],
-          ["azul", "#1F3A7A"]
+          ["preta", "#1F1F26"],
+          ["vermelha", "#6E1B1E"],
+          ["azul", "#1A2F63"]
         ]
       }
     },
     desenho: c => {
-      const { W, chaoY, op } = c;
+      const { W, chaoY, op, id } = c;
+      const hora = horaDoCeu();
+      const corEspuma = op.espuma;
+
+      const defs = `
+        <defs>
+          <linearGradient id="${id}-spotlight-beam" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stop-color="#FFFBEB" stop-opacity="0.55"/>
+            <stop offset="45%" stop-color="#FEF08A" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+          </linearGradient>
+          <radialGradient id="${id}-lamp-spot" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FEF08A" stop-opacity="0.9"/>
+            <stop offset="50%" stop-color="#F59E0B" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#D97706" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+      `;
+
       let espuma = "";
-      for (let y = 0; y < chaoY; y += 26)
-        for (let x = 0; x < W; x += 26)
-          espuma += `<rect x="${x + 1}" y="${y + 1}" width="24" height="24" fill="${op.espuma}"/><path d="M${x + 1} ${y + 9}H${x + 25}M${x + 1} ${y + 17}H${x + 25}" stroke="${escurecer(op.espuma, 0.7)}"/>`;
-      const ampli = (x, y, w, h) =>
-        `<g transform="translate(${x} ${y})"><rect width="${w}" height="${h}" rx="3" fill="#1E1F24" stroke="#141416" stroke-width="1.4"/><rect x="4" y="4" width="${w - 8}" height="10" fill="#2B2B33"/>${[0, 1, 2, 3].map(i => `<circle cx="${10 + i * ((w - 20) / 3)}" cy="9" r="2" fill="#C9CED6"/>`).join("")}<rect x="4" y="18" width="${w - 8}" height="${h - 22}" fill="#3A3A44"/><path d="M4 ${18 + (h - 22) / 2}H${w - 4}" stroke="#2B2B33"/></g>`;
-      return `<rect width="${W}" height="${chaoY}" fill="#141419"/>${espuma}
-        <g transform="translate(0 ${chaoY})"><rect width="${W}" height="64" fill="#2B2B33"/>${Array.from({ length: 9 }, (_, i) => `<path d="M${i * 40} 0L${i * 40 - 30} 64" stroke="#3A3A44"/>`).join("")}</g>
-        ${ampli(8, chaoY - 60, 70, 64)}${ampli(84, chaoY - 40, 56, 44)}
-        <g transform="translate(176 ${chaoY - 120})"><path d="M0 0L-10 -14" stroke="#3A3A44" stroke-width="3"/><rect x="-16" y="-24" width="9" height="14" rx="4" fill="#C9CED6" stroke="#141416" transform="rotate(-36 -11 -17)"/><path d="M0 0V126M-16 126H16" stroke="#3A3A44" stroke-width="3"/></g>
-        <path d="M150 0V22" stroke="#3A3A44"/><path d="M136 22H164L170 34H130Z" fill="#E0312F"/><path d="M130 34L104 ${chaoY - 40}H196L170 34Z" fill="#FFF6C8" opacity=".12"/>
-        ${c.leitor(18, chaoY - 136, 58)}${c.estante()}`;
+      for (let y = 0; y < chaoY; y += 26) {
+        for (let x = 0; x < W; x += 26) {
+          espuma += `
+            <rect x="${x + 1}" y="${y + 1}" width="24" height="24" rx="2" fill="${corEspuma}" stroke="#101014" stroke-width="1"/>
+            <line x1="${x + 2}" y1="${y + 9}" x2="${x + 24}" y2="${y + 9}" stroke="${escurecer(corEspuma, 0.65)}" stroke-width="1.2"/>
+            <line x1="${x + 2}" y1="${y + 17}" x2="${x + 24}" y2="${y + 17}" stroke="${escurecer(corEspuma, 0.65)}" stroke-width="1.2"/>
+            <line x1="${x + 2}" y1="${y + 2}" x2="${x + 24}" y2="${y + 2}" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="0.8"/>
+          `;
+        }
+      }
+
+      const ampli = (x, y, w, h) => `
+        <g transform="translate(${x} ${y})">
+          <rect width="${w}" height="${h}" rx="3" fill="#18181E" stroke="#0C0C10" stroke-width="1.4"/>
+          <polygon points="0,0 8,0 0,8" fill="#94A3B8"/>
+          <polygon points="${w},0 ${w - 8},0 ${w},8" fill="#94A3B8"/>
+          <polygon points="0,${h} 8,${h} 0,${h - 8}" fill="#94A3B8"/>
+          <polygon points="${w},${h} ${w - 8},${h} ${w},${h - 8}" fill="#94A3B8"/>
+          <rect x="5" y="5" width="${w - 10}" height="10" rx="1" fill="#2B2B33"/>
+          ${[0, 1, 2, 3].map(i => `<circle cx="${11 + i * ((w - 22) / 3)}" cy="10" r="2.2" fill="#E2E8F0" stroke="#0F172A" stroke-width="0.6"/>`).join("")}
+          <circle cx="${w - 10}" cy="10" r="2.2" fill="#EF4444" class="lampada-casa"/>
+          <rect x="5" y="19" width="${w - 10}" height="${h - 24}" rx="1" fill="#D4AF37" stroke="#1A1A22" stroke-width="1" opacity="0.85"/>
+          <line x1="5" y1="${19 + (h - 24) / 2}" x2="${w - 5}" y2="${19 + (h - 24) / 2}" stroke="#78350F" stroke-width="1.2"/>
+        </g>
+      `;
+
+      const microfone = `
+        <g transform="translate(176 ${chaoY - 120})">
+          <line x1="0" y1="0" x2="-10" y2="-14" stroke="#64748B" stroke-width="3.2"/>
+          <rect x="-18" y="-26" width="12" height="16" rx="4" fill="#CBD5E1" stroke="#0F172A" stroke-width="1.2" transform="rotate(-36 -12 -18)"/>
+          <line x1="-18" y1="-22" x2="-6" y2="-22" stroke="#475569" stroke-width="1" transform="rotate(-36 -12 -18)"/>
+          <line x1="0" y1="0" x2="0" y2="126" stroke="#475569" stroke-width="3"/>
+          <ellipse cx="0" cy="126" rx="16" ry="4" fill="#1E293B" stroke="#0F172A" stroke-width="1.2"/>
+        </g>
+      `;
+
+      const spotlight = `
+        <g class="estudio-spotlight">
+          <line x1="150" y1="0" x2="150" y2="24" stroke="#475569" stroke-width="3.2"/>
+          <polygon points="134,24 166,24 172,36 128,36" fill="#DC2626" stroke="#1E1E24" stroke-width="1.2"/>
+          <ellipse cx="150" cy="36" rx="22" ry="6" fill="url(#${id}-lamp-spot)"/>
+          <polygon points="128,36 172,36 210,${chaoY + 12} 80,${chaoY + 12}" fill="url(#${id}-spotlight-beam)" class="cenario-feixe-luz"/>
+          <ellipse cx="145" cy="${chaoY + 16}" rx="65" ry="14" fill="#FEF08A" opacity="0.16"/>
+          <g class="sotao-motes">
+            <circle cx="152" cy="70" r="1.3" fill="#FEF08A" class="cenario-poeira-mote" style="animation-delay:0s"/>
+            <circle cx="138" cy="110" r="1.0" fill="#FEF08A" class="cenario-poeira-mote" style="animation-delay:1.2s"/>
+            <circle cx="165" cy="145" r="1.4" fill="#FEF08A" class="cenario-poeira-mote" style="animation-delay:0.6s"/>
+          </g>
+        </g>
+      `;
+
+      const vitrola = vitrolaVintageCasa(10, chaoY - 48);
+
+      return `
+        ${defs}
+        <rect width="${W}" height="${chaoY}" fill="#101014"/>
+        ${espuma}
+        <g transform="translate(0 ${chaoY})">
+          <rect width="${W}" height="64" fill="#1E1F26"/>
+          ${Array.from({ length: 9 }, (_, i) => `<line x1="${i * 40}" y1="0" x2="${i * 40 - 28}" y2="64" stroke="#2D2E38" stroke-width="1.4"/>`).join("")}
+        </g>
+        ${ampli(8, chaoY - 62, 72, 66)}
+        ${ampli(84, chaoY - 42, 58, 46)}
+        ${microfone}
+        ${spotlight}
+        ${vitrola}
+        ${c.leitor(18, chaoY - 136, 58)}
+        ${c.estante()}
+      `;
     }
   },
   {
     id: "biblioteca",
     nome: "Biblioteca secreta",
     libera: BIBLIOTECA_PAGINAS,
-    desc: `Abre quando você junta ${BIBLIOTECA_PAGINAS} páginas lidas. A estante gira e revela tudo.`,
+    desc: `Abre quando você junta ${BIBLIOTECA_PAGINAS} páginas lidas. Estantes de jacarandá e poltrona Chesterfield.`,
     opcoes: {
       poltrona: {
         nome: "Poltrona",
@@ -664,17 +1347,112 @@ const COMODOS = [
       }
     },
     desenho: c => {
-      const { W, chaoY, op } = c;
+      const { W, chaoY, op, id } = c;
+      const hora = horaDoCeu();
+      const corPoltrona = op.poltrona;
+
+      const defs = `
+        <defs>
+          <linearGradient id="${id}-claraboia-beam" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stop-color="#FFF8E7" stop-opacity="0.45"/>
+            <stop offset="50%" stop-color="#FFEAA7" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#FAD390" stop-opacity="0"/>
+          </linearGradient>
+          <radialGradient id="${id}-lampada-leitura" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFBEB" stop-opacity="0.75"/>
+            <stop offset="40%" stop-color="#FDE047" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#EAB308" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+      `;
+
       let prateleiras = "";
-      for (let y = 10, k = 0; y < chaoY - 40; y += 44, k++)
-        prateleiras += `<rect x="0" y="${y + 36}" width="${W}" height="6" fill="#4A2E1A"/>${lombadas(4, y, W - 8, 36, k * 5 + 1)}`;
-      return `<rect width="${W}" height="${chaoY}" fill="#2E1E12"/>${prateleiras}
-        <g transform="translate(232 10)"><path d="M0 0V${chaoY - 10}M30 0V${chaoY - 10}" stroke="#8C6A4A" stroke-width="3"/>${Array.from({ length: Math.floor((chaoY - 20) / 18) }, (_, i) => `<path d="M0 ${12 + i * 18}H30" stroke="#8C6A4A" stroke-width="2.4"/>`).join("")}</g>
-        <g transform="translate(0 ${chaoY})">${piso(W, 64, "#5A3A22", "#3A2414")}</g>
-        <ellipse cx="110" cy="${chaoY + 30}" rx="100" ry="16" fill="#7A1F22" stroke="#4A0F12"/><ellipse cx="110" cy="${chaoY + 30}" rx="82" ry="11" fill="none" stroke="#E8C24A" stroke-width="1" opacity=".6"/>
-        <g transform="translate(40 ${chaoY - 70})"><path d="M10 0Q60 -14 110 0V48H10Z" fill="${op.poltrona}" stroke="#141416" stroke-width="1.4"/>${[0, 1, 2, 3].map(i => `<circle cx="${28 + i * 22}" cy="14" r="1.6" fill="#141416" opacity=".5"/><circle cx="${38 + i * 22}" cy="28" r="1.6" fill="#141416" opacity=".5"/>`).join("")}<rect x="-6" y="34" width="132" height="34" rx="8" fill="${op.poltrona}" stroke="#141416" stroke-width="1.4"/><rect x="-12" y="22" width="22" height="46" rx="9" fill="${escurecer(op.poltrona, 0.8)}" stroke="#141416" stroke-width="1.4"/><rect x="110" y="22" width="22" height="46" rx="9" fill="${escurecer(op.poltrona, 0.8)}" stroke="#141416" stroke-width="1.4"/></g>
-        <g transform="translate(190 ${chaoY - 6})"><path d="M0 0V-40" stroke="#E8C24A" stroke-width="2"/><path d="M-12 -40H12L6 -56H-6Z" fill="#2F6A3A" stroke="#141416"/><ellipse cx="0" cy="0" rx="10" ry="3" fill="#E8C24A"/><path d="M-20 -24L0 -40L20 -24" fill="#FFF3C4" opacity=".2"/></g>
-        ${c.leitor(78, chaoY - 118, 60)}${c.estante()}`;
+      for (let y = 10, k = 0; y < chaoY - 40; y += 44, k++) {
+        prateleiras += `
+          <rect x="0" y="${y + 36}" width="${W}" height="7" rx="1" fill="#3D2411" stroke="#241407" stroke-width="1"/>
+          <line x1="0" y1="${y + 37}" x2="${W}" y2="${y + 37}" stroke="#7A4D28" stroke-width="0.8"/>
+          ${lombadas(4, y, W - 8, 36, k * 5 + 1)}
+        `;
+      }
+
+      const escada = `
+        <g class="biblioteca-escada" transform="translate(230 10)">
+          <line x1="-230" y1="4" x2="40" y2="4" stroke="#C59B27" stroke-width="2.6"/>
+          <circle cx="0" cy="4" r="3.5" fill="#D4AF37" stroke="#4A3405" stroke-width="0.8"/>
+          <circle cx="30" cy="4" r="3.5" fill="#D4AF37" stroke="#4A3405" stroke-width="0.8"/>
+          <line x1="0" y1="4" x2="0" y2="${chaoY - 10}" stroke="#5A3A1E" stroke-width="3.6"/>
+          <line x1="30" y1="4" x2="30" y2="${chaoY - 10}" stroke="#5A3A1E" stroke-width="3.6"/>
+          ${Array.from({ length: Math.floor((chaoY - 20) / 18) }, (_, i) => `<line x1="0" y1="${14 + i * 18}" x2="30" y2="${14 + i * 18}" stroke="#8C6A4A" stroke-width="2.8"/>`).join("")}
+        </g>
+      `;
+
+      const tapete = `
+        <g transform="translate(110 ${chaoY + 30})">
+          <ellipse cx="0" cy="0" rx="104" ry="17" fill="#58161A" stroke="#2F0A0D" stroke-width="1.4"/>
+          <ellipse cx="0" cy="0" rx="90" ry="13" fill="#D8C8A8" stroke="#B8A480" stroke-width="0.8"/>
+          <ellipse cx="0" cy="0" rx="78" ry="10" fill="#7A1F22"/>
+          <ellipse cx="0" cy="0" rx="64" ry="7" fill="none" stroke="#D4AF37" stroke-width="1" opacity="0.7"/>
+        </g>
+      `;
+
+      const poltrona = `
+        <g transform="translate(40 ${chaoY - 72})">
+          <path d="M10 0 Q60 -16 110 0 V50 H10 Z" fill="${corPoltrona}" stroke="#141416" stroke-width="1.6"/>
+          ${[0, 1, 2, 3]
+            .map(
+              i => `
+            <circle cx="${28 + i * 22}" cy="15" r="2.2" fill="#0F0F14" opacity="0.6"/>
+            <circle cx="${39 + i * 22}" cy="30" r="2.2" fill="#0F0F14" opacity="0.6"/>
+            <line x1="${28 + i * 22}" y1="15" x2="${39 + i * 22}" y2="30" stroke="#0F0F14" stroke-width="0.8" opacity="0.3"/>
+          `
+            )
+            .join("")}
+          <rect x="-6" y="34" width="134" height="34" rx="9" fill="${corPoltrona}" stroke="#141416" stroke-width="1.4"/>
+          <rect x="-12" y="22" width="22" height="46" rx="9" fill="${escurecer(corPoltrona, 0.75)}" stroke="#141416" stroke-width="1.4"/>
+          <rect x="112" y="22" width="22" height="46" rx="9" fill="${escurecer(corPoltrona, 0.75)}" stroke="#141416" stroke-width="1.4"/>
+        </g>
+      `;
+
+      const luminaria = `
+        <g transform="translate(192 ${chaoY - 6})">
+          <circle cx="0" cy="-48" r="28" fill="url(#${id}-lampada-leitura)" pointer-events="none"/>
+          <line x1="0" y1="0" x2="0" y2="-44" stroke="#C59B27" stroke-width="2.4"/>
+          <path d="M-14 -44 H14 L8 -60 H-8 Z" fill="#2F6A3A" stroke="#141416" stroke-width="1"/>
+          <ellipse cx="0" cy="0" rx="12" ry="3.5" fill="#8C6A3A" stroke="#4E3218" stroke-width="1"/>
+        </g>
+      `;
+
+      const claraboia = `
+        <g class="biblioteca-claraboia">
+          <polygon points="80,0 200,0 240,${chaoY + 12} 40,${chaoY + 12}" fill="url(#${id}-claraboia-beam)" class="cenario-feixe-luz"/>
+          <g class="sotao-motes">
+            <circle cx="120" cy="40" r="1.4" fill="#FEF08A" class="cenario-poeira-mote" style="animation-delay:0s"/>
+            <circle cx="160" cy="75" r="1.1" fill="#FEF08A" class="cenario-poeira-mote" style="animation-delay:1.5s"/>
+            <circle cx="105" cy="115" r="1.5" fill="#FEF08A" class="cenario-poeira-mote" style="animation-delay:0.8s"/>
+            <circle cx="175" cy="155" r="1.2" fill="#FEF08A" class="cenario-poeira-mote" style="animation-delay:2.3s"/>
+          </g>
+        </g>
+      `;
+
+      const feixe = claraboia;
+      const vitrola = vitrolaVintageCasa(10, chaoY - 48);
+      const rodape = rodapeVintage(W, chaoY, "#241407");
+
+      return `
+        ${defs}
+        <rect width="${W}" height="${chaoY}" fill="#241407"/>
+        ${prateleiras}
+        ${escada}
+        <g transform="translate(0 ${chaoY})">${piso(W, 64, "#4A2A14", "#2B1608")}</g>
+        ${rodape}
+        ${tapete}
+        ${poltrona}
+        ${luminaria}
+        ${vitrola}
+        ${c.leitor(78, chaoY - 118, 60)}
+        ${c.estante()}
+        ${feixe}
+      `;
     }
   }
 ];
