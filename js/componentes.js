@@ -4,7 +4,10 @@
 "use strict";
 
 /* ================= componentes ================= */
+let tarefasSelecionadas = new Set();
+
 function taskRow(x, { showDate = false } = {}) {
+  const isSelected = typeof tarefasSelecionadas !== "undefined" && tarefasSelecionadas && tarefasSelecionadas.has(x.id);
   const open = openTask === x.id,
     subDone = x.sub.filter(s => s.done).length;
   const meta = [];
@@ -33,8 +36,12 @@ function taskRow(x, { showDate = false } = {}) {
   if (flashback) {
     meta.push(`<span class="selo-flashback" title="Flashback: atrasada há mais de 7 dias">Flashback</span>`);
   }
-  return `<li class="a-${x.area} ${x.prio ? "pr" + x.prio : ""} ${x.done ? "done" : ""} ${atrasada ? "atrasada" : ""} ${flashback ? "flashback" : ""} ${fx.newId === x.id ? "is-new" : ""} ${fx.toggled === x.id && x.done ? "just-done" : ""}">
+  return `<li class="a-${x.area} ${x.prio ? "pr" + x.prio : ""} ${x.done ? "done" : ""} ${atrasada ? "atrasada" : ""} ${flashback ? "flashback" : ""} ${fx.newId === x.id ? "is-new" : ""} ${fx.toggled === x.id && x.done ? "just-done" : ""} ${isSelected ? "tarefa-selecionada" : ""}" data-task-id="${x.id}">
     <div class="item">
+      <label class="tarefa-sel-label" title="Selecionar para apagar" aria-label="Selecionar para apagar">
+        <input type="checkbox" class="tarefa-sel-chk" data-change="sel-tarefa" data-id="${x.id}" ${isSelected ? "checked" : ""}>
+        <span class="tarefa-sel-custom" aria-hidden="true"></span>
+      </label>
       <button class="check" data-act="toggle" data-id="${x.id}" aria-pressed="${!!x.done}" aria-label="Concluir ${esc(x.title)}">${ICON.check}</button>
       <div class="main clickable" data-act="open" data-id="${x.id}"><span class="title">${esc(x.title)}</span><span class="meta">${meta.join("<span>·</span>")}</span></div>
       ${calLink({ title: x.title, date: x.date, time: x.time, dur: 60, recur: RRULE[x.repeat] || "" })}

@@ -362,6 +362,7 @@ document.addEventListener("click", e => {
       if (selDay !== b.dataset.d) {
         selDay = b.dataset.d;
         openTask = null;
+        if (typeof tarefasSelecionadas !== "undefined" && tarefasSelecionadas) tarefasSelecionadas.clear();
         fx.enter = true;
         render();
       }

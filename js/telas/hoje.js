@@ -113,6 +113,7 @@ function viewHoje() {
       <div class="parsed" id="qparsed">${parsedPills(parseQuick(qp, selDay), qp)}</div>
       <div class="hint">Escreva do seu jeito: <code>revisar cálculo amanhã 19h #estudo !1</code> · <code>academia toda segunda 7h</code></div>
     </form>
+    ${typeof barraSelecaoTarefasHTML === "function" ? barraSelecaoTarefasHTML(tasks, selDay) : ""}
     ${listHtml ? `<ul class="list">${listHtml}</ul>` : fresh ? `<div class="empty"><strong>Seu dia começa aqui.</strong>Escreva uma tarefa acima. Data, horário, área (#estudo, #dieta, #social) e prioridade (!1, !2, !3) são entendidos sozinhos. O ícone azul cria o lembrete no Google Agenda, que aparece no Samsung se a conta Google estiver sincronizada.<button class="btn small" data-act="sample">Ver com exemplos</button></div>` : `<div class="empty">${isToday ? textoMundo("vazioHoje", "Nada marcado para hoje.") : "Nada marcado para este dia."}</div>`}
   </section>
   ${isToday && typeof organizarHojeHTML === "function" ? organizarHojeHTML() : ""}
@@ -164,3 +165,120 @@ ACOES_EXTRAS["poema-do-dia"] = () => {
   campo.style.height = campo.scrollHeight + "px";
   react("happy", textoMundo("poemaFala", "Escrevi um poema pra hoje. Pode mexer, ele é seu."), 2600);
 };
+
+/* Barra de Seleção e Exclusão em Lote de Tarefas */
+function barraSelecaoTarefasHTML(tasks, dia) {
+  if (!tasks || !tasks.length) return "";
+  const feitas = tasks.filter(x => x.done).length;
+  const pendentes = tasks.filter(x => !x.done).length;
+  const selCount = tasks.filter(x => typeof tarefasSelecionadas !== "undefined" && tarefasSelecionadas && tarefasSelecionadas.has(x.id)).length;
+  const todasSel = tasks.length > 0 && selCount === tasks.length;
+
+  if (selCount > 0) {
+    return `
+    <div class="tarefas-lote-bar ativa">
+      <div class="lote-info">
+        <label class="tarefa-sel-label" title="Alternar todas as tarefas" aria-label="Alternar todas as tarefas">
+          <input type="checkbox" class="tarefa-sel-chk" data-change="toggle-todas-tarefas" ${todasSel ? "checked" : ""}>
+          <span class="tarefa-sel-custom" aria-hidden="true"></span>
+        </label>
+        <span class="lote-texto"><b>${selCount}</b> de ${tasks.length} selecionada${selCount > 1 ? "s" : ""}</span>
+      </div>
+      <div class="lote-botoes">
+        <button type="button" class="btn small danger" data-act="apagar-tarefas-selecionadas" title="Apagar tarefas selecionadas">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+          <span>Apagar selecionadas</span>
+        </button>
+        <button type="button" class="btn small ghost" data-act="desmarcar-todas-tarefas">Cancelar</button>
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div class="tarefas-lote-bar">
+    <div class="lote-info">
+      <label class="tarefa-sel-label" title="Selecionar todas para apagar" aria-label="Selecionar todas para apagar">
+        <input type="checkbox" class="tarefa-sel-chk" data-change="toggle-todas-tarefas">
+        <span class="tarefa-sel-custom" aria-hidden="true"></span>
+      </label>
+      <span class="lote-hint">Selecionar para apagar:</span>
+    </div>
+    <div class="lote-botoes">
+      <button type="button" class="btn-lote-pill" data-act="sel-todas-tarefas">Todas (${tasks.length})</button>
+      ${feitas > 0 ? `<button type="button" class="btn-lote-pill" data-act="sel-feitas-tarefas">Feitas (${feitas})</button>` : ""}
+      ${pendentes > 0 ? `<button type="button" class="btn-lote-pill" data-act="sel-pendentes-tarefas">Pendentes (${pendentes})</button>` : ""}
+    </div>
+  </div>`;
+}
+
+if (typeof MUDANCAS_EXTRAS !== "undefined") {
+  MUDANCAS_EXTRAS["sel-tarefa"] = el => {
+    const id = el.dataset.id;
+    if (!id || typeof tarefasSelecionadas === "undefined") return;
+    if (el.checked) tarefasSelecionadas.add(id);
+    else tarefasSelecionadas.delete(id);
+    render();
+  };
+
+  MUDANCAS_EXTRAS["toggle-todas-tarefas"] = el => {
+    if (typeof tarefasSelecionadas === "undefined") return;
+    const t = S.tasks.filter(x => x.date === selDay);
+    if (el.checked) {
+      t.forEach(x => tarefasSelecionadas.add(x.id));
+    } else {
+      t.forEach(x => tarefasSelecionadas.delete(x.id));
+    }
+    render();
+  };
+}
+
+if (typeof ACOES_EXTRAS !== "undefined") {
+  ACOES_EXTRAS["sel-todas-tarefas"] = () => {
+    if (typeof tarefasSelecionadas === "undefined") return;
+    const t = S.tasks.filter(x => x.date === selDay);
+    t.forEach(x => tarefasSelecionadas.add(x.id));
+    render();
+  };
+
+  ACOES_EXTRAS["sel-feitas-tarefas"] = () => {
+    if (typeof tarefasSelecionadas === "undefined") return;
+    tarefasSelecionadas.clear();
+    const feitas = S.tasks.filter(x => x.date === selDay && x.done);
+    feitas.forEach(x => tarefasSelecionadas.add(x.id));
+    render();
+  };
+
+  ACOES_EXTRAS["sel-pendentes-tarefas"] = () => {
+    if (typeof tarefasSelecionadas === "undefined") return;
+    tarefasSelecionadas.clear();
+    const pend = S.tasks.filter(x => x.date === selDay && !x.done);
+    pend.forEach(x => tarefasSelecionadas.add(x.id));
+    render();
+  };
+
+  ACOES_EXTRAS["desmarcar-todas-tarefas"] = () => {
+    if (typeof tarefasSelecionadas === "undefined") return;
+    tarefasSelecionadas.clear();
+    render();
+  };
+
+  ACOES_EXTRAS["apagar-tarefas-selecionadas"] = () => {
+    if (typeof tarefasSelecionadas === "undefined" || !tarefasSelecionadas.size) return;
+    const idsParaApagar = new Set(tarefasSelecionadas);
+    const qtd = idsParaApagar.size;
+    snapUndo();
+
+    S.tasks = S.tasks.filter(t => !idsParaApagar.has(t.id));
+
+    if (openTask && idsParaApagar.has(openTask)) {
+      openTask = null;
+    }
+
+    tarefasSelecionadas.clear();
+    commit();
+    toast(`${qtd} ${qtd === 1 ? "tarefa apagada" : "tarefas apagadas"}`, true, "worried");
+    if (typeof react === "function") {
+      react("worried", `${qtd} ${qtd === 1 ? "tarefa foi apagada" : "tarefas foram apagadas"}. Se foi sem querer, dá pra desfazer ali embaixo.`, 2800);
+    }
+  };
+}
