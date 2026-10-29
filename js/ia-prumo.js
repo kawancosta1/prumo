@@ -10,7 +10,7 @@
 "use strict";
 
 const IA_CONFIG_PADRAO = {
-  provedor: "gemini", // "gemini" | "groq" | "openai" | "autonomo"
+  provedor: "local", // "local" (0ms) | "groq" | "gemini" | "autonomo" | "openai"
   chave: "",
   modelo: "gemini-1.5-flash",
   temperatura: 0.7
@@ -27,13 +27,17 @@ function obterConfigIA() {
     if (salva && !S.iaConfig.chave) S.iaConfig.chave = salva;
     const provSalvo = localStorage.getItem("prumo_ia_provider");
     if (provSalvo) S.iaConfig.provedor = provSalvo;
+    // Se não há chave configurada e o provedor estava apontando para nuvem com chave, padronizar para local ultra-rápido
+    if (!S.iaConfig.chave && (!S.iaConfig.provedor || S.iaConfig.provedor === "gemini" || S.iaConfig.provedor === "groq")) {
+      S.iaConfig.provedor = "local";
+    }
   } catch (e) {}
   return S.iaConfig;
 }
 
 function salvarConfigIA(provedor, chave) {
   const cfg = obterConfigIA();
-  cfg.provedor = provedor || "gemini";
+  cfg.provedor = provedor || "local";
   cfg.chave = (chave || "").trim();
   try {
     localStorage.setItem("prumo_ia_key", cfg.chave);
@@ -189,6 +193,12 @@ function separarPensamentoECorpo(raw) {
 /* ---------- Chamada a LLM em Nuvem (Gemini, Groq, OpenAI) ---------- */
 async function chamarProvedorLLM(promptUsuario, mensagensAnteriores = []) {
   const cfg = obterConfigIA();
+
+  // 0. Modo Local Instantâneo (ICMC-USP) - Resposta imediata em 0ms sem latência de rede
+  if (cfg.provedor === "local" || !cfg.provedor) {
+    return gerarRespostaAutonomaIA(promptUsuario);
+  }
+
   const persona = obterPersonaAtual();
   const contexto = obterContextoUsuarioPrumo();
 
@@ -210,124 +220,143 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
 - Use os dados reais do usuário (cite tarefas reais ou hidratação).
 - NUNCA use tags HTML como <b> ou <br> — use apenas Markdown padrão (**negrito**, *itálico*).`;
 
-  // 1. Google Gemini 1.5 Flash (Padrão e Recomendado)
+  // 1. Google Gemini 1.5 Flash (Oficial Google com chave)
   if (cfg.provedor === "gemini" && cfg.chave) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(cfg.chave)}`;
-    const contents = [];
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(cfg.chave)}`;
+      const contents = [];
 
-    // Formatação de histórico estritamente compatível com o Gemini:
-    // O Gemini exige que a lista comece com role 'user' e alterne entre 'user' e 'model'.
-    const rawHist = (mensagensAnteriores || []).slice(-6);
-    rawHist.forEach(m => {
-      const role = m.remetente === "user" ? "user" : "model";
-      if (contents.length > 0 && contents[contents.length - 1].role === role) {
-        contents[contents.length - 1].parts[0].text += "\n" + (m.texto || "");
-      } else {
-        contents.push({ role, parts: [{ text: m.texto || "" }] });
-      }
-    });
-    while (contents.length > 0 && contents[0].role !== "user") {
-      contents.shift();
-    }
-    contents.push({
-      role: "user",
-      parts: [{ text: promptUsuario }]
-    });
-
-    const resp = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents,
-        generationConfig: {
-          temperature: cfg.temperatura || 0.7,
-          maxOutputTokens: 1000
+      const rawHist = (mensagensAnteriores || []).slice(-6);
+      rawHist.forEach(m => {
+        const role = m.remetente === "user" ? "user" : "model";
+        if (contents.length > 0 && contents[contents.length - 1].role === role) {
+          contents[contents.length - 1].parts[0].text += "\n" + (m.texto || "");
+        } else {
+          contents.push({ role, parts: [{ text: m.texto || "" }] });
         }
-      })
-    });
-
-    if (!resp.ok) {
-      const err = await resp.text();
-      throw new Error(`Erro na API Gemini (${resp.status}): ${err}`);
-    }
-    const data = await resp.json();
-    const textoResp = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (textoResp) return separarPensamentoECorpo(textoResp);
-  }
-
-  // 2. Groq ou OpenAI (formato OpenAI Chat Completions)
-  if ((cfg.provedor === "groq" || cfg.provedor === "openai") && cfg.chave) {
-    const endpoint =
-      cfg.provedor === "groq"
-        ? "https://api.groq.com/openai/v1/chat/completions"
-        : "https://api.openai.com/v1/chat/completions";
-    const modelo = cfg.provedor === "groq" ? "llama-3.3-70b-versatile" : "gpt-4o-mini";
-
-    const messages = [{ role: "system", content: systemInstruction }];
-    (mensagensAnteriores || []).slice(-6).forEach(m => {
-      messages.push({
-        role: m.remetente === "user" ? "user" : "assistant",
-        content: m.texto
       });
-    });
-    messages.push({ role: "user", content: promptUsuario });
-
-    const resp = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cfg.chave}`
-      },
-      body: JSON.stringify({
-        model: modelo,
-        messages,
-        temperature: cfg.temperatura || 0.7,
-        max_tokens: 1000
-      })
-    });
-
-    if (!resp.ok) {
-      const err = await resp.text();
-      throw new Error(`Erro na API (${resp.status}): ${err}`);
-    }
-    const data = await resp.json();
-    const textoResp = data?.choices?.[0]?.message?.content;
-    if (textoResp) return separarPensamentoECorpo(textoResp);
-  }
-
-  // 3. IA Generativa Real Gratuita Global (Pollinations AI - Llama 3.3 / GPT-4o-mini sem necessidade de chave)
-  try {
-    const messages = [{ role: "system", content: systemInstruction }];
-    (mensagensAnteriores || []).slice(-6).forEach(m => {
-      messages.push({
-        role: m.remetente === "user" ? "user" : "assistant",
-        content: m.texto
-      });
-    });
-    messages.push({ role: "user", content: promptUsuario });
-
-    const resp = await fetch("https://text.pollinations.ai/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages,
-        model: "openai",
-        temperature: cfg.temperatura || 0.7
-      })
-    });
-
-    if (resp.ok) {
-      const textoResp = await resp.text();
-      if (textoResp && textoResp.trim().length > 0) {
-        return separarPensamentoECorpo(textoResp);
+      while (contents.length > 0 && contents[0].role !== "user") {
+        contents.shift();
       }
+      contents.push({
+        role: "user",
+        parts: [{ text: promptUsuario }]
+      });
+
+      const controller = new AbortController();
+      const timerId = setTimeout(() => controller.abort(), 4000);
+
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemInstruction }] },
+          contents,
+          generationConfig: {
+            temperature: cfg.temperatura || 0.7,
+            maxOutputTokens: 1000
+          }
+        })
+      });
+      clearTimeout(timerId);
+
+      if (resp.ok) {
+        const data = await resp.json();
+        const textoResp = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (textoResp) return separarPensamentoECorpo(textoResp);
+      }
+    } catch (err) {
+      console.warn("[IA Prumo] Falha ou timeout no Gemini, usando motor local:", err);
     }
-  } catch (err) {
-    console.warn("[IA Prumo] Provedor gratuito indisponível, usando motor autônomo:", err);
   }
 
-  // 4. Fallback autônomo neuro-contextual offline com raciocínio integrado
+  // 2. Groq LPU (Ultra-rápido ~0.3s) ou OpenAI
+  if ((cfg.provedor === "groq" || cfg.provedor === "openai") && cfg.chave) {
+    try {
+      const endpoint =
+        cfg.provedor === "groq"
+          ? "https://api.groq.com/openai/v1/chat/completions"
+          : "https://api.openai.com/v1/chat/completions";
+      const modelo = cfg.provedor === "groq" ? "llama-3.3-70b-versatile" : "gpt-4o-mini";
+
+      const messages = [{ role: "system", content: systemInstruction }];
+      (mensagensAnteriores || []).slice(-6).forEach(m => {
+        messages.push({
+          role: m.remetente === "user" ? "user" : "assistant",
+          content: m.texto
+        });
+      });
+      messages.push({ role: "user", content: promptUsuario });
+
+      const controller = new AbortController();
+      const timerId = setTimeout(() => controller.abort(), 4000);
+
+      const resp = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cfg.chave}`
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: modelo,
+          messages,
+          temperature: cfg.temperatura || 0.7,
+          max_tokens: 1000
+        })
+      });
+      clearTimeout(timerId);
+
+      if (resp.ok) {
+        const data = await resp.json();
+        const textoResp = data?.choices?.[0]?.message?.content;
+        if (textoResp) return separarPensamentoECorpo(textoResp);
+      }
+    } catch (err) {
+      console.warn("[IA Prumo] Falha ou timeout no Groq/OpenAI, usando motor local:", err);
+    }
+  }
+
+  // 3. Nuvem Gratuita Global Sem Chave (Pollinations com timeout rigoroso de 3.5s)
+  if (cfg.provedor === "autonomo" || (!cfg.chave && cfg.provedor !== "local")) {
+    try {
+      const messages = [{ role: "system", content: systemInstruction }];
+      (mensagensAnteriores || []).slice(-6).forEach(m => {
+        messages.push({
+          role: m.remetente === "user" ? "user" : "assistant",
+          content: m.texto
+        });
+      });
+      messages.push({ role: "user", content: promptUsuario });
+
+      const controller = new AbortController();
+      const timerId = setTimeout(() => controller.abort(), 3500);
+
+      const resp = await fetch("https://text.pollinations.ai/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          messages,
+          model: "openai",
+          temperature: cfg.temperatura || 0.7
+        })
+      });
+      clearTimeout(timerId);
+
+      if (resp.ok) {
+        const textoResp = await resp.text();
+        if (textoResp && textoResp.trim().length > 0) {
+          return separarPensamentoECorpo(textoResp);
+        }
+      }
+    } catch (err) {
+      console.warn("[IA Prumo] Provedor gratuito em nuvem demorou ou falhou, ativando motor local instantâneo:", err);
+    }
+  }
+
+  // 4. Fallback autônomo neuro-contextual offline com raciocínio integrado (Instantâneo)
   return gerarRespostaAutonomaIA(promptUsuario);
 }
 
@@ -335,19 +364,30 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
 async function chamarLLMModoJSON(promptSistema, promptUsuario) {
   const cfg = obterConfigIA();
 
+  // 0. Modo Local Instantâneo (ICMC-USP) - Resposta imediata em 1ms sem latência de rede
+  if (cfg.provedor === "local" || !cfg.provedor) {
+    return null; // Força sintetizador local imediato
+  }
+
   // 1. Google Gemini (se chave configurada)
   if (cfg.provedor === "gemini" && cfg.chave) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(cfg.chave)}`;
+      const controller = new AbortController();
+      const timerId = setTimeout(() => controller.abort(), 3500);
+
       const resp = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: promptSistema }] },
           contents: [{ role: "user", parts: [{ text: promptUsuario + "\nIMPORTANTE: Responda EXCLUSIVAMENTE em formato JSON puro, sem formatação markdown ou crases ao redor." }] }],
           generationConfig: { responseMimeType: "application/json", temperature: 0.5 }
         })
       });
+      clearTimeout(timerId);
+
       if (resp.ok) {
         const data = await resp.json();
         const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -363,9 +403,13 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
     try {
       const endpoint = cfg.provedor === "groq" ? "https://api.groq.com/openai/v1/chat/completions" : "https://api.openai.com/v1/chat/completions";
       const modelo = cfg.provedor === "groq" ? "llama-3.3-70b-versatile" : "gpt-4o-mini";
+      const controller = new AbortController();
+      const timerId = setTimeout(() => controller.abort(), 3500);
+
       const resp = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${cfg.chave}` },
+        signal: controller.signal,
         body: JSON.stringify({
           model: modelo,
           response_format: { type: "json_object" },
@@ -376,6 +420,8 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
           temperature: 0.5
         })
       });
+      clearTimeout(timerId);
+
       if (resp.ok) {
         const data = await resp.json();
         const txt = data?.choices?.[0]?.message?.content;
@@ -386,30 +432,38 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
     }
   }
 
-  // 3. Provedor Gratuito Real Global (Pollinations AI com jsonMode nativo)
-  try {
-    const resp = await fetch("https://text.pollinations.ai/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: [
-          { role: "system", content: promptSistema },
-          { role: "user", content: promptUsuario + "\nResponda EXCLUSIVAMENTE em formato JSON puro, sem crases de markdown." }
-        ],
-        model: "openai",
-        jsonMode: true,
-        temperature: 0.5
-      })
-    });
-    if (resp.ok) {
-      const txt = await resp.text();
-      if (txt) {
-        const jsonLimpo = txt.replace(/```json/g, "").replace(/```/g, "").trim();
-        return JSON.parse(jsonLimpo);
+  // 3. Provedor Gratuito Real Global (Pollinations com timeout de segurança de 3.5s)
+  if (cfg.provedor === "autonomo" || (!cfg.chave && cfg.provedor !== "local")) {
+    try {
+      const controller = new AbortController();
+      const timerId = setTimeout(() => controller.abort(), 3500);
+
+      const resp = await fetch("https://text.pollinations.ai/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: promptSistema },
+            { role: "user", content: promptUsuario + "\nResponda EXCLUSIVAMENTE em formato JSON puro, sem crases de markdown." }
+          ],
+          model: "openai",
+          jsonMode: true,
+          temperature: 0.5
+        })
+      });
+      clearTimeout(timerId);
+
+      if (resp.ok) {
+        const txt = await resp.text();
+        if (txt) {
+          const jsonLimpo = txt.replace(/```json/g, "").replace(/```/g, "").trim();
+          return JSON.parse(jsonLimpo);
+        }
       }
+    } catch (err) {
+      console.warn("[IA Prumo] Chamada JSON via Pollinations falhou ou demorou:", err);
     }
-  } catch (err) {
-    console.warn("[IA Prumo] Chamada JSON via Pollinations falhou:", err);
   }
 
   return null;
@@ -732,6 +786,26 @@ function reiniciarChatIA() {
   }
 }
 
+function alternarVelocidadeIA() {
+  const cfg = obterConfigIA();
+  if (cfg.provedor === "local") {
+    const destino = cfg.chave ? (cfg.provedorAnterior || "groq") : "autonomo";
+    salvarConfigIA(destino, cfg.chave);
+    if (typeof toast === "function") {
+      toast(`🌐 Modo Nuvem ativado (${destino.toUpperCase()})!`, false, "happy");
+    }
+  } else {
+    cfg.provedorAnterior = cfg.provedor;
+    salvarConfigIA("local", cfg.chave);
+    if (typeof toast === "function") {
+      toast("⚡ Modo Instantâneo ativado! Respostas imediatas em 0ms.", false, "happy");
+    }
+  }
+  const inp = document.getElementById("ia-input-texto");
+  const msgPendente = inp ? inp.value : "";
+  abrirChatPrumiIA(msgPendente);
+}
+
 function abrirChatPrumiIA(mensagemInicial = "") {
   const modalAntigo = document.getElementById("modal-chat-ia");
   if (modalAntigo) modalAntigo.remove();
@@ -740,14 +814,17 @@ function abrirChatPrumiIA(mensagemInicial = "") {
   const persona = obterPersonaAtual();
   const hist = obterHistoricoChatIA();
 
+  const isInstantaneo = cfg.provedor === "local" || !cfg.provedor;
   const providerLabel =
-    cfg.chave
-      ? cfg.provedor === "gemini"
-        ? "Gemini 1.5 Flash"
-        : cfg.provedor === "groq"
-          ? "Groq Llama 3"
-          : "OpenAI GPT-4o"
-      : "IA Real (Llama 3.3 / GPT-4o)";
+    isInstantaneo
+      ? "⚡ Local Instantâneo (0ms)"
+      : cfg.chave
+        ? cfg.provedor === "gemini"
+          ? "Gemini 1.5 Flash"
+          : cfg.provedor === "groq"
+            ? "Groq Llama 3 Turbo"
+            : "OpenAI GPT-4o"
+        : "Nuvem Gratuita";
 
   const modalHtml = `
   <div id="modal-chat-ia" class="modal-ia-overlay">
@@ -760,11 +837,12 @@ function abrirChatPrumiIA(mensagemInicial = "") {
           </div>
           <div class="ia-header-titles">
             <h3>${esc(persona.titulo)}</h3>
-            <p><span class="ia-engine-badge">⚡ ${esc(providerLabel)}</span> • Coach com Raciocínio</p>
+            <p><span class="ia-engine-badge" data-act="ia-alternar-velocidade" style="cursor:pointer;" title="Clique para alternar entre Modo Instantâneo (0ms) e Nuvem">${esc(providerLabel)}</span> • Coach com Raciocínio</p>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button class="ia-header-action-btn" data-act="limpar-chat-ia" title="Reiniciar conversa com nova reflexão">🔄 Reiniciar</button>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button class="ia-header-action-btn" data-act="ia-alternar-velocidade" title="Alternar velocidade">${isInstantaneo ? "⚡ 0ms (Local)" : "🌐 Nuvem"}</button>
+          <button class="ia-header-action-btn" data-act="limpar-chat-ia" title="Reiniciar conversa com nova reflexão">🔄</button>
           <button class="ia-close-btn" data-act="fechar-chat-ia" aria-label="Fechar">&times;</button>
         </div>
       </div>
@@ -2154,17 +2232,18 @@ function iaAjustesHTML() {
           <span class="note">Escolha o motor que alimenta as conversas com o Coach e o Mascote.</span>
         </div>
         <select id="set-ia-provedor" class="ia-provider-select">
-          <option value="autonomo" ${cfg.provedor === "autonomo" ? "selected" : ""}>IA Real Gratuita Global (Llama 3.3 / GPT-4o - Sem Chave)</option>
-          <option value="gemini" ${cfg.provedor === "gemini" ? "selected" : ""}>Google Gemini 1.5 Flash (Chave Própria)</option>
-          <option value="groq" ${cfg.provedor === "groq" ? "selected" : ""}>Groq Llama 3.3 Turbo (Chave Própria)</option>
-          <option value="openai" ${cfg.provedor === "openai" ? "selected" : ""}>OpenAI ChatGPT GPT-4o (Chave Própria)</option>
+          <option value="local" ${cfg.provedor === "local" ? "selected" : ""}>⚡ Motor Local Instantâneo (ICMC-USP - 0ms / Sem Espera)</option>
+          <option value="groq" ${cfg.provedor === "groq" ? "selected" : ""}>🚀 Groq Llama 3.3 Turbo (Nuvem Mais Rápida do Mundo - 0.3s)</option>
+          <option value="gemini" ${cfg.provedor === "gemini" ? "selected" : ""}>⚡ Google Gemini 1.5 Flash (Nuvem Oficial Google - ~0.8s)</option>
+          <option value="autonomo" ${cfg.provedor === "autonomo" ? "selected" : ""}>🌐 Nuvem Gratuita Sem Chave (Pollinations - Llama 3.3 / GPT-4o)</option>
+          <option value="openai" ${cfg.provedor === "openai" ? "selected" : ""}>🧠 OpenAI ChatGPT GPT-4o (Chave Própria)</option>
         </select>
       </div>
 
-      <div class="setrow" id="ia-row-chave" style="${cfg.provedor === "autonomo" ? "display:none;" : ""}">
+      <div class="setrow" id="ia-row-chave" style="${(cfg.provedor === "autonomo" || cfg.provedor === "local") ? "display:none;" : ""}">
         <div class="lbl">
           <b>Chave de API (BYOK)</b>
-          <span class="note">Sua chave fica gravada apenas no seu dispositivo. <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:#3b82f6;text-decoration:underline;">Clique aqui para obter uma chave grátis no Google AI Studio</a>.</span>
+          <span class="note">Sua chave fica gravada apenas no seu dispositivo. <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:#3b82f6;text-decoration:underline;">Groq (Super rápida grátis)</a> ou <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:#3b82f6;text-decoration:underline;">Google AI Studio</a>.</span>
         </div>
         <input type="password" id="set-ia-chave" value="${esc(cfg.chave)}" placeholder="Cole sua chave aqui..." style="width:200px;" autocomplete="off" />
       </div>
@@ -2172,7 +2251,7 @@ function iaAjustesHTML() {
       <div class="setrow">
         <div class="lbl">
           <b>Status & Teste</b>
-          <span class="note" id="ia-status-conexao">${cfg.chave ? "Chave configurada. Teste abaixo." : "Conectado à IA Generativa Real Gratuita. Zero custo."}</span>
+          <span class="note" id="ia-status-conexao">${cfg.provedor === "local" ? "⚡ Modo Local Instantâneo ativado. Respostas imediatas em 0ms, zero tokens." : cfg.chave ? "Chave configurada. Teste abaixo." : "Conectado à IA Nuvem Gratuita."}</span>
         </div>
         <div style="display:flex;gap:8px;">
           <button type="button" class="btn small" id="ia-btn-testar-conexao" data-act="ia-testar-conexao">Testar Conexão</button>
@@ -2186,11 +2265,14 @@ function iaAjustesHTML() {
 function atualizarProvedorIA(val) {
   const rowChave = document.getElementById("ia-row-chave");
   if (rowChave) {
-    rowChave.style.display = val === "autonomo" ? "none" : "";
+    rowChave.style.display = (val === "autonomo" || val === "local") ? "none" : "";
   }
   const inpChave = document.getElementById("set-ia-chave");
   salvarConfigIA(val, inpChave ? inpChave.value : "");
-  if (typeof toast === "function") toast(`Provedor alterado para ${val}!`, false, "happy");
+  if (typeof toast === "function") {
+    const nomeProv = val === "local" ? "⚡ Motor Local Instantâneo (0ms)" : val;
+    toast(`Provedor alterado para ${nomeProv}!`, false, "happy");
+  }
 }
 
 function atualizarChaveIA(val) {
@@ -2216,6 +2298,7 @@ document.addEventListener("DOMContentLoaded", () => {
 if (typeof ACOES_EXTRAS !== "undefined") {
   ACOES_EXTRAS["abrir-chat-ia"] = () => abrirChatPrumiIA();
   ACOES_EXTRAS["fechar-chat-ia"] = () => fecharChatPrumiIA();
+  ACOES_EXTRAS["ia-alternar-velocidade"] = () => alternarVelocidadeIA();
   ACOES_EXTRAS["abrir-desdobrador-ia"] = () => abrirDesdobradorMetasIA();
   ACOES_EXTRAS["fechar-desdobrador-ia"] = () => fecharDesdobradorMetasIA();
   ACOES_EXTRAS["ia-msg-rapida"] = b => enviarMensagemRapidaIA(b ? b.dataset.msg : "");
@@ -2255,6 +2338,14 @@ document.addEventListener("click", e => {
   if (btnChat) {
     e.preventDefault();
     abrirChatPrumiIA();
+    return;
+  }
+
+  // 1.1 Alternar velocidade IA (Instantâneo / Nuvem)
+  const btnVel = e.target.closest("[data-act='ia-alternar-velocidade']");
+  if (btnVel) {
+    e.preventDefault();
+    alternarVelocidadeIA();
     return;
   }
 
@@ -2517,6 +2608,7 @@ if (typeof window !== "undefined") {
   window.executarDesdobramentoMetaIA = executarDesdobramentoMetaIA;
   window.preencherEGerarMetaIA = preencherEGerarMetaIA;
   window.reiniciarChatIA = reiniciarChatIA;
+  window.alternarVelocidadeIA = alternarVelocidadeIA;
   window.importarPlanoGeradoPrumo = importarPlanoGeradoPrumo;
   window.testarConexaoIA = testarConexaoIA;
   window.iaAjustesHTML = iaAjustesHTML;
