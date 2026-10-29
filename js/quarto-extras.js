@@ -1104,9 +1104,13 @@ function tocarMusicaQuarto(tipo) {
   musicaQuarto = { tipo, parar: () => ((vivo = false), chiado.parar()) };
 }
 ACOES_EXTRAS["movel-tocar"] = (b, id) => {
-  if (id === "vitrola") {
+  if (id === "vitrola" || id === "radio") {
     if (typeof alternarVitrola1930 === "function") {
       alternarVitrola1930();
+      return;
+    }
+    if (typeof alternarMusicaPrumo === "function") {
+      alternarMusicaPrumo();
       return;
     }
   }

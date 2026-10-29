@@ -333,6 +333,20 @@
     if (agora - _ultimoCliqueAsmr < 300) return;
     _ultimoCliqueAsmr = agora;
 
+    if (typeof window.obterEstadoMusicaPrumo === "function") {
+      const estado = window.obterEstadoMusicaPrumo();
+      if (estado.tocando) {
+        if (typeof window.abrirPlayerMusica === "function") {
+          window.abrirPlayerMusica();
+          return;
+        }
+        window.pararMusicaPrumo();
+      } else {
+        window.tocarMusicaPrumo(0);
+      }
+      return;
+    }
+
     if (_somAsmrAtivo === "vinil") {
       pararAsmrVintage();
       if (typeof toast === "function") toast("📻 Vitrola 1930 desligada.", false, "sleepy");
@@ -489,37 +503,42 @@
   }
 
   function renderVitrolaEstudoHTML() {
-    const nomes = {
-      vinil: "Vitrola 1930",
-      chuva: "Chuva",
-      lareira: "Lareira",
-      binaural: "Alfa 10Hz"
-    };
-    const ativo = _somAsmrAtivo;
-    const nomeAtual = ativo ? nomes[ativo] : "";
+    let estadoMusica = null;
+    if (typeof window.obterEstadoMusicaPrumo === "function") {
+      estadoMusica = window.obterEstadoMusicaPrumo();
+    }
+    const tocandoMusica = estadoMusica && estadoMusica.tocando;
+    const ativo = tocandoMusica ? estadoMusica.faixa.id : _somAsmrAtivo;
+    const nomeAtual = tocandoMusica
+      ? `${estadoMusica.faixa.icone} ${estadoMusica.faixa.nome} (${estadoMusica.faixa.estilo})`
+      : (_somAsmrAtivo || "");
 
     return `
       <div class="vitrola-foco-card">
         <div class="vitrola-foco-cena">
-          <div class="vitrola-estudo-palco" data-act="vitrola-tocar" title="Toque para ligar/pausar a Vitrola 1930">
+          <div class="vitrola-estudo-palco" data-act="vitrola-tocar" title="Toque para ouvir música ou abrir o player">
             <svg class="vitrola-estudo-svg" viewBox="0 0 52 48" width="64" height="58">
-              ${desenharVitrolaSVG({ tocando: ativo === "vinil", w: 52, h: 48, interativo: false })}
+              ${desenharVitrolaSVG({ tocando: !!(tocandoMusica || ativo === "vinil"), w: 52, h: 48, interativo: false })}
             </svg>
           </div>
           <div class="vitrola-foco-info">
-            <div class="vitrola-foco-titulo">
-              <span class="badge-vitrola">1930</span>
-              <strong>Vitrola Vintage &amp; Paisagens Sonoras</strong>
+            <div class="vitrola-foco-titulo" style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <span class="badge-vitrola">1930</span>
+                <strong>Vitrola Lo-Fi &amp; Músicas de Foco</strong>
+              </div>
+              <button class="chipbtn" data-act="abrir-player-musica" style="font-size:11.5px;padding:2px 8px;">🎵 Player</button>
             </div>
             <div class="vitrola-foco-sub">
-              ${ativo ? `<span class="ponto-verde"></span> Tocando: <b>${nomeAtual}</b>` : "Toque na Vitrola para focar com som analógico"}
+              ${(tocandoMusica || ativo) ? `<span class="ponto-verde"></span> Tocando: <b>${nomeAtual}</b>` : "Toque na Vitrola para focar ouvindo música lo-fi"}
             </div>
             <div class="vitrola-foco-botoes">
-              <button class="chipbtn ${ativo === 'vinil' ? 'ativo' : ''}" data-act="asmr-tocar" data-tipo="vinil">📻 Vinil 1930</button>
+              <button class="chipbtn ${ativo === 'lofi-cafe' ? 'ativo' : ''}" data-act="selecionar-faixa" data-idx="0">☕ Lo-Fi Café</button>
+              <button class="chipbtn ${ativo === 'piano-noturno' ? 'ativo' : ''}" data-act="selecionar-faixa" data-idx="1">🎹 Piano</button>
+              <button class="chipbtn ${ativo === 'jazz-vintage' ? 'ativo' : ''}" data-act="selecionar-faixa" data-idx="2">🎷 Jazz 1930</button>
+              <button class="chipbtn ${ativo === 'synth-foco' ? 'ativo' : ''}" data-act="selecionar-faixa" data-idx="3">🌌 Synth</button>
               <button class="chipbtn ${ativo === 'chuva' ? 'ativo' : ''}" data-act="asmr-tocar" data-tipo="chuva">🌧️ Chuva</button>
-              <button class="chipbtn ${ativo === 'lareira' ? 'ativo' : ''}" data-act="asmr-tocar" data-tipo="lareira">🔥 Lareira</button>
-              <button class="chipbtn ${ativo === 'binaural' ? 'ativo' : ''}" data-act="asmr-tocar" data-tipo="binaural">🧠 Alfa 10Hz</button>
-              ${ativo ? `<button class="chipbtn parar" data-act="asmr-parar">⏹️ Pausar</button>` : ''}
+              ${(tocandoMusica || ativo) ? `<button class="chipbtn parar" data-act="alternar-musica">⏹️ Pausar</button>` : ''}
             </div>
           </div>
         </div>
