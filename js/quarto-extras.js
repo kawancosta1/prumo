@@ -18,7 +18,7 @@ Object.assign(LUGARES_QUARTO, {
   movel: { nome: "Móvel", w: 44, h: 46 },
   pelucia: { nome: "Pelúcia", w: 30, h: 26 }
 });
-Object.assign(QUARTO_PADRAO, { teto: "", cortina: "", planta: "", movel: "", pelucia: "" });
+Object.assign(QUARTO_PADRAO, { teto: "", cortina: "", planta: "", movel: "q_vitrola", pelucia: "" });
 const LUGARES_OPCIONAIS = ["poster", "tapete", "pet", "teto", "cortina", "planta", "movel", "pelucia"];
 const ARRASTAVEIS = { poster: 1, pet: 1, movel: 1, pelucia: 1 };
 
@@ -228,11 +228,10 @@ const QUARTO_NOVOS = [
   {
     slot: "movel",
     id: "q_vitrola",
-    nome: "Vitrola (toca de verdade)",
-    preco: 140,
+    nome: "Vitrola 1930 (toca de verdade)",
+    preco: 0,
     toque: "vitrola",
-    svg: () =>
-      `<rect x="2" y="22" width="40" height="22" rx="2" fill="#8D6E63" stroke="var(--ink)" stroke-width="1.4"/><rect x="2" y="18" width="40" height="6" rx="1" fill="#6D4C41"/><g class="disco"><ellipse cx="20" cy="18" rx="13" ry="4" fill="#111"/><ellipse cx="20" cy="18" rx="4" ry="1.4" fill="#E53935"/></g><path d="M36 12L30 18" stroke="#BDBDBD" stroke-width="1.6"/><circle cx="36" cy="12" r="1.6" fill="#BDBDBD"/><circle cx="10" cy="33" r="2" fill="#D7CCC8"/><circle cx="18" cy="33" r="2" fill="#D7CCC8"/>`
+    svg: (w, h, d) => (typeof desenharVitrolaSVG === "function" ? desenharVitrolaSVG({ w, h, d }) : `<rect x="2" y="22" width="40" height="22" rx="2" fill="#8D6E63"/>`)
   },
   {
     slot: "movel",
@@ -903,6 +902,7 @@ quartoSVG = function (d = minhaEstante()) {
   const padraoMundo =
     typeof quartoPadraoDoMundo === "function" ? quartoPadraoDoMundo(d.persona) : QUARTO_PADRAO;
   const q = { ...padraoMundo, ...(decor.quarto || {}) };
+  if (!q.movel && q.movel !== "vazio") q.movel = "q_vitrola";
   const doMundoDele = x => !x.mundo || x.mundo === d.persona;
   const usar = slot => {
     const id = q[slot];
@@ -1104,6 +1104,12 @@ function tocarMusicaQuarto(tipo) {
   musicaQuarto = { tipo, parar: () => ((vivo = false), chiado.parar()) };
 }
 ACOES_EXTRAS["movel-tocar"] = (b, id) => {
+  if (id === "vitrola") {
+    if (typeof alternarVitrola1930 === "function") {
+      alternarVitrola1930();
+      return;
+    }
+  }
   if (id === "aquario") {
     react("happy", "Os peixinhos vieram ver você e soltaram umas bolhinhas!", 2600);
     return;
@@ -1120,6 +1126,11 @@ ACOES_EXTRAS["movel-tocar"] = (b, id) => {
       ? "Tocando um disco. Toque de novo pra parar."
       : "Rádio ligado. Toque de novo pra desligar."
   );
+};
+ACOES_EXTRAS["vitrola-tocar"] = () => {
+  if (typeof alternarVitrola1930 === "function") {
+    alternarVitrola1930();
+  }
 };
 document.addEventListener("click", e => {
   const t = e.target.closest("[data-tab]");

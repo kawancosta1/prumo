@@ -70,6 +70,6 @@ O Prumo se diferencia radicalmente de 99% dos apps de hábitos frios corporativo
 
 1. **Anti-Burnout & "Dia de Respiro":** Mecânica exclusiva de proteção de sequências sem culpa ou punição caso o usuário precise descansar.
 2. **Modo Corpo Duplo (*Body Doubling* para TDAH):** Companhia visual e acolhedora em tempo real do pet durante blocos de foco, comprovada para reduzir a procrastinação neurodivergente.
-3. **Experiência Sensorial ASMR Vintage:** Síntese matemática pura no WebAudio (sem arquivos pesados) com estalo de agulha de vinil dos anos 1930, chuva na vidraça e lareira crepitante.
+3. **Vitrola 1930 & ASMR Vintage Interativo:** Gramofone clássico dos anos 30 presente no Quarto, Sótão e Tela de Estudos com animação do disco de vinil girando em CSS, campânula de latão pulsante e notas flutuantes. Síntese pura no WebAudio com pouso de agulha mecânica, chiado de goma-laca 78 RPM e acordes vintage suaves.
 4. **Cenário Vivo (*Animal Crossing* da Vida Real):** Cada hábito cumprido e meta de hidratação atingida faz a plantinha do quarto florescer dinamicamente em tempo real.
 5. **Passaporte Vitalício (*Founder Lifetime Pass*):** Opção comercial de pagamento único contra a fadiga de assinaturas mensais, gerando alto volume de caixa imediato.

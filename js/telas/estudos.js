@@ -53,8 +53,7 @@ function viewEstudos() {
         ${busy ? `<button class="btn ghost" data-act="reset">Zerar</button>` : ""}
       </div>
       ${timer.acc > 0 && !timer.running && S.persona === "otaku" ? `<div class="intervalo-comercial-anime">📺 <b>Intervalo Comercial do Episódio</b>: hora de esticar os braços e fazer um alongamento ninja!</div>` : ""}
-      ${somDoMundo() ? `<div class="row">${botaoSom("chuva", textoMundo("somFocoNome", "Chuva durante o foco"))}</div>` : ""}
-      <div class="row" style="margin-top:8px"><button class="barra-som-asmr" data-act="alternar-asmr">🎧 Som ASMR Vintage</button></div>
+      ${typeof renderVitrolaEstudoHTML === "function" ? renderVitrolaEstudoHTML() : (somDoMundo() ? `<div class="row">${botaoSom("chuva", textoMundo("somFocoNome", "Chuva durante o foco"))}</div>` : "")}
       <span class="note">Quando o tempo acaba, toca um aviso e o relógio continua contando o tempo extra. Ao concluir, os minutos vão para a matéria.</span>
     </div>`
         : `<div class="empty"><strong>Cadastre uma matéria primeiro.</strong>Use o campo de matérias mais abaixo, e o cronômetro de foco aparece aqui.</div>`

@@ -42,7 +42,11 @@ function tocarPaisagemSonora(tipo) {
 
   _somAtivoTipo = tipo;
 
-  if (tipo === "chuva") {
+  if (tipo === "vinil") {
+    if (typeof tocarAsmrVintage === "function") {
+      tocarAsmrVintage("vinil");
+    }
+  } else if (tipo === "chuva") {
     // Gerar Ruído Rosa Suave (Frequências de Chuva na Vidraça)
     const bufferSize = ctx.sampleRate * 2;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -131,14 +135,14 @@ function tocarPaisagemSonora(tipo) {
   if (typeof document !== "undefined") {
     const btn = document.getElementById("btn-paisagem-som");
     if (btn) {
-      const nomes = { chuva: "🌧️ Chuva", lareira: "🔥 Lareira", binaural: "🧠 Alfa 10Hz" };
+      const nomes = { vinil: "📻 Vitrola 1930", chuva: "🌧️ Chuva", lareira: "🔥 Lareira", binaural: "🧠 Alfa 10Hz" };
       btn.textContent = nomes[tipo] || "🎧 Foco";
     }
   }
 }
 
 function alternarPaisagemSonora() {
-  const ordem = [null, "chuva", "lareira", "binaural"];
+  const ordem = [null, "vinil", "chuva", "lareira", "binaural"];
   const atualIdx = ordem.indexOf(_somAtivoTipo);
   const proximo = ordem[(atualIdx + 1) % ordem.length];
 

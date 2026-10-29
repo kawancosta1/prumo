@@ -566,6 +566,15 @@ const COMODOS = [
           <rect x="0" y="${chaoY}" width="${W}" height="3" fill="#140D07" opacity="0.45"/>
         </g>
         ${sombraEstante}
+        <g class="sotao-vitrola-canto" transform="translate(10 ${chaoY - 48})" data-act="vitrola-tocar" style="cursor:pointer;" role="button" tabindex="0" title="Vitrola 1930 (Toque para ouvir o disco de vinil)">
+          <ellipse cx="24" cy="46" rx="16" ry="3.5" fill="#140D07" opacity="0.5"/>
+          <rect x="10" y="36" width="28" height="9" rx="1.5" fill="#4E2711" stroke="#231006" stroke-width="0.8"/>
+          <line x1="13" y1="45" x2="13" y2="47" stroke="#231006" stroke-width="1.6"/>
+          <line x1="35" y1="45" x2="35" y2="47" stroke="#231006" stroke-width="1.6"/>
+          <g transform="translate(0 -6)">
+            ${typeof desenharVitrolaSVG === "function" ? desenharVitrolaSVG({ interativo: false }) : ""}
+          </g>
+        </g>
         ${bau}
         ${puff}
         ${lampada}
