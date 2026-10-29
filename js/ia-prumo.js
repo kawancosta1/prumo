@@ -296,8 +296,123 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
     if (textoResp) return separarPensamentoECorpo(textoResp);
   }
 
-  // Fallback autônomo neuro-contextual offline com raciocínio integrado
+  // 3. IA Generativa Real Gratuita Global (Pollinations AI - Llama 3.3 / GPT-4o-mini sem necessidade de chave)
+  try {
+    const messages = [{ role: "system", content: systemInstruction }];
+    (mensagensAnteriores || []).slice(-6).forEach(m => {
+      messages.push({
+        role: m.remetente === "user" ? "user" : "assistant",
+        content: m.texto
+      });
+    });
+    messages.push({ role: "user", content: promptUsuario });
+
+    const resp = await fetch("https://text.pollinations.ai/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages,
+        model: "openai",
+        temperature: cfg.temperatura || 0.7
+      })
+    });
+
+    if (resp.ok) {
+      const textoResp = await resp.text();
+      if (textoResp && textoResp.trim().length > 0) {
+        return separarPensamentoECorpo(textoResp);
+      }
+    }
+  } catch (err) {
+    console.warn("[IA Prumo] Provedor gratuito indisponível, usando motor autônomo:", err);
+  }
+
+  // 4. Fallback autônomo neuro-contextual offline com raciocínio integrado
   return gerarRespostaAutonomaIA(promptUsuario);
+}
+
+/* ---------- Chamada de IA Especializada em Modo JSON Puro ---------- */
+async function chamarLLMModoJSON(promptSistema, promptUsuario) {
+  const cfg = obterConfigIA();
+
+  // 1. Google Gemini (se chave configurada)
+  if (cfg.provedor === "gemini" && cfg.chave) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(cfg.chave)}`;
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: promptSistema }] },
+          contents: [{ role: "user", parts: [{ text: promptUsuario + "\nIMPORTANTE: Responda EXCLUSIVAMENTE em formato JSON puro, sem formatação markdown ou crases ao redor." }] }],
+          generationConfig: { responseMimeType: "application/json", temperature: 0.5 }
+        })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (txt) return JSON.parse(txt.replace(/```json/g, "").replace(/```/g, "").trim());
+      }
+    } catch (e) {
+      console.warn("[IA Prumo] Erro no Gemini JSON:", e);
+    }
+  }
+
+  // 2. Groq ou OpenAI (se chave configurada)
+  if ((cfg.provedor === "groq" || cfg.provedor === "openai") && cfg.chave) {
+    try {
+      const endpoint = cfg.provedor === "groq" ? "https://api.groq.com/openai/v1/chat/completions" : "https://api.openai.com/v1/chat/completions";
+      const modelo = cfg.provedor === "groq" ? "llama-3.3-70b-versatile" : "gpt-4o-mini";
+      const resp = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${cfg.chave}` },
+        body: JSON.stringify({
+          model: modelo,
+          response_format: { type: "json_object" },
+          messages: [
+            { role: "system", content: promptSistema },
+            { role: "user", content: promptUsuario + "\nResponda em formato JSON puro estrito." }
+          ],
+          temperature: 0.5
+        })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        const txt = data?.choices?.[0]?.message?.content;
+        if (txt) return JSON.parse(txt.replace(/```json/g, "").replace(/```/g, "").trim());
+      }
+    } catch (e) {
+      console.warn("[IA Prumo] Erro no Groq/OpenAI JSON:", e);
+    }
+  }
+
+  // 3. Provedor Gratuito Real Global (Pollinations AI com jsonMode nativo)
+  try {
+    const resp = await fetch("https://text.pollinations.ai/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: [
+          { role: "system", content: promptSistema },
+          { role: "user", content: promptUsuario + "\nResponda EXCLUSIVAMENTE em formato JSON puro, sem crases de markdown." }
+        ],
+        model: "openai",
+        jsonMode: true,
+        temperature: 0.5
+      })
+    });
+    if (resp.ok) {
+      const txt = await resp.text();
+      if (txt) {
+        const jsonLimpo = txt.replace(/```json/g, "").replace(/```/g, "").trim();
+        return JSON.parse(jsonLimpo);
+      }
+    }
+  } catch (err) {
+    console.warn("[IA Prumo] Chamada JSON via Pollinations falhou:", err);
+  }
+
+  return null;
 }
 
 /* ---------- Motor Neuro-Contextual Autônomo (Offline / Sem Chave) ---------- */
@@ -631,8 +746,8 @@ function abrirChatPrumiIA(mensagemInicial = "") {
         ? "Gemini 1.5 Flash"
         : cfg.provedor === "groq"
           ? "Groq Llama 3"
-          : "OpenAI"
-      : "Motor Prumo IA";
+          : "OpenAI GPT-4o"
+      : "IA Real (Llama 3.3 / GPT-4o)";
 
   const modalHtml = `
   <div id="modal-chat-ia" class="modal-ia-overlay">
@@ -877,7 +992,122 @@ function enviarMensagemRapidaIA(texto) {
   }
 }
 
-/* ---------- Quebra Inteligente de Metas & Cronograma IA ---------- */
+/* ---------- Quebra Inteligente de Metas & Planejador Estratégico IA ---------- */
+const PRESETS_ESTUDO_CONCURSOS = {
+  enem: {
+    nome: "ENEM",
+    materias: [
+      "Redação Nota 1000",
+      "Matemática e Tecnologias",
+      "Ciências da Natureza (Fís/Quím/Bio)",
+      "Ciências Humanas (Hist/Geo/Filo)",
+      "Linguagens e Códigos"
+    ],
+    prioridade: "Matemática e Tecnologias",
+    horas: 4,
+    dias: 6
+  },
+  inss: {
+    nome: "INSS (Técnico)",
+    materias: [
+      "Direito Previdenciário (Específica)",
+      "Língua Portuguesa",
+      "Direito Constitucional",
+      "Direito Administrativo",
+      "Raciocínio Lógico (RLM)",
+      "Noções de Informática"
+    ],
+    prioridade: "Direito Previdenciário (Específica)",
+    horas: 4,
+    dias: 6
+  },
+  policial: {
+    nome: "Carreira Policial (PF / PRF)",
+    materias: [
+      "Direito Penal e Processo Penal",
+      "Legislação Especial Extravagante",
+      "Direito Constitucional e Adm",
+      "Língua Portuguesa",
+      "Raciocínio Lógico Matemático",
+      "Informática e Contabilidade"
+    ],
+    prioridade: "Direito Penal e Processo Penal",
+    horas: 4,
+    dias: 6
+  },
+  caixa: {
+    nome: "Caixa Econômica / Banco do Brasil",
+    materias: [
+      "Conhecimentos Bancários",
+      "Atendimento e Técnicas de Vendas",
+      "Língua Portuguesa",
+      "Matemática Financeira",
+      "Tecnologia da Informação",
+      "Ética e Compliance"
+    ],
+    prioridade: "Conhecimentos Bancários",
+    horas: 3,
+    dias: 6
+  },
+  oab: {
+    nome: "OAB 1ª Fase (Exame de Ordem)",
+    materias: [
+      "Ética Profissional e Estatuto",
+      "Direito Constitucional",
+      "Direito Civil e Processo Civil",
+      "Direito Penal e Processo Penal",
+      "Direito Administrativo",
+      "Direito do Trabalho e Processo"
+    ],
+    prioridade: "Ética Profissional e Estatuto",
+    horas: 3,
+    dias: 6
+  },
+  tribunais: {
+    nome: "Tribunais (TJ / TRT / TRF)",
+    materias: [
+      "Direito Processual Civil",
+      "Direito Constitucional",
+      "Direito Administrativo",
+      "Língua Portuguesa",
+      "Administração Pública",
+      "Raciocínio Lógico"
+    ],
+    prioridade: "Direito Processual Civil",
+    horas: 4,
+    dias: 6
+  },
+  personalizado: {
+    nome: "Meu Concurso / Vestibular",
+    materias: [
+      "Língua Portuguesa",
+      "Raciocínio Lógico Matemático",
+      "Conhecimentos Específicos",
+      "Legislação Aplicada"
+    ],
+    prioridade: "Conhecimentos Específicos",
+    horas: 3,
+    dias: 5
+  }
+};
+
+const estadoPlanejadorEstudos = {
+  abaAtiva: "estrategia", // "estrategia" ou "rapido"
+  presetAtual: "enem",
+  concursoNome: "ENEM",
+  materias: [
+    "Redação Nota 1000",
+    "Matemática e Tecnologias",
+    "Ciências da Natureza (Fís/Quím/Bio)",
+    "Ciências Humanas (Hist/Geo/Filo)",
+    "Linguagens e Códigos"
+  ],
+  horasPorDia: 4,
+  diasPorSemana: 6,
+  materiaPrioridade: "Matemática e Tecnologias",
+  ultimoCicloGerado: null
+};
+
 let ultimoPlanoGeradoIA = null;
 
 function abrirDesdobradorMetasIA() {
@@ -887,49 +1117,41 @@ function abrirDesdobradorMetasIA() {
 
   const modalHtml = `
   <div id="modal-desdobrador-ia" class="modal-ia-overlay">
-    <div class="modal-ia-container">
+    <div class="modal-ia-container" style="max-width:560px;">
       <div class="ia-modal-header">
         <div class="ia-header-info">
           <div class="ia-avatar-wrapper">
-            <span>📅</span>
+            <span>🎓</span>
           </div>
           <div class="ia-header-titles">
             <h3>Cronograma Inteligente com IA</h3>
-            <p>Transforme sua meta em hábitos e cronograma prático</p>
+            <p><span class="ia-engine-badge">⚡ Estratégia & ENEM</span> • Ciclo Intercalado de Estudos</p>
           </div>
         </div>
         <button class="ia-close-btn" data-act="fechar-desdobrador-ia" aria-label="Fechar">&times;</button>
       </div>
 
-      <div class="ia-breakdown-body">
-        <form id="form-desdobrador-ia" class="ia-breakdown-form">
-          <label style="font-size:13px; font-weight:700; color:var(--ink, #334155);">Qual meta ou projeto você deseja organizar?</label>
-          <input type="text" id="ia-meta-objetivo" class="ia-meta-input" placeholder="Ex: Aprender Python do zero / Correr 5km / Passar na OAB / Emagrecer 4kg..." autocomplete="off" />
-          
-          <div class="ia-meta-chips">
-            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Aprender programação e foco diário">💻 Aprender Programação</button>
-            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Correr 5km em 30 dias">🏃 Correr 5km</button>
-            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Passar na OAB ou concurso público">⚖️ Passar na OAB</button>
-            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Emagrecer 4kg com hábitos saudáveis">🥗 Emagrecer 4kg</button>
-            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Ler 1 livro por mês">📚 Ler 1 Livro</button>
-            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Organizar rotina de estudos diária">🎯 Rotina de Estudos</button>
-          </div>
+      <!-- Abas de Navegação do Planejador -->
+      <div class="ia-modal-tabs">
+        <button type="button" class="ia-modal-tab-btn ${estadoPlanejadorEstudos.abaAtiva === "estrategia" ? "ativo" : ""}" data-act="ia-trocar-aba" data-aba="estrategia">
+          <span>🎓</span>
+          <span>Ciclo Concursos & ENEM</span>
+        </button>
+        <button type="button" class="ia-modal-tab-btn ${estadoPlanejadorEstudos.abaAtiva === "rapido" ? "ativo" : ""}" data-act="ia-trocar-aba" data-aba="rapido">
+          <span>⚡</span>
+          <span>Metas Rápidas & Projetos</span>
+        </button>
+      </div>
 
-          <button type="submit" class="btn primary coach-btn-gerar" id="ia-btn-gerar-plano" data-act="ia-gerar-plano" style="display:flex;align-items:center;justify-content:center;gap:6px;border-radius:12px;padding:10px 16px;font-weight:700;">
-            <span>⚡ Gerar Cronograma com IA</span>
-          </button>
-        </form>
-
-        <div id="ia-resultado-plano" style="display:none;"></div>
+      <div class="ia-breakdown-body" id="ia-conteudo-aba-desdobrador">
+        ${estadoPlanejadorEstudos.abaAtiva === "estrategia"
+          ? renderizarFormularioEstudosEstrategicoHTML()
+          : renderizarFormularioMetasRapidasHTML()}
       </div>
     </div>
   </div>`;
 
   document.body.insertAdjacentHTML("beforeend", modalHtml);
-  requestAnimationFrame(() => {
-    const inp = document.getElementById("ia-meta-objetivo");
-    if (inp) inp.focus();
-  });
 }
 
 function fecharDesdobradorMetasIA() {
@@ -941,6 +1163,607 @@ function fecharDesdobradorMetasIASeFundo(e) {
   if (e && e.target && e.target.classList.contains("modal-ia-overlay")) {
     fecharDesdobradorMetasIA();
   }
+}
+
+function trocarAbaDesdobrador(novaAba) {
+  if (novaAba !== "estrategia" && novaAba !== "rapido") return;
+  estadoPlanejadorEstudos.abaAtiva = novaAba;
+  const box = document.getElementById("ia-conteudo-aba-desdobrador");
+  if (box) {
+    box.innerHTML =
+      novaAba === "estrategia"
+        ? renderizarFormularioEstudosEstrategicoHTML()
+        : renderizarFormularioMetasRapidasHTML();
+  }
+  document.querySelectorAll(".ia-modal-tab-btn").forEach(b => {
+    b.classList.toggle("ativo", b.dataset.aba === novaAba);
+  });
+}
+
+function renderizarConteudoDesdobrador() {
+  const box = document.getElementById("ia-conteudo-aba-desdobrador");
+  if (box && estadoPlanejadorEstudos.abaAtiva === "estrategia") {
+    box.innerHTML = renderizarFormularioEstudosEstrategicoHTML();
+  }
+}
+
+/* ---------- Formulário do Ciclo de Estudos (Nível Estratégia Concursos) ---------- */
+function renderizarFormularioEstudosEstrategicoHTML() {
+  const st = estadoPlanejadorEstudos;
+  const presetsKeys = Object.keys(PRESETS_ESTUDO_CONCURSOS);
+
+  return `
+  <div class="ia-concurso-section">
+    <div style="font-size:11px;font-weight:700;color:var(--muted,#64748b);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">
+      Escolha o Edital ou Prova Alvo:
+    </div>
+    
+    <div class="ia-concurso-presets">
+      ${presetsKeys
+        .map(k => {
+          const p = PRESETS_ESTUDO_CONCURSOS[k];
+          const ativo = st.presetAtual === k ? "ativo" : "";
+          return `<button type="button" class="ia-concurso-preset-btn ${ativo}" data-act="ia-preset" data-preset="${k}">${esc(p.nome)}</button>`;
+        })
+        .join("")}
+    </div>
+
+    <div style="margin-top:10px;">
+      <label style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);display:block;margin-bottom:4px;">Nome da Prova / Concurso:</label>
+      <input type="text" id="ia-concurso-nome" class="ia-add-materia-input" style="width:100%;margin-bottom:10px;" value="${esc(st.concursoNome)}" placeholder="Ex: ENEM 2026, INSS, PF..." autocomplete="off" />
+    </div>
+
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <label style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);">Disciplinas do Edital (${st.materias.length}):</label>
+        <span style="font-size:11px;color:var(--muted,#64748b);">Clique no &times; para remover</span>
+      </div>
+
+      <div class="ia-tags-area" id="ia-tags-materias-lista">
+        ${st.materias
+          .map(
+            (m, idx) => `
+          <div class="ia-tag-materia">
+            <span>${esc(m)}</span>
+            <button type="button" class="ia-tag-materia-remover" data-act="ia-del-materia" data-idx="${idx}" title="Remover matéria">&times;</button>
+          </div>`
+          )
+          .join("")}
+      </div>
+
+      <div class="ia-add-materia-row">
+        <input type="text" id="ia-nova-materia-input" class="ia-add-materia-input" placeholder="Adicionar disciplina (ex: Direito Previdenciário)..." autocomplete="off" />
+        <button type="button" class="btn small" data-act="ia-add-materia" style="font-weight:700;white-space:nowrap;">+ Adicionar</button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);display:block;margin-bottom:4px;">Horas Líquidas / Dia:</label>
+        <div class="ia-pill-select-group">
+          ${[2, 3, 4, 5, 6]
+            .map(
+              h => `
+            <button type="button" class="ia-pill-select-btn ${st.horasPorDia === h ? "ativo" : ""}" data-act="ia-sel-horas" data-horas="${h}">${h}h</button>`
+            )
+            .join("")}
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);display:block;margin-bottom:4px;">Dias por Semana:</label>
+        <div class="ia-pill-select-group">
+          ${[4, 5, 6, 7]
+            .map(
+              d => `
+            <button type="button" class="ia-pill-select-btn ${st.diasPorSemana === d ? "ativo" : ""}" data-act="ia-sel-dias" data-dias="${d}">${d}d</button>`
+            )
+            .join("")}
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <label style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);display:block;margin-bottom:4px;">Disciplina Prioritária (Maior Peso ou Dificuldade):</label>
+      <select id="ia-materia-prioridade" class="ia-provider-select" style="width:100%;font-size:13px;">
+        ${st.materias
+          .map(
+            m => `
+          <option value="${esc(m)}" ${st.materiaPrioridade === m ? "selected" : ""}>${esc(m)} (Prioridade Alta)</option>`
+          )
+          .join("")}
+      </select>
+    </div>
+
+    <button type="button" class="btn primary coach-btn-gerar" id="ia-btn-gerar-ciclo" data-act="ia-gerar-ciclo-estrategia" style="display:flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:12px 16px;font-weight:800;font-size:14px;width:100%;margin-top:16px;">
+      <span>🎓 Gerar Ciclo Estratégico com IA (Estratégia Concursos)</span>
+    </button>
+
+    <div id="ia-resultado-ciclo" style="display:${st.ultimoCicloGerado ? "block" : "none"};margin-top:14px;">
+      ${st.ultimoCicloGerado ? renderizarResultadoCicloHTML(st.ultimoCicloGerado) : ""}
+    </div>
+  </div>`;
+}
+
+function selecionarPresetEstudo(key) {
+  if (!PRESETS_ESTUDO_CONCURSOS[key]) return;
+  const p = PRESETS_ESTUDO_CONCURSOS[key];
+  estadoPlanejadorEstudos.presetAtual = key;
+  estadoPlanejadorEstudos.concursoNome = p.nome;
+  estadoPlanejadorEstudos.materias = [...p.materias];
+  estadoPlanejadorEstudos.prioridade = p.prioridade;
+  estadoPlanejadorEstudos.materiaPrioridade = p.prioridade;
+  estadoPlanejadorEstudos.horasPorDia = p.horas;
+  estadoPlanejadorEstudos.diasPorSemana = p.dias;
+  renderizarConteudoDesdobrador();
+}
+
+function adicionarMateriaEdital(nome) {
+  const txt = (nome || "").trim();
+  if (!txt) return;
+  if (!estadoPlanejadorEstudos.materias.includes(txt)) {
+    estadoPlanejadorEstudos.materias.push(txt);
+    if (!estadoPlanejadorEstudos.materiaPrioridade) {
+      estadoPlanejadorEstudos.materiaPrioridade = txt;
+    }
+  }
+  renderizarConteudoDesdobrador();
+}
+
+function removerMateriaEdital(idx) {
+  if (typeof idx === "number" && idx >= 0 && idx < estadoPlanejadorEstudos.materias.length) {
+    const removida = estadoPlanejadorEstudos.materias[idx];
+    estadoPlanejadorEstudos.materias.splice(idx, 1);
+    if (estadoPlanejadorEstudos.materiaPrioridade === removida) {
+      estadoPlanejadorEstudos.materiaPrioridade = estadoPlanejadorEstudos.materias[0] || "";
+    }
+    renderizarConteudoDesdobrador();
+  }
+}
+
+function selecionarHorasEstudo(horas) {
+  estadoPlanejadorEstudos.horasPorDia = Number(horas) || 4;
+  document.querySelectorAll("[data-act='ia-sel-horas']").forEach(b => {
+    b.classList.toggle("ativo", Number(b.dataset.horas) === estadoPlanejadorEstudos.horasPorDia);
+  });
+}
+
+function selecionarDiasEstudo(dias) {
+  estadoPlanejadorEstudos.diasPorSemana = Number(dias) || 6;
+  document.querySelectorAll("[data-act='ia-sel-dias']").forEach(b => {
+    b.classList.toggle("ativo", Number(b.dataset.dias) === estadoPlanejadorEstudos.diasPorSemana);
+  });
+}
+
+/* ---------- Execução do Planejamento Estratégico (com Raciocínio IA) ---------- */
+async function executarPlanejamentoEstrategicoIA() {
+  const nomeInp = document.getElementById("ia-concurso-nome");
+  if (nomeInp && nomeInp.value.trim()) {
+    estadoPlanejadorEstudos.concursoNome = nomeInp.value.trim();
+  }
+  const prioSel = document.getElementById("ia-materia-prioridade");
+  if (prioSel && prioSel.value) {
+    estadoPlanejadorEstudos.materiaPrioridade = prioSel.value;
+  }
+
+  const dados = {
+    concursoNome: estadoPlanejadorEstudos.concursoNome || "Concurso Público",
+    materias: estadoPlanejadorEstudos.materias.length ? estadoPlanejadorEstudos.materias : ["Língua Portuguesa", "Matemática", "Conhecimentos Específicos"],
+    horasPorDia: estadoPlanejadorEstudos.horasPorDia || 4,
+    diasPorSemana: estadoPlanejadorEstudos.diasPorSemana || 6,
+    materiaPrioridade: estadoPlanejadorEstudos.materiaPrioridade || estadoPlanejadorEstudos.materias[0] || "Geral"
+  };
+
+  const btn = document.getElementById("ia-btn-gerar-ciclo");
+  const box = document.getElementById("ia-resultado-ciclo");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<span>⏳ Prumi está raciocinando sobre o ciclo...</span>`;
+  }
+  if (box) {
+    box.style.display = "block";
+    box.innerHTML = `
+      <div style="text-align:center;padding:24px;color:var(--muted,#64748b);">
+        <div class="ia-typing-indicator" style="margin:0 auto 12px;">
+          <div class="ia-typing-dot"></div><div class="ia-typing-dot"></div><div class="ia-typing-dot"></div>
+        </div>
+        <div style="font-weight:700;color:var(--ink,#1e293b);margin-bottom:4px;">🧠 Estruturando Ciclo Intercalado Nível Estratégia Concursos...</div>
+        <small>Calculando peso das disciplinas, curvas de esquecimento e simulados de final de semana...</small>
+      </div>`;
+  }
+
+  const promptSistema = `Você é o Diretor Pedagógico e Estrategista Chefe do Estratégia Concursos, especialista mundial em planejamento de estudos de alto rendimento para concursos públicos e ENEM.
+Você aplica com maestria:
+1. Ciclo de Estudos Intercalado (estudo em blocos de 50 a 90 min alternando disciplinas para evitar fadiga cognitiva).
+2. Metodologia dos 4 Pilares do Estratégia: Teoria Ativa, Bateria de Questões com Caderno de Erros, Revisão Espaçada (24h/7d) e Simulado Real.
+3. Priorização ponderada (a disciplina prioritária recebe peso e repetições dobradas).
+4. Descanso estratégico e retenção de longo prazo.
+
+Você DEVE responder EXCLUSIVAMENTE em formato JSON puro, sem crases de markdown ao redor, seguindo estritamente a estrutura solicitada.`;
+
+  const promptUsuario = `Crie um Cronograma de Estudos Estratégico Completo (Nível Estratégia Concursos) com os seguintes parâmetros:
+- Concurso / Exame: "${dados.concursoNome}"
+- Disciplinas do Edital: ${JSON.stringify(dados.materias)}
+- Carga horária líquida: ${dados.horasPorDia} horas por dia
+- Frequência semanal: ${dados.diasPorSemana} dias por semana
+- Disciplina prioritária (maior peso/dificuldade): "${dados.materiaPrioridade}"
+
+Estruture a resposta no seguinte formato JSON estrito:
+{
+  "titulo": "Ciclo Estratégico: ${dados.concursoNome}",
+  "analisePedagogica": "Explicação detalhada (de 3 a 5 parágrafos) do seu raciocínio estratégico pedagógico: por que você organizou as matérias nesta ordem, como a disciplina prioritária foi reforçada, a lógica de alternar matérias de cálculo com leitura, e as instruções de execução para o aluno gabaritar a prova.",
+  "horasSemanais": ${dados.horasPorDia * dados.diasPorSemana},
+  "dias": [
+    {
+      "dia": 1,
+      "nomeDia": "Dia 1 (Ciclo A)",
+      "foco": "Fundamentos e Teoria Ativa",
+      "blocos": [
+        {
+          "materia": "${dados.materiaPrioridade}",
+          "metodologia": "teoria",
+          "duracaoMin": 60,
+          "descricao": "Leitura ativa do PDF/aula 01 + mapa mental"
+        },
+        {
+          "materia": "${dados.materias[1] || dados.materiaPrioridade}",
+          "metodologia": "questoes",
+          "duracaoMin": 50,
+          "descricao": "Resolução de 20 questões da banca examinadora"
+        }
+      ]
+    }
+  ],
+  "orientacaoSimulado": "Como realizar o simulado e alimentar o caderno de erros no fim de semana.",
+  "dicaMascote": "Conselho motivador curto do coach concurseiro"
+}`;
+
+  let ciclo = null;
+  try {
+    ciclo = await chamarLLMModoJSON(promptSistema, promptUsuario);
+  } catch (err) {
+    console.warn("[IA Prumo] Erro no gerador LLM JSON, ativando sintetizador autônomo:", err);
+  }
+
+  // Fallback Inteligente se a rede falhar ou não retornar formato válido
+  if (!ciclo || !Array.isArray(ciclo.dias) || !ciclo.dias.length) {
+    ciclo = sintetizarCicloEstrategicoAutonomo(dados);
+  }
+
+  estadoPlanejadorEstudos.ultimoCicloGerado = ciclo;
+
+  if (box) {
+    box.innerHTML = renderizarResultadoCicloHTML(ciclo);
+  }
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = `<span>🔄 Recalcular / Gerar Novo Ciclo</span>`;
+  }
+}
+
+/* ---------- Renderização do Ciclo de Estudos com Métricas e Badges ---------- */
+function renderizarResultadoCicloHTML(ciclo) {
+  if (!ciclo) return "";
+  const st = estadoPlanejadorEstudos;
+
+  // Contagem de métricas
+  let totalBlocosQuestoes = 0;
+  let totalRevisoes = 0;
+  (ciclo.dias || []).forEach(d => {
+    (d.blocos || []).forEach(b => {
+      const met = (b.metodologia || "").toLowerCase();
+      if (met === "questoes") totalBlocosQuestoes++;
+      if (met === "revisao") totalRevisoes++;
+    });
+  });
+
+  return `
+  <div class="ia-plan-preview">
+    <div class="ia-plan-title">🎓 ${esc(ciclo.titulo || "Ciclo de Estudos Estratégico")}</div>
+
+    <!-- Painel de Métricas do Concurseiro -->
+    <div class="ia-metricas-painel">
+      <div class="ia-metrica-card">
+        <div class="ia-metrica-valor">${ciclo.horasSemanais || st.horasPorDia * st.diasPorSemana}h</div>
+        <div class="ia-metrica-label">Carga Semanal</div>
+      </div>
+      <div class="ia-metrica-card">
+        <div class="ia-metrica-valor">${st.materias.length}</div>
+        <div class="ia-metrica-label">Disciplinas</div>
+      </div>
+      <div class="ia-metrica-card">
+        <div class="ia-metrica-valor">${totalBlocosQuestoes || Math.round(st.diasPorSemana * 1.5)}</div>
+        <div class="ia-metrica-label">Baterias Questões</div>
+      </div>
+      <div class="ia-metrica-card">
+        <div class="ia-metrica-valor">${totalRevisoes || st.diasPorSemana}</div>
+        <div class="ia-metrica-label">Revisões 24h/7d</div>
+      </div>
+    </div>
+
+    <!-- Raciocínio Pedagógico da IA (Transparência de Pensamento) -->
+    ${ciclo.analisePedagogica ? `
+      <details class="ia-thought-card" open style="margin:12px 0;">
+        <summary class="ia-thought-summary">
+          <span class="ia-thought-icon">🧠</span>
+          <span class="ia-thought-title">Raciocínio Pedagógico da IA (Metodologia Estratégia)</span>
+          <span class="ia-thought-chevron">▾</span>
+        </summary>
+        <div class="ia-thought-content" style="line-height:1.6;font-size:12.5px;">
+          ${formatarTextoMensagemIA(ciclo.analisePedagogica)}
+        </div>
+      </details>
+    ` : ""}
+
+    <!-- Linha do Tempo e Dias do Ciclo Intercalado -->
+    <div style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);margin:14px 0 8px;">
+      📅 Distribuição dos Dias do Ciclo:
+    </div>
+
+    <div class="ia-ciclo-dias-lista">
+      ${(ciclo.dias || [])
+        .map(
+          d => `
+        <div class="ia-ciclo-dia-card">
+          <div class="ia-ciclo-dia-header">
+            <span class="ia-ciclo-dia-nome">${esc(d.nomeDia || `Dia ${d.dia}`)}</span>
+            <span class="ia-ciclo-dia-foco">${esc(d.foco || "Ciclo Intercalado")}</span>
+          </div>
+          <div class="ia-ciclo-dia-blocos">
+            ${(d.blocos || [])
+              .map(b => {
+                const met = (b.metodologia || "teoria").toLowerCase();
+                const badgeLabel =
+                  met === "questoes"
+                    ? "🎯 Questões"
+                    : met === "revisao"
+                      ? "🔄 Revisão"
+                      : met === "simulado"
+                        ? "📝 Simulado"
+                        : "📖 Teoria";
+                return `
+              <div class="ia-bloco-item">
+                <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
+                  <span class="ia-badge-metodologia ${met}">${badgeLabel}</span>
+                  <strong style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(b.materia)}</strong>
+                  <span style="opacity:0.75;font-size:11px;">• ${esc(b.descricao || "")}</span>
+                </div>
+                <span style="font-weight:700;color:var(--muted,#64748b);font-size:11px;white-space:nowrap;">${b.duracaoMin || 60}m</span>
+              </div>`;
+              })
+              .join("")}
+          </div>
+        </div>`
+        )
+        .join("")}
+    </div>
+
+    ${ciclo.orientacaoSimulado ? `
+      <div style="background:rgba(245, 158, 11, 0.08);border:1px solid rgba(245, 158, 11, 0.25);border-radius:12px;padding:10px 12px;margin:12px 0;font-size:12px;color:inherit;">
+        <strong>📝 Simulado & Caderno de Erros (Fim de Semana):</strong><br>
+        <span style="opacity:0.9;">${esc(ciclo.orientacaoSimulado)}</span>
+      </div>
+    ` : ""}
+
+    ${ciclo.dicaMascote ? `<div class="ia-plan-dica">💡 "${esc(ciclo.dicaMascote)}"</div>` : ""}
+
+    <!-- Botões de Ação Prática -->
+    <div class="ia-cronograma-actions" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
+      <button type="button" class="btn primary coach-btn-distribuir" data-act="ia-importar-ciclo-agenda" style="width:100%;font-weight:800;padding:12px;border-radius:12px;">
+        <span>📅 Importar Ciclo para Minha Agenda Prumo</span>
+      </button>
+      <button type="button" class="btn ia-btn-copiar-cronograma" data-act="ia-copiar-cronograma">
+        <span>📋 Copiar Cronograma Completo (Markdown / WhatsApp)</span>
+      </button>
+    </div>
+  </div>`;
+}
+
+/* ---------- Motor de Síntese Autônoma de Ciclos (Estratégia Concursos) ---------- */
+function sintetizarCicloEstrategicoAutonomo(dados) {
+  const mats = Array.isArray(dados.materias) && dados.materias.length ? dados.materias : ["Língua Portuguesa", "Matemática", "Conhecimentos Específicos"];
+  const prio = dados.materiaPrioridade || mats[0];
+  const hDia = dados.horasPorDia || 4;
+  const dSem = dados.diasPorSemana || 6;
+  const blocosPorDia = Math.max(2, Math.min(hDia, 4));
+  const duracaoBloco = Math.round((hDia * 60) / blocosPorDia);
+
+  // Lista de matérias intercaladas priorizando a matéria foco
+  const filaMaterias = [];
+  mats.forEach(m => {
+    filaMaterias.push(m);
+    if (m === prio) filaMaterias.push(m); // peso 2x
+  });
+
+  let matPointer = 0;
+  const dias = [];
+
+  for (let dia = 1; dia <= dSem; dia++) {
+    const isUltimoDia = dia === dSem;
+    const blocos = [];
+
+    if (isUltimoDia) {
+      // Dia de Simulado e Caderno de Erros
+      blocos.push({
+        materia: `Simulado Geral: ${dados.concursoNome}`,
+        metodologia: "simulado",
+        duracaoMin: Math.max(90, (hDia - 1) * 60),
+        descricao: "Prova cronometrada sem pausas, estilo banca examinadora"
+      });
+      blocos.push({
+        materia: `Caderno de Erros & Revisão Semanal`,
+        metodologia: "revisao",
+        duracaoMin: 60,
+        descricao: "Análise profunda de cada questão errada e reforço de teoria"
+      });
+      dias.push({
+        dia,
+        nomeDia: `Dia ${dia} (Simulado Real)`,
+        foco: "Validação Prática & Análise de Erros",
+        blocos
+      });
+    } else {
+      for (let b = 0; b < blocosPorDia; b++) {
+        const mat = filaMaterias[matPointer % filaMaterias.length];
+        matPointer++;
+        const isRevisaoFinal = b === blocosPorDia - 1;
+        const met = isRevisaoFinal ? "revisao" : b % 2 === 0 ? "teoria" : "questoes";
+        const desc =
+          met === "teoria"
+            ? "Leitura ativa de PDF/lei seca + grifos esquemáticos"
+            : met === "questoes"
+              ? "Bateria de 20 a 30 questões com marcação de dúvidas"
+              : "Revisão espaçada de 24h dos tópicos estudados ontem";
+
+        blocos.push({
+          materia: mat,
+          metodologia: met,
+          duracaoMin: duracaoBloco,
+          descricao: desc
+        });
+      }
+      dias.push({
+        dia,
+        nomeDia: `Dia ${dia} (Ciclo ${String.fromCharCode(64 + dia)})`,
+        foco: `Intercalação Teoria & Questões (${blocosPorDia} blocos de ${duracaoBloco}m)`,
+        blocos
+      });
+    }
+  }
+
+  return {
+    titulo: `Ciclo Estratégico: ${dados.concursoNome}`,
+    analisePedagogica: `Este ciclo foi desenhado com base na **metodologia do Estratégia Concursos** e nas descobertas da neurociência cognitiva sobre **aprendizado intercalado (interleaving effect)** e **efeito de testagem**.
+
+Em vez de estudar a mesma disciplina durante todo o dia (o que causa saturação e queda vertiginosa de retenção), o ciclo alterna matérias de leitura teórica com disciplinas práticas e de cálculo a cada ${duracaoBloco} minutos.
+
+A matéria **${prio}** recebeu **peso prioritário dobrado**, garantindo repetições constantes no ciclo para que você atinja alto índice de acertos. Ao final de cada dia há um bloco dedicado à **revisão espaçada de 24h**, impedindo a perda natural da Curva de Esquecimento de Ebbinghaus. No último dia (${dSem}º dia), o foco é 100% no **Simulado Real** com alimentação rigorosa do seu Caderno de Erros.`,
+    horasSemanais: hDia * dSem,
+    dias,
+    orientacaoSimulado: `Cronometre rigorosamente o tempo de prova (ex: 3 minutos por questão). Não consulte anotações durante o simulado. Logo após corrigir, transcreva todas as dúvidas para o seu Caderno de Erros anotando o porquê da alternativa correta.`,
+    dicaMascote: `A aprovação não vem de estudar 10 horas em um único dia, mas sim de cumprir com disciplina o ciclo de ${hDia}h todos os dias!`
+  };
+}
+
+/* ---------- Importação do Ciclo para a Agenda do Prumo ---------- */
+function importarCicloParaAgendaPrumo() {
+  const ciclo = estadoPlanejadorEstudos.ultimoCicloGerado;
+  if (!ciclo || !Array.isArray(ciclo.dias) || !ciclo.dias.length) {
+    if (typeof toast === "function") toast("Gere o ciclo com IA antes de importar!", false, "alert");
+    return;
+  }
+  if (typeof S === "undefined" || !S) return;
+  if (!Array.isArray(S.tasks)) S.tasks = [];
+
+  const tHoje = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
+  let totalTarefasInseridas = 0;
+
+  ciclo.dias.forEach((diaInfo, dIdx) => {
+    const dataAlvo = typeof addDays === "function" ? addDays(tHoje, dIdx) : tHoje;
+    (diaInfo.blocos || []).forEach(bloco => {
+      const met = (bloco.metodologia || "teoria").toUpperCase();
+      const xp = met === "SIMULADO" ? 60 : met === "QUESTOES" ? 40 : 30;
+      S.tasks.push({
+        id: "ia_ciclo_" + Math.random().toString(36).slice(2, 9),
+        title: `[${met}] ${bloco.materia}: ${bloco.descricao || "Estudo focado"} (${bloco.duracaoMin || 60}m)`,
+        date: dataAlvo,
+        done: false,
+        xp,
+        tag: "estudo"
+      });
+      totalTarefasInseridas++;
+    });
+  });
+
+  // Cadastrar hábito de estudo no Prumo se ainda não existir
+  if (Array.isArray(S.habits)) {
+    const nomeHabito = `Ciclo de Estudos: ${estadoPlanejadorEstudos.concursoNome} (${estadoPlanejadorEstudos.horasPorDia}h/dia)`;
+    const jaExiste = S.habits.some(h => (h.name || "").toLowerCase() === nomeHabito.toLowerCase());
+    if (!jaExiste) {
+      S.habits.push({
+        id: "ia_hab_estudo_" + Math.random().toString(36).slice(2, 8),
+        name: nomeHabito,
+        every: 1,
+        time: "08:30",
+        history: {}
+      });
+    }
+  }
+
+  if (typeof commit === "function") commit();
+  if (typeof persist === "function") persist(true);
+  if (typeof render === "function") render();
+
+  fecharDesdobradorMetasIA();
+
+  if (typeof toast === "function") {
+    toast(`🎓 ${totalTarefasInseridas} blocos de estudo adicionados à sua Agenda Prumo!`, false, "happy");
+  }
+}
+
+/* ---------- Copiar Cronograma Completo (Markdown / WhatsApp) ---------- */
+function copiarCronogramaCompleto() {
+  const ciclo = estadoPlanejadorEstudos.ultimoCicloGerado;
+  if (!ciclo) return;
+
+  let texto = `🎓 *${ciclo.titulo || "CICLO DE ESTUDOS ESTRATÉGICO"}*\n`;
+  texto += `Carga Horária Semanal: ${ciclo.horasSemanais || estadoPlanejadorEstudos.horasPorDia * estadoPlanejadorEstudos.diasPorSemana}h | ${estadoPlanejadorEstudos.diasPorSemana} dias/semana\n`;
+  texto += `Disciplina Prioritária: ${estadoPlanejadorEstudos.materiaPrioridade}\n\n`;
+
+  if (ciclo.analisePedagogica) {
+    texto += `🧠 *ESTRATÉGIA PEDAGÓGICA:*\n${ciclo.analisePedagogica.replace(/\*\*/g, "*")}\n\n`;
+  }
+
+  (ciclo.dias || []).forEach(d => {
+    texto += `📌 *${d.nomeDia || `Dia ${d.dia}`}* (${d.foco || "Estudo Intercalado"}):\n`;
+    (d.blocos || []).forEach((b, i) => {
+      const met = (b.metodologia || "teoria").toUpperCase();
+      texto += `  ${i + 1}. [${met}] ${b.materia} (${b.duracaoMin || 60}m) - ${b.descricao || ""}\n`;
+    });
+    texto += `\n`;
+  });
+
+  if (ciclo.orientacaoSimulado) {
+    texto += `📝 *SIMULADO & CADERNO DE ERROS:*\n${ciclo.orientacaoSimulado}\n\n`;
+  }
+  if (ciclo.dicaMascote) {
+    texto += `💡 *Dica do Coach:* "${ciclo.dicaMascote}"\n`;
+  }
+
+  if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard
+      .writeText(texto)
+      .then(() => {
+        if (typeof toast === "function") toast("📋 Cronograma copiado para a área de transferência!", false, "happy");
+      })
+      .catch(() => {
+        if (typeof toast === "function") toast("Não foi possível copiar automaticamente.", false, "alert");
+      });
+  }
+}
+
+/* ---------- Aba de Metas Rápidas (Aprender a programar, correr, etc.) ---------- */
+function renderizarFormularioMetasRapidasHTML() {
+  return `
+  <form id="form-desdobrador-ia" class="ia-breakdown-form">
+    <label style="font-size:13px; font-weight:700; color:var(--ink, #334155);">Qual meta ou projeto você deseja organizar?</label>
+    <input type="text" id="ia-meta-objetivo" class="ia-meta-input" placeholder="Ex: Aprender Python do zero / Correr 5km / Ler 1 livro por mês..." autocomplete="off" />
+    
+    <div class="ia-meta-chips">
+      <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Aprender programação e foco diário">💻 Aprender Programação</button>
+      <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Correr 5km em 30 dias">🏃 Correr 5km</button>
+      <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Passar na OAB ou concurso público">⚖️ Passar na OAB</button>
+      <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Emagrecer 4kg com hábitos saudáveis">🥗 Emagrecer 4kg</button>
+      <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Ler 1 livro por mês">📚 Ler 1 Livro</button>
+      <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Organizar rotina de estudos diária">🎯 Rotina de Estudos</button>
+    </div>
+
+    <button type="submit" class="btn primary coach-btn-gerar" id="ia-btn-gerar-plano" data-act="ia-gerar-plano" style="display:flex;align-items:center;justify-content:center;gap:6px;border-radius:12px;padding:10px 16px;font-weight:700;">
+      <span>⚡ Gerar Cronograma Rápido com IA</span>
+    </button>
+  </form>
+
+  <div id="ia-resultado-plano" style="display:none;"></div>`;
 }
 
 function preencherEGerarMetaIA(meta) {
@@ -956,7 +1779,6 @@ async function executarDesdobramentoMetaIA() {
   if (!inp) return;
   let meta = inp.value.trim();
 
-  // Se o campo estiver vazio, seleciona uma sugestão padrão inteligente em vez de travar
   if (!meta) {
     meta = "Aprender uma nova habilidade e ter mais foco";
     inp.value = meta;
@@ -979,13 +1801,8 @@ async function executarDesdobramentoMetaIA() {
   }
 
   let plano = null;
-  const cfg = obterConfigIA();
-
-  // Se tiver chave de LLM, pede para estruturar em JSON estrito
-  if (cfg.chave && (cfg.provedor === "gemini" || cfg.provedor === "groq" || cfg.provedor === "openai")) {
-    try {
-      const promptJson = `Aja como um planejador de produtividade e coach de classe mundial. O usuário quer criar um cronograma para alcançar este objetivo: "${meta}".
-Responda EXCLUSIVAMENTE em formato JSON puro, sem formatação markdown ou crases ao redor, no seguinte modelo:
+  const promptSistema = `Aja como um planejador de produtividade e coach de classe mundial. O usuário quer criar um cronograma para alcançar o objetivo. Responda em JSON puro estrito.`;
+  const promptJson = `Objetivo: "${meta}". Responda no formato:
 {
   "titulo": "Cronograma de Ação: Título curto",
   "habito": { "nome": "Hábito diário contínuo de 15 a 30 min", "horario": "08:00" },
@@ -993,20 +1810,17 @@ Responda EXCLUSIVAMENTE em formato JSON puro, sem formatação markdown ou crase
     { "diaOffset": 0, "titulo": "Ação inicial e prática para Hoje", "categoria": "foco", "xp": 20 },
     { "diaOffset": 1, "titulo": "Ação de aprofundamento para Amanhã", "categoria": "estudo", "xp": 30 },
     { "diaOffset": 2, "titulo": "Ação prática para daqui a 2 dias", "categoria": "foco", "xp": 35 },
-    { "diaOffset": 3, "titulo": "Ação de revisão ou consolidação para daqui a 3 dias", "categoria": "carreira", "xp": 40 }
+    { "diaOffset": 3, "titulo": "Ação de revisão para daqui a 3 dias", "categoria": "carreira", "xp": 40 }
   ],
   "dicaMascote": "Conselho motivador curto para começar com consistência"
 }`;
-      const raw = await chamarProvedorLLM(promptJson);
-      const rawTxt = typeof raw === "object" && raw !== null ? raw.texto : String(raw);
-      const jsonLimpo = rawTxt.replace(/```json/g, "").replace(/```/g, "").trim();
-      plano = JSON.parse(jsonLimpo);
-    } catch (e) {
-      console.warn("[IA Prumo] Erro no parse do plano JSON via LLM, usando sintetizador:", e);
-    }
+
+  try {
+    plano = await chamarLLMModoJSON(promptSistema, promptJson);
+  } catch (e) {
+    console.warn("[IA Prumo] Erro no JSON de meta rápida, usando sintetizador:", e);
   }
 
-  // Fallback Inteligente baseado no objetivo caso a API falhe ou não tenha chave
   if (!plano || !Array.isArray(plano.tarefas) || !plano.tarefas.length) {
     plano = sintetizarPlanoMetaAutonomo(meta);
   }
@@ -1136,7 +1950,6 @@ function sintetizarPlanoMetaAutonomo(meta) {
       dicaMascote: "Arte e técnica se desenvolvem no detalhe repetido com carinho. Celebre a sua evolução a cada traço!"
     };
   }
-  // Plano Geral adaptado
   return {
     titulo: `Cronograma Estruturado: ${meta}`,
     habito: { nome: `Bloco diário de 20 min dedicado a: ${meta.slice(0, 30)}`, horario: "10:00" },
@@ -1155,7 +1968,6 @@ function importarPlanoGeradoPrumo(diasMultiplos = false) {
   const plano = ultimoPlanoGeradoIA;
   const tHoje = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
 
-  // 1. Inserir tarefas (distribuídas nos próximos dias ou todas hoje)
   if (Array.isArray(plano.tarefas)) {
     if (!Array.isArray(S.tasks)) S.tasks = [];
     plano.tarefas.forEach((tarf, idx) => {
@@ -1172,7 +1984,6 @@ function importarPlanoGeradoPrumo(diasMultiplos = false) {
     });
   }
 
-  // 2. Inserir Hábito diário caso configurado
   if (plano.habito && plano.habito.nome && Array.isArray(S.habits)) {
     const jaExiste = S.habits.some(h => (h.name || "").toLowerCase() === plano.habito.nome.toLowerCase());
     if (!jaExiste) {
@@ -1186,7 +1997,6 @@ function importarPlanoGeradoPrumo(diasMultiplos = false) {
     }
   }
 
-  // 3. Salvar e re-renderizar
   if (typeof commit === "function") commit();
   if (typeof persist === "function") persist(true);
   if (typeof render === "function") render();
@@ -1236,10 +2046,10 @@ function iaAjustesHTML() {
           <span class="note">Escolha o motor que alimenta as conversas com o Coach e o Mascote.</span>
         </div>
         <select id="set-ia-provedor" class="ia-provider-select">
-          <option value="gemini" ${cfg.provedor === "gemini" ? "selected" : ""}>Google Gemini 1.5 Flash (Grátis & Rápido)</option>
-          <option value="groq" ${cfg.provedor === "groq" ? "selected" : ""}>Groq (Llama 3.3 Ultra Rápido)</option>
-          <option value="openai" ${cfg.provedor === "openai" ? "selected" : ""}>OpenAI (ChatGPT GPT-4o-mini)</option>
-          <option value="autonomo" ${cfg.provedor === "autonomo" ? "selected" : ""}>Motor Offline Integrado (Sem Chave)</option>
+          <option value="autonomo" ${cfg.provedor === "autonomo" ? "selected" : ""}>IA Real Gratuita Global (Llama 3.3 / GPT-4o - Sem Chave)</option>
+          <option value="gemini" ${cfg.provedor === "gemini" ? "selected" : ""}>Google Gemini 1.5 Flash (Chave Própria)</option>
+          <option value="groq" ${cfg.provedor === "groq" ? "selected" : ""}>Groq Llama 3.3 Turbo (Chave Própria)</option>
+          <option value="openai" ${cfg.provedor === "openai" ? "selected" : ""}>OpenAI ChatGPT GPT-4o (Chave Própria)</option>
         </select>
       </div>
 
@@ -1254,7 +2064,7 @@ function iaAjustesHTML() {
       <div class="setrow">
         <div class="lbl">
           <b>Status & Teste</b>
-          <span class="note" id="ia-status-conexao">${cfg.chave ? "Chave configurada. Teste abaixo." : "Usando motor neuro-heurístico autônomo com raciocínio visível."}</span>
+          <span class="note" id="ia-status-conexao">${cfg.chave ? "Chave configurada. Teste abaixo." : "Conectado à IA Generativa Real Gratuita. Zero custo."}</span>
         </div>
         <div style="display:flex;gap:8px;">
           <button type="button" class="btn small" id="ia-btn-testar-conexao" data-act="ia-testar-conexao">Testar Conexão</button>
@@ -1307,6 +2117,21 @@ if (typeof ACOES_EXTRAS !== "undefined") {
   ACOES_EXTRAS["ia-importar-plano"] = () => importarPlanoGeradoPrumo(false);
   ACOES_EXTRAS["ia-testar-conexao"] = () => testarConexaoIA();
   ACOES_EXTRAS["limpar-chat-ia"] = () => reiniciarChatIA();
+  ACOES_EXTRAS["ia-trocar-aba"] = b => trocarAbaDesdobrador(b ? b.dataset.aba : "estrategia");
+  ACOES_EXTRAS["ia-preset"] = b => selecionarPresetEstudo(b ? b.dataset.preset : "enem");
+  ACOES_EXTRAS["ia-add-materia"] = () => {
+    const inp = document.getElementById("ia-nova-materia-input");
+    if (inp) {
+      adicionarMateriaEdital(inp.value);
+      inp.value = "";
+    }
+  };
+  ACOES_EXTRAS["ia-del-materia"] = b => removerMateriaEdital(b ? +b.dataset.idx : -1);
+  ACOES_EXTRAS["ia-sel-horas"] = b => selecionarHorasEstudo(b ? +b.dataset.horas : 4);
+  ACOES_EXTRAS["ia-sel-dias"] = b => selecionarDiasEstudo(b ? +b.dataset.dias : 6);
+  ACOES_EXTRAS["ia-gerar-ciclo-estrategia"] = () => executarPlanejamentoEstrategicoIA();
+  ACOES_EXTRAS["ia-importar-ciclo-agenda"] = () => importarCicloParaAgendaPrumo();
+  ACOES_EXTRAS["ia-copiar-cronograma"] = () => copiarCronogramaCompleto();
 }
 
 // Delegação de cliques para botões com data-act (garante resposta direta em qualquer contexto)
@@ -1343,7 +2168,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 5. Abrir desdobrador de metas
+  // 5. Abrir desdobrador de metas / cronograma
   const btnDesdobrar = e.target.closest("[data-act='abrir-desdobrador-ia']");
   if (btnDesdobrar) {
     e.preventDefault();
@@ -1351,7 +2176,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 6. Fechar desdobrador de metas
+  // 6. Fechar desdobrador de metas / cronograma
   const btnFecharDesdobrar = e.target.closest("[data-act='fechar-desdobrador-ia']");
   if (btnFecharDesdobrar) {
     e.preventDefault();
@@ -1359,7 +2184,83 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 7. Chip de meta rápida com 1 clique
+  // 7. Trocar aba do planejador
+  const btnTrocarAba = e.target.closest("[data-act='ia-trocar-aba']");
+  if (btnTrocarAba) {
+    e.preventDefault();
+    trocarAbaDesdobrador(btnTrocarAba.dataset.aba);
+    return;
+  }
+
+  // 8. Selecionar preset de estudo
+  const btnPreset = e.target.closest("[data-act='ia-preset']");
+  if (btnPreset) {
+    e.preventDefault();
+    selecionarPresetEstudo(btnPreset.dataset.preset);
+    return;
+  }
+
+  // 9. Adicionar matéria ao edital
+  const btnAddMateria = e.target.closest("[data-act='ia-add-materia']");
+  if (btnAddMateria) {
+    e.preventDefault();
+    const inp = document.getElementById("ia-nova-materia-input");
+    if (inp) {
+      adicionarMateriaEdital(inp.value);
+      inp.value = "";
+    }
+    return;
+  }
+
+  // 10. Remover matéria do edital
+  const btnDelMateria = e.target.closest("[data-act='ia-del-materia']");
+  if (btnDelMateria) {
+    e.preventDefault();
+    removerMateriaEdital(+btnDelMateria.dataset.idx);
+    return;
+  }
+
+  // 11. Selecionar horas de estudo
+  const btnHoras = e.target.closest("[data-act='ia-sel-horas']");
+  if (btnHoras) {
+    e.preventDefault();
+    selecionarHorasEstudo(+btnHoras.dataset.horas);
+    return;
+  }
+
+  // 12. Selecionar dias de estudo
+  const btnDias = e.target.closest("[data-act='ia-sel-dias']");
+  if (btnDias) {
+    e.preventDefault();
+    selecionarDiasEstudo(+btnDias.dataset.dias);
+    return;
+  }
+
+  // 13. Gerar ciclo de estudos com IA
+  const btnGerarCiclo = e.target.closest("[data-act='ia-gerar-ciclo-estrategia']");
+  if (btnGerarCiclo) {
+    e.preventDefault();
+    executarPlanejamentoEstrategicoIA();
+    return;
+  }
+
+  // 14. Importar ciclo de estudos para a agenda
+  const btnImportarCiclo = e.target.closest("[data-act='ia-importar-ciclo-agenda']");
+  if (btnImportarCiclo) {
+    e.preventDefault();
+    importarCicloParaAgendaPrumo();
+    return;
+  }
+
+  // 15. Copiar cronograma completo
+  const btnCopiarCiclo = e.target.closest("[data-act='ia-copiar-cronograma']");
+  if (btnCopiarCiclo) {
+    e.preventDefault();
+    copiarCronogramaCompleto();
+    return;
+  }
+
+  // 16. Chip de meta rápida
   const btnChipMeta = e.target.closest("[data-act='ia-chip-meta']");
   if (btnChipMeta) {
     e.preventDefault();
@@ -1367,7 +2268,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 8. Gerar plano com IA
+  // 17. Gerar plano de meta rápida
   const btnGerarPlano = e.target.closest("[data-act='ia-gerar-plano']");
   if (btnGerarPlano) {
     e.preventDefault();
@@ -1375,7 +2276,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 9. Importar cronograma distribuído nos próximos dias
+  // 18. Importar cronograma distribuído nos próximos dias
   const btnImportarCronograma = e.target.closest("[data-act='ia-importar-cronograma']");
   if (btnImportarCronograma) {
     e.preventDefault();
@@ -1383,7 +2284,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 10. Importar plano tudo hoje
+  // 19. Importar plano tudo hoje
   const btnImportarPlano = e.target.closest("[data-act='ia-importar-plano']");
   if (btnImportarPlano) {
     e.preventDefault();
@@ -1391,7 +2292,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 10. Reiniciar conversa do chat
+  // 20. Reiniciar conversa do chat
   const btnLimpar = e.target.closest("[data-act='limpar-chat-ia']");
   if (btnLimpar) {
     e.preventDefault();
@@ -1399,7 +2300,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 11. Testar conexão IA
+  // 21. Testar conexão IA
   const btnTestar = e.target.closest("[data-act='ia-testar-conexao']");
   if (btnTestar) {
     e.preventDefault();
@@ -1408,7 +2309,7 @@ document.addEventListener("click", e => {
   }
 });
 
-// Delegação de formulários (Chat e Desdobrador)
+// Delegação de formulários (Chat e Metas Rápidas)
 document.addEventListener("submit", e => {
   if (e.target && e.target.id === "form-chat-ia") {
     e.preventDefault();
@@ -1422,7 +2323,7 @@ document.addEventListener("submit", e => {
   }
 });
 
-// Delegação de alteração de campos (Ajustes da IA)
+// Delegação de alteração de campos (Ajustes da IA e Prioridade)
 document.addEventListener("change", e => {
   if (e.target && e.target.id === "set-ia-provedor") {
     atualizarProvedorIA(e.target.value);
@@ -1432,20 +2333,38 @@ document.addEventListener("change", e => {
     atualizarChaveIA(e.target.value);
     return;
   }
+  if (e.target && e.target.id === "ia-materia-prioridade") {
+    estadoPlanejadorEstudos.materiaPrioridade = e.target.value;
+    return;
+  }
+  if (e.target && e.target.id === "ia-concurso-nome") {
+    estadoPlanejadorEstudos.concursoNome = e.target.value.trim();
+    return;
+  }
 });
 
-// Sincronizar chave em tempo de digitação
+// Sincronizar campos em tempo de digitação
 document.addEventListener("input", e => {
   if (e.target && e.target.id === "set-ia-chave") {
     atualizarChaveIA(e.target.value);
   }
+  if (e.target && e.target.id === "ia-concurso-nome") {
+    estadoPlanejadorEstudos.concursoNome = e.target.value;
+  }
 });
 
-// Fechar modais ao pressionar tecla Escape
+// Teclas especiais (Enter no input de matéria e Escape nos modais)
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") {
     fecharChatPrumiIA();
     fecharDesdobradorMetasIA();
+    return;
+  }
+  if (e.key === "Enter" && e.target && e.target.id === "ia-nova-materia-input") {
+    e.preventDefault();
+    adicionarMateriaEdital(e.target.value);
+    e.target.value = "";
+    return;
   }
 });
 
@@ -1461,6 +2380,15 @@ if (typeof window !== "undefined") {
   window.abrirDesdobradorMetasIA = abrirDesdobradorMetasIA;
   window.fecharDesdobradorMetasIA = fecharDesdobradorMetasIA;
   window.fecharDesdobradorMetasIASeFundo = fecharDesdobradorMetasIASeFundo;
+  window.trocarAbaDesdobrador = trocarAbaDesdobrador;
+  window.selecionarPresetEstudo = selecionarPresetEstudo;
+  window.adicionarMateriaEdital = adicionarMateriaEdital;
+  window.removerMateriaEdital = removerMateriaEdital;
+  window.selecionarHorasEstudo = selecionarHorasEstudo;
+  window.selecionarDiasEstudo = selecionarDiasEstudo;
+  window.executarPlanejamentoEstrategicoIA = executarPlanejamentoEstrategicoIA;
+  window.importarCicloParaAgendaPrumo = importarCicloParaAgendaPrumo;
+  window.copiarCronogramaCompleto = copiarCronogramaCompleto;
   window.executarDesdobramentoMetaIA = executarDesdobramentoMetaIA;
   window.preencherEGerarMetaIA = preencherEGerarMetaIA;
   window.reiniciarChatIA = reiniciarChatIA;

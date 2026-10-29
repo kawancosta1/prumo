@@ -88,7 +88,7 @@ function viewHoje() {
         <div class="coach-meta-principal">🎯 ${esc(gerarBriefingMatinalCoach().focoSugerido)}</div>
         <div class="coach-acoes-ia">
           <button class="btn small primary coach-btn-chat" data-act="abrir-chat-ia">💬 Conversar com Coach</button>
-          <button class="btn small coach-btn-cronograma" data-act="abrir-desdobrador-ia">✨ Desdobrar Meta com IA</button>
+          <button class="btn small coach-btn-cronograma" data-act="abrir-desdobrador-ia">🎓 Cronograma Estratégico com IA</button>
         </div>
       </div>
     `

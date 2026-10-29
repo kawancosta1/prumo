@@ -1078,3 +1078,380 @@ body.dark .ia-neural-badge,
   border-color: rgba(129, 140, 248, 0.4);
   color: #c7d2fe;
 }
+
+/* ==========================================================================
+   PLANEJADOR DE ESTUDOS ESTRATÉGICO (CONCURSOS & ENEM - NÍVEL ESTRATÉGIA)
+   ========================================================================== */
+.ia-modal-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  gap: 4px;
+}
+[data-theme="dark"] .ia-modal-tabs,
+html[data-theme="dark"] .ia-modal-tabs,
+body.dark .ia-modal-tabs,
+.dark .ia-modal-tabs {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ia-modal-tab-btn {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted, #64748b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.ia-modal-tab-btn.ativo {
+  background: #ffffff;
+  color: var(--ink, #0f172a);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+[data-theme="dark"] .ia-modal-tab-btn.ativo,
+html[data-theme="dark"] .ia-modal-tab-btn.ativo,
+body.dark .ia-modal-tab-btn.ativo,
+.dark .ia-modal-tab-btn.ativo {
+  background: #27272a;
+  color: #f8fafc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* Presets de Editais / Provas */
+.ia-concurso-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 10px;
+}
+.ia-concurso-preset-btn {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4f46e5;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.ia-concurso-preset-btn:hover,
+.ia-concurso-preset-btn.ativo {
+  background: #6366f1;
+  color: #ffffff;
+  border-color: #6366f1;
+  transform: translateY(-1px);
+}
+[data-theme="dark"] .ia-concurso-preset-btn,
+html[data-theme="dark"] .ia-concurso-preset-btn,
+body.dark .ia-concurso-preset-btn,
+.dark .ia-concurso-preset-btn {
+  background: rgba(129, 140, 248, 0.14);
+  border-color: rgba(129, 140, 248, 0.35);
+  color: #c7d2fe;
+}
+[data-theme="dark"] .ia-concurso-preset-btn:hover,
+[data-theme="dark"] .ia-concurso-preset-btn.ativo,
+html[data-theme="dark"] .ia-concurso-preset-btn.ativo {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+/* Área de Matérias com Tags */
+.ia-tags-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  min-height: 44px;
+  align-items: center;
+}
+[data-theme="dark"] .ia-tags-area,
+html[data-theme="dark"] .ia-tags-area,
+body.dark .ia-tags-area,
+.dark .ia-tags-area {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.ia-tag-materia {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(59, 130, 246, 0.1);
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  animation: iaModalFadeIn 0.2s ease;
+}
+[data-theme="dark"] .ia-tag-materia,
+html[data-theme="dark"] .ia-tag-materia,
+body.dark .ia-tag-materia,
+.dark .ia-tag-materia {
+  background: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.ia-tag-materia-remover {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.6;
+}
+.ia-tag-materia-remover:hover {
+  opacity: 1;
+}
+
+.ia-add-materia-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+.ia-add-materia-input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 13px;
+  background: #f8fafc;
+  color: inherit;
+}
+[data-theme="dark"] .ia-add-materia-input,
+html[data-theme="dark"] .ia-add-materia-input,
+body.dark .ia-add-materia-input,
+.dark .ia-add-materia-input {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #f1f5f9;
+}
+
+/* Seletor de Pílulas (Horas e Dias) */
+.ia-pill-select-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ia-pill-select-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted, #475569);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ia-pill-select-btn.ativo {
+  background: #7c3aed;
+  border-color: #7c3aed;
+  color: #ffffff;
+}
+[data-theme="dark"] .ia-pill-select-btn,
+html[data-theme="dark"] .ia-pill-select-btn,
+body.dark .ia-pill-select-btn,
+.dark .ia-pill-select-btn {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #cbd5e1;
+}
+[data-theme="dark"] .ia-pill-select-btn.ativo,
+html[data-theme="dark"] .ia-pill-select-btn.ativo {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  color: #ffffff;
+}
+
+/* Painel de Métricas do Concurseiro */
+.ia-metricas-painel {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 10px 0;
+}
+@media (min-width: 480px) {
+  .ia-metricas-painel {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.ia-metrica-card {
+  padding: 10px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+[data-theme="dark"] .ia-metrica-card,
+html[data-theme="dark"] .ia-metrica-card,
+body.dark .ia-metrica-card,
+.dark .ia-metrica-card {
+  background: #18181b;
+  border-color: #3f3f46;
+}
+.ia-metrica-valor {
+  font-size: 16px;
+  font-weight: 800;
+  color: #7c3aed;
+  margin-bottom: 2px;
+}
+[data-theme="dark"] .ia-metrica-valor,
+html[data-theme="dark"] .ia-metrica-valor,
+body.dark .ia-metrica-valor,
+.dark .ia-metrica-valor {
+  color: #a78bfa;
+}
+.ia-metrica-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Cards dos Dias e Blocos */
+.ia-ciclo-dia-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+[data-theme="dark"] .ia-ciclo-dia-card,
+html[data-theme="dark"] .ia-ciclo-dia-card,
+body.dark .ia-ciclo-dia-card,
+.dark .ia-ciclo-dia-card {
+  background: #18181b;
+  border-color: #3f3f46;
+}
+
+.ia-ciclo-dia-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+[data-theme="dark"] .ia-ciclo-dia-header,
+html[data-theme="dark"] .ia-ciclo-dia-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.ia-ciclo-dia-nome {
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--ink, #0f172a);
+}
+.ia-ciclo-dia-foco {
+  font-size: 11px;
+  color: var(--muted, #64748b);
+  text-align: right;
+}
+
+.ia-bloco-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.02);
+  margin-bottom: 6px;
+  gap: 8px;
+  font-size: 12px;
+}
+[data-theme="dark"] .ia-bloco-item,
+html[data-theme="dark"] .ia-bloco-item {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Badges de Metodologia */
+.ia-badge-metodologia {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ia-badge-metodologia.teoria {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+}
+.ia-badge-metodologia.questoes {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+.ia-badge-metodologia.revisao {
+  background: rgba(139, 92, 246, 0.15);
+  color: #7c3aed;
+}
+.ia-badge-metodologia.simulado {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+}
+[data-theme="dark"] .ia-badge-metodologia.teoria {
+  background: rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+}
+[data-theme="dark"] .ia-badge-metodologia.questoes {
+  background: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+}
+[data-theme="dark"] .ia-badge-metodologia.revisao {
+  background: rgba(139, 92, 246, 0.25);
+  color: #a78bfa;
+}
+[data-theme="dark"] .ia-badge-metodologia.simulado {
+  background: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+}
+
+.ia-btn-copiar-cronograma {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border: 1px solid rgba(99, 102, 241, 0.3) !important;
+  color: var(--ink, #334155) !important;
+  font-weight: 600 !important;
+  padding: 8px 14px !important;
+  border-radius: 12px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  cursor: pointer;
+}
+[data-theme="dark"] .ia-btn-copiar-cronograma,
+html[data-theme="dark"] .ia-btn-copiar-cronograma,
+body.dark .ia-btn-copiar-cronograma,
+.dark .ia-btn-copiar-cronograma {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #f1f5f9 !important;
+}
