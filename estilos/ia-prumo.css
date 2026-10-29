@@ -248,6 +248,112 @@ body.dark .ia-pill-btn:hover,
   flex-direction: row-reverse;
 }
 
+.ia-msg-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+}
+
+/* --- Card de Raciocínio / Pensamento da IA --- */
+.ia-thought-card {
+  margin-bottom: 8px;
+  border-radius: 14px;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px dashed rgba(99, 102, 241, 0.35);
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.06);
+}
+body.dark .ia-thought-card,
+.dark .ia-thought-card {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(129, 140, 248, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.ia-thought-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6366f1;
+  user-select: none;
+  list-style: none;
+  transition: background 0.15s ease;
+}
+body.dark .ia-thought-summary,
+.dark .ia-thought-summary {
+  color: #a5b4fc;
+}
+.ia-thought-summary:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+.ia-thought-summary::-webkit-details-marker {
+  display: none;
+}
+.ia-thought-icon {
+  font-size: 14px;
+  animation: iaBrainPulse 2.2s infinite ease-in-out;
+}
+@keyframes iaBrainPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+.ia-thought-title {
+  flex: 1;
+}
+.ia-thought-chevron {
+  font-size: 11px;
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+}
+.ia-thought-card[open] .ia-thought-chevron {
+  transform: rotate(180deg);
+}
+.ia-thought-content {
+  padding: 8px 12px 10px 12px;
+  border-top: 1px dashed rgba(99, 102, 241, 0.2);
+  font-size: 12px;
+  line-height: 1.55;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.65);
+  font-family: inherit;
+  word-break: break-word;
+}
+body.dark .ia-thought-content,
+.dark .ia-thought-content {
+  color: #cbd5e1;
+  background: rgba(24, 24, 27, 0.5);
+}
+.ia-thought-content strong {
+  color: #4338ca;
+}
+body.dark .ia-thought-content strong {
+  color: #c7d2fe;
+}
+
+/* Indicador de Pensamento Ativo */
+.ia-thinking-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 16px;
+  font-size: 13px;
+  color: #6366f1;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+}
+body.dark .ia-thinking-live,
+.dark .ia-thinking-live {
+  color: #a5b4fc;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.12));
+}
+
 .ia-msg-bubble {
   padding: 12px 16px;
   border-radius: 18px;

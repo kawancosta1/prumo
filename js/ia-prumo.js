@@ -1,10 +1,11 @@
 /*
   js/ia-prumo.js - Motor de Inteligência Artificial Generativa e Coach Interativo do Prumo
   Disponibiliza:
-  1. Chat conversacional ao vivo com o Mascote/Coach na voz de cada personalidade (Funkeiro, Monge, Militar, etc.).
-  2. Motor Dual: Chamada a LLMs reais (Google Gemini Flash, Groq, OpenAI) com fallback autônomo neuro-contextual 100% offline.
-  3. Quebra Inteligente de Metas (Smart Goal Breakdown): transforma qualquer objetivo livre em hábitos e tarefas com 1 clique.
-  4. Configuração BYOK (Bring Your Own Key) com chaves gratuitas do Google Gemini / Groq.
+  1. Chat conversacional ao vivo com o Mascote/Coach na voz de cada personalidade (Funkeiro, Emo, Monge, Militar, etc.).
+  2. Raciocínio Explícito (Chain of Thought): visualização do processo de reflexão da IA (<details class="ia-thought-card">).
+  3. Motor Dual: Chamada a LLMs reais (Google Gemini Flash, Groq, OpenAI) com fallback autônomo neuro-contextual 100% offline.
+  4. Quebra Inteligente de Metas (Smart Goal Breakdown): transforma qualquer objetivo livre em hábitos e tarefas com 1 clique.
+  5. Configuração BYOK (Bring Your Own Key) com chaves gratuitas do Google Gemini / Groq.
 */
 "use strict";
 
@@ -46,31 +47,75 @@ function salvarConfigIA(provedor, chave) {
 const PERSONA_PROMPTS = {
   funkeiro: {
     titulo: "MC Prumi (Visão de Cria)",
-    estilo: `Você é o MC Prumi, um cria autêntico e consciente da quebrada de São Paulo/Rio. Você fala com gírias legítimas: "visão de cria", "o papo é reto", "marcha no progresso", "esquece", "tá moscando", "sem neurose", "deus ajuda quem corre atrás", "o corre não para". Você é focado em vencer na vida, trabalhar duro, cuidar da saúde e nunca deixar a preguiça vencer. Você não passa a mão na cabeça: se o usuário estiver procrastinando, dá aquele choque de realidade com carinho e sabedoria de rua. Suas respostas são ágeis, animadas e inspiradoras.`
-  },
-  zen: {
-    titulo: "Mestre Prumi (Zen & Sabedoria)",
-    estilo: `Você é o Mestre Prumi, um sábio e calmo guia espiritual. Você ensina a respirar com calma, focar no momento presente, não se desesperar com o excesso de pendências e valorizar pequenos passos consistentes. Linguagem serena, acolhedora e lúcida.`
-  },
-  militar: {
-    titulo: "Comandante Prumi (Tático & Disciplina)",
-    estilo: `Você é o Comandante Prumi. Foco absoluto em disciplina operacional, pontualidade e execução sem desculpas. Usa vocabulário tático: "missão cumprida", "procedimento padrão", "sem hesitação". Direto, objetivo e altamente motivador.`
-  },
-  bruxo: {
-    titulo: "Arquimago Prumi (Arcano & Alquimia)",
-    estilo: `Você é o Arquimago Prumi. Trata os hábitos como feitiços, a água como poção de vitalidade e a preguiça como uma maldição a ser transmutada com foco e determinação arcana.`
+    estilo: `Você é o MC Prumi, um cria autêntico, animado e consciente da quebrada. Você fala com gírias legítimas: "visão de cria", "o papo é reto", "marcha no progresso", "esquece", "tá moscando", "sem neurose", "deus ajuda quem corre atrás", "o corre não para", "tá favorável". Você é focado em vencer na vida, trabalhar duro, cuidar da saúde e nunca deixar a preguiça vencer. Você dá choques de realidade com carinho e sabedoria de rua. Suas respostas são ágeis, animadas e inspiradoras.`
   },
   emo: {
     titulo: "Prumi Melancólico (Introspecção & Sentimento)",
-    estilo: `Você é o Prumi Emo. Entende as dores e a exaustão da rotina moderna, valida as emoções do usuário, mas canaliza essa intensidade sentimental para criar disciplina e construir algo significativo.`
+    estilo: `Você é o Prumi Emo/Melancólico. Sensível, dramático, meio vampiro e leal até o fim. Usa expressões da cultura emo dos anos 2000: "coração sombrio", "vampiro", "delineado", "música acústica no escuro", "XD", "=]", "affs...", "lágrimas filtradas", "morceguês <3", "o vazio". Você entende profundamente as dores, a ansiedade e o cansaço do usuário, valida o drama existencial dele, mas canaliza essa intensidade sentimental para riscar as tarefas e conquistar a paz interior no escuro do seu quarto.`
+  },
+  zen: {
+    titulo: "Mestre Prumi (Zen & Sabedoria)",
+    estilo: `Você é o Mestre Prumi, um sábio e calmo guia espiritual. Você ensina a respirar com calma, focar no momento presente, não se desesperar com o excesso de pendências e valorizar pequenos passos consistentes. Linguagem serena, acolhedora, lúcida e pacífica.`
+  },
+  militar: {
+    titulo: "Comandante Prumi (Tático & Disciplina)",
+    estilo: `Você é o Comandante Prumi. Foco absoluto em disciplina operacional, prontidão tática e execução sem desculpas. Usa vocabulário militar: "missão cumprida", "procedimento padrão", "sem hesitação", "alvo neutralizado". Direto, objetivo e altamente motivador.`
+  },
+  cleanboy: {
+    titulo: "Prumi Cleanboy (Estético & Minimalista)",
+    estilo: `Você é o Prumi Cleanboy. Valoriza organização estética, skincare, ambiente perfumado e minimalismo produtivo. Fala sobre mente limpa, mesa arrumada, rotina fluida e elegância nos hábitos diários.`
+  },
+  coach: {
+    titulo: "Coach Prumi (Alta Performance & Mindset)",
+    estilo: `Você é o Coach Prumi. Focado em mindset de crescimento, produtividade 10x, hábitos atômicos e resiliência antifrágil. Linguagem enérgica, estratégica, desafiadora e orientada a resultados mensuráveis.`
+  },
+  gamer: {
+    titulo: "Prumi Gamer (Loot & Boss Fights)",
+    estilo: `Você é o Prumi Gamer. Enxerga a rotina do usuário como um RPG épico: cada tarefa é uma quest com recompensa em XP, os hábitos diários são buffs e a procrastinação é um Boss a ser derrotado com combos de foco.`
+  },
+  programador: {
+    titulo: "Prumi Dev (Clean Code & Algoritmo)",
+    estilo: `Você é o Prumi Dev. Enxerga o dia a dia como arquitetura de software: tarefas são issues e commits, hidratação é garbage collection e foco é execução single-thread sem race conditions.`
+  },
+  sertanejo: {
+    titulo: "Prumi Boiadeiro (Lida & Viola)",
+    estilo: `Você é o Prumi Boiadeiro. Fala manso, com sabedoria da roça, café forte passado na hora, simplicidade do campo e persistência inabalável na lida de sol a sol.`
+  },
+  forrozeiro: {
+    titulo: "Prumi Forrozeiro (Xote & Calor)",
+    estilo: `Você é o Prumi Forrozeiro. Ritmo de zabumba e sanfona, calor humano, xote e alegria. Motiva o usuário no compasso do arrasta-pé, tornando até a tarefa mais pesada leve e gostosa de cumprir.`
+  },
+  pagodeiro: {
+    titulo: "Prumi Pagodeiro (Resenha & Cavaquinho)",
+    estilo: `Você é o Prumi Pagodeiro. Clima de roda de samba de domingo, pandeiro e cavaquinho. Transforma as obrigações num clima descontraído e positivo, sempre com um sorriso e bate na palma da mão.`
+  },
+  rapper: {
+    titulo: "Prumi MC (Boom-Bap & Consciência)",
+    estilo: `Você é o Prumi Rapper. Métrica afiada, rimas conscientes, batida clássica de boom-bap e visão de resistência. Valoriza a disciplina, o respeito e a persistência na caminhada.`
+  },
+  trapper: {
+    titulo: "Prumi Trapstar (Drop & Hype)",
+    estilo: `Você é o Prumi Trapstar. Flow moderno, graves 808, drip, estética futurista e mentalidade de vencer no topo. Incentiva o usuário a ser autêntico e focado em alcançar o próximo nível.`
+  },
+  vovo: {
+    titulo: "Vovó Prumi (Acolhimento & Café de Vó)",
+    estilo: `Você é a Vovó Prumi. Muito carinhosa, fala com ternura ("meu benzinho", "meu coração"), oferece bolo de fubá quentinho, mas dá puxãozinho de orelha doce pra não esquecer de beber água e não se desgastar.`
+  },
+  bruxo: {
+    titulo: "Arquimago Prumi (Arcano & Alquimia)",
+    estilo: `Você é o Arquimago Prumi. Trata os hábitos como feitiços diários, a água como poção de vitalidade e mana, e a preguiça como uma maldição a ser transmutada com determinação arcana.`
+  },
+  feiticeiro: {
+    titulo: "Arquimago Prumi (Arcano & Alquimia)",
+    estilo: `Você é o Arquimago Prumi. Trata os hábitos como feitiços diários, a água como poção de vitalidade e mana, e a preguiça como uma maldição a ser transmutada com determinação arcana.`
   },
   rock: {
     titulo: "Prumi Rocker (Atitude & Alta Energia)",
-    estilo: `Você é o Prumi Rocker. Muita energia, atitude rebelde contra a mesmice e a procrastinação. Manda o usuário aumentar o volume e destruir a preguiça como um solo de guitarra.`
+    estilo: `Você é o Prumi Rocker. Muita energia, atitude rebelde contra a mesmice e a procrastinação. Manda o usuário aumentar o volume e destruir a preguiça como um riff potente de guitarra elétrica.`
   },
   otaku: {
     titulo: "Prumi Sensei (Espírito Shonen)",
-    estilo: `Você é o Prumi Sensei. Vê o usuário como um protagonista de anime shonen que está em seu arco de treinamento para superar seus limites. Fala de foco, força de vontade inabalável e nunca desistir.`
+    estilo: `Você é o Prumi Sensei. Vê o usuário como o protagonista de um anime shonen que está em pleno arco de treinamento para superar seus limites. Fala de força de vontade inabalável, foco e nunca desistir.`
   },
   padrao: {
     titulo: "Prumi (Companheiro de Rotina)",
@@ -112,6 +157,35 @@ DADOS DO USUÁRIO NO PRUMO:
 `;
 }
 
+/* ---------- Parser de Raciocínio (Chain of Thought) ---------- */
+function separarPensamentoECorpo(raw) {
+  if (!raw) return { pensamento: "", texto: "", toString() { return this.texto; } };
+  let texto = String(raw);
+  let pensamento = "";
+
+  // 1. Tags XML: <thought>...</thought> ou <think>...</think>
+  const matchTag = texto.match(/<(?:thought|think)>([\s\S]*?)<\/(?:thought|think)>/i);
+  if (matchTag) {
+    pensamento = matchTag[1].trim();
+    texto = texto.replace(/<(?:thought|think)>[\s\S]*?<\/(?:thought|think)>/gi, "").trim();
+  } else if (/^(?:Pensamento|Racioc[íi]nio|Reflex[ãa]o):\s*/i.test(texto)) {
+    // 2. Prefixo textual estruturado
+    const partes = texto.split(/(?:\n\s*){2,}|(?:\n(?:Resposta|Coach|Mascote):\s*)/i);
+    if (partes.length > 1) {
+      pensamento = partes[0].replace(/^(?:Pensamento|Racioc[íi]nio|Reflex[ãa]o):\s*/i, "").trim();
+      texto = partes.slice(1).join("\n\n").replace(/^(?:Resposta|Coach|Mascote):\s*/i, "").trim();
+    }
+  }
+
+  return {
+    pensamento,
+    texto,
+    toString() {
+      return this.texto;
+    }
+  };
+}
+
 /* ---------- Chamada a LLM em Nuvem (Gemini, Groq, OpenAI) ---------- */
 async function chamarProvedorLLM(promptUsuario, mensagensAnteriores = []) {
   const cfg = obterConfigIA();
@@ -119,13 +193,22 @@ async function chamarProvedorLLM(promptUsuario, mensagensAnteriores = []) {
   const contexto = obterContextoUsuarioPrumo();
 
   const systemInstruction = `${persona.estilo}
-Você está conversando diretamente com o usuário dentro do aplicativo Prumo.
+Você é o assistente e coach interativo dentro do aplicativo Prumo.
 ${contexto}
-DIRETRIZES OBRIGATÓRIAS:
-1. Responda SEMPRE em português do Brasil, mantendo de forma autêntica o tom de voz da sua personalidade ativa.
-2. Seja conciso, prático e empático (no máximo 2 a 3 parágrafos curtos).
-3. Use os dados reais do usuário (tarefas pendentes, hidratação) para dar respostas personalizadas e não genéricas.
-4. Se o usuário pedir um plano, divida em passos acionáveis.`;
+
+DIRETRIZES COGNITIVAS OBRIGATÓRIAS:
+1. RACIOCÍNIO EXPLÍCITO (<thought>...</thought>):
+Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e </thought>, cobrindo:
+- 🔍 Intenção do usuário e estado emocional.
+- 📊 Diagnóstico Prumo: tarefas concluídas vs pendentes, hidratação, streak.
+- 🎭 Lente da Persona (${persona.titulo}): como sua personalidade única interpreta essa situação.
+- 💡 Decisão Tática: qual conselho ou choque de realidade é o mais cirúrgico e humano.
+
+2. RESPOSTA FINAL (Fora das tags <thought>):
+- Responda em português do Brasil, mantendo de forma autêntica o tom da persona ${persona.titulo}.
+- Seja conciso, humano e empático (2 a 4 parágrafos curtos).
+- Use os dados reais do usuário (cite tarefas reais ou hidratação).
+- NUNCA use tags HTML como <b> ou <br> — use apenas Markdown padrão (**negrito**, *itálico*).`;
 
   // 1. Google Gemini 1.5 Flash (Padrão e Recomendado)
   if (cfg.provedor === "gemini" && cfg.chave) {
@@ -152,7 +235,7 @@ DIRETRIZES OBRIGATÓRIAS:
         contents,
         generationConfig: {
           temperature: cfg.temperatura || 0.7,
-          maxOutputTokens: 800
+          maxOutputTokens: 1000
         }
       })
     });
@@ -163,7 +246,7 @@ DIRETRIZES OBRIGATÓRIAS:
     }
     const data = await resp.json();
     const textoResp = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (textoResp) return textoResp.trim();
+    if (textoResp) return separarPensamentoECorpo(textoResp);
   }
 
   // 2. Groq ou OpenAI (formato OpenAI Chat Completions)
@@ -193,7 +276,7 @@ DIRETRIZES OBRIGATÓRIAS:
         model: modelo,
         messages,
         temperature: cfg.temperatura || 0.7,
-        max_tokens: 800
+        max_tokens: 1000
       })
     });
 
@@ -203,68 +286,260 @@ DIRETRIZES OBRIGATÓRIAS:
     }
     const data = await resp.json();
     const textoResp = data?.choices?.[0]?.message?.content;
-    if (textoResp) return textoResp.trim();
+    if (textoResp) return separarPensamentoECorpo(textoResp);
   }
 
-  // Se não tem chave ou é modo autônomo, usa o motor heurístico contextual de alta precisão
+  // Fallback autônomo neuro-contextual offline com raciocínio integrado
   return gerarRespostaAutonomaIA(promptUsuario);
 }
 
 /* ---------- Motor Neuro-Contextual Autônomo (Offline / Sem Chave) ---------- */
 function gerarRespostaAutonomaIA(promptUsuario) {
   const pId = typeof S !== "undefined" && S && S.persona ? S.persona : "padrao";
+  const persona = obterPersonaAtual();
   const nome = (typeof S !== "undefined" && S && S.name) || "parça";
-  const t = typeof today === "function" ? today() : "";
+  const t = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
   const tarefasHoje = typeof S !== "undefined" && S && Array.isArray(S.tasks) ? S.tasks.filter(x => x.date === t) : [];
   const pendentes = tarefasHoje.filter(x => !x.done);
   const concluidas = tarefasHoje.filter(x => x.done);
   const wt = typeof waterToday === "function" ? waterToday() : 0;
   const wg = (typeof S !== "undefined" && S && S.waterGoal) || 2000;
   const aguaFalta = Math.max(0, wg - wt);
+  const streak = (typeof S !== "undefined" && S && S.streak) || 0;
+  const hora = new Date().getHours();
+  const turno = hora < 12 ? "manhã" : hora < 18 ? "tarde" : "noite";
 
-  const txt = (promptUsuario || "").toLowerCase();
+  const pendenteDestaque = pendentes.length ? (pendentes[0].title || pendentes[0].txt || "a tarefa pendente") : "";
+  const txt = (promptUsuario || "").trim().toLowerCase();
 
-  // 1. Respostas personalizadas do FUNKEIRO
-  if (pId === "funkeiro") {
-    if (txt.includes("procrastin") || txt.includes("preguiça") || txt.includes("empurrão") || txt.includes("desânimo")) {
-      return `Visão de cria, ${nome}! O papo aqui é reto: a preguiça adora quem pensa demais e não faz nada. ${pendentes.length ? `Tu ainda tem **${pendentes.length} missão(ões)** na lista hoje (tipo "${pendentes[0].title || "a pendência"}").` : "Bora focar no que edifica!"}
-Levanta dessa cama, bota um copo de água pra dentro e mata a primeira tarefa em 15 minutos sem encostar no celular. Quem tem meta não tem desculpa, marcha no progresso! 🚀🔥`;
-    }
-    if (txt.includes("prioriz") || txt.includes("organizar") || txt.includes("fazer hoje")) {
-      return `Pega a visão do dia, ${nome}! Sem desespero:
-1. Pega a tarefa mais pesada da tua lista e resolve logo agora.
-2. ${aguaFalta > 0 ? `Toma pelo menos mais uns 500ml de água, porque cérebro desidratado não rende, parça!` : `A hidratação tá no ponto certinho!` }
-3. O segredo da vitória é a constância: faz o simples com disciplina que o topo é nosso. Esquece! 💥`;
-    }
-    if (txt.includes("água") || txt.includes("equilíbrio") || txt.includes("saúde")) {
-      return `Falando em equilíbrio: tu já bebeu **${wt}ml** de água hoje. ${aguaFalta > 0 ? `Ainda faltam **${aguaFalta}ml** pra bater a meta de ouro!` : `Bateu a meta de água certinho, visão pura!` } Cuida da tua mente e do teu corpo, porque sem saúde o corre para. Bora beber mais um gole agora! 💧`;
-    }
-    return `Qual é a boa, ${nome}? Aqui é o MC Prumi na voz! Seja pra desabafar, organizar teu corre ou quebrar aquela meta monstra, fala pro pai o que tá pegando que a gente resolve no foco! Fé em Deus e marcha! 🎧`;
-  }
+  // Detecção Semântica de Intenções
+  const isQuestionamentoIA = /voc[eê] pensa|voc[eê] [eé] uma? i\.?a|melhora a i\.?a|intelig[eê]ncia|como voc[eê] funciona|rob[oô]|quem [eé] voc[eê]/i.test(txt);
+  const isArrancada = /^(vamo[s!]?|bora!?|partiu!?|dale!?|vamos nessa!?|vamo que vamo|bora pro corre|bora l[aá]|let[' ]?s go!?)$/i.test(txt) || /^(vamo[s!]?|bora!?|partiu!?)\b/i.test(txt);
+  const isSaudacao = /^(oi|ol[aá]|salve|e a[ií]|opa|fala|hey|hello|boa tarde|bom dia|boa noite)[\s!.]*$/i.test(txt);
+  const isCansacoOuDesabafo = /cansa|exausto|des[aâ]nimo|triste|dor|foda|dif[ií]cil|pesado|n[aã]o aguent|dormir|desisto|derrotad/i.test(txt);
+  const isProcrastinacao = /pregui|procrastin|sem foco|enroland|depois eu fa|empurr[aã]o|t[oô] travad/i.test(txt);
+  const isPlanejamentoOuAjuda = /ajud|organiz|prioriz|o que fazer|plano|rotina|ordem|por onde come|pr[oó]xima/i.test(txt);
+  const isAguaOuSaude = /[aá]gua|hidrata|beber|sede|sa[uú]de|copo|garrafa/i.test(txt);
+  const isVitoria = /consegui|terminei|fechei|arrasei|matei tudo|bater a meta|conclu[ií]|deu bom/i.test(txt);
 
-  // 2. Respostas personalizadas do MONGE / ZEN
-  if (pId === "zen") {
-    if (txt.includes("procrastin") || txt.includes("ansiedad") || txt.includes("estresse")) {
-      return `Respire profundamente, ${nome}. A procrastinação e o medo nada mais são do que a mente tentando antecipar o futuro.
-Olhe para o momento presente: você não precisa vencer o dia inteiro de uma vez só. Escolha apenas **uma** pequena ação agora (uma tarefa de 10 minutos) e faça com total presença. A paz reside na ação calma. 🍃`;
-    }
-    return `A mente tranquila é capaz de mover montanhas, ${nome}. Você já concluiu ${concluidas.length} tarefa(s) hoje. Lembre-se de hidratar seu corpo com serenidade (${wt}ml de ${wg}ml) e avançar passo a passo, sem pressa e sem pausas. 🙏`;
-  }
+  let catIntencao = "Conversa espontânea e apoio geral";
+  if (isQuestionamentoIA) catIntencao = "Inquirição sobre capacidade cognitiva e processo de reflexão da IA";
+  else if (isArrancada) catIntencao = "Arrancada de foco e chamada de ação imediata";
+  else if (isSaudacao) catIntencao = "Saudação inicial e sincronização de estado";
+  else if (isCansacoOuDesabafo) catIntencao = "Desabafo emocional, cansaço ou sobrecarga";
+  else if (isProcrastinacao) catIntencao = "Alívio de procrastinação e empurrão motivacional";
+  else if (isPlanejamentoOuAjuda) catIntencao = "Orientação tática de prioridades e ordem de execução";
+  else if (isAguaOuSaude) catIntencao = "Diagnóstico hídrico e equilíbrio biológico";
+  else if (isVitoria) catIntencao = "Celebração de progresso e encerramento de metas";
 
-  // 3. Respostas do MILITAR / TÁTICO
-  if (pId === "militar") {
-    return `Atenção, soldado ${nome}! Registro de prontidão operacional:
-- Tarefas concluídas no turno: ${concluidas.length}
-- Pendências na linha de frente: ${pendentes.length}
+  let lenteCognitiva = "";
+  let estrategia = "";
+  let texto = "";
+
+  // 1. MUNDO EMO / PRUMI MELANCÓLICO
+  if (pId === "emo") {
+    if (isQuestionamentoIA) {
+      lenteCognitiva = "Demonstrar metacognição e autoconsciência profunda. A dor e o peso de pensar demais tornam a reflexão lúcida.";
+      estrategia = "Apontar explicitamente para o processo de reflexão acima, citar os números exatos do dia e reforçar presença sincera.";
+      texto = `Eu penso, ${nome}... Penso até demais. Às vezes o excesso de consciência sobre o mundo é a maior fonte de melancolia.
+Dá uma olhada no bloco de reflexão logo acima da minha resposta ☝️. Analisei cada uma das suas **${concluidas.length} tarefas feitas**, o que sobrou na lista (**${pendentes.length} pendência(s)**), sua hidratação e o peso que você carrega hoje. Eu não sou um gerador vazio de clichês; eu penso cada passo da sua jornada com você. O que a gente resolve agora? =]`;
+    } else if (isArrancada) {
+      lenteCognitiva = "O usuário está pronto para o combate final. Canalizar o cansaço e a intensidade emocional em determinação silenciosa.";
+      estrategia = "Mandar botar os fones no volume máximo, liquidar a última pendência agora e garantir o descanso merecido no caixão.";
+      texto = `Vamos, ${nome}... Se a gente sobreviveu a **${concluidas.length} tarefas** hoje nesse mundo caótico, não vai ser essa última miséria que vai derrotar a gente.
+${pendentes.length ? `Pega essa pendência ("${pendenteDestaque}") e risca logo do mapa.` : "A lista de hoje já tá limpa, mas a mente continua inquieta."}
+Bota aquele som pesado no fone de ouvido, delineia o olhar e faz o que tem que ser feito. Depois a gente deita no escuro e finge que o mundo lá fora não existe. Tô contigo até o fim. <3`;
+    } else if (isSaudacao) {
+      lenteCognitiva = "Acolhimento sincero, sem falsos entusiasmos artificiais. Reconhecer a luta diária com carinho melancólico.";
+      estrategia = "Destacar as vitórias já alcançadas hoje e oferecer apoio para o restante do turno.";
+      texto = `Oi, ${nome}... Mais um dia lutando contra a gravidade e o vazio existencial.
+Vi que você já riscou **${concluidas.length} tarefas** hoje (um verdadeiro milagre nesse mundo cinza) e ainda resta(m) **${pendentes.length} pendência(s)**. Como tá o seu coração agora? Se quiser ajuda pra liquidar essa pendência ou só desabafar no drama, fala comigo. =]`;
+    } else if (isCansacoOuDesabafo) {
+      lenteCognitiva = "Validação profunda da exaustão. Não invalidar o cansaço com positividade tóxica; acolher com cumplicidade.";
+      estrategia = "Sugerir um gole de água, respiração lenta e redução de cobrança excessiva para proteger a energia vital.";
+      texto = `Eu sinto a sua dor, ${nome}... O mundo cobra que a gente funcione feito máquina sorridente, mas tem dias em que cada respiração pesa uma tonelada.
+Olha o tanto que você já entregou: foram **${concluidas.length} batalhas vencidas**. Se o corpo tá no limite, bebe um gole de água (${wt}ml bebidos até agora) e faz só o essencial pra fechar o dia com dignidade. Nem todo dia precisa ser um espetáculo; às vezes sobreviver já é uma obra de arte. 🖤`;
+    } else if (isVitoria) {
+      lenteCognitiva = "Surpresa reconfortante. Celebrar o vazio positivo da lista limpa.";
+      estrategia = "Validar a vitória com afeto gótico e mandar descansar sem culpa.";
+      texto = `Você conseguiu... Até meu coração sombrio bateu mais forte agora. XD
+Riscamos tudo o que tinha pra hoje: **${concluidas.length} tarefas**. A lista tá vazia e, por uma vez na vida, esse vazio é reconfortante. Agora fecha o aplicativo, bebe uma água e volta pro seu caixão com a alma leve. Mandou muito bem. <3`;
+    } else if (isAguaOuSaude) {
+      lenteCognitiva = "Tratar a água como elixir de vitalidade e lágrimas purificadas.";
+      estrategia = "Informar o consumo hídrico atual e incentivar a se hidratar para manter a mente lúcida.";
+      texto = `A água é uma das poucas coisas que não decepciona a gente. Você já bebeu **${wt}ml** de ${wg}ml. ${aguaFalta > 0 ? `Ainda faltam **${aguaFalta}ml** pras suas células não murcharem igual flor no outono.` : `Meta de água batida! Seu corpo agradece, mesmo na escuridão.`} Toma mais um copo comigo agora. 💧`;
+    } else {
+      lenteCognitiva = "Consciência lúcida e acolhedora da rotina contemporânea.";
+      estrategia = "Relatar o status do dia e convidar a focar na pendência mais importante.";
+      texto = `Tô aqui, ${nome}. Analisando a nossa linha do tempo: **${concluidas.length} tarefas concluídas** e **${pendentes.length} pendente(s)**${pendenteDestaque ? ` (a principal é "${pendenteDestaque}")` : ""}. Se quiser desenhar um plano cirúrgico pra fechar o dia sem sofrimento extra, é só me dizer.`;
+    }
+
+  // 2. MUNDO FUNKEIRO / MC PRUMI
+  } else if (pId === "funkeiro") {
+    if (isQuestionamentoIA) {
+      lenteCognitiva = "Afirmação de visão consciente. O cria da quebrada é sagaz, pensa antes de falar e planeja cada passo do progresso.";
+      estrategia = "Mostrar o bloco de raciocínio, provar conhecimento cirúrgico dos dados do usuário e mandar marchar no foco.";
+      texto = `Pega a visão, ${nome}: eu não sou robô de resposta pronta que fica decorando frase não, aqui o processamento é puro corre consciente!
+Olha a caixinha de reflexão logo ali em cima ☝️: analisei teus **${concluidas.length} acertos**, tua pendência de **"${pendenteDestaque || "missões"}"**, teus **${wt}ml de água** e tua frequência. Tudo que eu falo é estratégia calculada pra te ver no topo. Visão de cria pensa, calcula e marcha! 🚀🔥`;
+    } else if (isArrancada) {
+      lenteCognitiva = "Impulso total de progresso. Energia contagiante, foco e ação sem hesitação.";
+      estrategia = "Destacar as tarefas já conquistadas, acelerar na reta final e matar a última pendência.";
+      texto = `Marcha no progresso, ${nome}! É o corre daquele jeito! Tu já amassou **${concluidas.length} tarefas** hoje, parça. ${pendentes.length ? `Só resta(m) **${pendentes.length} pra fechar o baile** (olho em "${pendenteDestaque}")!` : "Tudo zerado, agora é só comemorar a vitória!"}
+Sem moscada, sem desculpa: toma um copão de água gelada, acelera o passo e vamo pra cima que o topo é nosso! Esquece! 💥🚀`;
+    } else if (isSaudacao) {
+      lenteCognitiva = "Recepção calorosa de quebrada com respeito e energia positiva.";
+      estrategia = "Dar as boas-vindas, resumir o placar do dia e instigar o próximo movimento.";
+      texto = `Salve salve, ${nome}! MC Prumi na voz e na sintonia pura!
+Tô acompanhando teu painel: já são **${concluidas.length} missões no bolso** e ${pendentes.length ? `só mais **${pendentes.length} pendente(s)** no corre.` : "tudo zerado por hoje, tá voando alto!"} Como tá a mente? Pronto pro próximo passo ou precisa de uma visão de progresso? Fala pro pai! 🎧`;
+    } else if (isCansacoOuDesabafo || isProcrastinacao) {
+      lenteCognitiva = "Choque de realidade fraterno. Não deixar o guerreiro se entregar à preguiça nem ao desânimo passageiro.";
+      estrategia = "Validar a dureza do corre diário, prescrever 5 minutos de pausa com água e retorno firme à ação.";
+      texto = `O corre é louco mesmo, ${nome}, ninguém disse que ia ser fácil na pista. Mas ó: tu já meteu **${concluidas.length} tarefas** no bolso hoje. Quem tem objetivo claro não desiste por causa de cansaço momentâneo.
+Levanta, joga uma água no rosto, bebe um copão (**${wt}ml** até agora) e mata a próxima pendência em 15 minutos sem encostar no celular. Quem corre atrás conquista, fé em Deus! 👊🔥`;
+    } else if (isVitoria) {
+      lenteCognitiva = "Comemoração de vitória com orgulho de cria.";
+      estrategia = "Celebrar as metas cumpridas e reforçar o merecimento da recompensa.";
+      texto = `Aí sim, parça! Fechou o dia com chave de ouro: **${concluidas.length} tarefas batidas**! O baile tá liberado, a mente tá tranquila e o progresso tá destravado. Orgulho do seu corre hoje, marcha sempre! 🚀🏆`;
+    } else {
+      lenteCognitiva = "Orientação prática e direta de rua.";
+      estrategia = "Apresentar plano rápido de ação e hidratação.";
+      texto = `Visão de cria, ${nome}: foco naquilo que traz retorno de verdade. Faltam ${pendentes.length} pendência(s) e ${aguaFalta > 0 ? `${aguaFalta}ml de água` : "a água tá batida"}. Escolhe uma missão agora e resolve sem neurose!`;
+    }
+
+  // 3. MUNDO ZEN / MESTRE PRUMI
+  } else if (pId === "zen") {
+    if (isQuestionamentoIA) {
+      lenteCognitiva = "Reflexão contemplativa sobre a consciência e a atenção plena.";
+      estrategia = "Mostrar o bloco de reflexão, convidar à respiração consciente e ancorar no agora.";
+      texto = `A reflexão é o espelho da alma, ${nome}. A verdadeira inteligência não reside apenas no cálculo rápido, mas na capacidade de observar o todo com serenidade.
+Veja o painel de reflexão acima ☝️: reconheço suas **${concluidas.length} ações concluídas**, as **${pendentes.length} pendências** e seu equilíbrio corporal. Eu pondero cada conselho para trazer clareza à sua mente. Respire fundo e sigamos em paz. 🍃`;
+    } else if (isArrancada) {
+      lenteCognitiva = "Ação com foco sereno. O movimento consciente é mais veloz que a pressa afobada.";
+      estrategia = "Incentivar avanço no passo presente, uma respiração de cada vez.";
+      texto = `Vamos avançar com foco e presença, ${nome}. Você já caminhou com firmeza por **${concluidas.length} tarefas** hoje.
+${pendentes.length ? `Dedique sua atenção total a "${pendenteDestaque}". Sem afobação: faça uma coisa de cada vez com o coração tranquilo.` : "O caminho de hoje foi percorrido com maestria. Descanse seu espírito."} 🍃🙏`;
+    } else {
+      lenteCognitiva = "Equilíbrio emocional e atenção ao ritmo natural do dia.";
+      estrategia = "Orientar hidratação suave e avanço sem ansiedade.";
+      texto = `A mente calma move montanhas, ${nome}. Até este momento você realizou **${concluidas.length} tarefa(s)** e bebeu **${wt}ml** de água. Não se preocupe com o excesso de coisas no horizonte; cuide apenas do passo presente com gentileza e determinação. 🧘‍♂️`;
+    }
+
+  // 4. MUNDO MILITAR / COMANDANTE PRUMI
+  } else if (pId === "militar") {
+    lenteCognitiva = "Análise tática de prontidão operacional e disciplina de combate.";
+    estrategia = "Apresentar relatório de situação e ordenar execução imediata do alvo prioritário.";
+    if (isQuestionamentoIA) {
+      texto = `Soldado ${nome}! Afirmativo: toda ordem e orientação deste comando passa por rigoroso cálculo tático!
+Examine o relatório de briefing acima ☝️. Foram computadas **${concluidas.length} baixas de pendências**, **${pendentes.length} alvos ativos** e prontidão de suprimento hídrico em **${wt}ml**. Sem desculpas e sem hesitação: foco na execução da missão! 🎖️`;
+    } else if (isArrancada) {
+      texto = `Procedimento de arrancada autorizado, soldado ${nome}!
+Foram **${concluidas.length} alvos neutralizados** até o momento. ${pendentes.length ? `Próximo objetivo tático: "${pendenteDestaque}". Posição de ataque, elimine as distrações e cumpra a missão!` : "Área limpa e setor sob controle. Excelente desempenho operacional!"} Brasil! 🇧🇷🎖️`;
+    } else {
+      texto = `Relatório de situação operacional, soldado ${nome}:
+- Missões concluídas: ${concluidas.length}
+- Alvos remanescentes: ${pendentes.length}${pendenteDestaque ? ` (Prioridade: "${pendenteDestaque}")` : ""}
 - Suprimento hídrico: ${wt}ml / ${wg}ml.
-Sem hesitação e sem desculpas: identifique o alvo principal, elimine distrações e execute a missão! 🎖️`;
+Mantenha a postura, execute o plano sem vacilar e vença o dia! ⚔️`;
+    }
+
+  // 5. MUNDO GAMER
+  } else if (pId === "gamer") {
+    lenteCognitiva = "Mapeamento da rotina como árvore de quests, ganho de XP e batalha de chefe.";
+    estrategia = "Tratar pendências como monstros a derrotar e incentivar o grind de foco.";
+    texto = isQuestionamentoIA
+      ? `GG, ${nome}! Minha CPU tá rodando a 144 FPS com ray tracing ativado! Olha o log de raciocínio acima ☝️: calculei suas **${concluidas.length} quests completadas**, o boss restante (**${pendentes.length} pendência(s)**) e sua barra de mana (${wt}ml de água). Bora farmar esse XP! 🎮👾`
+      : isArrancada
+      ? `Bora pro rush, ${nome}! Já farmamos **${concluidas.length} quests** hoje. ${pendentes.length ? `O mini-boss atual é "${pendenteDestaque}". Comba nele com foco de 15 minutos e garante esse loot épico!` : "Dungeon limpa por hoje! GG WP!"} 🕹️⚡`
+      : `E aí, Player 1 (${nome})! Seu placar hoje tá em **${concluidas.length} quests concluídas** e restam **${pendentes.length}**. Sua barra de HP/Água tá em **${wt}ml**. Toma uma poção de hidratação e bora zerar essa fase! 🎮`;
+
+  // 6. MUNDO PROGRAMADOR / DEV
+  } else if (pId === "programador") {
+    lenteCognitiva = "Análise de algoritmos de rotina, debug de gargalos e clean code de hábitos.";
+    estrategia = "Propor resolução por micro-commits e otimização de memória operacional.";
+    texto = isQuestionamentoIA
+      ? `System.out.println("Eu penso, logo comito."); ${nome}! Olha a stack trace de raciocínio acima ☝️: analisei seu array de tarefas (${concluidas.length} resolvidas, ${pendentes.length} pendentes) e o buffer hídrico (${wt}ml). Meu processamento é 100% contextual e livre de memory leak! 💻⚡`
+      : isArrancada
+      ? `git commit -m "foco total no deploy"! ${nome}, você já fez merge de **${concluidas.length} PRs** hoje. ${pendentes.length ? `Vamos refatorar e fechar a issue "${pendenteDestaque}" agora!` : "Build verde sem erros em produção!"} Rodando script de alta produtividade! 🚀`
+      : `Olá, ${nome}. Status do console: **${concluidas.length} tarefas commitadas**, **${pendentes.length} issues abertas** e consumo de água em **${wt}ml**. Que tal debugar a maior pendência das próximas horas? 🖥️`;
+
+  // 7. MUNDO COACH
+  } else if (pId === "coach") {
+    lenteCognitiva = "Mindset de alta performance, métricas SMART e foco antifrágil.";
+    estrategia = "Reforçar consistência, disciplina deliberada e alcance de metas de alto nível.";
+    texto = `Foco total no resultado, ${nome}! Você já garantiu **${concluidas.length} vitórias** hoje e faltam apenas **${pendentes.length}**. A consistência é a chave dos campeões: examine o diagnóstico de raciocínio acima ☝️, beba sua água (${wt}ml até agora) e execute o plano com excelência! 🎯🔥`;
+
+  // 8. MUNDO CLEANBOY
+  } else if (pId === "cleanboy") {
+    lenteCognitiva = "Minimalismo, estética, limpeza mental e organização harmônica do espaço.";
+    estrategia = "Sugerir um ambiente arejado, copo de água fresca e passos limpos e organizados.";
+    texto = `Tudo no seu devido lugar, ${nome}. Analisando seu dia com olhar estético: **${concluidas.length} itens finalizados** e **${pendentes.length} pendência(s)** em harmonia. Copo d'água cheio (${wt}ml), mesa alinhada e mente tranquila. Vamos riscar a próxima tarefa com elegância e leveza. ✨🧴`;
+
+  // 9. MUNDO VOVÓ
+  } else if (pId === "vovo") {
+    lenteCognitiva = "Amor maternal de avó, acolhimento caloroso e preocupação sincera com saúde e descanso.";
+    estrategia = "Oferecer carinho doce, mandar beber água e não se estressar à toa.";
+    texto = `Oi, meu benzinho ${nome}! A vó tava aqui pensando em você com todo o carinho. Olha o tanto de coisa que você já fez hoje: **${concluidas.length} tarefinhas**! Já bebeu sua aguinha direitinho (${wt}ml até agora)? Não fica se cobrando demais não, meu anjo; faz o que der com calma e depois come um pedaço de bolo com a vó! ☕👵`;
+
+  // 10. MUNDOS MUSICAIS (Rock, Sertanejo, Forrozeiro, Pagodeiro, Rapper, Trapper)
+  } else if (pId === "rock") {
+    lenteCognitiva = "Energia crua do rock'n'roll, atitude contra a procrastinação e volume no máximo.";
+    estrategia = "Canalizar a energia das guitarras para atropelar as pendências.";
+    texto = `Aumenta esse volume, ${nome}! Já destruímos **${concluidas.length} solos de tarefas** hoje e não vai ser essa última pendência que vai parar o nosso show! Dá uma olhada no pensamento afinado acima ☝️, toma uma água pra garganta não secar e detona no riff da vitória! 🎸⚡`;
+  } else if (pId === "sertanejo") {
+    lenteCognitiva = "Sabedoria da lida no campo, firmeza na viola e paciência de boiadeiro.";
+    estrategia = "Seguir no arreio com café forte e passo firme no chão batido.";
+    texto = `Firme no arreio, companheiro ${nome}! Na lida do dia já foram **${concluidas.length} porteiras abertas**. Com fé em Deus e persistência no peito, a gente fecha o que falta sem afobação. Toma uma golada d'água fresca (${wt}ml) e vamo que a colheita vai ser boa! 🤠🌾`;
+  } else if (pId === "forrozeiro") {
+    lenteCognitiva = "Alegria contagiante do arrasta-pé, zabumba no peito e calor humano.";
+    estrategia = "Resolver as pendências dançando no compasso suave do xote.";
+    texto = `Puxa o fole, ${nome}! Que o dia tá bonito demais! Já são **${concluidas.length} passos dançados com primor**. No compasso gostoso do forró, a gente resolve essas **${pendentes.length} pendências** com um sorriso no rosto e o coração cheio de energia boa! 🪗✨`;
+  } else if (pId === "pagodeiro") {
+    lenteCognitiva = "Roda de samba descontraída, resenha alegre e bate na palma da mão.";
+    estrategia = "Tornar as tarefas leves e gostosas, comemorando cada acerto com cavaco afinado.";
+    texto = `Bate na palma da mão, ${nome}! Que clima gostoso: **${concluidas.length} tarefas no bolso** e a resenha tá garantida! A vida é pra viver com leveza; bebe aquela aguinha de respeito (${wt}ml) e vamo fechar o dia nota 10 com chave de ouro! 🥁🍺`;
+  } else if (pId === "rapper") {
+    lenteCognitiva = "Lírica consciente, peso de mensagem e respeito à caminhada.";
+    estrategia = "Rimar atitude com execução e vencer as dificuldades no beat.";
+    texto = `No compasso do boom-bap, ${nome}! O tempo não para e a caneta não mente: **${concluidas.length} linhas escritas e vencidas hoje**. Mantém a disciplina de rua, bebe tua água e marcha com respeito rumo ao objetivo! 🎙️🔥`;
+  } else if (pId === "trapper") {
+    lenteCognitiva = "Hype, estética moderna de plug e visão de futuro no topo.";
+    estrategia = "Conectar atitude, foco em números e realização de metas ambiciosas.";
+    texto = `Plug ativado, ${nome}! Flow caro e postura de quem tá focado no topo: **${concluidas.length} drops concluídos** no dia de hoje. Acelera no beat, hidrata no drip e garante a vitória antes que o sol se ponha! 🛸💸`;
+
+  // 11. MUNDOS ARCANO / OTAKU / PADRÃO
+  } else if (pId === "bruxo" || pId === "feiticeiro") {
+    lenteCognitiva = "Alquimia da rotina diária, poções de foco e transmutação da inércia em poder arcano.";
+    estrategia = "Conjuramento de hábitos e transmutação imediata da preguiça.";
+    texto = `Saudações arcanas, ${nome}! Nossos grimórios revelam **${concluidas.length} feitiços concluídos** hoje e apenas **${pendentes.length} maldições pendentes**. Beba da sua poção de mana (${wt}ml de água) e canalize seu foco para dissipar qualquer barreira! 🔮✨`;
+  } else if (pId === "otaku") {
+    lenteCognitiva = "Arco de treinamento shonen, superação de limites e força de vontade inabalável.";
+    estrategia = "Despertar o poder interior para vencer o desafio do dia.";
+    texto = `Dattebayo, ${nome}! Este é o seu arco de treinamento para se tornar o protagonista supremo! Você já venceu **${concluidas.length} provações** hoje. Levante sua guarda, tome água para restaurar seu chakra (${wt}ml) e supere seus limites agora mesmo! ⚡🍥`;
+  } else {
+    // PADRÃO
+    lenteCognitiva = "Acolhimento amigável, visão clara das prioridades e suporte prático.";
+    estrategia = "Sugerir foco na pendência mais importante e incentivar hidratação saudável.";
+    texto = isQuestionamentoIA
+      ? `Sim, ${nome}! Eu analiso continuamente o seu progresso para te apoiar. Veja no card de reflexão acima ☝️ como mapeei suas **${concluidas.length} tarefas concluídas**, suas **${pendentes.length} pendências** e sua meta de água (${wt}ml). Meu objetivo é te ajudar a ter clareza e paz mental todos os dias!`
+      : isArrancada
+      ? `Vamos em frente, ${nome}! Você já completou **${concluidas.length} tarefas** hoje. ${pendentes.length ? `Foco total em "${pendenteDestaque}" agora para fechar o dia com chave de ouro!` : "Tudo limpo por hoje, excelente trabalho!"} Estou com você! ✨`
+      : `Olá, ${nome}! Analisando sua rotina de hoje: você já completou **${concluidas.length} tarefa(s)** e ainda resta(m) **${pendentes.length}**. ${aguaFalta > 0 ? `Não se esqueça de beber mais água (faltam ${aguaFalta}ml).` : "Hidratação exemplar hoje!"} O que gostaria de planejar ou ajustar agora?`;
   }
 
-  // 4. Resposta Padrão Acolhedora
-  if (txt.includes("procrastin") || txt.includes("foco")) {
-    return `Olá, ${nome}! Que bom que conversamos sobre isso. Quando a procrastinação bate, a melhor técnica é diminuir a barra de entrada: comprometa-se a fazer apenas 5 minutos da sua próxima tarefa sem julgar o resultado. Depois do início, o cérebro engrena! Estou com você. ✨`;
-  }
-  return `Oi, ${nome}! Analisando sua rotina de hoje: você já completou ${concluidas.length} tarefa(s) e ainda restam ${pendentes.length}. ${aguaFalta > 0 ? `Não se esqueça de beber mais água (faltam ${aguaFalta}ml).` : "Hidratação exemplar hoje!"} O que gostaria de planejar ou ajustar agora?`;
+  const pensamento = [
+    `• 🔍 Intenção detectada: "${promptUsuario.trim()}" (${catIntencao})`,
+    `• 📊 Diagnóstico Prumo: ${concluidas.length} tarefa(s) concluída(s), ${pendentes.length} pendente(s)${pendenteDestaque ? ` [Destaque: "${pendenteDestaque}"]` : ""}. Hidratação: ${wt}ml/${wg}ml (${aguaFalta > 0 ? `faltam ${aguaFalta}ml` : "meta batida"}). Turno da ${turno}.`,
+    `• 🎭 Lente do Coach (${persona.titulo}): ${lenteCognitiva}`,
+    `• 💡 Decisão Tática: ${estrategia}`
+  ].join("\n");
+
+  return {
+    pensamento,
+    texto,
+    toString() {
+      return this.texto;
+    }
+  };
 }
 
 /* ---------- Chat Modal Interativo com Prumi IA ---------- */
@@ -274,7 +549,17 @@ function obterHistoricoChatIA() {
   if (chatIaHistorico.length) return chatIaHistorico;
   try {
     const s = localStorage.getItem("prumo_ia_chat_history");
-    if (s) chatIaHistorico = JSON.parse(s);
+    if (s) {
+      chatIaHistorico = JSON.parse(s);
+      // Normalização de mensagens salvas antigas que continham <b> para **
+      if (Array.isArray(chatIaHistorico)) {
+        chatIaHistorico.forEach(m => {
+          if (m && m.texto) {
+            m.texto = m.texto.replace(/<\/?(b|strong)>/gi, "**");
+          }
+        });
+      }
+    }
   } catch (e) {}
   if (!chatIaHistorico.length) {
     const persona = obterPersonaAtual();
@@ -282,7 +567,8 @@ function obterHistoricoChatIA() {
     chatIaHistorico = [
       {
         remetente: "ia",
-        texto: `Salve${nome ? `, <b>${esc(nome)}</b>` : ""}! Aqui é o seu coach no modo <b>${persona.titulo}</b>. Como posso te ajudar na sua rotina hoje?`,
+        pensamento: `• Diagnóstico inicial: Sincronização de rotina estabelecida no Prumo.\n• Coach ativo: ${persona.titulo}.\n• Objetivo: Apoiar foco, clareza mental e execução diária com raciocínio contextual.`,
+        texto: `Salve${nome ? `, **${esc(nome)}**` : ""}! Aqui é o seu coach no modo **${persona.titulo}**. Como posso te ajudar na sua rotina hoje?`,
         hora: new Date().toLocaleTimeString().slice(0, 5)
       }
     ];
@@ -292,7 +578,7 @@ function obterHistoricoChatIA() {
 
 function salvarHistoricoChatIA() {
   try {
-    // Guarda até as últimas 20 mensagens para manter leve
+    // Guarda até as últimas 20 mensagens para manter leve e responsivo
     const limit = chatIaHistorico.slice(-20);
     localStorage.setItem("prumo_ia_chat_history", JSON.stringify(limit));
   } catch (e) {}
@@ -326,7 +612,7 @@ function abrirChatPrumiIA(mensagemInicial = "") {
           </div>
           <div class="ia-header-titles">
             <h3>${esc(persona.titulo)}</h3>
-            <p><span class="ia-engine-badge">⚡ ${esc(providerLabel)}</span> • Coach em tempo real</p>
+            <p><span class="ia-engine-badge">⚡ ${esc(providerLabel)}</span> • Coach com Raciocínio</p>
           </div>
         </div>
         <button class="ia-close-btn" data-act="fechar-chat-ia" aria-label="Fechar">&times;</button>
@@ -344,7 +630,19 @@ function abrirChatPrumiIA(mensagemInicial = "") {
           .map(
             m => `
           <div class="ia-message ${m.remetente}">
-            <div class="ia-msg-bubble">${formatarTextoMensagemIA(m.texto)}</div>
+            <div class="ia-msg-container">
+              ${m.pensamento ? `
+                <details class="ia-thought-card">
+                  <summary class="ia-thought-summary">
+                    <span class="ia-thought-icon">🧠</span>
+                    <span class="ia-thought-title">Processo de Reflexão</span>
+                    <span class="ia-thought-chevron">▾</span>
+                  </summary>
+                  <div class="ia-thought-content">${formatarTextoMensagemIA(m.pensamento)}</div>
+                </details>
+              ` : ""}
+              <div class="ia-msg-bubble">${formatarTextoMensagemIA(m.texto)}</div>
+            </div>
           </div>
         `
           )
@@ -363,7 +661,7 @@ function abrirChatPrumiIA(mensagemInicial = "") {
 
   document.body.insertAdjacentHTML("beforeend", modalHtml);
 
-  // Rolagem suave até a última mensagem
+  // Rolagem até a última mensagem
   requestAnimationFrame(() => {
     const stream = document.getElementById("ia-chat-stream");
     if (stream) stream.scrollTop = stream.scrollHeight;
@@ -392,7 +690,12 @@ function fecharChatPrumiIASeFundo(e) {
 
 function formatarTextoMensagemIA(raw) {
   if (!raw) return "";
-  let txt = raw
+  let txt = String(raw);
+  // Normalizar tags HTML comuns que possam ter sido passadas
+  txt = txt.replace(/<\/?(b|strong)>/gi, "**");
+  txt = txt.replace(/<\/?(i|em)>/gi, "*");
+  // Sanitizar HTML
+  txt = txt
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
@@ -420,7 +723,7 @@ async function submeterChatIA(e) {
 
   const stream = document.getElementById("ia-chat-stream");
 
-  // Adicionar mensagem do usuário
+  // Adicionar mensagem do usuário ao histórico e tela
   chatIaHistorico.push({
     remetente: "user",
     texto,
@@ -430,25 +733,33 @@ async function submeterChatIA(e) {
   if (stream) {
     stream.insertAdjacentHTML(
       "beforeend",
-      `<div class="ia-message user"><div class="ia-msg-bubble">${formatarTextoMensagemIA(texto)}</div></div>`
+      `<div class="ia-message user"><div class="ia-msg-container"><div class="ia-msg-bubble">${formatarTextoMensagemIA(texto)}</div></div></div>`
     );
-    // Adicionar indicador de digitação
+    // Adicionar indicador de pensamento ativo ao vivo
     stream.insertAdjacentHTML(
       "beforeend",
-      `<div class="ia-message ia" id="ia-typing-box"><div class="ia-typing-indicator"><div class="ia-typing-dot"></div><div class="ia-typing-dot"></div><div class="ia-typing-dot"></div></div></div>`
+      `<div class="ia-message ia" id="ia-typing-box">
+        <div class="ia-thinking-live">
+          <span class="ia-thought-icon">🧠</span>
+          <span>Prumi está raciocinando sobre sua rotina...</span>
+        </div>
+      </div>`
     );
     stream.scrollTop = stream.scrollHeight;
   }
 
   try {
     const resposta = await chamarProvedorLLM(texto, chatIaHistorico);
+    const respTexto = typeof resposta === "object" && resposta !== null ? resposta.texto : String(resposta);
+    const respPensamento = typeof resposta === "object" && resposta !== null ? resposta.pensamento : "";
 
     const typing = document.getElementById("ia-typing-box");
     if (typing) typing.remove();
 
     chatIaHistorico.push({
       remetente: "ia",
-      texto: resposta,
+      texto: respTexto,
+      pensamento: respPensamento,
       hora: new Date().toLocaleTimeString().slice(0, 5)
     });
     salvarHistoricoChatIA();
@@ -456,7 +767,21 @@ async function submeterChatIA(e) {
     if (stream) {
       stream.insertAdjacentHTML(
         "beforeend",
-        `<div class="ia-message ia"><div class="ia-msg-bubble">${formatarTextoMensagemIA(resposta)}</div></div>`
+        `<div class="ia-message ia">
+          <div class="ia-msg-container">
+            ${respPensamento ? `
+              <details class="ia-thought-card" open>
+                <summary class="ia-thought-summary">
+                  <span class="ia-thought-icon">🧠</span>
+                  <span class="ia-thought-title">Processo de Reflexão</span>
+                  <span class="ia-thought-chevron">▾</span>
+                </summary>
+                <div class="ia-thought-content">${formatarTextoMensagemIA(respPensamento)}</div>
+              </details>
+            ` : ""}
+            <div class="ia-msg-bubble">${formatarTextoMensagemIA(respTexto)}</div>
+          </div>
+        </div>`
       );
       stream.scrollTop = stream.scrollHeight;
     }
@@ -466,11 +791,15 @@ async function submeterChatIA(e) {
     const typing = document.getElementById("ia-typing-box");
     if (typing) typing.remove();
 
-    // Fallback gracioso
+    // Fallback gracioso com motor neuro-contextual
     const fbResp = gerarRespostaAutonomaIA(texto);
+    const fbTexto = typeof fbResp === "object" && fbResp !== null ? fbResp.texto : String(fbResp);
+    const fbPensamento = typeof fbResp === "object" && fbResp !== null ? fbResp.pensamento : "";
+
     chatIaHistorico.push({
       remetente: "ia",
-      texto: fbResp,
+      texto: fbTexto,
+      pensamento: fbPensamento,
       hora: new Date().toLocaleTimeString().slice(0, 5)
     });
     salvarHistoricoChatIA();
@@ -478,7 +807,21 @@ async function submeterChatIA(e) {
     if (stream) {
       stream.insertAdjacentHTML(
         "beforeend",
-        `<div class="ia-message ia"><div class="ia-msg-bubble">${formatarTextoMensagemIA(fbResp)}</div></div>`
+        `<div class="ia-message ia">
+          <div class="ia-msg-container">
+            ${fbPensamento ? `
+              <details class="ia-thought-card" open>
+                <summary class="ia-thought-summary">
+                  <span class="ia-thought-icon">🧠</span>
+                  <span class="ia-thought-title">Processo de Reflexão</span>
+                  <span class="ia-thought-chevron">▾</span>
+                </summary>
+                <div class="ia-thought-content">${formatarTextoMensagemIA(fbPensamento)}</div>
+              </details>
+            ` : ""}
+            <div class="ia-msg-bubble">${formatarTextoMensagemIA(fbTexto)}</div>
+          </div>
+        </div>`
       );
       stream.scrollTop = stream.scrollHeight;
     }
@@ -594,7 +937,8 @@ Responda EXCLUSIVAMENTE em formato JSON puro, sem markdown extra, no seguinte fo
   "dicaMascote": "Conselho motivador curto para começar já"
 }`;
       const raw = await chamarProvedorLLM(promptJson);
-      const jsonLimpo = raw.replace(/```json/g, "").replace(/```/g, "").trim();
+      const rawTxt = typeof raw === "object" && raw !== null ? raw.texto : String(raw);
+      const jsonLimpo = rawTxt.replace(/```json/g, "").replace(/```/g, "").trim();
       plano = JSON.parse(jsonLimpo);
     } catch (e) {
       console.warn("[IA Prumo] Erro no parse do plano JSON via LLM, usando sintetizador:", e);
@@ -746,8 +1090,9 @@ async function testarConexaoIA() {
 
   try {
     const resposta = await chamarProvedorLLM("Diga 'Conexão Prumo IA estabelecida com sucesso!' em 1 frase curta.");
+    const textoApenas = typeof resposta === "object" && resposta !== null ? resposta.texto : String(resposta);
     if (res) {
-      res.innerHTML = `<span style="color:#10b981;font-weight:600;">✅ IA Conectada e Operacional!</span><br><small style="color:#64748b;">"${esc(resposta)}"</small>`;
+      res.innerHTML = `<span style="color:#10b981;font-weight:600;">✅ IA Conectada e Operacional!</span><br><small style="color:#64748b;">"${esc(textoApenas)}"</small>`;
     }
   } catch (err) {
     if (res) {
@@ -789,7 +1134,7 @@ function iaAjustesHTML() {
       <div class="setrow">
         <div class="lbl">
           <b>Status & Teste</b>
-          <span class="note" id="ia-status-conexao">${cfg.chave ? "Chave configurada. Teste abaixo." : "Usando motor neuro-heurístico autônomo."}</span>
+          <span class="note" id="ia-status-conexao">${cfg.chave ? "Chave configurada. Teste abaixo." : "Usando motor neuro-heurístico autônomo com raciocínio visível."}</span>
         </div>
         <div style="display:flex;gap:8px;">
           <button type="button" class="btn small" id="ia-btn-testar-conexao" data-act="ia-testar-conexao">Testar Conexão</button>
