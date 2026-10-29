@@ -317,6 +317,21 @@ function gerarRespostaAutonomaIA(promptUsuario) {
   const turno = hora < 12 ? "manhã" : hora < 18 ? "tarde" : "noite";
 
   const pendenteDestaque = pendentes.length ? (pendentes[0].title || pendentes[0].txt || "a tarefa pendente") : "";
+
+  // 1. Acionamento da Mini IA Cognitiva com tensores semânticos, atenção e deliberação
+  if (typeof MiniPrumoAI !== "undefined" && typeof MiniPrumoAI.processar === "function") {
+    const ctxPrumo = {
+      concluidas: concluidas.length,
+      pendentes: pendentes.length,
+      aguaMl: wt,
+      aguaMeta: wg,
+      streak,
+      persona: pId,
+      pendenteDestaque
+    };
+    return MiniPrumoAI.processar(promptUsuario, ctxPrumo, pId, nome);
+  }
+
   const txt = (promptUsuario || "").trim().toLowerCase();
 
   // Detecção Semântica de Intenções
