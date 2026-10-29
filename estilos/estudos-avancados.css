@@ -709,3 +709,75 @@ body.dark .caderno-raio-x-pill,
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ==========================================================================
+   6. BOTÃO DE EMERGÊNCIA & RESPIRAÇÃO GUIADA 4-7-8 (FOCO & ANSIEDADE)
+   ========================================================================== */
+.respiracao-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 10px;
+  text-align: center;
+}
+
+.respiracao-circulo-container {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.respiracao-circulo {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #38BDF8 0%, #0284C7 100%);
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+  transition: transform 1s ease-in-out, background 1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+.respiracao-circulo.inspirar {
+  transform: scale(1.8);
+  background: radial-gradient(circle, #34D399 0%, #059669 100%);
+  box-shadow: 0 0 40px rgba(52, 211, 153, 0.6);
+  transition-duration: 4s;
+}
+
+.respiracao-circulo.segurar {
+  transform: scale(1.85);
+  background: radial-gradient(circle, #A78BFA 0%, #7C3AED 100%);
+  box-shadow: 0 0 40px rgba(167, 139, 250, 0.6);
+  transition-duration: 7s;
+}
+
+.respiracao-circulo.expirar {
+  transform: scale(1);
+  background: radial-gradient(circle, #38BDF8 0%, #0284C7 100%);
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+  transition-duration: 8s;
+}
+
+.respiracao-fase-rotulo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--ink, #1e293b);
+  margin-top: 10px;
+}
+
+.respiracao-instrucao {
+  font-size: 0.85rem;
+  color: var(--sub, #64748b);
+  max-width: 320px;
+  margin-top: 4px;
+}

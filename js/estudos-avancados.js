@@ -148,6 +148,9 @@ function renderBateriaQuestoesHTML() {
         <button type="button" class="btn ghost small" data-act="questao-zerar-hoje" title="Reiniciar contagem de hoje">
           🔄 Zerar
         </button>
+        <button type="button" class="btn ghost small" data-act="abrir-respiracao-478" title="Respiração 4-7-8 para foco e combate à ansiedade de provas">
+          🧘 60s Foco
+        </button>
       </div>
     </div>
   </section>`;
@@ -304,6 +307,9 @@ function renderCadernoErrosHTML() {
           <div class="caderno-erro-rodape">
             <span>Registrado em ${fmtShort(e.date || today())}</span>
             <div class="caderno-erro-acoes">
+              <button type="button" class="btn small" data-act="criar-flashcard-do-erro" data-id="${e.id}" title="Gerar Flashcard SM-2 focado nesta regra">
+                🗂️ Virar Card
+              </button>
               <button type="button" class="btn small ${e.resolved ? "ghost" : "primary"}" data-act="alternar-erro-superado" data-id="${e.id}">
                 ${e.resolved ? "↩ Reabrir" : "✅ Dominado"}
               </button>
@@ -648,6 +654,132 @@ function fecharModalGeradorFlashcardsIA() {
   if (m) m.remove();
 }
 
+/** Modal de Respiração 4-7-8 Guiada (Anti-Ansiedade e Reativação de Foco) */
+let timerRespiracaoId = null;
+
+function abrirModalRespiracao478() {
+  const modalExistente = document.getElementById("modal-respiracao-478");
+  if (modalExistente) modalExistente.remove();
+
+  if (timerRespiracaoId) {
+    clearInterval(timerRespiracaoId);
+    timerRespiracaoId = null;
+  }
+
+  const modalHtml = `
+  <div id="modal-respiracao-478" class="modal-estudo-overlay" data-act="fechar-modal-estudo-fundo">
+    <div class="modal-estudo-container" style="max-width:440px;" onclick="event.stopPropagation()">
+      <div class="modal-estudo-header">
+        <h3 class="modal-estudo-header-titulo">
+          <span>🧘</span> Respiração Guiada 4-7-8
+        </h3>
+        <button type="button" class="modal-estudo-fechar" data-act="fechar-modal-respiracao">&times;</button>
+      </div>
+      <div class="modal-estudo-corpo">
+        <div class="respiracao-box">
+          <div class="respiracao-instrucao">
+            Técnica para desacelerar batimentos cardíacos, reduzir cortisol e restabelecer clareza mental e foco.
+          </div>
+          <div class="respiracao-circulo-container">
+            <div id="respiracao-circulo" class="respiracao-circulo">4</div>
+          </div>
+          <div id="respiracao-fase" class="respiracao-fase-rotulo">Prepare-se...</div>
+          <div id="respiracao-ciclo" style="font-size:0.8rem;color:var(--sub);margin-top:6px;">Ciclo 1 de 3</div>
+        </div>
+        <div style="display:flex;justify-content:center;margin-top:8px;">
+          <button type="button" class="btn primary small" data-act="fechar-modal-respiracao" style="font-weight:700;">Concluir e Voltar</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+  iniciarCiclosRespiracao();
+}
+
+function fecharModalRespiracao478() {
+  if (timerRespiracaoId) {
+    clearInterval(timerRespiracaoId);
+    timerRespiracaoId = null;
+  }
+  const m = document.getElementById("modal-respiracao-478");
+  if (m) m.remove();
+}
+
+function iniciarCiclosRespiracao() {
+  const circulo = document.getElementById("respiracao-circulo");
+  const faseEl = document.getElementById("respiracao-fase");
+  const cicloEl = document.getElementById("respiracao-ciclo");
+  if (!circulo || !faseEl) return;
+
+  let cicloAtual = 1;
+  const maxCiclos = 3;
+
+  function executarFase() {
+    if (!document.getElementById("modal-respiracao-478")) return;
+
+    // Fase 1: Inspirar (4s)
+    circulo.className = "respiracao-circulo inspirar";
+    faseEl.textContent = "Inspire pelo nariz (4s)...";
+    let contagem = 4;
+    circulo.textContent = contagem;
+
+    const tInspirar = setInterval(() => {
+      contagem--;
+      if (contagem >= 1) circulo.textContent = contagem;
+      if (contagem <= 0) {
+        clearInterval(tInspirar);
+        if (!document.getElementById("modal-respiracao-478")) return;
+
+        // Fase 2: Segurar (7s)
+        circulo.className = "respiracao-circulo segurar";
+        faseEl.textContent = "Segure o ar nos pulmões (7s)...";
+        contagem = 7;
+        circulo.textContent = contagem;
+
+        const tSegurar = setInterval(() => {
+          contagem--;
+          if (contagem >= 1) circulo.textContent = contagem;
+          if (contagem <= 0) {
+            clearInterval(tSegurar);
+            if (!document.getElementById("modal-respiracao-478")) return;
+
+            // Fase 3: Expirar (8s)
+            circulo.className = "respiracao-circulo expirar";
+            faseEl.textContent = "Expire suavemente pela boca (8s)...";
+            contagem = 8;
+            circulo.textContent = contagem;
+
+            const tExpirar = setInterval(() => {
+              contagem--;
+              if (contagem >= 1) circulo.textContent = contagem;
+              if (contagem <= 0) {
+                clearInterval(tExpirar);
+                if (!document.getElementById("modal-respiracao-478")) return;
+
+                cicloAtual++;
+                if (cicloAtual <= maxCiclos) {
+                  if (cicloEl) cicloEl.textContent = `Ciclo ${cicloAtual} de ${maxCiclos}`;
+                  executarFase();
+                } else {
+                  faseEl.textContent = "✨ Mente equilibrada e desperta!";
+                  circulo.textContent = "✓";
+                  circulo.className = "respiracao-circulo inspirar";
+                  S.xp = (S.xp || 0) + 15;
+                  commit();
+                  toast("Respiração concluída! +15 XP para seu foco mental.", false, "happy");
+                }
+              }
+            }, 1000);
+          }
+        }, 1000);
+      }
+    }, 1000);
+  }
+
+  executarFase();
+}
+
 /* ==========================================================================
    REGISTRO DE AÇÕES (ACOES_EXTRAS)
    ========================================================================== */
@@ -713,6 +845,23 @@ ACOES_EXTRAS["alternar-erro-superado"] = (btn, id) => {
   }
   commit();
   render();
+};
+
+ACOES_EXTRAS["criar-flashcard-do-erro"] = (btn, id) => {
+  const erros = garantirCadernoErros();
+  const e = erros.find(x => x.id === id);
+  if (!e) return;
+  const frente = `Como evitar o erro em: ${e.topic}?`;
+  const verso = e.note ? `${e.note}` : `Atenção aos conceitos e causas de pegadinha do tópico: ${e.topic}`;
+  abrirModalNovoFlashcard(e.subjectId || "", frente, verso);
+};
+
+ACOES_EXTRAS["abrir-respiracao-478"] = () => {
+  abrirModalRespiracao478();
+};
+
+ACOES_EXTRAS["fechar-modal-respiracao"] = () => {
+  fecharModalRespiracao478();
 };
 
 ACOES_EXTRAS["excluir-erro-caderno"] = (btn, id) => {
