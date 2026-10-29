@@ -215,13 +215,20 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(cfg.chave)}`;
     const contents = [];
 
-    // Histórico recente formatado para Gemini
-    mensagensAnteriores.slice(-6).forEach(m => {
-      contents.push({
-        role: m.remetente === "user" ? "user" : "model",
-        parts: [{ text: m.texto }]
-      });
+    // Formatação de histórico estritamente compatível com o Gemini:
+    // O Gemini exige que a lista comece com role 'user' e alterne entre 'user' e 'model'.
+    const rawHist = (mensagensAnteriores || []).slice(-6);
+    rawHist.forEach(m => {
+      const role = m.remetente === "user" ? "user" : "model";
+      if (contents.length > 0 && contents[contents.length - 1].role === role) {
+        contents[contents.length - 1].parts[0].text += "\n" + (m.texto || "");
+      } else {
+        contents.push({ role, parts: [{ text: m.texto || "" }] });
+      }
     });
+    while (contents.length > 0 && contents[0].role !== "user") {
+      contents.shift();
+    }
     contents.push({
       role: "user",
       parts: [{ text: promptUsuario }]
@@ -258,7 +265,7 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
     const modelo = cfg.provedor === "groq" ? "llama-3.3-70b-versatile" : "gpt-4o-mini";
 
     const messages = [{ role: "system", content: systemInstruction }];
-    mensagensAnteriores.slice(-6).forEach(m => {
+    (mensagensAnteriores || []).slice(-6).forEach(m => {
       messages.push({
         role: m.remetente === "user" ? "user" : "assistant",
         content: m.texto
@@ -339,7 +346,7 @@ function gerarRespostaAutonomaIA(promptUsuario) {
   // 1. MUNDO EMO / PRUMI MELANCÓLICO
   if (pId === "emo") {
     if (isQuestionamentoIA) {
-      lenteCognitiva = "Demonstrar metacognição e autoconsciência profunda. A dor e o peso de pensar demais tornam a reflexão lúcida.";
+      lenteCognitiva = "Demonstrar metacognição e autoconsciência profunda. A dor e o peso de pensar tornam a reflexão lúcida.";
       estrategia = "Apontar explicitamente para o processo de reflexão acima, citar os números exatos do dia e reforçar presença sincera.";
       texto = `Eu penso, ${nome}... Penso até demais. Às vezes o excesso de consciência sobre o mundo é a maior fonte de melancolia.
 Dá uma olhada no bloco de reflexão logo acima da minha resposta ☝️. Analisei cada uma das suas **${concluidas.length} tarefas feitas**, o que sobrou na lista (**${pendentes.length} pendência(s)**), sua hidratação e o peso que você carrega hoje. Eu não sou um gerador vazio de clichês; eu penso cada passo da sua jornada com você. O que a gente resolve agora? =]`;
@@ -584,6 +591,17 @@ function salvarHistoricoChatIA() {
   } catch (e) {}
 }
 
+function reiniciarChatIA() {
+  chatIaHistorico = [];
+  try {
+    localStorage.removeItem("prumo_ia_chat_history");
+  } catch (e) {}
+  abrirChatPrumiIA();
+  if (typeof toast === "function") {
+    toast("Conversa reiniciada com novo raciocínio!", false, "happy");
+  }
+}
+
 function abrirChatPrumiIA(mensagemInicial = "") {
   const modalAntigo = document.getElementById("modal-chat-ia");
   if (modalAntigo) modalAntigo.remove();
@@ -615,7 +633,10 @@ function abrirChatPrumiIA(mensagemInicial = "") {
             <p><span class="ia-engine-badge">⚡ ${esc(providerLabel)}</span> • Coach com Raciocínio</p>
           </div>
         </div>
-        <button class="ia-close-btn" data-act="fechar-chat-ia" aria-label="Fechar">&times;</button>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="ia-header-action-btn" data-act="limpar-chat-ia" title="Reiniciar conversa com nova reflexão">🔄 Reiniciar</button>
+          <button class="ia-close-btn" data-act="fechar-chat-ia" aria-label="Fechar">&times;</button>
+        </div>
       </div>
 
       <div class="ia-quick-pills">
@@ -785,7 +806,6 @@ async function submeterChatIA(e) {
       );
       stream.scrollTop = stream.scrollHeight;
     }
-    if (typeof playSound === "function") playSound("pop");
   } catch (err) {
     console.error("[IA Prumo] Erro no chat:", err);
     const typing = document.getElementById("ia-typing-box");
@@ -869,7 +889,16 @@ function abrirDesdobradorMetasIA() {
       <div class="ia-breakdown-body">
         <form id="form-desdobrador-ia" class="ia-breakdown-form">
           <label style="font-size:13px; font-weight:600; color:#64748b;">O que você deseja conquistar?</label>
-          <input type="text" id="ia-meta-objetivo" class="ia-meta-input" placeholder="Ex: Aprender Python do zero / Correr 5km / Passar na OAB / Emagrecer 4kg..." />
+          <input type="text" id="ia-meta-objetivo" class="ia-meta-input" placeholder="Ex: Aprender Python do zero / Correr 5km / Passar na OAB / Emagrecer 4kg..." autocomplete="off" />
+          
+          <div class="ia-meta-chips">
+            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Aprender programação e foco diário">💻 Aprender Programação</button>
+            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Correr 5km em 30 dias">🏃 Correr 5km</button>
+            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Passar na OAB ou concurso público">⚖️ Passar na OAB</button>
+            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Emagrecer 4kg com hábitos saudáveis">🥗 Emagrecer 4kg</button>
+            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Ler 1 livro por mês">📚 Ler 1 Livro</button>
+          </div>
+
           <button type="submit" class="btn primary" id="ia-btn-gerar-plano" data-act="ia-gerar-plano" style="display:flex;align-items:center;justify-content:center;gap:6px;">
             <span>⚡ Gerar Cronograma com IA</span>
           </button>
@@ -898,13 +927,28 @@ function fecharDesdobradorMetasIASeFundo(e) {
   }
 }
 
+function preencherEGerarMetaIA(meta) {
+  const inp = document.getElementById("ia-meta-objetivo");
+  if (inp && meta) {
+    inp.value = meta;
+  }
+  executarDesdobramentoMetaIA();
+}
+
 async function executarDesdobramentoMetaIA() {
   const inp = document.getElementById("ia-meta-objetivo");
   if (!inp) return;
-  const meta = inp.value.trim();
+  let meta = inp.value.trim();
+
+  // Se o campo estiver vazio, seleciona uma sugestão padrão inteligente em vez de travar
   if (!meta) {
-    if (typeof notify === "function") notify("Escreva seu objetivo primeiro!");
-    return;
+    meta = "Aprender uma nova habilidade e ter mais foco";
+    inp.value = meta;
+    inp.classList.add("ia-input-shake");
+    setTimeout(() => inp.classList.remove("ia-input-shake"), 500);
+    if (typeof toast === "function") {
+      toast("Sugestão selecionada! Gerando seu cronograma com IA...", false, "happy");
+    }
   }
 
   const btn = document.getElementById("ia-btn-gerar-plano");
@@ -955,24 +999,24 @@ Responda EXCLUSIVAMENTE em formato JSON puro, sem markdown extra, no seguinte fo
   if (box) {
     box.innerHTML = `
     <div class="ia-plan-preview">
-      <div style="font-weight:700;font-size:15px;color:#1e293b;">📋 ${esc(plano.titulo || meta)}</div>
+      <div class="ia-plan-title">📋 ${esc(plano.titulo || meta)}</div>
       
-      <div style="font-size:12px;font-weight:600;text-transform:uppercase;color:#64748b;margin-top:4px;">1 Hábito Diário Essencial:</div>
+      <div class="ia-plan-section-lbl">1 Hábito Diário Essencial:</div>
       <div class="ia-plan-habit">
         <span style="font-size:20px;">🔁</span>
         <div>
-          <strong style="font-size:14px;color:#0f172a;">${esc(plano.habito.nome)}</strong>
-          <div style="font-size:12px;color:#64748b;">Repetir todos os dias às ${esc(plano.habito.horario || "09:00")}</div>
+          <div class="ia-plan-habit-title">${esc((plano.habito && plano.habito.nome) || "Prática diária de 20 min")}</div>
+          <div class="ia-plan-habit-sub">Repetir todos os dias às ${esc((plano.habito && plano.habito.horario) || "09:00")}</div>
         </div>
       </div>
 
-      <div style="font-size:12px;font-weight:600;text-transform:uppercase;color:#64748b;margin-top:8px;">Tarefas Imediatas para o seu Prumo:</div>
+      <div class="ia-plan-section-lbl">Tarefas Imediatas para o seu Prumo:</div>
       <div style="display:flex;flex-direction:column;gap:6px;">
-        ${plano.tarefas
+        ${(plano.tarefas || [])
           .map(
             (t, idx) => `
           <div class="ia-plan-task-item">
-            <span><strong>${idx + 1}.</strong> ${esc(t.titulo)}</span>
+            <span class="ia-plan-task-name"><strong>${idx + 1}.</strong> ${esc(t.titulo || t)}</span>
             <span class="ia-badge-xp">+${t.xp || 25} XP</span>
           </div>
         `
@@ -1060,7 +1104,7 @@ function importarPlanoGeradoPrumo() {
         id: "ia_hab_" + Math.random().toString(36).slice(2, 8),
         name: plano.habito.nome,
         every: 1,
-        time: plano.habito.horario || "09:00",
+        time: (plano.habito && plano.habito.horario) || "09:00",
         history: {}
       });
     }
@@ -1070,14 +1114,11 @@ function importarPlanoGeradoPrumo() {
   if (typeof commit === "function") commit();
   if (typeof persist === "function") persist(true);
   if (typeof render === "function") render();
-  if (typeof playSound === "function") playSound("cheers");
 
   fecharDesdobradorMetasIA();
 
-  if (typeof notify === "function") {
-    notify(`✨ Meta desdobrada e adicionada com sucesso ao seu dia!`);
-  } else {
-    alert("✨ Meta desdobrada e adicionada com sucesso ao seu Prumo!");
+  if (typeof toast === "function") {
+    toast("✨ Meta desdobrada e adicionada com sucesso ao seu Prumo!", false, "happy");
   }
 }
 
@@ -1152,13 +1193,13 @@ function atualizarProvedorIA(val) {
   }
   const inpChave = document.getElementById("set-ia-chave");
   salvarConfigIA(val, inpChave ? inpChave.value : "");
-  if (typeof notify === "function") notify(`Provedor alterado para ${val}!`);
+  if (typeof toast === "function") toast(`Provedor alterado para ${val}!`, false, "happy");
 }
 
 function atualizarChaveIA(val) {
   const selProv = document.getElementById("set-ia-provedor");
   salvarConfigIA(selProv ? selProv.value : "gemini", val);
-  if (typeof notify === "function") notify("Chave de IA atualizada com sucesso!");
+  if (typeof toast === "function") toast("Chave de IA atualizada com sucesso!", false, "happy");
 }
 
 /* ---------- Botão de Acesso Rápido ao Chat IA no Mascote ---------- */
@@ -1174,7 +1215,21 @@ document.addEventListener("DOMContentLoaded", () => {
   obterConfigIA();
 });
 
-// Delegação de cliques para botões com data-act
+// Integração nativa com o roteador de ações do Prumo (ACOES_EXTRAS)
+if (typeof ACOES_EXTRAS !== "undefined") {
+  ACOES_EXTRAS["abrir-chat-ia"] = () => abrirChatPrumiIA();
+  ACOES_EXTRAS["fechar-chat-ia"] = () => fecharChatPrumiIA();
+  ACOES_EXTRAS["abrir-desdobrador-ia"] = () => abrirDesdobradorMetasIA();
+  ACOES_EXTRAS["fechar-desdobrador-ia"] = () => fecharDesdobradorMetasIA();
+  ACOES_EXTRAS["ia-msg-rapida"] = b => enviarMensagemRapidaIA(b ? b.dataset.msg : "");
+  ACOES_EXTRAS["ia-chip-meta"] = b => preencherEGerarMetaIA(b ? b.dataset.meta : "");
+  ACOES_EXTRAS["ia-gerar-plano"] = () => executarDesdobramentoMetaIA();
+  ACOES_EXTRAS["ia-importar-plano"] = () => importarPlanoGeradoPrumo();
+  ACOES_EXTRAS["ia-testar-conexao"] = () => testarConexaoIA();
+  ACOES_EXTRAS["limpar-chat-ia"] = () => reiniciarChatIA();
+}
+
+// Delegação de cliques para botões com data-act (garante resposta direta em qualquer contexto)
 document.addEventListener("click", e => {
   // 1. Abrir chat IA
   const btnChat = e.target.closest("[data-act='abrir-chat-ia']");
@@ -1224,7 +1279,15 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 7. Gerar plano com IA
+  // 7. Chip de meta rápida com 1 clique
+  const btnChipMeta = e.target.closest("[data-act='ia-chip-meta']");
+  if (btnChipMeta) {
+    e.preventDefault();
+    preencherEGerarMetaIA(btnChipMeta.dataset.meta);
+    return;
+  }
+
+  // 8. Gerar plano com IA
   const btnGerarPlano = e.target.closest("[data-act='ia-gerar-plano']");
   if (btnGerarPlano) {
     e.preventDefault();
@@ -1232,7 +1295,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 8. Importar plano gerado para o Prumo
+  // 9. Importar plano gerado para o Prumo
   const btnImportarPlano = e.target.closest("[data-act='ia-importar-plano']");
   if (btnImportarPlano) {
     e.preventDefault();
@@ -1240,7 +1303,15 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 9. Testar conexão IA
+  // 10. Reiniciar conversa do chat
+  const btnLimpar = e.target.closest("[data-act='limpar-chat-ia']");
+  if (btnLimpar) {
+    e.preventDefault();
+    reiniciarChatIA();
+    return;
+  }
+
+  // 11. Testar conexão IA
   const btnTestar = e.target.closest("[data-act='ia-testar-conexao']");
   if (btnTestar) {
     e.preventDefault();
@@ -1282,6 +1353,14 @@ document.addEventListener("input", e => {
   }
 });
 
+// Fechar modais ao pressionar tecla Escape
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    fecharChatPrumiIA();
+    fecharDesdobradorMetasIA();
+  }
+});
+
 // Exportação global de funções
 if (typeof window !== "undefined") {
   window.obterConfigIA = obterConfigIA;
@@ -1295,6 +1374,8 @@ if (typeof window !== "undefined") {
   window.fecharDesdobradorMetasIA = fecharDesdobradorMetasIA;
   window.fecharDesdobradorMetasIASeFundo = fecharDesdobradorMetasIASeFundo;
   window.executarDesdobramentoMetaIA = executarDesdobramentoMetaIA;
+  window.preencherEGerarMetaIA = preencherEGerarMetaIA;
+  window.reiniciarChatIA = reiniciarChatIA;
   window.importarPlanoGeradoPrumo = importarPlanoGeradoPrumo;
   window.testarConexaoIA = testarConexaoIA;
   window.iaAjustesHTML = iaAjustesHTML;
