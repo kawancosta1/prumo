@@ -68,6 +68,7 @@ function viewEstudos() {
         </div>`
     }
   </section>
+  ${typeof renderBateriaQuestoesHTML === "function" ? renderBateriaQuestoesHTML() : ""}
   <section class="block">
     <h2 class="h2">Revisão espaçada <span class="count">${revDue.length} para hoje</span></h2>
     <span class="note">Estudou um conteúdo? Registre aqui. O Prumo agenda revisões para 1, 3, 7, 15 e 30 dias depois, que é quando você estaria quase esquecendo.</span>
@@ -75,6 +76,8 @@ function viewEstudos() {
     ${revDue.length ? `<ul class="list">${revDue.map(reviewRow).join("")}</ul>` : S.reviews.length ? `<div class="empty">Nenhuma revisão para hoje.</div>` : ""}
     ${revNext.length ? `<details class="more"><summary>Próximas revisões (${revNext.length})</summary><ul class="list">${revNext.slice(0, 30).map(reviewRow).join("")}</ul></details>` : ""}
   </section>
+  ${typeof renderFlashcardsHTML === "function" ? renderFlashcardsHTML() : ""}
+  ${typeof renderCadernoErrosHTML === "function" ? renderCadernoErrosHTML() : ""}
   <section class="block">
     <h2 class="h2">Últimos 7 dias</h2>
     <div class="chart">${barChart(

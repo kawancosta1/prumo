@@ -33,7 +33,22 @@ const MiniPrumoAI = (() => {
       "enem", "concurso", "cronograma", "edital", "ciclo", "estudar", "materia", "materias",
       "prova", "vestibular", "oab", "caixa", "inss", "banco do brasil", "tribunal", "cnu",
       "policia", "faculdade", "disciplina", "horas líquidas", "estratégia", "alexandre meirelles",
-      "curva de esquecimento", "revisao espacada", "ebbinghaus", "questoes"
+      "curva de esquecimento", "revisao espacada", "ebbinghaus"
+    ],
+    // Flashcards e Repetição Espaçada SM-2
+    flashcards: [
+      "flashcard", "flashcards", "card", "cards", "anki", "repeticao espacada", "sm2", "sm-2",
+      "memorizar", "evocacao ativa", "active recall", "baralho"
+    ],
+    // Caderno de Erros Estratégico
+    caderno_erros: [
+      "caderno de erros", "caderno de erro", "errei", "questoes erradas", "banca examinadora",
+      "pegadinha", "falta de atencao", "onde estou errando", "isolar o erro"
+    ],
+    // Bateria Diária de Questões
+    bateria_questoes: [
+      "bateria de questoes", "bateria de questao", "resolver questoes", "fazer questoes",
+      "quantas questoes", "taxa de acerto", "acertos", "questoes"
     ]
   };
 
@@ -126,6 +141,18 @@ const MiniPrumoAI = (() => {
       valencia = 0.55;
       energia = 0.85;
       urgencia = 0.95;
+    } else if (matchCat === "flashcards") {
+      valencia = 0.60;
+      energia = 0.85;
+      urgencia = 0.90;
+    } else if (matchCat === "caderno_erros") {
+      valencia = 0.45;
+      energia = 0.80;
+      urgencia = 0.85;
+    } else if (matchCat === "bateria_questoes") {
+      valencia = 0.60;
+      energia = 0.85;
+      urgencia = 0.90;
     } else if (matchCat === "arrancada" || matchCat === "vitoria") {
       valencia = 0.65;
       energia = 0.90;
@@ -342,6 +369,62 @@ A solução inteligente é o **Ciclo de Estudos Contínuo (Interleaving Cognitiv
 Posso estruturar agora mesmo o seu ciclo e aplicá-lo diretamente às suas matérias e metas do Prumo:
 
 [[ACAO_CICLO:${preset}:${nomeAlvo}]]`;
+    }
+
+    // 4.0.0.1. ESPECIALISTA EM FLASHCARDS & REPETIÇÃO ESPAÇADA (SM-2)
+    if (tensor.categoria === "flashcards") {
+      const mat = tensor.materia ? tensor.materia.nome : "Geral";
+      const matId = tensor.materia ? tensor.materia.id : "calculo";
+      return `Sistema de Flashcards com **Algoritmo SM-2 (SuperMemo 2)** ativo, **${nome}**! 🗂️
+
+A repetição espaçada é cientificamente o método mais potente para transferir conteúdo da memória de curto prazo para a memória de longo prazo:
+
+1. ⚡ **Evocação Ativa (Active Recall):** A pergunta ou fórmula fica na frente. Seu cérebro é forçado a reconstruir a resposta antes de virar o cartão.
+2. 🧮 **Algoritmo SM-2 de Ebbinghaus:** A cada revisão você avalia seu domínio em 4 níveis:
+   • **1. Repetir:** Reinicia o intervalo para 1 dia.
+   • **2. Difícil:** Mantém intervalo curto de 1 dia.
+   • **3. Bom:** Multiplica o intervalo pelo fator de facilidade (Ease Factor).
+   • **4. Fácil:** Aplica bônus de 1.3x e agenda para datas mais distantes.
+3. ⌨️ **Atalhos Rápidos:** Pressione **Espaço** para virar o cartão e **1, 2, 3 ou 4** para avaliar instantaneamente sem tirar a mão do teclado!
+
+Você pode revisar os cartões devidos hoje ou importar pacotes prontos de alta retenção:
+
+[[ACAO_FLASHCARD:${matId}:${mat}]]`;
+    }
+
+    // 4.0.0.2. ESPECIALISTA EM CADERNO DE ERROS ESTRATÉGICO
+    if (tensor.categoria === "caderno_erros") {
+      return `Caderno de Erros Estratégico ativado, **${nome}**! 📖
+
+Quem estuda para vestibulares de elite ou concursos concorda: **a nota de corte não é definida pelo que você acertou, mas pelos erros bobos que você deixou de cometer**.
+
+No método cognitivo do Prumo, todo erro em lista ou simulado precisa ser classificado pela sua **causa raiz**:
+
+1. 🧠 **Teoria / Lacuna:** Você errou porque não dominava a fórmula, regra ou conceito.
+2. 👁️ **Falta de Atenção:** Você sabia a matéria, mas leu rápido e não viu um 'NÃO', 'EXCETO' ou detalhe do enunciado.
+3. 🪤 **Pegadinha da Banca:** A banca armou uma alternativa tentadora feita sob medida para induzir ao erro.
+4. 📐 **Cálculo / Álgebra:** Você acertou a ideia teórica, mas trocou um sinal, errou conta ou simplificação.
+5. ⏳ **Tempo / Pressão:** Erro por correria no fim da prova ou chute.
+
+O Prumo gera um **Raio-X Diagnóstico** automático mostrando onde você mais sangra pontos e permite registrar a **Regra de Ouro** para nunca mais cair na mesma armadilha:
+
+[[ACAO_CADERNO_ERROS]]`;
+    }
+
+    // 4.0.0.3. ESPECIALISTA EM BATERIA DIÁRIA DE QUESTÕES
+    if (tensor.categoria === "bateria_questoes") {
+      return `Bateria Diária de Questões configurada, **${nome}**! 🎯
+
+A teoria sem resolução intensiva de exercícios cria uma **falsa sensação de competência**. Resolver de 30 a 50 questões por dia é o motor real que consolida a aprovação.
+
+Na aba de Estudos do Prumo, você conta com:
+• ✅ **Botão +1 Acerto:** Incrementa a contagem e premia com XP e moedas ao bater a meta.
+• ❌ **Botão +1 Erro:** Registra o erro e já abre o Caderno de Erros com 1 clique para catalogar a causa raiz.
+• 📊 **Indicador de Precisão:** Mostra sua taxa de acerto em tempo real (meta recomendada: acima de 80%).
+
+Vamos resolver a bateria de hoje?
+
+[[ACAO_BATERIA_QUESTOES]]`;
     }
 
     // 4.0.1. ESPECIALISTA EM DISCIPLINA / MATÉRIA ESPECÍFICA (CÁLCULO, PROGRAMAÇÃO, MATEMÁTICA, ETC.)

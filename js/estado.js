@@ -1,4 +1,4 @@
-﻿/*
+/*
   Os dados do app (S), como são salvos (navegador + conta Claude) e o estado da tela.
 */
 "use strict";
@@ -46,6 +46,9 @@ const blank = () => ({
   sessions: [],
   classes: [],
   reviews: [],
+  flashcards: [],
+  errorLog: [],
+  questionStats: { date: "", done: 0, correct: 0, goal: 30 },
   meals: {},
   mealCheck: {},
   shopping: [],
@@ -157,6 +160,15 @@ function normalize(x) {
   if (!b.stats || typeof b.stats !== "object") b.stats = {};
   for (const k of ["tasks", "water", "focus", "reviews", "talked", "perfect", "closed", "morcego"])
     b.stats[k] = +b.stats[k] || 0;
+  if (!Array.isArray(b.flashcards)) b.flashcards = [];
+  if (!Array.isArray(b.errorLog)) b.errorLog = [];
+  if (!b.questionStats || typeof b.questionStats !== "object") {
+    b.questionStats = { date: today(), done: 0, correct: 0, goal: 30 };
+  } else {
+    if (typeof b.questionStats.done !== "number") b.questionStats.done = 0;
+    if (typeof b.questionStats.correct !== "number") b.questionStats.correct = 0;
+    if (typeof b.questionStats.goal !== "number" || b.questionStats.goal <= 0) b.questionStats.goal = 30;
+  }
   if (!b.equip || typeof b.equip !== "object") b.equip = {};
   const MUNDOS_VALIDOS = ["zen", "rock", "emo", "otaku", "gamer", "programador", "bruxo", "feiticeiro", "cleanboy", "coach", "forrozeiro", "funkeiro", "pagodeiro", "rapper", "sertanejo", "trapper", "vovo"];
   if (!b.persona || (typeof PERSONAS !== "undefined" && Object.keys(PERSONAS).length > 0 ? !PERSONAS[b.persona] : !MUNDOS_VALIDOS.includes(b.persona))) {

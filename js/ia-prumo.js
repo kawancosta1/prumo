@@ -934,6 +934,26 @@ function formatarTextoMensagemIA(raw) {
     }
   }
 
+  const temCardFlashcard = txt.includes("[[ACAO_FLASHCARD:");
+  let fcNome = "";
+  if (temCardFlashcard) {
+    const m = txt.match(/\[\[ACAO_FLASHCARD:([a-z0-9_-]+):([^\]]+)\]\]/);
+    if (m) {
+      fcNome = m[2];
+      txt = txt.replace(/\[\[ACAO_FLASHCARD:[^\]]+\]\]/g, "");
+    }
+  }
+
+  const temCardCaderno = txt.includes("[[ACAO_CADERNO_ERROS]]");
+  if (temCardCaderno) {
+    txt = txt.replace(/\[\[ACAO_CADERNO_ERROS\]\]/g, "");
+  }
+
+  const temCardBateria = txt.includes("[[ACAO_BATERIA_QUESTOES]]");
+  if (temCardBateria) {
+    txt = txt.replace(/\[\[ACAO_BATERIA_QUESTOES\]\]/g, "");
+  }
+
   // Normalizar tags HTML comuns que possam ter sido passadas
   txt = txt.replace(/<\/?(b|strong)>/gi, "**");
   txt = txt.replace(/<\/?(i|em)>/gi, "*");
@@ -956,6 +976,39 @@ function formatarTextoMensagemIA(raw) {
       <div style="font-size:12px;color:var(--muted,#64748b);margin-bottom:10px;">Clique abaixo para configurar suas horas e gerar o ciclo do <b>${esc(nomeCard)}</b>:</div>
       <button type="button" class="btn primary small" data-act="ia-abrir-ciclo-chat" data-concurso="${esc(presetCard)}" style="font-weight:800;padding:8px 18px;border-radius:10px;">
         ⚡ Abrir Gerador para ${esc(nomeCard)}
+      </button>
+    </div>`;
+  }
+
+  if (temCardFlashcard) {
+    txt += `
+    <div style="margin-top:14px;padding:14px;background:rgba(139,92,246,0.08);border-radius:14px;border:1.5px solid rgba(139,92,246,0.3);text-align:center;">
+      <div style="font-weight:800;font-size:13.5px;color:#8B5CF6;margin-bottom:4px;">🗂️ Flashcards SM-2 (Repetição Espaçada)</div>
+      <div style="font-size:12px;color:var(--muted,#64748b);margin-bottom:10px;">Acesse seu baralho cognitivo ou importe cards de <b>${esc(fcNome || "Estudos")}</b>:</div>
+      <button type="button" class="btn primary small" data-act="ia-abrir-flashcard-chat" style="background:#8B5CF6;font-weight:800;padding:8px 18px;border-radius:10px;">
+        ⚡ Abrir Flashcards SM-2
+      </button>
+    </div>`;
+  }
+
+  if (temCardCaderno) {
+    txt += `
+    <div style="margin-top:14px;padding:14px;background:rgba(245,158,11,0.08);border-radius:14px;border:1.5px solid rgba(245,158,11,0.3);text-align:center;">
+      <div style="font-weight:800;font-size:13.5px;color:#D97706;margin-bottom:4px;">📖 Caderno de Erros Estratégico</div>
+      <div style="font-size:12px;color:var(--muted,#64748b);margin-bottom:10px;">Isole a causa raiz dos seus erros e nunca mais perca questões por atenção ou pegadinha:</div>
+      <button type="button" class="btn primary small" data-act="ia-abrir-caderno-chat" style="background:#F59E0B;font-weight:800;padding:8px 18px;border-radius:10px;">
+        ⚡ Abrir Caderno de Erros
+      </button>
+    </div>`;
+  }
+
+  if (temCardBateria) {
+    txt += `
+    <div style="margin-top:14px;padding:14px;background:rgba(16,185,129,0.08);border-radius:14px;border:1.5px solid rgba(16,185,129,0.3);text-align:center;">
+      <div style="font-weight:800;font-size:13.5px;color:#059669;margin-bottom:4px;">🎯 Bateria Diária de Questões</div>
+      <div style="font-size:12px;color:var(--muted,#64748b);margin-bottom:10px;">Acompanhe sua meta e registre seus acertos e erros na aba Estudos:</div>
+      <button type="button" class="btn primary small" data-act="ia-abrir-bateria-chat" style="background:#10B981;font-weight:800;padding:8px 18px;border-radius:10px;">
+        ⚡ Ir para Bateria de Questões
       </button>
     </div>`;
   }
@@ -2355,6 +2408,23 @@ if (typeof ACOES_EXTRAS !== "undefined") {
     abrirDesdobradorMetasIA();
     selecionarPresetEstudo(preset);
   };
+  ACOES_EXTRAS["ia-abrir-flashcard-chat"] = () => {
+    fecharChatPrumiIA();
+    tab = "estudos";
+    render();
+    if (typeof abrirModalGeradorFlashcardsIA === "function") abrirModalGeradorFlashcardsIA();
+  };
+  ACOES_EXTRAS["ia-abrir-caderno-chat"] = () => {
+    fecharChatPrumiIA();
+    tab = "estudos";
+    render();
+    if (typeof abrirModalNovoErro === "function") abrirModalNovoErro();
+  };
+  ACOES_EXTRAS["ia-abrir-bateria-chat"] = () => {
+    fecharChatPrumiIA();
+    tab = "estudos";
+    render();
+  };
 }
 
 // Delegação de cliques para botões com data-act (garante resposta direta em qualquer contexto)
@@ -2391,6 +2461,34 @@ document.addEventListener("click", e => {
     fecharChatPrumiIA();
     abrirDesdobradorMetasIA();
     selecionarPresetEstudo(preset);
+    return;
+  }
+
+  // 2.2. Abrir ferramentas de estudos a partir do chat
+  const btnFcChat = e.target.closest("[data-act='ia-abrir-flashcard-chat']");
+  if (btnFcChat) {
+    e.preventDefault();
+    fecharChatPrumiIA();
+    tab = "estudos";
+    render();
+    if (typeof abrirModalGeradorFlashcardsIA === "function") abrirModalGeradorFlashcardsIA();
+    return;
+  }
+  const btnCeChat = e.target.closest("[data-act='ia-abrir-caderno-chat']");
+  if (btnCeChat) {
+    e.preventDefault();
+    fecharChatPrumiIA();
+    tab = "estudos";
+    render();
+    if (typeof abrirModalNovoErro === "function") abrirModalNovoErro();
+    return;
+  }
+  const btnBatChat = e.target.closest("[data-act='ia-abrir-bateria-chat']");
+  if (btnBatChat) {
+    e.preventDefault();
+    fecharChatPrumiIA();
+    tab = "estudos";
+    render();
     return;
   }
 

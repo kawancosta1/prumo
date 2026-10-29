@@ -1,0 +1,711 @@
+/*
+  estilos/estudos-avancados.css - Estilos da Bateria Diária de Questões,
+  Caderno de Erros Estratégico e Flashcards com Algoritmo SM-2 (SuperMemo).
+  100% responsivo, acessível e adaptado a temas claros e escuros.
+*/
+
+/* ==========================================================================
+   1. BATERIA DIÁRIA DE QUESTÕES
+   ========================================================================== */
+.bateria-questoes-container {
+  background: var(--card, #ffffff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 18px;
+  padding: 18px 20px;
+  margin-top: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bateria-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.bateria-titulo-grupo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bateria-icone {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  flex-shrink: 0;
+}
+
+.bateria-titulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink, #1e293b);
+  margin: 0;
+}
+
+.bateria-subtitulo {
+  font-size: 0.8rem;
+  color: var(--sub, #64748b);
+  display: block;
+}
+
+.bateria-taxa-badge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.bateria-taxa-badge.baixa {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.bateria-taxa-badge.media {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.bateria-progresso-trilho {
+  width: 100%;
+  height: 10px;
+  background: var(--sunken, #f1f5f9);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.bateria-progresso-preenchimento {
+  height: 100%;
+  background: linear-gradient(90deg, #3B82F6 0%, #10B981 100%);
+  border-radius: 6px;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bateria-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.bateria-stat-item {
+  background: var(--sunken, #f8fafc);
+  border-radius: 12px;
+  padding: 8px 12px;
+  text-align: center;
+  border: 1px solid var(--line, #e2e8f0);
+}
+
+.bateria-stat-valor {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.bateria-stat-valor.acerto {
+  color: #10B981;
+}
+
+.bateria-stat-valor.erro {
+  color: #EF4444;
+}
+
+.bateria-stat-valor.meta {
+  color: #3B82F6;
+}
+
+.bateria-stat-rotulo {
+  font-size: 0.72rem;
+  color: var(--sub, #64748b);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.bateria-acoes-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-questao-acerto {
+  background: #10B981 !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+  flex: 1 1 120px;
+}
+
+.btn-questao-acerto:hover {
+  background: #059669 !important;
+  transform: translateY(-1px);
+}
+
+.btn-questao-erro {
+  background: #EF4444 !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+  flex: 1 1 120px;
+}
+
+.btn-questao-erro:hover {
+  background: #DC2626 !important;
+  transform: translateY(-1px);
+}
+
+
+/* ==========================================================================
+   2. CADERNO DE ERROS ESTRATÉGICO
+   ========================================================================== */
+.caderno-erros-container {
+  margin-top: 14px;
+}
+
+.caderno-header-acoes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.caderno-raio-x {
+  background: var(--sunken, #f8fafc);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.caderno-raio-x-titulo {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink, #1e293b);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.caderno-raio-x-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.caderno-raio-x-pill {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: var(--card, #ffffff);
+  border: 1px solid var(--line, #e2e8f0);
+  color: var(--ink, #1e293b);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.caderno-raio-x-pill b {
+  color: var(--brand, #3B82F6);
+}
+
+.caderno-filtros-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.caderno-filtro-btn {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: var(--sunken, #f1f5f9);
+  color: var(--sub, #64748b);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.caderno-filtro-btn:hover {
+  background: var(--card, #ffffff);
+  color: var(--ink, #1e293b);
+  border-color: var(--line, #e2e8f0);
+}
+
+.caderno-filtro-btn.ativo {
+  background: var(--ink, #1e293b);
+  color: var(--bg, #ffffff);
+  border-color: var(--ink, #1e293b);
+}
+
+.caderno-erros-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.caderno-erro-item {
+  background: var(--card, #ffffff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  transition: border-color 0.2s, opacity 0.2s;
+}
+
+.caderno-erro-item.superado {
+  opacity: 0.65;
+  background: var(--sunken, #f8fafc);
+  border-left: 4px solid #10B981;
+}
+
+.caderno-erro-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.badge-motivo-erro {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid transparent;
+}
+
+.caderno-erro-topico {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink, #1e293b);
+  line-height: 1.35;
+}
+
+.caderno-erro-item.superado .caderno-erro-topico {
+  text-decoration: line-through;
+}
+
+.caderno-regra-ouro-box {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 3px solid #F59E0B;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.84rem;
+  color: var(--ink, #1e293b);
+  line-height: 1.4;
+}
+
+.caderno-regra-ouro-box b {
+  color: #D97706;
+}
+
+.caderno-erro-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--sub, #64748b);
+}
+
+.caderno-erro-acoes {
+  display: flex;
+  gap: 6px;
+}
+
+
+/* ==========================================================================
+   3. FLASHCARDS COM REPETIÇÃO ESPAÇADA (SM-2)
+   ========================================================================== */
+.flashcards-container {
+  margin-top: 14px;
+}
+
+.flashcards-header-acoes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.flashcards-deck-card {
+  background: var(--card, #ffffff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 18px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.flashcards-deck-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.flashcards-deck-icone {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+  flex-shrink: 0;
+}
+
+.flashcards-deck-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink, #1e293b);
+  margin: 0;
+}
+
+.flashcards-deck-sub {
+  font-size: 0.8rem;
+  color: var(--sub, #64748b);
+  margin-top: 2px;
+}
+
+.flashcards-deck-botoes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   4. MODAIS INTERATIVOS: REVISÃO DE FLASHCARDS & FORMULÁRIOS
+   ========================================================================== */
+.modal-estudo-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: estudoModalFadeIn 0.25s ease-out;
+}
+
+@keyframes estudoModalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-estudo-container {
+  width: 100%;
+  max-width: 540px;
+  background: var(--card, #ffffff);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--line, rgba(226, 232, 240, 0.8));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: estudoModalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+}
+
+@keyframes estudoModalSlideUp {
+  from { transform: translateY(20px) scale(0.97); }
+  to { transform: translateY(0) scale(1); }
+}
+
+.modal-estudo-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line, #e2e8f0);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-estudo-header-titulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink, #1e293b);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.modal-estudo-fechar {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--sub, #64748b);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+
+.modal-estudo-fechar:hover {
+  background: var(--sunken, #f1f5f9);
+  color: var(--ink, #1e293b);
+}
+
+.modal-estudo-corpo {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Área de flip do Flashcard */
+.flashcard-arena {
+  min-height: 240px;
+  perspective: 1000px;
+  display: flex;
+  flex-direction: column;
+}
+
+.flashcard-flipper-box {
+  width: 100%;
+  min-height: 240px;
+  background: var(--sunken, #f8fafc);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+
+.flashcard-flipper-box.virado {
+  background: var(--card, #ffffff);
+  border-color: #8B5CF6;
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.12);
+}
+
+.flashcard-pergunta-txt {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink, #1e293b);
+  line-height: 1.45;
+  text-align: center;
+  margin: auto 0;
+}
+
+.flashcard-resposta-box {
+  border-top: 1px dashed var(--line, #cbd5e1);
+  padding-top: 16px;
+  margin-top: 16px;
+  animation: respostaReveal 0.25s ease-out;
+}
+
+@keyframes respostaReveal {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.flashcard-resposta-txt {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--ink, #1e293b);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.flashcard-sm2-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn-sm2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 6px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-sm2 span {
+  font-size: 0.68rem;
+  font-weight: 500;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.btn-sm2-repetir {
+  background: rgba(239, 68, 68, 0.12);
+  color: #DC2626;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.btn-sm2-repetir:hover {
+  background: #DC2626;
+  color: #ffffff;
+}
+
+.btn-sm2-dificil {
+  background: rgba(245, 158, 11, 0.12);
+  color: #D97706;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.btn-sm2-dificil:hover {
+  background: #D97706;
+  color: #ffffff;
+}
+
+.btn-sm2-bom {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.btn-sm2-bom:hover {
+  background: #059669;
+  color: #ffffff;
+}
+
+.btn-sm2-facil {
+  background: rgba(139, 92, 246, 0.12);
+  color: #7C3AED;
+  border-color: rgba(139, 92, 246, 0.25);
+}
+
+.btn-sm2-facil:hover {
+  background: #7C3AED;
+  color: #ffffff;
+}
+
+.flashcard-sucesso-container {
+  text-align: center;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.flashcard-sucesso-emoji {
+  font-size: 3rem;
+  animation: pulseSucesso 1s infinite alternate;
+}
+
+@keyframes pulseSucesso {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+/* ==========================================================================
+   5. MODO ESCURO (DARK MODE)
+   ========================================================================== */
+[data-theme="dark"] .bateria-questoes-container,
+html[data-theme="dark"] .bateria-questoes-container,
+body.dark .bateria-questoes-container,
+.dark .bateria-questoes-container,
+[data-theme="dark"] .flashcards-deck-card,
+html[data-theme="dark"] .flashcards-deck-card,
+body.dark .flashcards-deck-card,
+.dark .flashcards-deck-card,
+[data-theme="dark"] .modal-estudo-container,
+html[data-theme="dark"] .modal-estudo-container,
+body.dark .modal-estudo-container,
+.dark .modal-estudo-container {
+  background: #18181b;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .bateria-stat-item,
+html[data-theme="dark"] .bateria-stat-item,
+body.dark .bateria-stat-item,
+.dark .bateria-stat-item,
+[data-theme="dark"] .caderno-raio-x,
+html[data-theme="dark"] .caderno-raio-x,
+body.dark .caderno-raio-x,
+.dark .caderno-raio-x,
+[data-theme="dark"] .caderno-erro-item,
+html[data-theme="dark"] .caderno-erro-item,
+body.dark .caderno-erro-item,
+.dark .caderno-erro-item,
+[data-theme="dark"] .flashcard-flipper-box,
+html[data-theme="dark"] .flashcard-flipper-box,
+body.dark .flashcard-flipper-box,
+.dark .flashcard-flipper-box {
+  background: #27272a;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .flashcard-flipper-box.virado,
+html[data-theme="dark"] .flashcard-flipper-box.virado,
+body.dark .flashcard-flipper-box.virado,
+.dark .flashcard-flipper-box.virado {
+  background: #202023;
+  border-color: #8B5CF6;
+}
+
+[data-theme="dark"] .caderno-raio-x-pill,
+html[data-theme="dark"] .caderno-raio-x-pill,
+body.dark .caderno-raio-x-pill,
+.dark .caderno-raio-x-pill {
+  background: #18181b;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 600px) {
+  .flashcard-sm2-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
