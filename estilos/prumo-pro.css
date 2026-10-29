@@ -44,13 +44,15 @@
     0 4px 16px rgba(139, 92, 246, 0.08),
     0 1px 3px rgba(0, 0, 0, 0.05);
 }
+[data-theme="dark"] .card-coach-ia,
+html[data-theme="dark"] .card-coach-ia,
 body.dark .card-coach-ia,
 .dark .card-coach-ia {
-  background: linear-gradient(145deg, rgba(30, 24, 48, 0.95) 0%, rgba(20, 16, 35, 0.9) 100%);
-  border-color: rgba(167, 139, 250, 0.2);
+  background: linear-gradient(145deg, rgba(28, 22, 44, 0.96) 0%, rgba(18, 14, 30, 0.94) 100%);
+  border-color: rgba(167, 139, 250, 0.3);
   box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.06);
+    0 4px 24px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 .card-coach-ia::before {
   content: "";
@@ -73,32 +75,43 @@ body.dark .card-coach-ia,
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--text, #1e293b);
+  color: var(--ink, #1e293b);
 }
 .coach-score {
   font-size: 12px;
   font-weight: 800;
-  color: #7c3aed;
-  background: rgba(124, 58, 237, 0.1);
+  color: #a78bfa;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(167, 139, 250, 0.25);
   padding: 2px 8px;
   border-radius: 12px;
 }
 .coach-texto {
   font-size: 13px;
   line-height: 1.5;
-  color: var(--text-sec, #475569);
+  color: var(--ink, #1e293b);
+  opacity: 0.9;
   margin-bottom: 10px;
 }
 .coach-meta-principal {
   background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 10px;
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--text, #1e293b);
+  color: var(--ink, #1e293b);
   display: flex;
   align-items: center;
   gap: 8px;
+}
+[data-theme="dark"] .coach-meta-principal,
+html[data-theme="dark"] .coach-meta-principal,
+body.dark .coach-meta-principal,
+.dark .coach-meta-principal {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(167, 139, 250, 0.35);
+  color: #f3e8ff;
 }
 
 /* Modal de Assinatura e Checkout Prumo PRO */
@@ -139,6 +152,8 @@ body.dark .card-coach-ia,
     0 24px 60px rgba(0, 0, 0, 0.35),
     0 0 0 1px rgba(0, 0, 0, 0.05);
 }
+[data-theme="dark"] .modal-pro-conteudo,
+html[data-theme="dark"] .modal-pro-conteudo,
 body.dark .modal-pro-conteudo,
 .dark .modal-pro-conteudo {
   background: #191627;
@@ -202,6 +217,8 @@ body.dark .modal-pro-conteudo,
   transition: all 0.2s ease;
   background: #f8fafc;
 }
+[data-theme="dark"] .plano-card,
+html[data-theme="dark"] .plano-card,
 body.dark .plano-card,
 .dark .plano-card {
   background: #211c34;
@@ -262,6 +279,8 @@ body.dark .plano-card,
   margin-bottom: 8px;
   color: var(--text, #334155);
 }
+[data-theme="dark"] .lista-vantagens-pro li,
+html[data-theme="dark"] .lista-vantagens-pro li,
 body.dark .lista-vantagens-pro li,
 .dark .lista-vantagens-pro li {
   color: #cbd5e1;
@@ -276,6 +295,8 @@ body.dark .lista-vantagens-pro li,
   margin-bottom: 16px;
   text-align: center;
 }
+[data-theme="dark"] .area-pix-box,
+html[data-theme="dark"] .area-pix-box,
 body.dark .area-pix-box,
 .dark .area-pix-box {
   background: #161324;
@@ -292,6 +313,8 @@ body.dark .area-pix-box,
   background: #ffffff;
   color: #0f172a;
 }
+[data-theme="dark"] .pix-codigo-input,
+html[data-theme="dark"] .pix-codigo-input,
 body.dark .pix-codigo-input,
 .dark .pix-codigo-input {
   background: #0f0d18;

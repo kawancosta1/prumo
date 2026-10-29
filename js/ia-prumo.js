@@ -877,7 +877,7 @@ function enviarMensagemRapidaIA(texto) {
   }
 }
 
-/* ---------- Quebra Inteligente de Metas (Smart Goal Breakdown) ---------- */
+/* ---------- Quebra Inteligente de Metas & Cronograma IA ---------- */
 let ultimoPlanoGeradoIA = null;
 
 function abrirDesdobradorMetasIA() {
@@ -891,11 +891,11 @@ function abrirDesdobradorMetasIA() {
       <div class="ia-modal-header">
         <div class="ia-header-info">
           <div class="ia-avatar-wrapper">
-            <span>🎯</span>
+            <span>📅</span>
           </div>
           <div class="ia-header-titles">
-            <h3>Quebra Inteligente de Metas com IA</h3>
-            <p>Transforme qualquer sonho em hábitos e tarefas práticas</p>
+            <h3>Cronograma Inteligente com IA</h3>
+            <p>Transforme sua meta em hábitos e cronograma prático</p>
           </div>
         </div>
         <button class="ia-close-btn" data-act="fechar-desdobrador-ia" aria-label="Fechar">&times;</button>
@@ -903,7 +903,7 @@ function abrirDesdobradorMetasIA() {
 
       <div class="ia-breakdown-body">
         <form id="form-desdobrador-ia" class="ia-breakdown-form">
-          <label style="font-size:13px; font-weight:600; color:#64748b;">O que você deseja conquistar?</label>
+          <label style="font-size:13px; font-weight:700; color:var(--ink, #334155);">Qual meta ou projeto você deseja organizar?</label>
           <input type="text" id="ia-meta-objetivo" class="ia-meta-input" placeholder="Ex: Aprender Python do zero / Correr 5km / Passar na OAB / Emagrecer 4kg..." autocomplete="off" />
           
           <div class="ia-meta-chips">
@@ -912,9 +912,10 @@ function abrirDesdobradorMetasIA() {
             <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Passar na OAB ou concurso público">⚖️ Passar na OAB</button>
             <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Emagrecer 4kg com hábitos saudáveis">🥗 Emagrecer 4kg</button>
             <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Ler 1 livro por mês">📚 Ler 1 Livro</button>
+            <button type="button" class="ia-chip-btn" data-act="ia-chip-meta" data-meta="Organizar rotina de estudos diária">🎯 Rotina de Estudos</button>
           </div>
 
-          <button type="submit" class="btn primary" id="ia-btn-gerar-plano" data-act="ia-gerar-plano" style="display:flex;align-items:center;justify-content:center;gap:6px;">
+          <button type="submit" class="btn primary coach-btn-gerar" id="ia-btn-gerar-plano" data-act="ia-gerar-plano" style="display:flex;align-items:center;justify-content:center;gap:6px;border-radius:12px;padding:10px 16px;font-weight:700;">
             <span>⚡ Gerar Cronograma com IA</span>
           </button>
         </form>
@@ -970,11 +971,11 @@ async function executarDesdobramentoMetaIA() {
   const box = document.getElementById("ia-resultado-plano");
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = `<span>⏳ Criando estrutura com IA...</span>`;
+    btn.innerHTML = `<span>⏳ Criando cronograma com IA...</span>`;
   }
   if (box) {
     box.style.display = "block";
-    box.innerHTML = `<div style="text-align:center;padding:24px;color:#64748b;"><div class="ia-typing-indicator" style="margin:0 auto 12px;"><div class="ia-typing-dot"></div><div class="ia-typing-dot"></div><div class="ia-typing-dot"></div></div>Analisando a meta e desenhando os passos ideais...</div>`;
+    box.innerHTML = `<div style="text-align:center;padding:24px;color:var(--muted, #64748b);"><div class="ia-typing-indicator" style="margin:0 auto 12px;"><div class="ia-typing-dot"></div><div class="ia-typing-dot"></div><div class="ia-typing-dot"></div></div>Estruturando linha do tempo e passos práticos com IA...</div>`;
   }
 
   let plano = null;
@@ -983,17 +984,18 @@ async function executarDesdobramentoMetaIA() {
   // Se tiver chave de LLM, pede para estruturar em JSON estrito
   if (cfg.chave && (cfg.provedor === "gemini" || cfg.provedor === "groq" || cfg.provedor === "openai")) {
     try {
-      const promptJson = `Aja como um planejador de produtividade de classe mundial. O usuário quer alcançar este objetivo: "${meta}".
-Responda EXCLUSIVAMENTE em formato JSON puro, sem markdown extra, no seguinte formato:
+      const promptJson = `Aja como um planejador de produtividade e coach de classe mundial. O usuário quer criar um cronograma para alcançar este objetivo: "${meta}".
+Responda EXCLUSIVAMENTE em formato JSON puro, sem formatação markdown ou crases ao redor, no seguinte modelo:
 {
-  "titulo": "Título curto do plano",
+  "titulo": "Cronograma de Ação: Título curto",
   "habito": { "nome": "Hábito diário contínuo de 15 a 30 min", "horario": "08:00" },
   "tarefas": [
-    { "titulo": "Ação 1 inicial e prática para hoje", "categoria": "foco", "xp": 20 },
-    { "titulo": "Ação 2 de aprofundamento", "categoria": "estudo", "xp": 30 },
-    { "titulo": "Ação 3 de revisão ou teste prático", "categoria": "carreira", "xp": 40 }
+    { "diaOffset": 0, "titulo": "Ação inicial e prática para Hoje", "categoria": "foco", "xp": 20 },
+    { "diaOffset": 1, "titulo": "Ação de aprofundamento para Amanhã", "categoria": "estudo", "xp": 30 },
+    { "diaOffset": 2, "titulo": "Ação prática para daqui a 2 dias", "categoria": "foco", "xp": 35 },
+    { "diaOffset": 3, "titulo": "Ação de revisão ou consolidação para daqui a 3 dias", "categoria": "carreira", "xp": 40 }
   ],
-  "dicaMascote": "Conselho motivador curto para começar já"
+  "dicaMascote": "Conselho motivador curto para começar com consistência"
 }`;
       const raw = await chamarProvedorLLM(promptJson);
       const rawTxt = typeof raw === "object" && raw !== null ? raw.texto : String(raw);
@@ -1005,7 +1007,7 @@ Responda EXCLUSIVAMENTE em formato JSON puro, sem markdown extra, no seguinte fo
   }
 
   // Fallback Inteligente baseado no objetivo caso a API falhe ou não tenha chave
-  if (!plano || !plano.tarefas) {
+  if (!plano || !Array.isArray(plano.tarefas) || !plano.tarefas.length) {
     plano = sintetizarPlanoMetaAutonomo(meta);
   }
 
@@ -1016,34 +1018,48 @@ Responda EXCLUSIVAMENTE em formato JSON puro, sem markdown extra, no seguinte fo
     <div class="ia-plan-preview">
       <div class="ia-plan-title">📋 ${esc(plano.titulo || meta)}</div>
       
-      <div class="ia-plan-section-lbl">1 Hábito Diário Essencial:</div>
+      <div class="ia-plan-section-lbl">🔁 1 Hábito Diário Essencial:</div>
       <div class="ia-plan-habit">
-        <span style="font-size:20px;">🔁</span>
+        <span style="font-size:22px;">🔄</span>
         <div>
           <div class="ia-plan-habit-title">${esc((plano.habito && plano.habito.nome) || "Prática diária de 20 min")}</div>
-          <div class="ia-plan-habit-sub">Repetir todos os dias às ${esc((plano.habito && plano.habito.horario) || "09:00")}</div>
+          <div class="ia-plan-habit-sub">Todos os dias às ${esc((plano.habito && plano.habito.horario) || "09:00")}</div>
         </div>
       </div>
 
-      <div class="ia-plan-section-lbl">Tarefas Imediatas para o seu Prumo:</div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
+      <div class="ia-plan-section-lbl">📅 Cronograma & Linha do Tempo:</div>
+      <div class="ia-plan-timeline">
         ${(plano.tarefas || [])
-          .map(
-            (t, idx) => `
+          .map((t, idx) => {
+            const offset = typeof t.diaOffset === "number" ? t.diaOffset : idx;
+            const rotuloDia = offset === 0 ? "Hoje" : offset === 1 ? "Amanhã" : offset === 2 ? "+2 dias" : `+${offset} dias`;
+            const badgeClass = offset <= 5 ? `day-${offset}` : "day-5";
+            return `
           <div class="ia-plan-task-item">
-            <span class="ia-plan-task-name"><strong>${idx + 1}.</strong> ${esc(t.titulo || t)}</span>
-            <span class="ia-badge-xp">+${t.xp || 25} XP</span>
+            <div class="ia-task-left">
+              <span class="ia-timeline-day-badge ${badgeClass}">${rotuloDia}</span>
+              <span class="ia-plan-task-name">${esc(t.titulo || t)}</span>
+            </div>
+            <div class="ia-task-right">
+              ${t.categoria ? `<span class="ia-tag-pill">#${esc(t.categoria)}</span>` : ""}
+              <span class="ia-badge-xp">+${t.xp || 25} XP</span>
+            </div>
           </div>
-        `
-          )
+        `;
+          })
           .join("")}
       </div>
 
-      ${plano.dicaMascote ? `<div style="font-size:13px;font-style:italic;color:#6366f1;padding:8px 12px;background:rgba(99,102,241,0.08);border-radius:8px;">💡 "${esc(plano.dicaMascote)}"</div>` : ""}
+      ${plano.dicaMascote ? `<div class="ia-plan-dica">💡 "${esc(plano.dicaMascote)}"</div>` : ""}
 
-      <button type="button" class="btn primary" data-act="ia-importar-plano" style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;">
-        <span>📥 Inserir no meu Prumo Agora</span>
-      </button>
+      <div class="ia-cronograma-actions">
+        <button type="button" class="btn primary coach-btn-distribuir" data-act="ia-importar-cronograma">
+          <span>📅 Distribuir Cronograma nos Próximos Dias</span>
+        </button>
+        <button type="button" class="btn coach-btn-tudo-hoje" data-act="ia-importar-plano">
+          <span>⚡ Inserir Tudo Hoje</span>
+        </button>
+      </div>
     </div>`;
   }
 
@@ -1055,55 +1071,100 @@ Responda EXCLUSIVAMENTE em formato JSON puro, sem markdown extra, no seguinte fo
 
 function sintetizarPlanoMetaAutonomo(meta) {
   const m = meta.toLowerCase();
-  if (m.includes("corr") || m.includes("peso") || m.includes("emagrec") || m.includes("academia") || m.includes("trein")) {
+  if (m.includes("corr") || m.includes("peso") || m.includes("emagrec") || m.includes("academia") || m.includes("trein") || m.includes("saude") || m.includes("fit")) {
     return {
-      titulo: `Plano de Condicionamento & Saúde: ${meta}`,
-      habito: { nome: "30 min de atividade física moderada", horario: "07:30" },
+      titulo: `Cronograma de Saúde & Condicionamento: ${meta}`,
+      habito: { nome: "30 min de atividade física e hidratação regular", horario: "07:30" },
       tarefas: [
-        { titulo: "Separar tênis, roupa de treino e garrafa d'água", categoria: "saude", xp: 15 },
-        { titulo: "Caminhada acelerada ou corrida leve intercalada de 20 min", categoria: "saude", xp: 30 },
-        { titulo: "Alongamento pós-treino e hidratação reforçada", categoria: "saude", xp: 20 }
+        { diaOffset: 0, titulo: "Separar tênis, roupas de treino e planejar o percurso inicial", categoria: "saude", xp: 20 },
+        { diaOffset: 1, titulo: "Primeira sessão: caminhada rápida ou corrida leve intercalada de 20 min", categoria: "saude", xp: 35 },
+        { diaOffset: 2, titulo: "Treino de fortalecimento funcional (pernas e core) em casa", categoria: "saude", xp: 30 },
+        { diaOffset: 3, titulo: "Corrida intervalada de 25 min com alongamento e registro de evolução", categoria: "saude", xp: 40 }
       ],
-      dicaMascote: "O corpo é a sua morada. A consistência de hoje constrói a saúde dos próximos 10 anos!"
+      dicaMascote: "O corpo é a sua morada. A consistência de hoje constrói a saúde e a energia dos próximos 10 anos!"
     };
   }
-  if (m.includes("program") || m.includes("python") || m.includes("código") || m.includes("estud") || m.includes("oab") || m.includes("concurso")) {
+  if (m.includes("program") || m.includes("python") || m.includes("código") || m.includes("dev") || m.includes("javascript") || m.includes("computador") || m.includes("site") || m.includes("app")) {
     return {
-      titulo: `Plano de Estudos & Maestria: ${meta}`,
-      habito: { nome: "Pomodoro diário de estudo com caderno de erros", horario: "19:00" },
+      titulo: `Cronograma de Programação & Tecnologia: ${meta}`,
+      habito: { nome: "1 bloco Pomodoro (25 min) diário de código prático", horario: "19:30" },
       tarefas: [
-        { titulo: "Mapear o edital/ementa e listar os 3 primeiros tópicos", categoria: "estudo", xp: 20 },
-        { titulo: "Sessão focada de 25 min com zero distrações no celular", categoria: "estudo", xp: 35 },
-        { titulo: "Resolver 5 exercícios práticos e anotar as dúvidas", categoria: "estudo", xp: 30 }
+        { diaOffset: 0, titulo: "Configurar ambiente, editor de código e criar o primeiro script de teste", categoria: "estudo", xp: 25 },
+        { diaOffset: 1, titulo: "Estudar lógica, variáveis e estruturas de decisão com exercícios práticos", categoria: "estudo", xp: 35 },
+        { diaOffset: 2, titulo: "Construir uma funcionalidade prática e testar as entradas e saídas", categoria: "estudo", xp: 40 },
+        { diaOffset: 3, titulo: "Fazer commit do projeto no GitHub e anotar o que aprendeu", categoria: "carreira", xp: 30 }
       ],
-      dicaMascote: "Estudar todo dia um pouco vale 10x mais que virar uma noite na véspera. Foco total!"
+      dicaMascote: "Não tente aprender tudo de uma vez. Um script que roda hoje vale mais do que dez teorias para amanhã!"
     };
   }
+  if (m.includes("oab") || m.includes("concurso") || m.includes("prova") || m.includes("enem") || m.includes("faculdade") || m.includes("estud") || m.includes("direito") || m.includes("lei")) {
+    return {
+      titulo: `Cronograma Estruturado de Estudos: ${meta}`,
+      habito: { nome: "Revisão ativa diária com caderno de erros (25 min)", horario: "19:00" },
+      tarefas: [
+        { diaOffset: 0, titulo: "Mapear edital/ementa e selecionar as 3 disciplinas de maior pontuação", categoria: "estudo", xp: 20 },
+        { diaOffset: 1, titulo: "Estudo concentrado do primeiro tópico-chave com resumos esquemáticos", categoria: "estudo", xp: 35 },
+        { diaOffset: 2, titulo: "Resolver bateria de 15 questões de provas anteriores e identificar dúvidas", categoria: "estudo", xp: 40 },
+        { diaOffset: 3, titulo: "Revisão flashcards e reforço direcionado nos pontos fracos", categoria: "estudo", xp: 30 }
+      ],
+      dicaMascote: "Estudar 30 minutos com consistência todo dia supera 8 horas de estudo exaustivo na véspera!"
+    };
+  }
+  if (m.includes("livro") || m.includes("ler") || m.includes("leitur") || m.includes("escrev")) {
+    return {
+      titulo: `Cronograma de Hábito de Leitura: ${meta}`,
+      habito: { nome: "Ler 15 a 20 páginas todos os dias com celular no silencioso", horario: "21:30" },
+      tarefas: [
+        { diaOffset: 0, titulo: "Definir o livro, deixar na mesa de cabeceira e ler sumário e prólogo", categoria: "foco", xp: 15 },
+        { diaOffset: 1, titulo: "Leitura focada do capítulo 1 (20 páginas) sem nenhuma distração", categoria: "foco", xp: 30 },
+        { diaOffset: 2, titulo: "Leitura do capítulo 2 e grifar os 3 principais aprendizados", categoria: "foco", xp: 35 },
+        { diaOffset: 3, titulo: "Sintetizar as ideias do livro em 1 parágrafo prático no caderno de notas", categoria: "foco", xp: 30 }
+      ],
+      dicaMascote: "Livros são a mente de mestres condensada em páginas. 15 páginas por dia são mais de 15 livros por ano!"
+    };
+  }
+  if (m.includes("desenh") || m.includes("arte") || m.includes("pint") || m.includes("músic") || m.includes("tocar") || m.includes("viol") || m.includes("guitar")) {
+    return {
+      titulo: `Cronograma Criativo & Prática: ${meta}`,
+      habito: { nome: "20 min diários de treino prático deliberado", horario: "18:00" },
+      tarefas: [
+        { diaOffset: 0, titulo: "Preparar os instrumentos/materiais e fazer 10 min de aquecimento técnico", categoria: "criativo", xp: 20 },
+        { diaOffset: 1, titulo: "Estudo de fundamentos e exercícios repetitivos para ganhar precisão", categoria: "criativo", xp: 35 },
+        { diaOffset: 2, titulo: "Construção de uma peça prática aplicando o que treinou", categoria: "criativo", xp: 40 },
+        { diaOffset: 3, titulo: "Gravar/registrar o resultado final e comparar com a primeira sessão", categoria: "criativo", xp: 30 }
+      ],
+      dicaMascote: "Arte e técnica se desenvolvem no detalhe repetido com carinho. Celebre a sua evolução a cada traço!"
+    };
+  }
+  // Plano Geral adaptado
   return {
-    titulo: `Projeto Estruturado: ${meta}`,
-    habito: { nome: `Bloco diário de 20 min focado em: ${meta.slice(0, 30)}`, horario: "10:00" },
+    titulo: `Cronograma Estruturado: ${meta}`,
+    habito: { nome: `Bloco diário de 20 min dedicado a: ${meta.slice(0, 30)}`, horario: "10:00" },
     tarefas: [
-      { titulo: `Definir o primeiro passo concreto para: ${meta.slice(0, 35)}`, categoria: "foco", xp: 20 },
-      { titulo: "Remover a maior barreira que causa procrastinação", categoria: "foco", xp: 25 },
-      { titulo: "Executar a primeira etapa prática e comemorar o avanço", categoria: "foco", xp: 35 }
+      { diaOffset: 0, titulo: `Definir a primeira ação prática e desobstruir o caminho para: ${meta.slice(0, 35)}`, categoria: "foco", xp: 20 },
+      { diaOffset: 1, titulo: "Executar o bloco de foco inicial de 30 min com zero distrações", categoria: "foco", xp: 35 },
+      { diaOffset: 2, titulo: "Avaliar o que funcionou, ajustar a rota e resolver o principal desafio", categoria: "foco", xp: 30 },
+      { diaOffset: 3, titulo: "Consolidar a primeira entrega e definir o próximo marco de crescimento", categoria: "foco", xp: 40 }
     ],
-    dicaMascote: "A distância entre o sonho e a realidade chama-se atitude diária. Bora começar agora!"
+    dicaMascote: "A distância entre o sonho e a conquista chama-se atitude diária. Comece pelo menor passo hoje!"
   };
 }
 
-function importarPlanoGeradoPrumo() {
+function importarPlanoGeradoPrumo(diasMultiplos = false) {
   if (!ultimoPlanoGeradoIA || typeof S === "undefined" || !S) return;
   const plano = ultimoPlanoGeradoIA;
-  const t = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
+  const tHoje = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
 
-  // 1. Inserir tarefas no dia de hoje
+  // 1. Inserir tarefas (distribuídas nos próximos dias ou todas hoje)
   if (Array.isArray(plano.tarefas)) {
     if (!Array.isArray(S.tasks)) S.tasks = [];
-    plano.tarefas.forEach(tarf => {
+    plano.tarefas.forEach((tarf, idx) => {
+      const offset = typeof tarf.diaOffset === "number" ? tarf.diaOffset : idx;
+      const dataAlvo = diasMultiplos && typeof addDays === "function" ? addDays(tHoje, offset) : tHoje;
       S.tasks.push({
         id: "ia_" + Math.random().toString(36).slice(2, 9),
-        title: tarf.titulo,
-        date: t,
+        title: tarf.titulo || String(tarf),
+        date: dataAlvo,
         done: false,
         xp: tarf.xp || 25,
         tag: tarf.categoria || "foco"
@@ -1112,7 +1173,7 @@ function importarPlanoGeradoPrumo() {
   }
 
   // 2. Inserir Hábito diário caso configurado
-  if (plano.habito && Array.isArray(S.habits)) {
+  if (plano.habito && plano.habito.nome && Array.isArray(S.habits)) {
     const jaExiste = S.habits.some(h => (h.name || "").toLowerCase() === plano.habito.nome.toLowerCase());
     if (!jaExiste) {
       S.habits.push({
@@ -1125,7 +1186,7 @@ function importarPlanoGeradoPrumo() {
     }
   }
 
-  // Salvar e re-renderizar
+  // 3. Salvar e re-renderizar
   if (typeof commit === "function") commit();
   if (typeof persist === "function") persist(true);
   if (typeof render === "function") render();
@@ -1133,7 +1194,10 @@ function importarPlanoGeradoPrumo() {
   fecharDesdobradorMetasIA();
 
   if (typeof toast === "function") {
-    toast("✨ Meta desdobrada e adicionada com sucesso ao seu Prumo!", false, "happy");
+    const msg = diasMultiplos
+      ? "✨ Cronograma distribuído com sucesso nos próximos dias!"
+      : "✨ Tarefas adicionadas para hoje com sucesso!";
+    toast(msg, false, "happy");
   }
 }
 
@@ -1239,7 +1303,8 @@ if (typeof ACOES_EXTRAS !== "undefined") {
   ACOES_EXTRAS["ia-msg-rapida"] = b => enviarMensagemRapidaIA(b ? b.dataset.msg : "");
   ACOES_EXTRAS["ia-chip-meta"] = b => preencherEGerarMetaIA(b ? b.dataset.meta : "");
   ACOES_EXTRAS["ia-gerar-plano"] = () => executarDesdobramentoMetaIA();
-  ACOES_EXTRAS["ia-importar-plano"] = () => importarPlanoGeradoPrumo();
+  ACOES_EXTRAS["ia-importar-cronograma"] = () => importarPlanoGeradoPrumo(true);
+  ACOES_EXTRAS["ia-importar-plano"] = () => importarPlanoGeradoPrumo(false);
   ACOES_EXTRAS["ia-testar-conexao"] = () => testarConexaoIA();
   ACOES_EXTRAS["limpar-chat-ia"] = () => reiniciarChatIA();
 }
@@ -1310,11 +1375,19 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 9. Importar plano gerado para o Prumo
+  // 9. Importar cronograma distribuído nos próximos dias
+  const btnImportarCronograma = e.target.closest("[data-act='ia-importar-cronograma']");
+  if (btnImportarCronograma) {
+    e.preventDefault();
+    importarPlanoGeradoPrumo(true);
+    return;
+  }
+
+  // 10. Importar plano tudo hoje
   const btnImportarPlano = e.target.closest("[data-act='ia-importar-plano']");
   if (btnImportarPlano) {
     e.preventDefault();
-    importarPlanoGeradoPrumo();
+    importarPlanoGeradoPrumo(false);
     return;
   }
 
