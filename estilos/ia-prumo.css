@@ -1,0 +1,541 @@
+/*
+  estilos/ia-prumo.css - Estilos da Inteligência Artificial Generativa e Coach Interativo do Prumo
+  Design moderno, fluido, responsivo e com suporte total a Dark/Light Mode.
+*/
+
+/* --- Modal Base da IA --- */
+.modal-ia-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: iaModalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes iaModalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-ia-container {
+  width: 100%;
+  max-width: 580px;
+  max-height: 88vh;
+  height: 640px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow:
+    0 20px 40px -15px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(226, 232, 240, 0.8);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  animation: iaModalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes iaModalSlideUp {
+  from { transform: translateY(24px) scale(0.97); }
+  to { transform: translateY(0) scale(1); }
+}
+
+body.dark .modal-ia-container,
+.dark .modal-ia-container {
+  background: #18181b;
+  box-shadow:
+    0 24px 48px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* --- Header do Chat IA --- */
+.ia-modal-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.85));
+}
+
+body.dark .ia-modal-header,
+.dark .ia-modal-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(39, 39, 42, 0.95), rgba(24, 24, 27, 0.85));
+}
+
+.ia-header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ia-avatar-wrapper {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  font-size: 22px;
+}
+
+.ia-online-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+}
+body.dark .ia-online-dot,
+.dark .ia-online-dot {
+  border-color: #18181b;
+}
+
+.ia-header-titles h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+body.dark .ia-header-titles h3,
+.dark .ia-header-titles h3 {
+  color: #f1f5f9;
+}
+
+.ia-header-titles p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ia-engine-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 600;
+}
+body.dark .ia-engine-badge,
+.dark .ia-engine-badge {
+  background: rgba(96, 165, 250, 0.15);
+  color: #93c5fd;
+}
+
+.ia-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.ia-close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #334155;
+}
+body.dark .ia-close-btn:hover,
+.dark .ia-close-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+
+/* --- Pílulas de Sugestão Rápida --- */
+.ia-quick-pills {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+  background: rgba(248, 250, 252, 0.5);
+  flex-shrink: 0;
+}
+.ia-quick-pills::-webkit-scrollbar {
+  display: none;
+}
+body.dark .ia-quick-pills,
+.dark .ia-quick-pills {
+  background: rgba(30, 30, 34, 0.5);
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+.ia-pill-btn {
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.ia-pill-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+body.dark .ia-pill-btn,
+.dark .ia-pill-btn {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #d4d4d8;
+}
+body.dark .ia-pill-btn:hover,
+.dark .ia-pill-btn:hover {
+  background: #3f3f46;
+  border-color: #52525b;
+  color: #ffffff;
+}
+
+/* --- Área de Mensagens (Stream) --- */
+.ia-chat-stream {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ia-message {
+  display: flex;
+  gap: 10px;
+  max-width: 86%;
+  animation: iaMsgPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes iaMsgPop {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ia-message.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.ia-msg-bubble {
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+  position: relative;
+}
+
+.ia-message.user .ia-msg-bubble {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.ia-message.ia .ia-msg-bubble {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+body.dark .ia-message.ia .ia-msg-bubble,
+.dark .ia-message.ia .ia-msg-bubble {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #f4f4f5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.ia-msg-bubble strong {
+  font-weight: 700;
+  color: inherit;
+}
+
+.ia-msg-bubble p {
+  margin: 0 0 8px;
+}
+.ia-msg-bubble p:last-child {
+  margin-bottom: 0;
+}
+
+.ia-msg-bubble ul, .ia-msg-bubble ol {
+  margin: 6px 0 6px 18px;
+  padding: 0;
+}
+
+.ia-msg-bubble li {
+  margin-bottom: 4px;
+}
+
+/* Indicador de Digitação (Typing) */
+.ia-typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  background: #f1f5f9;
+  border-radius: 16px;
+  width: fit-content;
+}
+body.dark .ia-typing-indicator,
+.dark .ia-typing-indicator {
+  background: #27272a;
+}
+.ia-typing-dot {
+  width: 6px;
+  height: 6px;
+  background: #94a3b8;
+  border-radius: 50%;
+  animation: iaTypingBlink 1.4s infinite ease-in-out both;
+}
+.ia-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.ia-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+@keyframes iaTypingBlink {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* --- Barra de Input do Chat --- */
+.ia-chat-input-bar {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+}
+body.dark .ia-chat-input-bar,
+.dark .ia-chat-input-bar {
+  border-top-color: rgba(255, 255, 255, 0.08);
+  background: #18181b;
+}
+
+.ia-chat-input {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #0f172a;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.ia-chat-input:focus {
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+body.dark .ia-chat-input,
+.dark .ia-chat-input {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #f1f5f9;
+}
+body.dark .ia-chat-input:focus,
+.dark .ia-chat-input:focus {
+  background: #18181b;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+}
+
+.ia-send-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+.ia-send-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+.ia-send-btn:active {
+  transform: translateY(0);
+}
+
+/* --- Botão Flutuante do Mascote IA na Tela Inicial --- */
+.btn-hero-ia-sparkle {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.2));
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #6366f1;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.12);
+}
+.btn-hero-ia-sparkle:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.3));
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+}
+body.dark .btn-hero-ia-sparkle,
+.dark .btn-hero-ia-sparkle {
+  color: #a5b4fc;
+  border-color: rgba(165, 180, 252, 0.3);
+}
+
+/* --- Ações do Coach IA --- */
+.coach-acoes-ia {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* --- Modal do Desdobrador Inteligente de Metas --- */
+.ia-breakdown-body {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ia-breakdown-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ia-meta-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  font-family: inherit;
+  background: #f8fafc;
+  color: #0f172a;
+}
+body.dark .ia-meta-input,
+.dark .ia-meta-input {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #f1f5f9;
+}
+
+.ia-plan-preview {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+body.dark .ia-plan-preview,
+.dark .ia-plan-preview {
+  background: #27272a;
+  border-color: #3f3f46;
+}
+
+.ia-plan-habit {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+body.dark .ia-plan-habit,
+.dark .ia-plan-habit {
+  background: #18181b;
+  border-color: #3f3f46;
+}
+
+.ia-plan-task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  font-size: 13px;
+}
+body.dark .ia-plan-task-item,
+.dark .ia-plan-task-item {
+  background: #18181b;
+  border-color: #3f3f46;
+}
+
+.ia-badge-xp {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+/* --- Ajustes da IA --- */
+.ia-config-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ia-provider-select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 13px;
+  color: inherit;
+}
+body.dark .ia-provider-select,
+.dark .ia-provider-select {
+  background: #27272a;
+  border-color: #3f3f46;
+}

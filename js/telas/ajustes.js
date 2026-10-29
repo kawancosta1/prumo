@@ -49,6 +49,7 @@ function viewAjustes() {
       </div>
     </div>
   </section>
+  ${typeof iaAjustesHTML === "function" ? iaAjustesHTML() : ""}
   ${notificacoesAjustesHTML()}
   ${
     somDoMundo()

@@ -233,7 +233,10 @@ function cartaoCoachBloqueadoHTML() {
   return `<div class="card-coach-ia coach-bloqueado">
     <div class="coach-header"><span class="coach-titulo">🤖 Coach de Rotina com IA</span><span class="badge-pro-vip">PRO</span></div>
     <div class="coach-texto">Seu briefing de hoje: foco sugerido, equilíbrio de rotina e conselho do dia, feitos com os seus dados. Teste 7 dias grátis.</div>
-    <button class="btn small primary" data-act="abrir-pro">Testar 7 dias grátis</button>
+    <div class="coach-acoes-ia">
+      <button class="btn small primary" data-act="abrir-pro">Testar 7 dias grátis</button>
+      <button class="btn small ghost" data-act="abrir-chat-ia">💬 Conversar com IA</button>
+    </div>
   </div>`;
 }
 
