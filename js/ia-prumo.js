@@ -842,6 +842,20 @@ function fecharChatPrumiIASeFundo(e) {
 function formatarTextoMensagemIA(raw) {
   if (!raw) return "";
   let txt = String(raw);
+
+  // Detector de ação de ciclo especial da IA
+  const temCardCiclo = txt.includes("[[ACAO_CICLO:");
+  let presetCard = "";
+  let nomeCard = "";
+  if (temCardCiclo) {
+    const m = txt.match(/\[\[ACAO_CICLO:([a-z0-9_-]+):([^\]]+)\]\]/);
+    if (m) {
+      presetCard = m[1];
+      nomeCard = m[2];
+      txt = txt.replace(/\[\[ACAO_CICLO:[^\]]+\]\]/g, "");
+    }
+  }
+
   // Normalizar tags HTML comuns que possam ter sido passadas
   txt = txt.replace(/<\/?(b|strong)>/gi, "**");
   txt = txt.replace(/<\/?(i|em)>/gi, "*");
@@ -856,6 +870,18 @@ function formatarTextoMensagemIA(raw) {
   // Quebras de linha
   txt = txt.replace(/\n\n/g, "<br><br>");
   txt = txt.replace(/\n/g, "<br>");
+
+  if (temCardCiclo && presetCard) {
+    txt += `
+    <div style="margin-top:14px;padding:14px;background:rgba(99,102,241,0.08);border-radius:14px;border:1.5px solid rgba(99,102,241,0.3);text-align:center;">
+      <div style="font-weight:800;font-size:13.5px;color:var(--accent,#4f46e5);margin-bottom:4px;">🎓 Gerador Inteligente de Ciclo de Estudos</div>
+      <div style="font-size:12px;color:var(--muted,#64748b);margin-bottom:10px;">Clique abaixo para configurar suas horas e gerar o ciclo do <b>${esc(nomeCard)}</b>:</div>
+      <button type="button" class="btn primary small" data-act="ia-abrir-ciclo-chat" data-concurso="${esc(presetCard)}" style="font-weight:800;padding:8px 18px;border-radius:10px;">
+        ⚡ Abrir Gerador para ${esc(nomeCard)}
+      </button>
+    </div>`;
+  }
+
   return txt;
 }
 
@@ -1077,6 +1103,34 @@ const PRESETS_ESTUDO_CONCURSOS = {
     horas: 4,
     dias: 6
   },
+  receita: {
+    nome: "Receita Federal (Área Fiscal)",
+    materias: [
+      "Direito Tributário e Legislação",
+      "Contabilidade Geral e Avançada",
+      "Direito Constitucional e Adm",
+      "Língua Portuguesa",
+      "Raciocínio Lógico Matemático",
+      "Fluência em Dados e TI"
+    ],
+    prioridade: "Direito Tributário e Legislação",
+    horas: 4,
+    dias: 6
+  },
+  fuvest: {
+    nome: "Fuvest / Unicamp (Vestibulares)",
+    materias: [
+      "Redação e Prática Discursiva",
+      "Matemática",
+      "Física e Química",
+      "Biologia",
+      "História e Geografia",
+      "Português e Literatura"
+    ],
+    prioridade: "Redação e Prática Discursiva",
+    horas: 4,
+    dias: 6
+  },
   personalizado: {
     nome: "Meu Concurso / Vestibular",
     materias: [
@@ -1209,13 +1263,13 @@ function renderizarFormularioEstudosEstrategicoHTML() {
     </div>
 
     <div style="margin-top:10px;">
-      <label style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);display:block;margin-bottom:4px;">Nome da Prova / Concurso:</label>
+      <label class="ia-label-titulo">Nome da Prova / Concurso:</label>
       <input type="text" id="ia-concurso-nome" class="ia-add-materia-input" style="width:100%;margin-bottom:10px;" value="${esc(st.concursoNome)}" placeholder="Ex: ENEM 2026, INSS, PF..." autocomplete="off" />
     </div>
 
     <div>
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <label style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);">Disciplinas do Edital (${st.materias.length}):</label>
+        <label class="ia-label-titulo" style="margin:0;">Disciplinas do Edital (${st.materias.length}):</label>
         <span style="font-size:11px;color:var(--muted,#64748b);">Clique no &times; para remover</span>
       </div>
 
@@ -1239,7 +1293,7 @@ function renderizarFormularioEstudosEstrategicoHTML() {
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
       <div>
-        <label style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);display:block;margin-bottom:4px;">Horas Líquidas / Dia:</label>
+        <label class="ia-label-titulo">Horas Líquidas / Dia:</label>
         <div class="ia-pill-select-group">
           ${[2, 3, 4, 5, 6]
             .map(
@@ -1251,7 +1305,7 @@ function renderizarFormularioEstudosEstrategicoHTML() {
       </div>
 
       <div>
-        <label style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);display:block;margin-bottom:4px;">Dias por Semana:</label>
+        <label class="ia-label-titulo">Dias por Semana:</label>
         <div class="ia-pill-select-group">
           ${[4, 5, 6, 7]
             .map(
@@ -1264,7 +1318,7 @@ function renderizarFormularioEstudosEstrategicoHTML() {
     </div>
 
     <div style="margin-top:12px;">
-      <label style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);display:block;margin-bottom:4px;">Disciplina Prioritária (Maior Peso ou Dificuldade):</label>
+      <label class="ia-label-titulo">Disciplina Prioritária (Maior Peso ou Dificuldade):</label>
       <select id="ia-materia-prioridade" class="ia-provider-select" style="width:100%;font-size:13px;">
         ${st.materias
           .map(
@@ -1367,7 +1421,7 @@ async function executarPlanejamentoEstrategicoIA() {
         <div class="ia-typing-indicator" style="margin:0 auto 12px;">
           <div class="ia-typing-dot"></div><div class="ia-typing-dot"></div><div class="ia-typing-dot"></div>
         </div>
-        <div style="font-weight:700;color:var(--ink,#1e293b);margin-bottom:4px;">🧠 Estruturando Ciclo Intercalado Nível Estratégia Concursos...</div>
+        <div class="ia-label-titulo" style="text-align:center;font-size:14px;margin-bottom:4px;">🧠 Estruturando Ciclo Intercalado Nível Estratégia Concursos...</div>
         <small>Calculando peso das disciplinas, curvas de esquecimento e simulados de final de semana...</small>
       </div>`;
   }
@@ -1496,7 +1550,7 @@ function renderizarResultadoCicloHTML(ciclo) {
     ` : ""}
 
     <!-- Linha do Tempo e Dias do Ciclo Intercalado -->
-    <div style="font-size:12px;font-weight:700;color:var(--ink,#1e293b);margin:14px 0 8px;">
+    <div class="ia-label-titulo" style="margin:14px 0 8px;font-size:13px;">
       📅 Distribuição dos Dias do Ciclo:
     </div>
 
@@ -1654,10 +1708,59 @@ function importarCicloParaAgendaPrumo() {
   }
   if (typeof S === "undefined" || !S) return;
   if (!Array.isArray(S.tasks)) S.tasks = [];
+  if (!Array.isArray(S.subjects)) S.subjects = [];
+  if (!Array.isArray(S.reviews)) S.reviews = [];
 
   const tHoje = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
   let totalTarefasInseridas = 0;
 
+  // 1. Cadastrar Matérias do Ciclo em S.subjects (com cores profissionais)
+  const coresPadrao = (typeof SUBJ_COLORS !== "undefined" && Array.isArray(SUBJ_COLORS))
+    ? SUBJ_COLORS
+    : ["#2F6FD6", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#06B6D4", "#F97316", "#6366F1"];
+  const subjectMap = {};
+  const mats = Array.isArray(estadoPlanejadorEstudos.materias) ? estadoPlanejadorEstudos.materias : [];
+
+  mats.forEach((nomeMateria, idx) => {
+    let s = S.subjects.find(sub => (sub.name || "").trim().toLowerCase() === nomeMateria.trim().toLowerCase());
+    if (!s) {
+      s = {
+        id: typeof newId === "function" ? newId() : "s_" + Math.random().toString(36).slice(2, 9),
+        name: nomeMateria,
+        color: coresPadrao[S.subjects.length % coresPadrao.length]
+      };
+      S.subjects.push(s);
+    }
+    subjectMap[nomeMateria] = s.id;
+  });
+
+  // Conectar timer de foco à primeira matéria do ciclo se estiver vazio
+  if (typeof timer !== "undefined" && S.subjects.length) {
+    const prioId = subjectMap[estadoPlanejadorEstudos.materiaPrioridade] || S.subjects[0].id;
+    timer.subjectId = prioId;
+    if (typeof saveTimerState === "function") saveTimerState();
+  }
+
+  // 2. Programar Revisões Espaçadas de Ebbinghaus (D+1, D+3, D+7, D+15)
+  const revSteps = (typeof REV_STEPS !== "undefined" && Array.isArray(REV_STEPS)) ? REV_STEPS : [1, 3, 7, 15, 30];
+  mats.slice(0, 5).forEach((nomeMateria, i) => {
+    const sid = subjectMap[nomeMateria] || (S.subjects[0] ? S.subjects[0].id : "");
+    const offset = revSteps[i % revSteps.length] || 1;
+    const jaExisteRev = S.reviews.some(r => r.topic && r.topic.includes(nomeMateria));
+    if (!jaExisteRev) {
+      S.reviews.push({
+        id: typeof newId === "function" ? newId() : "rev_" + Math.random().toString(36).slice(2, 9),
+        subjectId: sid,
+        topic: `Ciclo: Revisão Ativa de ${nomeMateria}`,
+        created: tHoje,
+        step: 0,
+        due: typeof addDays === "function" ? addDays(tHoje, offset) : tHoje,
+        done: false
+      });
+    }
+  });
+
+  // 3. Cadastrar os blocos de estudo diários em S.tasks
   ciclo.dias.forEach((diaInfo, dIdx) => {
     const dataAlvo = typeof addDays === "function" ? addDays(tHoje, dIdx) : tHoje;
     (diaInfo.blocos || []).forEach(bloco => {
@@ -1675,7 +1778,7 @@ function importarCicloParaAgendaPrumo() {
     });
   });
 
-  // Cadastrar hábito de estudo no Prumo se ainda não existir
+  // 4. Cadastrar hábito de estudo no Prumo se ainda não existir
   if (Array.isArray(S.habits)) {
     const nomeHabito = `Ciclo de Estudos: ${estadoPlanejadorEstudos.concursoNome} (${estadoPlanejadorEstudos.horasPorDia}h/dia)`;
     const jaExiste = S.habits.some(h => (h.name || "").toLowerCase() === nomeHabito.toLowerCase());
@@ -1690,14 +1793,19 @@ function importarCicloParaAgendaPrumo() {
     }
   }
 
+  // 5. Salvar, fechar modal e redirecionar imediatamente para a aba Estudos
   if (typeof commit === "function") commit();
   if (typeof persist === "function") persist(true);
+
+  if (typeof tab !== "undefined") {
+    tab = "estudos";
+  }
   if (typeof render === "function") render();
 
   fecharDesdobradorMetasIA();
 
   if (typeof toast === "function") {
-    toast(`🎓 ${totalTarefasInseridas} blocos de estudo adicionados à sua Agenda Prumo!`, false, "happy");
+    toast(`🎓 Ciclo de Estudos criado com sucesso! ${S.subjects.length} matérias e ${totalTarefasInseridas} blocos ativos no Prumo.`, false, "happy");
   }
 }
 
@@ -2132,6 +2240,12 @@ if (typeof ACOES_EXTRAS !== "undefined") {
   ACOES_EXTRAS["ia-gerar-ciclo-estrategia"] = () => executarPlanejamentoEstrategicoIA();
   ACOES_EXTRAS["ia-importar-ciclo-agenda"] = () => importarCicloParaAgendaPrumo();
   ACOES_EXTRAS["ia-copiar-cronograma"] = () => copiarCronogramaCompleto();
+  ACOES_EXTRAS["ia-abrir-ciclo-chat"] = b => {
+    const preset = (b && b.dataset && b.dataset.concurso) || "enem";
+    fecharChatPrumiIA();
+    abrirDesdobradorMetasIA();
+    selecionarPresetEstudo(preset);
+  };
 }
 
 // Delegação de cliques para botões com data-act (garante resposta direta em qualquer contexto)
@@ -2149,6 +2263,17 @@ document.addEventListener("click", e => {
   if (btnFecharChat) {
     e.preventDefault();
     fecharChatPrumiIA();
+    return;
+  }
+
+  // 2.1. Abrir ciclo a partir do chat
+  const btnCicloChat = e.target.closest("[data-act='ia-abrir-ciclo-chat']");
+  if (btnCicloChat) {
+    e.preventDefault();
+    const preset = btnCicloChat.dataset.concurso || "enem";
+    fecharChatPrumiIA();
+    abrirDesdobradorMetasIA();
+    selecionarPresetEstudo(preset);
     return;
   }
 

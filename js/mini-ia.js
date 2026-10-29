@@ -27,7 +27,14 @@ const MiniPrumoAI = (() => {
     // Biometria / Água
     biologia: ["agua", "sede", "beber", "hidrat", "saude", "garrafa", "copo"],
     // Planejamento / Organização
-    planejamento: ["ajud", "organiz", "prioriz", "o que fazer", "plano", "rotina", "ordem", "passo", "proxima", "estrategia"]
+    planejamento: ["ajud", "organiz", "prioriz", "o que fazer", "plano", "rotina", "ordem", "passo", "proxima", "estrategia"],
+    // Concursos, ENEM, Cronogramas e Estudos Estratégicos
+    estudos_concurso: [
+      "enem", "concurso", "cronograma", "edital", "ciclo", "estudar", "materia", "materias",
+      "prova", "vestibular", "oab", "caixa", "inss", "banco do brasil", "tribunal", "cnu",
+      "policia", "faculdade", "disciplina", "horas líquidas", "estratégia", "alexandre meirelles",
+      "curva de esquecimento", "revisao espacada", "ebbinghaus", "questoes"
+    ]
   };
 
   // Pesos Sinápticos Padrão
@@ -79,7 +86,11 @@ const MiniPrumoAI = (() => {
       }
     });
 
-    if (matchCat === "arrancada" || matchCat === "vitoria") {
+    if (matchCat === "estudos_concurso") {
+      valencia = 0.55;
+      energia = 0.85;
+      urgencia = 0.95;
+    } else if (matchCat === "arrancada" || matchCat === "vitoria") {
       valencia = 0.65;
       energia = 0.90;
       urgencia = 0.75;
@@ -250,6 +261,52 @@ const MiniPrumoAI = (() => {
     const faltaAgua = atencao.deficitAgua;
     const destaque = pendenteDestaque || "a pendência do momento";
 
+    // 4.0. ESPECIALISTA EM CONCURSOS, ENEM E CICLO DE ESTUDOS (ESTRATÉGIA CONCURSOS / ICMC-USP)
+    if (tensor.categoria === "estudos_concurso") {
+      const raw = (tensor.raw || "").toLowerCase();
+      let preset = "enem";
+      let nomeAlvo = "ENEM 2026";
+
+      if (raw.includes("caixa") || raw.includes("banco do brasil") || raw.includes("bancari")) {
+        preset = "caixa";
+        nomeAlvo = "Concurso Caixa / Banco do Brasil";
+      } else if (raw.includes("cnu") || raw.includes("unificado")) {
+        preset = "cnu";
+        nomeAlvo = "CNU (Concurso Nacional Unificado)";
+      } else if (raw.includes("inss") || raw.includes("previdenci")) {
+        preset = "inss";
+        nomeAlvo = "Concurso INSS";
+      } else if (raw.includes("oab") || raw.includes("ordem") || raw.includes("advog")) {
+        preset = "oab";
+        nomeAlvo = "OAB 1ª Fase (Exame de Ordem)";
+      } else if (raw.includes("policia") || raw.includes("pf") || raw.includes("prf") || raw.includes("penal")) {
+        preset = "policial";
+        nomeAlvo = "Carreiras Policiais (PF / PRF)";
+      } else if (raw.includes("tribunal") || raw.includes("trt") || raw.includes("tj") || raw.includes("trf")) {
+        preset = "tribunais";
+        nomeAlvo = "Tribunais (TJ / TRT / TRF)";
+      } else if (raw.includes("receita") || raw.includes("fiscal") || raw.includes("tributar")) {
+        preset = "receita";
+        nomeAlvo = "Receita Federal (Área Fiscal)";
+      } else if (raw.includes("fuvest") || raw.includes("unicamp") || raw.includes("vestibular")) {
+        preset = "fuvest";
+        nomeAlvo = "Vestibulares Paulistas (Fuvest / Unicamp)";
+      }
+
+      return `Planejamento de alto rendimento ativado, **${nome}**! 🎯
+
+Para conquistar a aprovação em um exame de alta concorrência como o **${nomeAlvo}**, a metodologia do *Estratégia Concursos* e de *Alexandre Meirelles* (referência ensinada nos pilares de IA do ICMC-USP) comprova que **cronogramas semanais fixos falham**, pois geram culpa e acúmulo quando um imprevisto acontece.
+
+A solução inteligente é o **Ciclo de Estudos Contínuo (Interleaving Cognitivo)**:
+1. **Alternância entre Exatas e Humanas:** Blocos de 60 a 90 minutos alternando leitura densa com raciocínio lógico/cálculo para evitar fadiga cognitiva.
+2. **Priorização Ponderada:** A disciplina com maior peso ou sua maior dificuldade recebe maior frequência de repetição no ciclo.
+3. **Curva de Ebbinghaus:** Revisões ativas programadas em 24h, 7 dias e 30 dias com resolução intensiva de questões da banca.
+
+Posso estruturar agora mesmo o seu ciclo e aplicá-lo diretamente às suas matérias e metas do Prumo:
+
+[[ACAO_CICLO:${preset}:${nomeAlvo}]]`;
+    }
+
     // 4.1. MUNDO EMO / PRUMI MELANCÓLICO
     if (personaId === "emo") {
       if (tensor.categoria === "metacognicao") {
@@ -334,13 +391,24 @@ Status do runtime: **${nConcluidas} commits hoje**, heap de memória hídrica em
     const energiaPerc = Math.round(tensor.energia * 100);
     const tarefasPerc = Math.round(atencao.taxaConclusao * 100);
 
-    const pensamento = [
-      `⚡ **MINI I.A COGNITIVA PRUMO (Ativação Neural Local)**`,
-      `• 🧠 **Tensores de Entrada:** Valência: ${tensor.valencia >= 0 ? "+" : ""}${tensor.valencia.toFixed(2)} (${valenciaPerc}%) | Energia: ${energiaPerc}% | Confiança: ${Math.round(tensor.confianca * 100)}%`,
-      `• 📊 **Atenção Multi-Head:** Tarefas (${Math.round(atencao.pesoTarefas * 100)}%) | Biometria (${Math.round(atencao.pesoBiologico * 100)}%) | Ritmo (${Math.round(atencao.pesoCircadiano * 100)}%)`,
-      `• 🎯 **Deliberação Competitiva:** ${deliberacao.todas.map(h => `${h.nome} (${Math.round(h.score * 100)}%)${h.id === deliberacao.vencedora.id ? " ★ [Vencedora]" : ""}`).join(" vs ")}`,
-      `• 💡 **Decisão Sintética:** Ativação da estratégia de ${deliberacao.vencedora.nome} através da filosofia da persona ativa.`
-    ].join("\n");
+    let pensamento;
+    if (tensor.categoria === "estudos_concurso") {
+      pensamento = [
+        `🧠 **RACIOCÍNIO DELIBERATIVO ESTRATÉGICO (Padrão ICMC-USP & Meirelles)**`,
+        `• 🎯 **Alvo Identificado:** Análise da intenção de preparação para concurso/exame de alto rendimento.`,
+        `• ⚖️ **Cálculo de Pesos & Interleaving:** Alternância cognitiva entre leitura e lógica para absorção contínua (Sessões de 60 a 90 min).`,
+        `• ⏳ **Alocação de Carga:** Estruturação em Ciclo Contínuo imune a interrupções (Elimina a culpa e o acúmulo do cronograma engessado).`,
+        `• 🔁 **Curva de Ebbinghaus:** Programação de revisões ativas espaçadas (D+1, D+7, D+30) com resolução direcionada de questões da banca examinadora.`
+      ].join("\n");
+    } else {
+      pensamento = [
+        `⚡ **MINI I.A COGNITIVA PRUMO (Ativação Neural Local)**`,
+        `• 🧠 **Tensores de Entrada:** Valência: ${tensor.valencia >= 0 ? "+" : ""}${tensor.valencia.toFixed(2)} (${valenciaPerc}%) | Energia: ${energiaPerc}% | Confiança: ${Math.round(tensor.confianca * 100)}%`,
+        `• 📊 **Atenção Multi-Head:** Tarefas (${Math.round(atencao.pesoTarefas * 100)}%) | Biometria (${Math.round(atencao.pesoBiologico * 100)}%) | Ritmo (${Math.round(atencao.pesoCircadiano * 100)}%)`,
+        `• 🎯 **Deliberação Competitiva:** ${deliberacao.todas.map(h => `${h.nome} (${Math.round(h.score * 100)}%)${h.id === deliberacao.vencedora.id ? " ★ [Vencedora]" : ""}`).join(" vs ")}`,
+        `• 💡 **Decisão Sintética:** Ativação da estratégia de ${deliberacao.vencedora.nome} através da filosofia da persona ativa.`
+      ].join("\n");
+    }
 
     return {
       tensor,

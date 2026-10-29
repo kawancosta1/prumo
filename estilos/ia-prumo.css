@@ -1455,3 +1455,29 @@ body.dark .ia-btn-copiar-cronograma,
   border-color: rgba(255, 255, 255, 0.2) !important;
   color: #f1f5f9 !important;
 }
+
+.ia-label-titulo {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink, #0f172a);
+  display: block;
+  margin-bottom: 4px;
+}
+[data-theme="dark"] .ia-label-titulo,
+html[data-theme="dark"] .ia-label-titulo,
+body.dark .ia-label-titulo,
+.dark .ia-label-titulo {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .ia-concurso-section,
+html[data-theme="dark"] .ia-concurso-section {
+  color: #f8fafc;
+}
+[data-theme="dark"] .ia-concurso-section select,
+html[data-theme="dark"] .ia-concurso-section select {
+  background: #27272a;
+  color: #f8fafc;
+  border-color: #3f3f46;
+}
+
