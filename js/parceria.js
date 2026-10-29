@@ -468,19 +468,30 @@ function parceriaHeroHTML() {
 
 /* Seção de parceria na aba Hábitos e social */
 function parceriaSecaoHTML() {
+  const atalhoAmigos = `
+    <button class="card amigos-atalho" data-tab="amigos" style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+        <div>
+          <b>👥 Espaço de Amigos & Rede Social</b>
+          <span class="note" style="display:block;margin-top:2px;">Ver amigos, mandar convites, desafios e sala de foco</span>
+        </div>
+        <span style="font-size:18px;">➔</span>
+      </div>
+    </button>`;
+
   // Com conta Google: amigos de verdade (js/telas/amigos.js). O par é escolhido entre os amigos.
   if (typeof modoFirebase === "function" && modoFirebase()) {
     const n = amigosAceitos().length,
       p = pedidosRecebidos().length;
-    return `<section class="block"><h2 class="h2">Amigos ${p ? `<span class="count">${p} ${p === 1 ? "pedido" : "pedidos"}</span>` : ""}</h2>
+    return `<section class="block"><h2 class="h2">Amigos & Dupla ${p ? `<span class="count">${p} ${p === 1 ? "pedido" : "pedidos"}</span>` : ""}</h2>
+      ${atalhoAmigos}
       <button class="card amigos-atalho" data-tab="amigos"><span><b>${n} ${n === 1 ? "amigo" : "amigos"}</b>${parceriaAtiva() ? ` · seu par: <b>${esc(nomeParceiro())}</b>` : S.parceria.id ? " · pedido de par enviado" : ""}</span><span class="note">Toque para ver amigos, mandar convite e escolher seu par.</span></button>
     </section>`;
   }
-  if (!banco) {
-    return `<section class="block"><h2 class="h2">Parceria</h2><div class="empty"><strong>${textoMundo("conviteTitulo", "Junte seu Prumi com o de outra pessoa.")}</strong>${contaConfigurada() ? "Entre com Google em Ajustes. Depois é só passar seu código ou seu @ para a outra pessoa." : "Para isso, o Prumo precisa estar ligado a uma conta. A conta com Google chega em breve."}</div></section>`;
-  }
+
   const pend = S.parceria.id && !parceriaAtiva();
-  return `<section class="block"><h2 class="h2">Parceria</h2>
+  return `<section class="block"><h2 class="h2">Amigos & Modo Dupla</h2>
+    ${atalhoAmigos}
     ${pedidos.map(p => `<div class="card pedido"><span><b>${esc(p.nome || "Alguém")}</b> ${textoMundo("pedidoChegou", `quer ser ${p.tipo === "amizade" ? "seu amigo(a)" : "seu namorado(a)"} no Prumo.`)}</span><div class="row"><button class="btn small primary" data-act="aceitar" data-id="${esc(p.id)}">Aceitar</button></div></div>`).join("")}
     ${
       parceriaAtiva()
@@ -488,9 +499,9 @@ function parceriaSecaoHTML() {
         : pend
           ? `<div class="card"><span>Pedido enviado. Assim que a outra pessoa aceitar, os Prumis aparecem juntos.</span><div><button class="btn small ghost" data-act="desfazer">Cancelar pedido</button></div></div>`
           : `<div class="card">
-          <span>Seu código: <b class="mono codigo">${esc(S.codigo || "…")}</b></span>
-          <span class="note">${textoMundo("conviteDica", "Passe esse código para a outra pessoa, ou digite o código dela aqui embaixo.")}</span>
-          <form class="row" data-form="parceria">
+          <span>Seu código de amizade: <b class="mono codigo">${esc(S.codigo || "…")}</b></span>
+          <span class="note">${textoMundo("conviteDica", "Passe esse código para a outra pessoa, ou digite o código dela aqui embaixo para juntar os Prumis.")}</span>
+          <form class="row" data-form="parceria" style="margin-top:8px;">
             <input id="par-codigo" type="text" maxlength="21" placeholder="Código ou @" style="width:130px" autocomplete="off" autocapitalize="off" required>
             <select id="par-tipo" aria-label="Tipo"><option value="namoro">Namorado(a)</option><option value="amizade">Amigo(a)</option></select>
             <button class="btn primary" type="submit">${textoMundo("conviteBotao", "Conectar")}</button>

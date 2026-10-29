@@ -106,8 +106,33 @@ function perfilAmigoHTML(uid) {
 }
 
 function viewAmigos() {
-  if (!modoFirebase())
-    return `<section class="block"><h1 class="h1">Amigos</h1><div class="empty"><strong>${textoMundo("conviteTitulo", "Amigos precisam de conta.")}</strong>Entre com Google em Ajustes para adicionar amigos, trocar recados e ver a estante deles.${conviteRecebido ? `<br>Você recebeu um convite de <b>${esc(conviteRecebido)}</b>: ele aparece aqui depois do login.` : ""}<div><button class="btn primary" data-act="conta-entrar">Entrar com Google</button></div></div></section>`;
+  if (!modoFirebase()) {
+    return `
+    <section class="block">
+      <h1 class="h1">Amigos & Rede Social<small>Convites, conexões e amizades</small></h1>
+    </section>
+    <section class="block">
+      <div class="card convite">
+        <span>Seu código de amizade: <b class="mono codigo">${esc(S.codigo)}</b>${S.perfil.usuario ? ` · <b>@${esc(S.perfil.usuario)}</b>` : ` · <span class="note">escolha seu @ em Ajustes</span>`}</span>
+        <div class="row" style="margin-top:8px;">
+          <button class="btn small" data-act="convite-copiar">Copiar link de convite</button>
+          <button class="btn small" data-act="convite-qr">${qrSvg ? "Esconder QR code" : "Mostrar QR code"}</button>
+        </div>
+        ${qrSvg ? `<div class="qr">${qrSvg}</div><span class="note">Quem escanear abre o Prumo já com o seu convite.</span>` : ""}
+      </div>
+      <div class="card" style="margin-top:10px;">
+        <strong>Conexão Online com Amigos</strong>
+        <p style="font-size:13px;color:var(--muted,#64748b);margin:4px 0 10px;">Conecte com sua conta Google para adicionar amigos em tempo real, ver quem está focando agora, participar do ranking semanal e mandar mimos.</p>
+        <button class="btn primary" data-act="conta-entrar">Entrar com Google</button>
+      </div>
+    </section>
+    <section class="block">
+      <button class="card amigos-atalho" data-tab="social">
+        <span><b>➔ Voltar para Social & Hábitos</b></span>
+        <span class="note">Gerenciar seus contatos, grupos de pessoas e rotina.</span>
+      </button>
+    </section>`;
+  }
   if (amigoAberto) return `<section class="block">${perfilAmigoHTML(amigoAberto)}</section>`;
   const amigos = amigosAceitos().sort(
     (a, b) =>

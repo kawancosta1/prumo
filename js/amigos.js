@@ -381,7 +381,7 @@ function atualizarSino() {
     amigosBt = document.getElementById("amigos-bt");
   const ligado = modoFirebase();
   if (sino) sino.hidden = !ligado;
-  if (amigosBt) amigosBt.hidden = !ligado;
+  if (amigosBt) amigosBt.hidden = false;
   const n = totalAvisos();
   const b = document.getElementById("sino-n");
   if (b) {
