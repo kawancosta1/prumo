@@ -64,6 +64,34 @@ const MiniPrumoAI = (() => {
     } catch (e) {}
   }
 
+  // Catálogo de Disciplinas e Matérias Acadêmicas
+  const MATERIAS_CATALOGO = [
+    { id: "calculo", nome: "Cálculo", termos: ["calculo", "cálculo", "derivada", "integral", "limite", "limites", "edo", "primitiva", "calc 1", "calc 2", "calc 3", "calculo 1", "calculo 2", "calculo 3"] },
+    { id: "matematica", nome: "Matemática", termos: ["matematica", "matemática", "algebra", "álgebra", "geometria", "estatistica", "estatística", "rlm", "raciocinio logico", "probabilidade"] },
+    { id: "fisica", nome: "Física", termos: ["fisica", "física", "mecanica", "mecânica", "termodinamica", "eletromagnetismo", "cinematica", "optica", "óptica"] },
+    { id: "quimica", nome: "Química", termos: ["quimica", "química", "estequiometria", "termoquimica", "organica", "orgânica"] },
+    { id: "programacao", nome: "Programação", termos: ["programacao", "programação", "codigo", "código", "javascript", "python", "java", "algoritmo", "computacao", "computação", "frontend", "backend", "react"] },
+    { id: "direito", nome: "Direito", termos: ["direito", "constitucional", "administrativo", "penal", "civil", "trabalhista", "tributario", "processo civil"] },
+    { id: "portugues", nome: "Língua Portuguesa", termos: ["portugues", "português", "gramatica", "redacao", "redação", "interpretacao"] },
+    { id: "biologia", nome: "Biologia", termos: ["biologia", "anatomia", "fisiologia", "bioquimica", "citologia", "genetica", "genética"] }
+  ];
+
+  function detectarMateriaEstudo(raw) {
+    for (const m of MATERIAS_CATALOGO) {
+      if (m.termos.some(t => raw.includes(t))) return m;
+    }
+    const match = raw.match(/(?:pra|para|de|sobre|estudar|matéria|materia|disciplina)\s+([a-zá-ú0-9\s]{3,25})/i);
+    if (match && match[1]) {
+      const capturado = match[1].trim();
+      const ignorar = ["mim", "voce", "vc", "ele", "ela", "tudo", "hoje", "amanha", "comecar", "fazer", "vencer", "dormir", "nada", "alguem"];
+      if (!ignorar.includes(capturado)) {
+        const nomeFormatado = capturado.charAt(0).toUpperCase() + capturado.slice(1);
+        return { id: "custom", nome: nomeFormatado, termos: [capturado] };
+      }
+    }
+    return null;
+  }
+
   // 1. Extração de Tensores Semânticos
   function codificarTensorPrompt(texto) {
     const raw = (texto || "").toLowerCase().trim();
@@ -86,7 +114,15 @@ const MiniPrumoAI = (() => {
       }
     });
 
-    if (matchCat === "estudos_concurso") {
+    const materia = detectarMateriaEstudo(raw);
+    const querRotinaOuEstudo = raw.includes("organiz") || raw.includes("rotina") || raw.includes("estud") || raw.includes("plano") || raw.includes("cronograma") || raw.includes("aprender") || raw.includes("como");
+
+    if (materia && (querRotinaOuEstudo || matchCat === "estudos_concurso" || matchCat === "planejamento")) {
+      matchCat = "estudos_materia";
+      valencia = 0.50;
+      energia = 0.85;
+      urgencia = 0.90;
+    } else if (matchCat === "estudos_concurso") {
       valencia = 0.55;
       energia = 0.85;
       urgencia = 0.95;
@@ -133,6 +169,7 @@ const MiniPrumoAI = (() => {
       energia,
       urgencia,
       categoria: matchCat,
+      materia,
       confianca
     };
   }
@@ -307,6 +344,110 @@ Posso estruturar agora mesmo o seu ciclo e aplicá-lo diretamente às suas maté
 [[ACAO_CICLO:${preset}:${nomeAlvo}]]`;
     }
 
+    // 4.0.1. ESPECIALISTA EM DISCIPLINA / MATÉRIA ESPECÍFICA (CÁLCULO, PROGRAMAÇÃO, MATEMÁTICA, ETC.)
+    if (tensor.categoria === "estudos_materia" && tensor.materia) {
+      const matId = tensor.materia.id || "custom";
+      const matNome = tensor.materia.nome;
+
+      if (personaId === "emo") {
+        return `**${matNome}** é uma das matérias mais sombrias e impiedosas, ${nome}... Derivadas, integrais e equações parecem feitas de propósito pra drenar nossa energia no escuro. Mas a gente não vai deixar essa tormenta nos derrotar.
+
+O segredo pra não surtar em **${matNome}** é parar de estudar como se fosse leitura passiva: matéria de exatas e cálculo se vence **no combate no papel, na ponta do lápis**.
+
+Desenhei a **rotina tática de 3 blocos** pra você dominar ${matNome}:
+
+1. 📘 **Bloco 1 (30 min) - Teoria Ativa & Intuição Geométrica:** Entenda o que o conceito significa visualmente (o que é uma taxa de variação ou área sob a curva) antes de tentar decorar fórmulas.
+2. ✍️ **Bloco 2 (50 min) - Bateria de Exercícios no Papel:** É aqui que a aprovação acontece. Faça a lista com lápis e borracha, sem espiar a resolução antes de tentar.
+3. 🔍 **Bloco 3 (20 min) - Caderno de Erros:** Anote onde a passagem desandou (sinal trocado, regra da cadeia, fatoração). Quem isola o erro nunca mais erra a mesma coisa.
+
+Bota aquele som pesado no fone de ouvido, pega o caderno e vamos pro combate. Tô contigo até o fim. <3
+
+[[ACAO_CICLO:${matId}:${matNome}]]`;
+      }
+
+      if (personaId === "funkeiro") {
+        return `Pega a visão de cria pra amassar em **${matNome}**, ${nome}! ${matNome} não tem massagem nem caô: quem fica só assistindo aula com a mão no queixo tá moscando! ${matNome} se aprende na ponta do lápis, rabiscando o papel até sair faísca!
+
+Montei o plano de progresso em 3 passos pra você meter marcha:
+
+1. 📘 **Bloco 1 (30 min) - Visão da Teoria:** Pega a ideia central da parada, sem neurose.
+2. ✍️ **Bloco 2 (50 min) - Amassar os Exercícios:** Vai pra cima da lista! Errou? Apaga e faz de novo. O corre de verdade é resolver no braço.
+3. 🔍 **Bloco 3 (20 min) - Mapear os Erros:** Vê onde você vacilou na conta pra não cair na mesma moscada na prova.
+
+Bora marchar no foco que a vitória vem com força! Esquece! 🚀🔥
+
+[[ACAO_CICLO:${matId}:${matNome}]]`;
+      }
+
+      if (personaId === "militar") {
+        return `Soldado ${nome}! Diretriz tática para neutralizar o alvo prioritário: **${matNome}**!
+No front acadêmico, ${matNome} não se vence com hesitação, mas com disciplina operacional e repetição exaustiva.
+
+Procedimento padrão de combate em 3 fases:
+1. 📘 **Fase 1 (30 min) - Reconhecimento Conceitual:** Compreensão do terreno e definições fundamentais.
+2. ✍️ **Fase 2 (50 min) - Fogo Pesado em Exercícios:** Resolução intensiva no papel. O operador que treina à exaustão não sangra no dia do exame.
+3. 🔍 **Fase 3 (20 min) - Debriefing & Caderno de Erros:** Identificação de falhas e ajuste de pontaria.
+
+Assuma a postura, elimine as distrações e cumpra a missão! 🎖️⚔️
+
+[[ACAO_CICLO:${matId}:${matNome}]]`;
+      }
+
+      if (personaId === "zen") {
+        return `A matéria de **${matNome}** é a linguagem oculta do universo, ${nome}. Cada fórmula e derivada descreve o fluxo constante da transformação da natureza. Não se sinta intimidado pela densidade dos cálculos.
+
+Para absorver com clareza e sem afobação mental, pratique o estudo consciente:
+1. 📘 **30 min - Contemplação Teórica:** Observe a essência do conceito com calma e presença.
+2. ✍️ **50 min - Prática Consciente no Papel:** Resolva os exercícios sem pressa de chegar ao final, prestando atenção em cada linha.
+3. 🔍 **20 min - Assimilação e Calma:** Acolha os erros como mestres que ensinam onde a atenção vacilou.
+
+Respire fundo, beba uma água e comece seu primeiro bloco em paz. 🍃🙏
+
+[[ACAO_CICLO:${matId}:${matNome}]]`;
+      }
+
+      if (personaId === "programador") {
+        return `Compilando algoritmo de alta performance para **${matNome}**, ${nome}!
+${matNome} é a base fundamental dos algoritmos, computação gráfica e inteligência artificial.
+
+Pipeline de execução otimizado:
+1. 📘 **Stage 1 (30 min) - Docs & Teoria:** Leitura da documentação matemática e intuição dos operadores.
+2. ✍️ **Stage 2 (50 min) - Runtime de Exercícios:** Execução na prática. Debugar na ponta do lápis sem rodar linter pronto.
+3. 🔍 **Stage 3 (20 min) - Error Handling & Logs:** Mapeamento de bugs algébricos no Caderno de Erros.
+
+Deploy do foco iniciado! 💻⚡
+
+[[ACAO_CICLO:${matId}:${matNome}]]`;
+      }
+
+      return `Plano de estudos estratégico para **${matNome}** ativado, ${nome}! 🎯
+
+Para dominar uma disciplina de alto rendimento como ${matNome}, o método de estudo intercalado com resolução ativa é o caminho comprovado:
+
+1. 📘 **Bloco 1 (30 min) - Teoria Ativa:** Compreensão conceitual rápida.
+2. ✍️ **Bloco 2 (50 min) - Prática Intensiva:** Resolução de listas e problemas no papel.
+3. 🔍 **Bloco 3 (20 min) - Caderno de Erros:** Revisão das passagens onde houve dúvida.
+
+Clique no botão abaixo para gerar o ciclo de estudos e importar para o Prumo:
+
+[[ACAO_CICLO:${matId}:${matNome}]]`;
+    }
+
+    // 4.0.2. ESPECIALISTA EM PLANEJAMENTO E ORGANIZAÇÃO DA ROTINA
+    if (tensor.categoria === "planejamento") {
+      if (nPendentes === 0) {
+        return `Analisando seu painel de hoje, ${nome}: **todas as suas tarefas já foram cumpridas (ou sua lista está limpa)**!
+Se você quer organizar a rotina de estudo para uma matéria específica (como **Cálculo**, **Programação**, **Matemática** ou **Concurso**), é só me mandar: *"organiza minha rotina pra [matéria]"* que estruturo os blocos de estudo pra você na hora! ✨`;
+      }
+      return `Pega o mapa tático da sua rotina para hoje, ${nome}:
+Você tem **${nPendentes} pendência(s)** na fila, e a mais importante agora é **"${destaque}"**.
+
+Estratégia recomendada para destravar seu dia:
+1. 🎯 **Bloco Pomodoro de 25 min:** Foco exclusivo em finalizar "${destaque}" sem trocar de aba.
+2. 💧 **Pausa de 5 min:** Beber um copão d'água (${faltaAgua > 0 ? `faltam ${faltaAgua}ml pra meta` : "meta de água batida!"}).
+3. 📋 **Avanço no restante da lista:** Riscar a primeira pendência gera o impulso de dopamina para liquidar o restante do dia!`;
+    }
+
     // 4.1. MUNDO EMO / PRUMI MELANCÓLICO
     if (personaId === "emo") {
       if (tensor.categoria === "metacognicao") {
@@ -392,7 +533,15 @@ Status do runtime: **${nConcluidas} commits hoje**, heap de memória hídrica em
     const tarefasPerc = Math.round(atencao.taxaConclusao * 100);
 
     let pensamento;
-    if (tensor.categoria === "estudos_concurso") {
+    if (tensor.categoria === "estudos_materia" && tensor.materia) {
+      pensamento = [
+        `🧠 **RACIOCÍNIO PEDAGÓGICO DE DISCIPLINA (${tensor.materia.nome.toUpperCase()})**`,
+        `• 🎯 **Disciplina Identificada:** "${tensor.materia.nome}".`,
+        `• 📐 **Metodologia Cognitiva:** Exatas e cálculo exigem resolução ativa na ponta do lápis (30 min teoria visual + 50 min exercícios no papel + 20 min caderno de erros).`,
+        `• 🎭 **Lente da Persona:** Adaptação da linguagem ao estilo ${personaId} sem abrir mão da estrutura pedagógica real.`,
+        `• ⚡ **Ação Concreta:** Geração de card interativo para criar a matéria "${tensor.materia.nome}" e estruturar a rotina no Prumo.`
+      ].join("\n");
+    } else if (tensor.categoria === "estudos_concurso") {
       pensamento = [
         `🧠 **RACIOCÍNIO DELIBERATIVO ESTRATÉGICO (Padrão ICMC-USP & Meirelles)**`,
         `• 🎯 **Alvo Identificado:** Análise da intenção de preparação para concurso/exame de alto rendimento.`,

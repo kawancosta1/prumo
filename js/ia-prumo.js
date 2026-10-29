@@ -1098,6 +1098,18 @@ function enviarMensagemRapidaIA(texto) {
 
 /* ---------- Quebra Inteligente de Metas & Planejador Estratégico IA ---------- */
 const PRESETS_ESTUDO_CONCURSOS = {
+  calculo: {
+    nome: "Cálculo (Exatas & Engenharia)",
+    materias: [
+      "Cálculo: Teoria & Intuição Geométrica",
+      "Cálculo: Resolução Ativa de Exercícios",
+      "Cálculo: Caderno de Erros & Álgebra",
+      "Geometria Analítica & Pré-Cálculo"
+    ],
+    prioridade: "Cálculo: Resolução Ativa de Exercícios",
+    horas: 3,
+    dias: 5
+  },
   enem: {
     nome: "ENEM",
     materias: [
@@ -1418,15 +1430,29 @@ function renderizarFormularioEstudosEstrategicoHTML() {
 }
 
 function selecionarPresetEstudo(key) {
-  if (!PRESETS_ESTUDO_CONCURSOS[key]) return;
-  const p = PRESETS_ESTUDO_CONCURSOS[key];
-  estadoPlanejadorEstudos.presetAtual = key;
-  estadoPlanejadorEstudos.concursoNome = p.nome;
-  estadoPlanejadorEstudos.materias = [...p.materias];
-  estadoPlanejadorEstudos.prioridade = p.prioridade;
-  estadoPlanejadorEstudos.materiaPrioridade = p.prioridade;
-  estadoPlanejadorEstudos.horasPorDia = p.horas;
-  estadoPlanejadorEstudos.diasPorSemana = p.dias;
+  if (PRESETS_ESTUDO_CONCURSOS[key]) {
+    const p = PRESETS_ESTUDO_CONCURSOS[key];
+    estadoPlanejadorEstudos.presetAtual = key;
+    estadoPlanejadorEstudos.concursoNome = p.nome;
+    estadoPlanejadorEstudos.materias = [...p.materias];
+    estadoPlanejadorEstudos.prioridade = p.prioridade;
+    estadoPlanejadorEstudos.materiaPrioridade = p.prioridade;
+    estadoPlanejadorEstudos.horasPorDia = p.horas;
+    estadoPlanejadorEstudos.diasPorSemana = p.dias;
+  } else {
+    const nomeMateria = key ? (key.charAt(0).toUpperCase() + key.slice(1)) : "Cálculo";
+    estadoPlanejadorEstudos.presetAtual = "custom";
+    estadoPlanejadorEstudos.concursoNome = `Rotina: ${nomeMateria}`;
+    estadoPlanejadorEstudos.materias = [
+      `${nomeMateria} (Teoria & Conceitos)`,
+      `${nomeMateria} (Resolução de Exercícios)`,
+      `${nomeMateria} (Caderno de Erros & Revisão)`
+    ];
+    estadoPlanejadorEstudos.prioridade = `${nomeMateria} (Resolução de Exercícios)`;
+    estadoPlanejadorEstudos.materiaPrioridade = `${nomeMateria} (Resolução de Exercícios)`;
+    estadoPlanejadorEstudos.horasPorDia = 3;
+    estadoPlanejadorEstudos.diasPorSemana = 5;
+  }
   renderizarConteudoDesdobrador();
 }
 
