@@ -231,7 +231,7 @@ const QUARTO_NOVOS = [
     nome: "Vitrola 1930 (toca de verdade)",
     preco: 0,
     toque: "vitrola",
-    svg: (w, h, d) => (typeof desenharVitrolaSVG === "function" ? desenharVitrolaSVG({ w, h, d }) : `<rect x="2" y="22" width="40" height="22" rx="2" fill="#8D6E63"/>`)
+    svg: (w, h, d) => (typeof desenharVitrolaSVG === "function" ? desenharVitrolaSVG({ w, h, d, interativo: false }) : `<rect x="2" y="22" width="40" height="22" rx="2" fill="#8D6E63"/>`)
   },
   {
     slot: "movel",

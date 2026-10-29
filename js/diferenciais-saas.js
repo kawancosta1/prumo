@@ -114,6 +114,9 @@
   let _somAsmrAtivo = null;
   let _nosAsmr = [];
   let _timerMelodiaVinil = null;
+  let _masterGainAsmr = null;
+  let _parandoAsmr = false;
+  let _ultimoCliqueAsmr = 0;
 
   function obterAudioCtx() {
     if (typeof obterAudioContext === "function") return obterAudioContext();
@@ -124,10 +127,27 @@
   }
 
   function pararAsmrVintage() {
+    if (_parandoAsmr) return;
+    _parandoAsmr = true;
+
+    // 1. Limpar timer de melodia
     if (_timerMelodiaVinil) {
       clearTimeout(_timerMelodiaVinil);
       _timerMelodiaVinil = null;
     }
+
+    // 2. Cortar instantaneamente ganho mestre e desconectar do alto-falante
+    const ctx = obterAudioCtx();
+    if (_masterGainAsmr && ctx) {
+      try {
+        _masterGainAsmr.gain.cancelScheduledValues(ctx.currentTime);
+        _masterGainAsmr.gain.setValueAtTime(0, ctx.currentTime);
+        _masterGainAsmr.disconnect();
+      } catch (_) {}
+      _masterGainAsmr = null;
+    }
+
+    // 3. Parar e desconectar todos os nós individuais
     _nosAsmr.forEach(n => {
       try {
         if (n.stop) n.stop();
@@ -136,17 +156,36 @@
     });
     _nosAsmr = [];
     _somAsmrAtivo = null;
+
+    // 4. Parar sintetizadores legados se estiverem ativos
+    if (typeof pararPaisagemSonora === "function" && typeof window._somAtivoTipo !== "undefined" && window._somAtivoTipo) {
+      try { pararPaisagemSonora(); } catch (_) {}
+    }
+    if (typeof pararMusicaQuarto === "function") {
+      try { pararMusicaQuarto(); } catch (_) {}
+    }
+
     atualizarBotaoAsmr();
+    _parandoAsmr = false;
   }
 
   function tocarAsmrVintage(tipo) {
     pararAsmrVintage();
-    if (typeof pararPaisagemSonora === "function") pararPaisagemSonora();
     const ctx = obterAudioCtx();
     if (!ctx) return;
     if (ctx.state === "suspended") ctx.resume();
 
     _somAsmrAtivo = tipo;
+
+    // Criar ganho mestre exclusivo desta sessão de áudio
+    try {
+      _masterGainAsmr = ctx.createGain();
+      _masterGainAsmr.gain.setValueAtTime(1.0, ctx.currentTime);
+      _masterGainAsmr.connect(ctx.destination);
+    } catch (_) {
+      _masterGainAsmr = null;
+    }
+    const destinoAudio = _masterGainAsmr || ctx.destination;
 
     if (tipo === "vinil") {
       const t0 = ctx.currentTime;
@@ -161,7 +200,7 @@
         popGain.gain.setValueAtTime(0.08, t0);
         popGain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.05);
         pop.connect(popGain);
-        popGain.connect(ctx.destination);
+        popGain.connect(destinoAudio);
         pop.start(t0);
         pop.stop(t0 + 0.055);
         _nosAsmr.push(pop, popGain);
@@ -209,7 +248,7 @@
       noise.connect(filter);
       filter.connect(highpass);
       highpass.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(destinoAudio);
       noise.start();
       _nosAsmr.push(noise, filter, highpass, gain);
 
@@ -223,7 +262,7 @@
       let acordeIdx = 0;
 
       const tocarProximoAcorde = () => {
-        if (_somAsmrAtivo !== "vinil") return;
+        if (_somAsmrAtivo !== "vinil" || !_masterGainAsmr) return;
         try {
           const agora = ctx.currentTime;
           const notas = acordes[acordeIdx % acordes.length];
@@ -241,7 +280,7 @@
           mGain.gain.linearRampToValueAtTime(0.001, agora + 3.2);
 
           mFilter.connect(mGain);
-          mGain.connect(ctx.destination);
+          mGain.connect(destinoAudio);
 
           notas.forEach((freq, k) => {
             const osc = ctx.createOscillator();
@@ -274,24 +313,33 @@
   }
 
   function alternarAsmrVintage() {
-    const lista = [null, "vinil", "chuva", "lareira", "binaural"];
-    const idx = lista.indexOf(_somAsmrAtivo);
-    const prox = lista[(idx + 1) % lista.length];
-    if (prox) {
-      tocarAsmrVintage(prox);
-    } else {
+    const agora = Date.now();
+    if (agora - _ultimoCliqueAsmr < 300) return;
+    _ultimoCliqueAsmr = agora;
+
+    // Se já estiver tocando qualquer som: DESLIGA IMEDIATAMENTE!
+    if (_somAsmrAtivo) {
       pararAsmrVintage();
+      if (typeof toast === "function") toast("🔇 Som desligado.", false, "sleepy");
+    } else {
+      // Se estiver desligado: liga a Vitrola 1930
+      tocarAsmrVintage("vinil");
+      if (typeof toast === "function") toast("📻 Vitrola 1930 ligada! Foco analógico e vinil vintage.", false, "happy");
     }
   }
 
   function alternarVitrola1930() {
+    const agora = Date.now();
+    if (agora - _ultimoCliqueAsmr < 300) return;
+    _ultimoCliqueAsmr = agora;
+
     if (_somAsmrAtivo === "vinil") {
       pararAsmrVintage();
-      if (typeof toast === "function") toast("📻 Vitrola 1930 pausada.", false, "sleepy");
+      if (typeof toast === "function") toast("📻 Vitrola 1930 desligada.", false, "sleepy");
     } else {
       tocarAsmrVintage("vinil");
-      if (typeof toast === "function") toast("📻 Vitrola 1930 ligada! Foco analógico e chiado vintage.", false, "happy");
-      if (typeof react === "function") react("happy", "A agulha pousou no disco... Bom foco e boa rotina!", 3000);
+      if (typeof toast === "function") toast("📻 Vitrola 1930 ligada! Foco analógico e vinil vintage.", false, "happy");
+      if (typeof react === "function") react("happy", "A agulha pousou no disco... Bom foco!", 2600);
     }
   }
 
@@ -309,6 +357,7 @@
     };
     btns.forEach(btn => {
       btn.classList.toggle("tocando", !!_somAsmrAtivo);
+      btn.title = _somAsmrAtivo ? "Clique para desligar o som" : "Clique para ligar o som analógico";
       btn.innerHTML = _somAsmrAtivo
         ? `<span class="onda-animada"><i></i><i></i><i></i></span> ${nomes[_somAsmrAtivo] || "Tocando"}`
         : `🎧 Som ASMR Vintage`;
@@ -527,26 +576,9 @@
     window.ACOES_EXTRAS["asmr-parar"] = () => pararAsmrVintage();
   }
 
-  // Interceptar cliques em botões para feedback sensorial sutil e ações da Vitrola/ASMR
+  // Interceptar cliques em botões para feedback sensorial sutil de clique retrô
   if (typeof document !== "undefined") {
     document.addEventListener("click", e => {
-      const act = e.target.closest("[data-act]");
-      if (act) {
-        const a = act.dataset.act;
-        if (a === "alternar-asmr") {
-          alternarAsmrVintage();
-        } else if (a === "vitrola-tocar") {
-          alternarVitrola1930();
-        } else if (a === "asmr-tocar") {
-          const tipo = act.dataset.tipo;
-          if (tipo) tocarAsmrVintage(tipo);
-        } else if (a === "asmr-parar") {
-          pararAsmrVintage();
-        } else if (a === "alternar-respiro") {
-          alternarDiaRespiro();
-        }
-      }
-
       const b = e.target.closest("button, .btn, [role='button'], .tab");
       if (b && !b.classList.contains("sem-clique")) {
         tocarCliqueAnalogo();

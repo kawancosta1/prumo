@@ -19,7 +19,11 @@ function obterAudioContext() {
   return _audioCtx;
 }
 
+let _parandoPaisagem = false;
 function pararPaisagemSonora() {
+  if (_parandoPaisagem) return;
+  _parandoPaisagem = true;
+
   _nosAudio.forEach(node => {
     try {
       if (node.stop) node.stop();
@@ -33,6 +37,12 @@ function pararPaisagemSonora() {
     const btn = document.getElementById("btn-paisagem-som");
     if (btn) btn.textContent = "🎧 Foco Sonoro";
   }
+
+  if (typeof pararAsmrVintage === "function" && typeof window.obterSomAsmrAtivo === "function" && window.obterSomAsmrAtivo()) {
+    try { pararAsmrVintage(); } catch (_) {}
+  }
+
+  _parandoPaisagem = false;
 }
 
 function tocarPaisagemSonora(tipo) {
@@ -142,14 +152,10 @@ function tocarPaisagemSonora(tipo) {
 }
 
 function alternarPaisagemSonora() {
-  const ordem = [null, "vinil", "chuva", "lareira", "binaural"];
-  const atualIdx = ordem.indexOf(_somAtivoTipo);
-  const proximo = ordem[(atualIdx + 1) % ordem.length];
-
-  if (proximo) {
-    tocarPaisagemSonora(proximo);
-  } else {
+  if (_somAtivoTipo || (typeof window.obterSomAsmrAtivo === "function" && window.obterSomAsmrAtivo())) {
     pararPaisagemSonora();
+  } else {
+    tocarPaisagemSonora("vinil");
   }
 }
 
