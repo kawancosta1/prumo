@@ -316,8 +316,8 @@ function abrirChatPrumiIA(mensagemInicial = "") {
       : "Motor Prumo IA";
 
   const modalHtml = `
-  <div id="modal-chat-ia" class="modal-ia-overlay" onclick="fecharChatPrumiIASeFundo(event)">
-    <div class="modal-ia-container" onclick="event.stopPropagation()">
+  <div id="modal-chat-ia" class="modal-ia-overlay">
+    <div class="modal-ia-container">
       <div class="ia-modal-header">
         <div class="ia-header-info">
           <div class="ia-avatar-wrapper">
@@ -329,14 +329,14 @@ function abrirChatPrumiIA(mensagemInicial = "") {
             <p><span class="ia-engine-badge">⚡ ${esc(providerLabel)}</span> • Coach em tempo real</p>
           </div>
         </div>
-        <button class="ia-close-btn" onclick="fecharChatPrumiIA()" aria-label="Fechar">&times;</button>
+        <button class="ia-close-btn" data-act="fechar-chat-ia" aria-label="Fechar">&times;</button>
       </div>
 
       <div class="ia-quick-pills">
-        <button class="ia-pill-btn" onclick="enviarMensagemRapidaIA('Tô sem foco, me dá um empurrão agora!')">⚡ Tô sem foco</button>
-        <button class="ia-pill-btn" onclick="enviarMensagemRapidaIA('Como devo organizar minhas próximas horas?')">🎯 Priorizar hoje</button>
-        <button class="ia-pill-btn" onclick="enviarMensagemRapidaIA('Analise meu progresso e equilíbrio de hoje')">📊 Como tá meu dia?</button>
-        <button class="ia-pill-btn" onclick="abrirDesdobradorMetasIA()">✨ Desdobrar Meta</button>
+        <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Tô sem foco, me dá um empurrão agora!">⚡ Tô sem foco</button>
+        <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Como devo organizar minhas próximas horas?">🎯 Priorizar hoje</button>
+        <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Analise meu progresso e equilíbrio de hoje">📊 Como tá meu dia?</button>
+        <button class="ia-pill-btn" data-act="abrir-desdobrador-ia">✨ Desdobrar Meta</button>
       </div>
 
       <div class="ia-chat-stream" id="ia-chat-stream">
@@ -351,7 +351,7 @@ function abrirChatPrumiIA(mensagemInicial = "") {
           .join("")}
       </div>
 
-      <form class="ia-chat-input-bar" onsubmit="submeterChatIA(event)">
+      <form id="form-chat-ia" class="ia-chat-input-bar">
         <input type="text" id="ia-input-texto" class="ia-chat-input" placeholder="Converse com seu coach..." autocomplete="off" />
         <button type="submit" class="ia-send-btn" id="ia-btn-enviar">
           <span>Enviar</span>
@@ -385,7 +385,7 @@ function fecharChatPrumiIA() {
 }
 
 function fecharChatPrumiIASeFundo(e) {
-  if (e.target && e.target.classList.contains("modal-ia-overlay")) {
+  if (e && e.target && e.target.classList.contains("modal-ia-overlay")) {
     fecharChatPrumiIA();
   }
 }
@@ -508,8 +508,8 @@ function abrirDesdobradorMetasIA() {
   if (antigo) antigo.remove();
 
   const modalHtml = `
-  <div id="modal-desdobrador-ia" class="modal-ia-overlay" onclick="fecharDesdobradorMetasIASeFundo(event)">
-    <div class="modal-ia-container" onclick="event.stopPropagation()">
+  <div id="modal-desdobrador-ia" class="modal-ia-overlay">
+    <div class="modal-ia-container">
       <div class="ia-modal-header">
         <div class="ia-header-info">
           <div class="ia-avatar-wrapper">
@@ -520,17 +520,17 @@ function abrirDesdobradorMetasIA() {
             <p>Transforme qualquer sonho em hábitos e tarefas práticas</p>
           </div>
         </div>
-        <button class="ia-close-btn" onclick="fecharDesdobradorMetasIA()" aria-label="Fechar">&times;</button>
+        <button class="ia-close-btn" data-act="fechar-desdobrador-ia" aria-label="Fechar">&times;</button>
       </div>
 
       <div class="ia-breakdown-body">
-        <div class="ia-breakdown-form">
+        <form id="form-desdobrador-ia" class="ia-breakdown-form">
           <label style="font-size:13px; font-weight:600; color:#64748b;">O que você deseja conquistar?</label>
           <input type="text" id="ia-meta-objetivo" class="ia-meta-input" placeholder="Ex: Aprender Python do zero / Correr 5km / Passar na OAB / Emagrecer 4kg..." />
-          <button class="btn primary" id="ia-btn-gerar-plano" onclick="executarDesdobramentoMetaIA()" style="display:flex;align-items:center;justify-content:center;gap:6px;">
+          <button type="submit" class="btn primary" id="ia-btn-gerar-plano" data-act="ia-gerar-plano" style="display:flex;align-items:center;justify-content:center;gap:6px;">
             <span>⚡ Gerar Cronograma com IA</span>
           </button>
-        </div>
+        </form>
 
         <div id="ia-resultado-plano" style="display:none;"></div>
       </div>
@@ -550,7 +550,7 @@ function fecharDesdobradorMetasIA() {
 }
 
 function fecharDesdobradorMetasIASeFundo(e) {
-  if (e.target && e.target.classList.contains("modal-ia-overlay")) {
+  if (e && e.target && e.target.classList.contains("modal-ia-overlay")) {
     fecharDesdobradorMetasIA();
   }
 }
@@ -638,7 +638,7 @@ Responda EXCLUSIVAMENTE em formato JSON puro, sem markdown extra, no seguinte fo
 
       ${plano.dicaMascote ? `<div style="font-size:13px;font-style:italic;color:#6366f1;padding:8px 12px;background:rgba(99,102,241,0.08);border-radius:8px;">💡 "${esc(plano.dicaMascote)}"</div>` : ""}
 
-      <button class="btn primary" onclick="importarPlanoGeradoPrumo()" style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;">
+      <button type="button" class="btn primary" data-act="ia-importar-plano" style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;">
         <span>📥 Inserir no meu Prumo Agora</span>
       </button>
     </div>`;
@@ -770,7 +770,7 @@ function iaAjustesHTML() {
           <b>Provedor de IA</b>
           <span class="note">Escolha o motor que alimenta as conversas com o Coach e o Mascote.</span>
         </div>
-        <select id="set-ia-provedor" class="ia-provider-select" onchange="atualizarProvedorIA(this.value)">
+        <select id="set-ia-provedor" class="ia-provider-select">
           <option value="gemini" ${cfg.provedor === "gemini" ? "selected" : ""}>Google Gemini 1.5 Flash (Grátis & Rápido)</option>
           <option value="groq" ${cfg.provedor === "groq" ? "selected" : ""}>Groq (Llama 3.3 Ultra Rápido)</option>
           <option value="openai" ${cfg.provedor === "openai" ? "selected" : ""}>OpenAI (ChatGPT GPT-4o-mini)</option>
@@ -783,7 +783,7 @@ function iaAjustesHTML() {
           <b>Chave de API (BYOK)</b>
           <span class="note">Sua chave fica gravada apenas no seu dispositivo. <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:#3b82f6;text-decoration:underline;">Clique aqui para obter uma chave grátis no Google AI Studio</a>.</span>
         </div>
-        <input type="password" id="set-ia-chave" value="${esc(cfg.chave)}" placeholder="Cole sua chave aqui..." style="width:200px;" onchange="atualizarChaveIA(this.value)" autocomplete="off" />
+        <input type="password" id="set-ia-chave" value="${esc(cfg.chave)}" placeholder="Cole sua chave aqui..." style="width:200px;" autocomplete="off" />
       </div>
 
       <div class="setrow">
@@ -792,8 +792,8 @@ function iaAjustesHTML() {
           <span class="note" id="ia-status-conexao">${cfg.chave ? "Chave configurada. Teste abaixo." : "Usando motor neuro-heurístico autônomo."}</span>
         </div>
         <div style="display:flex;gap:8px;">
-          <button class="btn small" id="ia-btn-testar-conexao" onclick="testarConexaoIA()">Testar Conexão</button>
-          <button class="btn small primary" onclick="abrirChatPrumiIA()">Abrir Chat IA</button>
+          <button type="button" class="btn small" id="ia-btn-testar-conexao" data-act="ia-testar-conexao">Testar Conexão</button>
+          <button type="button" class="btn small primary" data-act="abrir-chat-ia">Abrir Chat IA</button>
         </div>
       </div>
     </div>
@@ -818,7 +818,7 @@ function atualizarChaveIA(val) {
 
 /* ---------- Botão de Acesso Rápido ao Chat IA no Mascote ---------- */
 function mascoteBotaoIaHTML() {
-  return `<button class="btn-hero-ia-sparkle" onclick="abrirChatPrumiIA()" aria-label="Conversar com Coach IA">
+  return `<button class="btn-hero-ia-sparkle" data-act="abrir-chat-ia" aria-label="Conversar com Coach IA">
     <span>✨</span>
     <span>Conversar com IA</span>
   </button>`;
@@ -831,17 +831,109 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Delegação de cliques para botões com data-act
 document.addEventListener("click", e => {
+  // 1. Abrir chat IA
   const btnChat = e.target.closest("[data-act='abrir-chat-ia']");
   if (btnChat) {
     e.preventDefault();
     abrirChatPrumiIA();
     return;
   }
+
+  // 2. Fechar chat IA
+  const btnFecharChat = e.target.closest("[data-act='fechar-chat-ia']");
+  if (btnFecharChat) {
+    e.preventDefault();
+    fecharChatPrumiIA();
+    return;
+  }
+
+  // 3. Clique fora do modal (no overlay escuro) para fechar
+  if (e.target && e.target.classList && e.target.classList.contains("modal-ia-overlay")) {
+    fecharChatPrumiIA();
+    fecharDesdobradorMetasIA();
+    return;
+  }
+
+  // 4. Mensagem rápida no chat
+  const btnMsgRapida = e.target.closest("[data-act='ia-msg-rapida']");
+  if (btnMsgRapida) {
+    e.preventDefault();
+    const msg = btnMsgRapida.dataset.msg;
+    if (msg) enviarMensagemRapidaIA(msg);
+    return;
+  }
+
+  // 5. Abrir desdobrador de metas
   const btnDesdobrar = e.target.closest("[data-act='abrir-desdobrador-ia']");
   if (btnDesdobrar) {
     e.preventDefault();
     abrirDesdobradorMetasIA();
     return;
+  }
+
+  // 6. Fechar desdobrador de metas
+  const btnFecharDesdobrar = e.target.closest("[data-act='fechar-desdobrador-ia']");
+  if (btnFecharDesdobrar) {
+    e.preventDefault();
+    fecharDesdobradorMetasIA();
+    return;
+  }
+
+  // 7. Gerar plano com IA
+  const btnGerarPlano = e.target.closest("[data-act='ia-gerar-plano']");
+  if (btnGerarPlano) {
+    e.preventDefault();
+    executarDesdobramentoMetaIA();
+    return;
+  }
+
+  // 8. Importar plano gerado para o Prumo
+  const btnImportarPlano = e.target.closest("[data-act='ia-importar-plano']");
+  if (btnImportarPlano) {
+    e.preventDefault();
+    importarPlanoGeradoPrumo();
+    return;
+  }
+
+  // 9. Testar conexão IA
+  const btnTestar = e.target.closest("[data-act='ia-testar-conexao']");
+  if (btnTestar) {
+    e.preventDefault();
+    testarConexaoIA();
+    return;
+  }
+});
+
+// Delegação de formulários (Chat e Desdobrador)
+document.addEventListener("submit", e => {
+  if (e.target && e.target.id === "form-chat-ia") {
+    e.preventDefault();
+    submeterChatIA(e);
+    return;
+  }
+  if (e.target && e.target.id === "form-desdobrador-ia") {
+    e.preventDefault();
+    executarDesdobramentoMetaIA();
+    return;
+  }
+});
+
+// Delegação de alteração de campos (Ajustes da IA)
+document.addEventListener("change", e => {
+  if (e.target && e.target.id === "set-ia-provedor") {
+    atualizarProvedorIA(e.target.value);
+    return;
+  }
+  if (e.target && e.target.id === "set-ia-chave") {
+    atualizarChaveIA(e.target.value);
+    return;
+  }
+});
+
+// Sincronizar chave em tempo de digitação
+document.addEventListener("input", e => {
+  if (e.target && e.target.id === "set-ia-chave") {
+    atualizarChaveIA(e.target.value);
   }
 });
 

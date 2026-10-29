@@ -185,19 +185,19 @@ const COMODOS = [
       sofa: {
         nome: "Sofá",
         valores: [
-          ["vermelho", "#9E2A2B"],
-          ["musgo", "#4F6D38"],
-          ["azul", "#2B4C7E"],
-          ["mostarda", "#C98A1E"]
+          ["vermelho", "#B23A3A"],
+          ["musgo", "#5E7A3A"],
+          ["azul", "#33558C"],
+          ["mostarda", "#D49A2A"]
         ]
       },
       parede: {
         nome: "Parede",
         valores: [
-          ["areia", "#E8D8C0"],
-          ["salvia", "#BFCDB4", "Sálvia"],
-          ["cinza", "#CACAD2"],
-          ["vinho", "#65232D"]
+          ["areia", "#EADBC4"],
+          ["salvia", "#C9D6C0", "Sálvia"],
+          ["cinza", "#D2D2D8"],
+          ["vinho", "#6E2A35"]
         ]
       }
     },
@@ -741,9 +741,9 @@ const COMODOS = [
       parede: {
         nome: "Parede",
         valores: [
-          ["azul", "#B8CCDE"],
-          ["verde", "#2A4535"],
-          ["madeira", "#7C5A3A"]
+          ["azul", "#C8D6E8"],
+          ["verde", "#2F4A3A"],
+          ["madeira", "#8C6A4A"]
         ]
       },
       luz: {
@@ -1233,9 +1233,9 @@ const COMODOS = [
       espuma: {
         nome: "Espuma",
         valores: [
-          ["preta", "#1F1F26"],
-          ["vermelha", "#6E1B1E"],
-          ["azul", "#1A2F63"]
+          ["preta", "#26262E"],
+          ["vermelha", "#7A1F22"],
+          ["azul", "#1F3A7A"]
         ]
       }
     },
