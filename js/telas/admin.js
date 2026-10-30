@@ -30,13 +30,47 @@ function renderConteudoPainelAdmin() {
           <h1 class="h1" style="margin-bottom:4px;">Painel Administrativo</h1>
           <p class="note">DataGrid CRUD e Gestão de Entidades com Persistência Firestore</p>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button type="button" class="btn small primary" data-act="admin-novo-modal">
             ➕ Novo Item
           </button>
           <button type="button" class="btn small ghost" data-act="admin-sincronizar">
             🔄 Sincronizar
           </button>
+          ${
+            typeof ExportButton === "function"
+              ? ExportButton({
+                  id: "exp_admin_catalogo",
+                  rotulo: "Exportar Catálogo PDF",
+                  classe: "btn small ghost",
+                  dadosFn: () => ({
+                    titulo: "Relatório de Entidades do Catálogo",
+                    subtitulo: "Inventário Geral e Dados Comerciais Prumo",
+                    colunas: [
+                      { key: "id", label: "ID" },
+                      { key: "nome", label: "Nome da Entidade" },
+                      { key: "categoria", label: "Categoria" },
+                      { key: "preco", label: "Preço (Gotas)" },
+                      { key: "mundo", label: "Mundo" },
+                      { key: "status", label: "Status" }
+                    ],
+                    linhas: filtrados.map(it => ({
+                      id: it.id,
+                      nome: it.nome,
+                      categoria: (it.categoria || "geral").toUpperCase(),
+                      preco: "💧 " + (it.preco || 0),
+                      mundo: it.mundo || "todos",
+                      status: it.ativo !== false ? "Ativo" : "Inativo"
+                    })),
+                    filtros: {
+                      "Termo de busca": filtroAdminBusca || "Nenhum",
+                      "Categoria selecionada": filtroAdminCategoria || "Todas"
+                    },
+                    autor: typeof S !== "undefined" && S.name ? S.name : "Administrador"
+                  })
+                })
+              : ""
+          }
         </div>
       </div>
 
