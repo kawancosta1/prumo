@@ -54,13 +54,18 @@ let catalogoIniciado = false;
 /** Verifica se o usuário atual está autenticado no Firebase Auth */
 function isUsuarioAutenticado() {
   if (typeof contaUsuario !== "undefined" && contaUsuario && contaUsuario.uid) return true;
+  if (typeof window !== "undefined" && window.contaUsuario && window.contaUsuario.uid) return true;
   return false;
 }
 
 /** Verifica se o usuário possui privilégios administrativos */
 function isUsuarioAdmin() {
   if (!isUsuarioAutenticado()) return false;
-  const email = (contaUsuario.email || "").toLowerCase();
+  const user =
+    (typeof contaUsuario !== "undefined" && contaUsuario) ||
+    (typeof window !== "undefined" && window.contaUsuario) ||
+    {};
+  const email = (user.email || "").toLowerCase();
   if (email.includes("admin") || email.endsWith("@prumo.app") || email === "kawancosta1@gmail.com")
     return true;
   if (typeof S !== "undefined" && S && S.adminRole === true) return true;
