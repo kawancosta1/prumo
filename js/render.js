@@ -13,7 +13,8 @@ const VIEWS = {
   amigos: viewAmigos,
   avisos: viewAvisos,
   ajustes: viewAjustes,
-  feedback: viewFeedback
+  feedback: viewFeedback,
+  admin: () => (typeof viewAdmin === "function" ? viewAdmin() : "")
 };
 
 let lastProg = 0,

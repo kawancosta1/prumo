@@ -47,6 +47,13 @@ function viewAjustes() {
         </div>
         <button class="btn small" data-act="imprimir-relatorio-executivo">Imprimir / Salvar PDF</button>
       </div>
+      <div class="setrow">
+        <div class="lbl">
+          <b>Painel Administrativo (CRUD DataGrid)</b>
+          <span class="note">Gerenciamento de entidades, catálogo e sincronia em tempo real com Firestore.</span>
+        </div>
+        <button class="btn small" data-tab="admin">Abrir DataGrid</button>
+      </div>
     </div>
   </section>
   ${typeof iaAjustesHTML === "function" ? iaAjustesHTML() : ""}

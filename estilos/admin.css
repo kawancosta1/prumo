@@ -1,0 +1,125 @@
+/* estilos/admin.css - Painel Administrativo, DataGrid e AuthGuard */
+.auth-guard-card {
+  max-width: 520px;
+  margin: 32px auto;
+  padding: 24px;
+  background: var(--card, #ffffff);
+  border: 1px solid var(--borda, rgba(0, 0, 0, 0.1));
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+[data-theme="dark"] .auth-guard-card {
+  background: var(--card, #1e1e24);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+.auth-guard-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  margin-bottom: 12px;
+}
+[data-theme="dark"] .auth-guard-badge {
+  background: rgba(239, 68, 68, 0.22);
+  color: #f87171;
+}
+
+/* DataGrid Admin */
+.admin-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 8px 60px;
+}
+.admin-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.admin-search-input {
+  flex: 1;
+  min-width: 220px;
+  padding: 8px 12px;
+  border: 1px solid var(--borda, #cbd5e1);
+  border-radius: 8px;
+  background: var(--bg, #fff);
+  color: var(--txt, #0f172a);
+  font-size: 0.9rem;
+}
+.admin-datagrid-container {
+  overflow-x: auto;
+  border: 1px solid var(--borda, rgba(0, 0, 0, 0.1));
+  border-radius: 12px;
+  background: var(--card, #fff);
+}
+[data-theme="dark"] .admin-datagrid-container {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: var(--card, #1a1a20);
+}
+.admin-datagrid {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.88rem;
+}
+.admin-datagrid th {
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid var(--borda, rgba(0, 0, 0, 0.1));
+  font-weight: 700;
+  color: var(--sub, #64748b);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+[data-theme="dark"] .admin-datagrid th {
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.admin-datagrid td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--borda, rgba(0, 0, 0, 0.06));
+  vertical-align: middle;
+}
+[data-theme="dark"] .admin-datagrid td {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+.admin-datagrid tr:hover td {
+  background: rgba(0, 0, 0, 0.015);
+}
+[data-theme="dark"] .admin-datagrid tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+.admin-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(47, 111, 214, 0.1);
+  color: #2563eb;
+}
+[data-theme="dark"] .admin-chip {
+  background: rgba(96, 165, 250, 0.2);
+  color: #93c5fd;
+}
+.admin-acoes-col {
+  display: flex;
+  gap: 6px;
+}
