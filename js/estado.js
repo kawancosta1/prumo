@@ -63,6 +63,10 @@ const blank = () => ({
   welcomed: false,
   semConta: false, // escolheu "Continuar sem conta" na tela de entrada (js/telas/entrar.js)
   persona: "zen",
+  idioma:
+    typeof navigator !== "undefined" && navigator.language && navigator.language.startsWith("en")
+      ? "en"
+      : "pt",
   calendar: "google",
   mode: "auto",
   themeBy: {},
@@ -225,6 +229,12 @@ function normalize(x) {
   };
   if (!b.consentimento || typeof b.consentimento !== "object" || !b.consentimento.versao)
     b.consentimento = null;
+  if (!b.idioma) {
+    b.idioma =
+      typeof navigator !== "undefined" && navigator.language && navigator.language.startsWith("en")
+        ? "en"
+        : "pt";
+  }
   if (!Array.isArray(b.fotolog)) b.fotolog = [];
   if (!Array.isArray(b.noites)) b.noites = [];
   const rk = b.rock && typeof b.rock === "object" ? b.rock : {};
