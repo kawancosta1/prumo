@@ -17,8 +17,14 @@
 }
 
 @keyframes valFadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .modal-valuation-card {
@@ -35,7 +41,7 @@
   border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
-.dark .modal-valuation-card {
+:root[data-theme="dark"] .modal-valuation-card {
   background: #0f172a;
   color: #f8fafc;
   border-color: #334155;
@@ -50,7 +56,7 @@
   background: linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%);
 }
 
-.dark .val-header {
+:root[data-theme="dark"] .val-header {
   border-color: #1e293b;
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
 }
@@ -94,7 +100,7 @@
   color: #0f172a;
 }
 
-.dark .val-close-btn:hover {
+:root[data-theme="dark"] .val-close-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
 }
@@ -185,7 +191,7 @@
   gap: 6px;
 }
 
-.dark .val-card-metric {
+:root[data-theme="dark"] .val-card-metric {
   background: #1e293b;
   border-color: #334155;
 }
@@ -198,7 +204,7 @@
   letter-spacing: 0.5px;
 }
 
-.dark .val-card-metric .metric-label {
+:root[data-theme="dark"] .val-card-metric .metric-label {
   color: #94a3b8;
 }
 
@@ -208,7 +214,7 @@
   color: #0f172a;
 }
 
-.dark .val-card-metric .metric-value {
+:root[data-theme="dark"] .val-card-metric .metric-value {
   color: #f8fafc;
 }
 
@@ -226,7 +232,7 @@
   padding: 20px;
 }
 
-.dark .val-simulator-box {
+:root[data-theme="dark"] .val-simulator-box {
   background: #1e293b;
   border-color: #334155;
 }
@@ -263,7 +269,7 @@
   text-align: center;
 }
 
-.dark .val-sim-results {
+:root[data-theme="dark"] .val-sim-results {
   background: #0f172a;
   border-color: #334155;
 }
@@ -281,7 +287,7 @@
   display: block;
 }
 
-.dark .val-sim-results div strong {
+:root[data-theme="dark"] .val-sim-results div strong {
   color: #60a5fa;
 }
 
@@ -295,6 +301,6 @@
   border-top: 1px solid #e2e8f0;
 }
 
-.dark .val-footer-actions {
+:root[data-theme="dark"] .val-footer-actions {
   border-color: #334155;
 }

@@ -277,8 +277,12 @@ module.exports = async url => {
         else if (p.endsWith(".css")) css.push(p);
       });
     varrer(path.join(__dirname, "..", "estilos"));
+    // .dark pode existir ao lado de data-theme (vale pelo data-theme); sozinho nunca casa
     const mortos = css
-      .filter(p => /body\.dark|(^|[\s,>])\.dark\s/m.test(fs.readFileSync(p, "utf8")))
+      .filter(p => {
+        const t = fs.readFileSync(p, "utf8");
+        return /body\.dark|(^|[\s,>])\.dark\s/m.test(t) && !/data-theme=["']?dark/.test(t);
+      })
       .map(p => path.basename(p));
     ok(
       mortos.length === 0,
