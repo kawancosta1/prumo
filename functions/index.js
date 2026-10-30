@@ -31,6 +31,8 @@ const db = admin.firestore();
 
 const MP_ACCESS_TOKEN = defineSecret("MP_ACCESS_TOKEN");
 const MP_WEBHOOK_SECRET = defineSecret("MP_WEBHOOK_SECRET");
+const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
+const GEMINI_MODELO = process.env.GEMINI_MODELO || "gemini-2.0-flash";
 const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
 const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
 const REGIAO = "southamerica-east1";
@@ -294,7 +296,7 @@ exports.criarStripeCheckout = onRequest(
       params.append("success_url", `${ORIGENS[0]}/?pagamento=sucesso&session_id={CHECKOUT_SESSION_ID}`);
       params.append("cancel_url", `${ORIGENS[0]}/?pagamento=cancelado`);
       params.append("line_items[0][quantity]", "1");
-      
+
       const precoCentavos = plano === "anual" ? 3999 : plano === "vitalicio" ? 7900 : 499;
       params.append("line_items[0][price_data][currency]", "usd");
       params.append("line_items[0][price_data][unit_amount]", String(precoCentavos));
@@ -327,7 +329,7 @@ exports.webhookStripe = onRequest(
       const payload = req.rawBody ? req.rawBody.toString() : JSON.stringify(req.body);
       const sig = req.get("stripe-signature");
       const secret = STRIPE_WEBHOOK_SECRET.value();
-      
+
       // Validação do evento
       const evento = req.body;
       if (evento && evento.type === "checkout.session.completed") {
@@ -339,7 +341,7 @@ exports.webhookStripe = onRequest(
             const plano = m[2];
             const refLic = db.doc(`licencas/${uid}`);
             const refPg = db.doc(`pagamentos/stripe_${session.id}`);
-            
+
             await db.runTransaction(async t => {
               const [sLic, sPg] = await Promise.all([t.get(refLic), t.get(refPg)]);
               if (sPg.exists) return; // Ja processado
@@ -355,6 +357,96 @@ exports.webhookStripe = onRequest(
     } catch (e) {
       console.error("webhookStripe", e.message);
       return res.status(400).send(`Webhook Error: ${e.message}`);
+    }
+  }
+);
+
+/*
+  IA do Prumo (mini Gemini): o app manda a conversa, o servidor chama o Gemini com a chave do Prumo
+  (a pessoa não precisa de chave própria). Cota por dia: ver functions/ia.js.
+  modo "chat" devolve texto em Markdown; modo "json" devolve JSON (usado para ler o edital).
+*/
+exports.chatIA = onRequest(
+  { region: REGIAO, secrets: [GEMINI_API_KEY], maxInstances: 10, timeoutSeconds: 60 },
+  async (req, res) => {
+    if (cors(req, res)) return;
+    const user = await usuarioDoToken(req);
+    if (!user) return res.status(401).json({ erro: "Entre na sua conta para usar a IA." });
+    const corpo = req.body && typeof req.body === "object" ? req.body : {};
+    const modoJson = corpo.modo === "json";
+    const mensagem = ia.limparTexto(corpo.mensagem, modoJson ? ia.MAX_EDITAL : ia.MAX_MENSAGEM).trim();
+    if (!mensagem) return res.status(400).json({ erro: "Escreva uma mensagem." });
+
+    const refUso = db.doc(`iaUso/${user.uid}`);
+    const sLic = await db.doc(`licencas/${user.uid}`).get();
+    const l = sLic.exists ? sLic.data() : {};
+    const pro =
+      l.ativo === true &&
+      (l.vitalicio === true || (typeof l.expiraEm === "number" && l.expiraEm > Date.now()));
+
+    const cota = await db.runTransaction(async t => {
+      const s = await t.get(refUso);
+      const r = ia.contarUso(s.exists ? s.data() : null, Date.now(), pro);
+      if (r.ok) t.set(refUso, r.uso);
+      return r;
+    });
+    if (!cota.ok) {
+      return res.status(429).json({
+        erro: pro
+          ? `Você usou as ${cota.limite} mensagens de hoje. Volta amanhã!`
+          : `Você usou as ${cota.limite} mensagens grátis de hoje. Teste o PRO para ter mais.`,
+        limite: cota.limite,
+        restantes: 0
+      });
+    }
+
+    const devolverCota = () =>
+      db
+        .runTransaction(async t => {
+          const s = await t.get(refUso);
+          if (s.exists && s.data().n > 0) t.set(refUso, { dia: s.data().dia, n: s.data().n - 1 });
+        })
+        .catch(() => {});
+
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 45000);
+    try {
+      const pedido = {
+        systemInstruction: {
+          parts: [{ text: modoJson ? ia.SISTEMA_JSON : ia.montarSistemaChat(corpo.estilo, corpo.contexto) }]
+        },
+        contents: ia.montarContents(
+          modoJson ? [] : corpo.historico,
+          mensagem,
+          modoJson ? ia.MAX_EDITAL : ia.MAX_MENSAGEM
+        ),
+        generationConfig: modoJson
+          ? { temperature: 0.2, maxOutputTokens: 8192, responseMimeType: "application/json" }
+          : { temperature: 0.7, maxOutputTokens: 2048 }
+      };
+      const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODELO}:generateContent`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY.value() },
+          body: JSON.stringify(pedido),
+          signal: ctrl.signal
+        }
+      );
+      const dados = await r.json().catch(() => ({}));
+      const texto = ia.extrairTextoGemini(dados).trim();
+      if (!r.ok || !texto) {
+        console.error("chatIA gemini", r.status, JSON.stringify(dados).slice(0, 300));
+        await devolverCota();
+        return res.status(502).json({ erro: "A IA não respondeu agora. Tente de novo em instantes." });
+      }
+      return res.json({ texto, restantes: cota.restantes, limite: cota.limite });
+    } catch (e) {
+      console.error("chatIA", e.message);
+      await devolverCota();
+      return res.status(502).json({ erro: "A IA demorou demais. Tente de novo." });
+    } finally {
+      clearTimeout(timer);
     }
   }
 );

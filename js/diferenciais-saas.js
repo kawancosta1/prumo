@@ -88,11 +88,12 @@
   function renderCorpoDuploHTML() {
     const pet = typeof petAtivo === "function" ? petAtivo() : null;
     const nomePet = pet ? pet.nome : "Prumi";
-    const petDesenho = pet && typeof petSVG === "function"
-      ? petSVG(pet, { pose: "lendo", tam: 52 })
-      : typeof prumi === "function"
-        ? prumi({ mood: "focus", size: 52 })
-        : "🐾";
+    const petDesenho =
+      pet && typeof petSVG === "function"
+        ? petSVG(pet, { pose: "lendo", tam: 52 })
+        : typeof prumi === "function"
+          ? prumi({ mood: "focus", size: 52 })
+          : "🐾";
 
     return `
       <div class="box-corpo-duplo">
@@ -158,11 +159,19 @@
     _somAsmrAtivo = null;
 
     // 4. Parar sintetizadores legados se estiverem ativos
-    if (typeof pararPaisagemSonora === "function" && typeof window._somAtivoTipo !== "undefined" && window._somAtivoTipo) {
-      try { pararPaisagemSonora(); } catch (_) {}
+    if (
+      typeof pararPaisagemSonora === "function" &&
+      typeof window._somAtivoTipo !== "undefined" &&
+      window._somAtivoTipo
+    ) {
+      try {
+        pararPaisagemSonora();
+      } catch (_) {}
     }
     if (typeof pararMusicaQuarto === "function") {
-      try { pararMusicaQuarto(); } catch (_) {}
+      try {
+        pararMusicaQuarto();
+      } catch (_) {}
     }
 
     atualizarBotaoAsmr();
@@ -215,13 +224,13 @@
 
       for (let i = 0; i < bufferSize; i++) {
         const revMod = 1.0 + 0.14 * Math.sin((i / revSamples) * 2 * Math.PI);
-        const white = (Math.random() * 2 - 1);
+        const white = Math.random() * 2 - 1;
         let crackle = 0;
         if (Math.random() < 0.0007) {
           crackle = (Math.random() > 0.5 ? 1 : -1) * (0.12 + Math.random() * 0.3);
         }
         if (i % revSamples < 16) {
-          crackle += (Math.random() * 0.08);
+          crackle += Math.random() * 0.08;
         }
         const s = (white * 0.032 + crackle) * revMod;
         dL[i] = s;
@@ -257,7 +266,7 @@
         [261.6, 329.6, 392.0], // C
         [220.0, 261.6, 329.6], // Am
         [174.6, 220.0, 261.6], // F
-        [196.0, 246.9, 293.7]  // G
+        [196.0, 246.9, 293.7] // G
       ];
       let acordeIdx = 0;
 
@@ -297,7 +306,6 @@
         _timerMelodiaVinil = setTimeout(tocarProximoAcorde, 3400);
       };
       tocarProximoAcorde();
-
     } else if (tipo === "chuva" && typeof tocarPaisagemSonora === "function") {
       tocarPaisagemSonora("chuva");
       _somAsmrAtivo = "chuva";
@@ -324,7 +332,8 @@
     } else {
       // Se estiver desligado: liga a Vitrola 1930
       tocarAsmrVintage("vinil");
-      if (typeof toast === "function") toast("📻 Vitrola 1930 ligada! Foco analógico e vinil vintage.", false, "happy");
+      if (typeof toast === "function")
+        toast("📻 Vitrola 1930 ligada! Foco analógico e vinil vintage.", false, "happy");
     }
   }
 
@@ -352,7 +361,8 @@
       if (typeof toast === "function") toast("📻 Vitrola 1930 desligada.", false, "sleepy");
     } else {
       tocarAsmrVintage("vinil");
-      if (typeof toast === "function") toast("📻 Vitrola 1930 ligada! Foco analógico e vinil vintage.", false, "happy");
+      if (typeof toast === "function")
+        toast("📻 Vitrola 1930 ligada! Foco analógico e vinil vintage.", false, "happy");
       if (typeof react === "function") react("happy", "A agulha pousou no disco... Bom foco!", 2600);
     }
   }
@@ -401,14 +411,18 @@
      DESENHO VETORIAL DA VITROLA 1930 (Gramofone Clássico em Puro SVG)
      ================================================================= */
   function desenharVitrolaSVG(opcoes = {}) {
-    const tocando = typeof opcoes.tocando === "boolean"
-      ? opcoes.tocando
-      : (_somAsmrAtivo === "vinil" || (typeof document !== "undefined" && document.body && document.body.classList.contains("vitrola-tocando")));
+    const tocando =
+      typeof opcoes.tocando === "boolean"
+        ? opcoes.tocando
+        : _somAsmrAtivo === "vinil" ||
+          (typeof document !== "undefined" &&
+            document.body &&
+            document.body.classList.contains("vitrola-tocando"));
     const interativo = opcoes.interativo !== false;
     const classe = (opcoes.classe || "") + (tocando ? " vitrola-girando tocando" : "");
 
     return `
-      <g class="vitrola-svg-grupo ${classe}" ${interativo ? 'data-act="vitrola-tocar" style="cursor:pointer;" role="button" tabindex="0" title="Vitrola 1930 (Toque para ligar ou pausar o disco de vinil)"' : ''}>
+      <g class="vitrola-svg-grupo ${classe}" ${interativo ? 'data-act="vitrola-tocar" style="cursor:pointer;" role="button" tabindex="0" title="Vitrola 1930 (Toque para ligar ou pausar o disco de vinil)"' : ""}>
         <!-- Sombra no piso -->
         <ellipse cx="24" cy="45" rx="19" ry="3" fill="#000000" opacity="0.32"/>
 
@@ -465,7 +479,9 @@
         <!-- BRAÇO FONOGRÁFICO COM AGULHA (Tonearm) -->
         <circle cx="35.5" cy="22.5" r="1.8" fill="#78350F" stroke="#261005" stroke-width="0.6"/>
         <circle cx="35.5" cy="22.5" r="0.8" fill="#FDE68A"/>
-        ${tocando ? `
+        ${
+          tocando
+            ? `
           <g class="braco-tocando">
             <path d="M35.5 22.5 C33 18.5, 28 18.5, 24.5 21.8" fill="none" stroke="#E2E8F0" stroke-width="1.3" stroke-linecap="round"/>
             <path d="M35.5 22.5 C33 18.5, 28 18.5, 24.5 21.8" fill="none" stroke="#F59E0B" stroke-width="0.5" stroke-linecap="round" opacity="0.6"/>
@@ -473,13 +489,15 @@
             <line x1="24.5" y1="21.8" x2="24" y2="23.2" stroke="#FEF08A" stroke-width="0.8"/>
             <circle cx="24" cy="23.2" r="0.6" fill="#FDE047" opacity="0.9"/>
           </g>
-        ` : `
+        `
+            : `
           <g class="braco-repouso">
             <path d="M35.5 22.5 C36.5 19, 37.5 17, 37.5 15" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-linecap="round"/>
             <ellipse cx="37.5" cy="14.8" rx="1.1" ry="0.8" fill="#94A3B8"/>
             <line x1="36.2" y1="16.5" x2="38.8" y2="16.5" stroke="#B45309" stroke-width="0.8"/>
           </g>
-        `}
+        `
+        }
 
         <!-- CORNETA FLORAL DE LATÃO 1930 (Brass Horn / Gramophone Bell) -->
         <path d="M16 6.5 C21 5.5, 26 2, 33 0 C28 5, 24 12, 18 14 Z" fill="#D97706" stroke="#78350F" stroke-width="0.8"/>
@@ -511,12 +529,12 @@
     const ativo = tocandoMusica ? estadoMusica.faixa.id : _somAsmrAtivo;
     const nomeAtual = tocandoMusica
       ? `${estadoMusica.faixa.icone} ${estadoMusica.faixa.nome} (${estadoMusica.faixa.estilo})`
-      : (_somAsmrAtivo || "");
+      : _somAsmrAtivo || "";
 
     return `
       <div class="vitrola-foco-card">
         <div class="vitrola-foco-cena">
-          <div class="vitrola-estudo-palco" data-act="vitrola-tocar" title="Toque para ouvir música ou abrir o player">
+          <div class="vitrola-estudo-palco" data-act="vitrola-tocar" title="Toque para ligar ou desligar o som de vinil">
             <svg class="vitrola-estudo-svg" viewBox="0 0 52 48" width="64" height="58">
               ${desenharVitrolaSVG({ tocando: !!(tocandoMusica || ativo === "vinil"), w: 52, h: 48, interativo: false })}
             </svg>
@@ -525,20 +543,16 @@
             <div class="vitrola-foco-titulo" style="display:flex;justify-content:space-between;align-items:center;">
               <div>
                 <span class="badge-vitrola">1930</span>
-                <strong>Vitrola Lo-Fi &amp; Músicas de Foco</strong>
+                <strong>Vitrola 1930 &amp; Sons de Foco</strong>
               </div>
-              <button class="chipbtn" data-act="abrir-player-musica" style="font-size:11.5px;padding:2px 8px;">🎵 Player</button>
-            </div>
+                          </div>
             <div class="vitrola-foco-sub">
-              ${(tocandoMusica || ativo) ? `<span class="ponto-verde"></span> Tocando: <b>${nomeAtual}</b>` : "Toque na Vitrola para focar ouvindo música lo-fi"}
+              ${tocandoMusica || ativo ? `<span class="ponto-verde"></span> Tocando: <b>${nomeAtual}</b>` : "Toque na Vitrola para focar com som de vinil"}
             </div>
             <div class="vitrola-foco-botoes">
-              <button class="chipbtn ${ativo === 'lofi-cafe' ? 'ativo' : ''}" data-act="selecionar-faixa" data-idx="0">☕ Lo-Fi Café</button>
-              <button class="chipbtn ${ativo === 'piano-noturno' ? 'ativo' : ''}" data-act="selecionar-faixa" data-idx="1">🎹 Piano</button>
-              <button class="chipbtn ${ativo === 'jazz-vintage' ? 'ativo' : ''}" data-act="selecionar-faixa" data-idx="2">🎷 Jazz 1930</button>
-              <button class="chipbtn ${ativo === 'synth-foco' ? 'ativo' : ''}" data-act="selecionar-faixa" data-idx="3">🌌 Synth</button>
-              <button class="chipbtn ${ativo === 'chuva' ? 'ativo' : ''}" data-act="asmr-tocar" data-tipo="chuva">🌧️ Chuva</button>
-              ${(tocandoMusica || ativo) ? `<button class="chipbtn parar" data-act="alternar-musica">⏹️ Pausar</button>` : ''}
+              <button class="chipbtn ${ativo === "vinil" ? "ativo" : ""}" data-act="asmr-tocar" data-tipo="vinil">🎞️ Vinil</button>
+              <button class="chipbtn ${ativo === "chuva" ? "ativo" : ""}" data-act="asmr-tocar" data-tipo="chuva">🌧️ Chuva</button>
+              ${tocandoMusica || ativo ? `<button class="chipbtn parar" data-act="asmr-parar">⏹️ Pausar</button>` : ""}
             </div>
           </div>
         </div>
@@ -585,14 +599,14 @@
   /* =================================================================
      05. REGISTRO DE AÇÕES E EXPORTAÇÃO GLOBAL
      ================================================================= */
-  if (typeof window.ACOES_EXTRAS !== "undefined") {
-    window.ACOES_EXTRAS["alternar-respiro"] = () => alternarDiaRespiro();
-    window.ACOES_EXTRAS["alternar-asmr"] = () => alternarAsmrVintage();
-    window.ACOES_EXTRAS["vitrola-tocar"] = () => alternarVitrola1930();
-    window.ACOES_EXTRAS["asmr-tocar"] = b => {
+  if (typeof ACOES_EXTRAS !== "undefined") {
+    ACOES_EXTRAS["alternar-respiro"] = () => alternarDiaRespiro();
+    ACOES_EXTRAS["alternar-asmr"] = () => alternarAsmrVintage();
+    ACOES_EXTRAS["vitrola-tocar"] = () => alternarVitrola1930();
+    ACOES_EXTRAS["asmr-tocar"] = b => {
       if (b && b.dataset && b.dataset.tipo) tocarAsmrVintage(b.dataset.tipo);
     };
-    window.ACOES_EXTRAS["asmr-parar"] = () => pararAsmrVintage();
+    ACOES_EXTRAS["asmr-parar"] = () => pararAsmrVintage();
   }
 
   // Interceptar cliques em botões para feedback sensorial sutil de clique retrô

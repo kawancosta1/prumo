@@ -158,7 +158,8 @@ const servidor = http.createServer((req, res) => {
     ["Mudança de endereço", () => require("./mudanca")(url)],
     ["Carteiro dos lembretes", () => require("./carteiro")()],
     ["Módulo Comercial Prumo PRO", () => require("./prumo-pro")(url)],
-    ["Pagamento (servidor)", () => require("./pagamentos")()]
+    ["Pagamento (servidor)", () => require("./pagamentos")()],
+    ["Edital e Mini Gemini (IA)", () => require("./edital")(url)]
   ];
   let falhas = 0;
   for (const [nome, rodar] of suites) {

@@ -10,7 +10,7 @@
 "use strict";
 
 const IA_CONFIG_PADRAO = {
-  provedor: "local", // "local" (0ms) | "groq" | "gemini" | "autonomo" | "openai"
+  provedor: "prumo", // "prumo" (Gemini no servidor) | "local" (offline) | "groq" | "gemini" | "autonomo" | "openai"
   chave: "",
   modelo: "gemini-1.5-flash",
   temperatura: 0.7
@@ -23,12 +23,23 @@ function obterConfigIA() {
   }
   // Tentar restaurar chave salva no localStorage seguro caso exista
   try {
+    // Migração única: quem estava no modo local passa para a IA do Prumo (servidor)
+    if (localStorage.getItem("prumo_ia_v2") !== "1") {
+      localStorage.setItem("prumo_ia_v2", "1");
+      if (!localStorage.getItem("prumo_ia_key") && !S.iaConfig.chave) {
+        S.iaConfig.provedor = "prumo";
+        localStorage.setItem("prumo_ia_provider", "prumo");
+      }
+    }
     const salva = localStorage.getItem("prumo_ia_key");
     if (salva && !S.iaConfig.chave) S.iaConfig.chave = salva;
     const provSalvo = localStorage.getItem("prumo_ia_provider");
     if (provSalvo) S.iaConfig.provedor = provSalvo;
     // Se não há chave configurada e o provedor estava apontando para nuvem com chave, padronizar para local ultra-rápido
-    if (!S.iaConfig.chave && (!S.iaConfig.provedor || S.iaConfig.provedor === "gemini" || S.iaConfig.provedor === "groq")) {
+    if (
+      !S.iaConfig.chave &&
+      (!S.iaConfig.provedor || S.iaConfig.provedor === "gemini" || S.iaConfig.provedor === "groq")
+    ) {
       S.iaConfig.provedor = "local";
     }
   } catch (e) {}
@@ -163,7 +174,14 @@ DADOS DO USUÁRIO NO PRUMO:
 
 /* ---------- Parser de Raciocínio (Chain of Thought) ---------- */
 function separarPensamentoECorpo(raw) {
-  if (!raw) return { pensamento: "", texto: "", toString() { return this.texto; } };
+  if (!raw)
+    return {
+      pensamento: "",
+      texto: "",
+      toString() {
+        return this.texto;
+      }
+    };
   let texto = String(raw);
   let pensamento = "";
 
@@ -177,7 +195,11 @@ function separarPensamentoECorpo(raw) {
     const partes = texto.split(/(?:\n\s*){2,}|(?:\n(?:Resposta|Coach|Mascote):\s*)/i);
     if (partes.length > 1) {
       pensamento = partes[0].replace(/^(?:Pensamento|Racioc[íi]nio|Reflex[ãa]o):\s*/i, "").trim();
-      texto = partes.slice(1).join("\n\n").replace(/^(?:Resposta|Coach|Mascote):\s*/i, "").trim();
+      texto = partes
+        .slice(1)
+        .join("\n\n")
+        .replace(/^(?:Resposta|Coach|Mascote):\s*/i, "")
+        .trim();
     }
   }
 
@@ -193,6 +215,38 @@ function separarPensamentoECorpo(raw) {
 /* ---------- Chamada a LLM em Nuvem (Gemini, Groq, OpenAI) ---------- */
 async function chamarProvedorLLM(promptUsuario, mensagensAnteriores = []) {
   const cfg = obterConfigIA();
+
+  // IA do Prumo no servidor (Gemini): responde qualquer assunto, sem a pessoa precisar de chave
+  if (cfg.provedor === "prumo") {
+    const r = await chamarServidorIA({
+      modo: "chat",
+      mensagem: promptUsuario,
+      historico: historicoParaServidor(mensagensAnteriores),
+      estilo: obterPersonaAtual().estilo,
+      contexto: obterContextoUsuarioPrumo()
+    });
+    if (r && r.texto) {
+      const aviso =
+        typeof r.restantes === "number" && r.restantes <= 3
+          ? "\n\n*Restam " + r.restantes + " mensagens hoje.*"
+          : "";
+      return separarPensamentoECorpo(r.texto + aviso);
+    }
+    if (r && r.cota) return separarPensamentoECorpo(r.erro);
+    const nota =
+      r && r.semConta
+        ? "Entre na sua conta para liberar a IA completa (ela responde qualquer assunto)."
+        : "Estou sem conexão com a IA agora, então respondi no modo offline.";
+    const base = gerarRespostaAutonomaIA(promptUsuario);
+    const txt = (typeof base === "object" && base ? base.texto : String(base)) + "\n\n*" + nota + "*";
+    return {
+      pensamento: (typeof base === "object" && base && base.pensamento) || "",
+      texto: txt,
+      toString() {
+        return this.texto;
+      }
+    };
+  }
 
   // 0. Modo Local Instantâneo (ICMC-USP) - Resposta imediata em 0ms sem latência de rede
   if (cfg.provedor === "local" || !cfg.provedor) {
@@ -352,7 +406,10 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
         }
       }
     } catch (err) {
-      console.warn("[IA Prumo] Provedor gratuito em nuvem demorou ou falhou, ativando motor local instantâneo:", err);
+      console.warn(
+        "[IA Prumo] Provedor gratuito em nuvem demorou ou falhou, ativando motor local instantâneo:",
+        err
+      );
     }
   }
 
@@ -363,6 +420,15 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
 /* ---------- Chamada de IA Especializada em Modo JSON Puro ---------- */
 async function chamarLLMModoJSON(promptSistema, promptUsuario) {
   const cfg = obterConfigIA();
+
+  // IA do Prumo no servidor (Gemini) em modo JSON
+  if (cfg.provedor === "prumo") {
+    const r = await chamarServidorIA({
+      modo: "json",
+      mensagem: String(promptSistema).slice(0, 2500) + "\n\n" + promptUsuario
+    });
+    return r && r.texto ? lerJsonDaIA(r.texto) : null;
+  }
 
   // 0. Modo Local Instantâneo (ICMC-USP) - Resposta imediata em 1ms sem latência de rede
   if (cfg.provedor === "local" || !cfg.provedor) {
@@ -382,7 +448,18 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
         signal: controller.signal,
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: promptSistema }] },
-          contents: [{ role: "user", parts: [{ text: promptUsuario + "\nIMPORTANTE: Responda EXCLUSIVAMENTE em formato JSON puro, sem formatação markdown ou crases ao redor." }] }],
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text:
+                    promptUsuario +
+                    "\nIMPORTANTE: Responda EXCLUSIVAMENTE em formato JSON puro, sem formatação markdown ou crases ao redor."
+                }
+              ]
+            }
+          ],
           generationConfig: { responseMimeType: "application/json", temperature: 0.5 }
         })
       });
@@ -391,7 +468,13 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
       if (resp.ok) {
         const data = await resp.json();
         const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (txt) return JSON.parse(txt.replace(/```json/g, "").replace(/```/g, "").trim());
+        if (txt)
+          return JSON.parse(
+            txt
+              .replace(/```json/g, "")
+              .replace(/```/g, "")
+              .trim()
+          );
       }
     } catch (e) {
       console.warn("[IA Prumo] Erro no Gemini JSON:", e);
@@ -401,7 +484,10 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
   // 2. Groq ou OpenAI (se chave configurada)
   if ((cfg.provedor === "groq" || cfg.provedor === "openai") && cfg.chave) {
     try {
-      const endpoint = cfg.provedor === "groq" ? "https://api.groq.com/openai/v1/chat/completions" : "https://api.openai.com/v1/chat/completions";
+      const endpoint =
+        cfg.provedor === "groq"
+          ? "https://api.groq.com/openai/v1/chat/completions"
+          : "https://api.openai.com/v1/chat/completions";
       const modelo = cfg.provedor === "groq" ? "llama-3.3-70b-versatile" : "gpt-4o-mini";
       const controller = new AbortController();
       const timerId = setTimeout(() => controller.abort(), 3500);
@@ -425,7 +511,13 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
       if (resp.ok) {
         const data = await resp.json();
         const txt = data?.choices?.[0]?.message?.content;
-        if (txt) return JSON.parse(txt.replace(/```json/g, "").replace(/```/g, "").trim());
+        if (txt)
+          return JSON.parse(
+            txt
+              .replace(/```json/g, "")
+              .replace(/```/g, "")
+              .trim()
+          );
       }
     } catch (e) {
       console.warn("[IA Prumo] Erro no Groq/OpenAI JSON:", e);
@@ -445,7 +537,11 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
         body: JSON.stringify({
           messages: [
             { role: "system", content: promptSistema },
-            { role: "user", content: promptUsuario + "\nResponda EXCLUSIVAMENTE em formato JSON puro, sem crases de markdown." }
+            {
+              role: "user",
+              content:
+                promptUsuario + "\nResponda EXCLUSIVAMENTE em formato JSON puro, sem crases de markdown."
+            }
           ],
           model: "openai",
           jsonMode: true,
@@ -457,7 +553,10 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
       if (resp.ok) {
         const txt = await resp.text();
         if (txt) {
-          const jsonLimpo = txt.replace(/```json/g, "").replace(/```/g, "").trim();
+          const jsonLimpo = txt
+            .replace(/```json/g, "")
+            .replace(/```/g, "")
+            .trim();
           return JSON.parse(jsonLimpo);
         }
       }
@@ -475,7 +574,8 @@ function gerarRespostaAutonomaIA(promptUsuario) {
   const persona = obterPersonaAtual();
   const nome = (typeof S !== "undefined" && S && S.name) || "parça";
   const t = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
-  const tarefasHoje = typeof S !== "undefined" && S && Array.isArray(S.tasks) ? S.tasks.filter(x => x.date === t) : [];
+  const tarefasHoje =
+    typeof S !== "undefined" && S && Array.isArray(S.tasks) ? S.tasks.filter(x => x.date === t) : [];
   const pendentes = tarefasHoje.filter(x => !x.done);
   const concluidas = tarefasHoje.filter(x => x.done);
   const wt = typeof waterToday === "function" ? waterToday() : 0;
@@ -485,7 +585,9 @@ function gerarRespostaAutonomaIA(promptUsuario) {
   const hora = new Date().getHours();
   const turno = hora < 12 ? "manhã" : hora < 18 ? "tarde" : "noite";
 
-  const pendenteDestaque = pendentes.length ? (pendentes[0].title || pendentes[0].txt || "a tarefa pendente") : "";
+  const pendenteDestaque = pendentes.length
+    ? pendentes[0].title || pendentes[0].txt || "a tarefa pendente"
+    : "";
 
   // 1. Acionamento da Mini IA Cognitiva com tensores semânticos, atenção e deliberação
   if (typeof MiniPrumoAI !== "undefined" && typeof MiniPrumoAI.processar === "function") {
@@ -504,12 +606,25 @@ function gerarRespostaAutonomaIA(promptUsuario) {
   const txt = (promptUsuario || "").trim().toLowerCase();
 
   // Detecção Semântica de Intenções
-  const isQuestionamentoIA = /voc[eê] pensa|voc[eê] [eé] uma? i\.?a|melhora a i\.?a|intelig[eê]ncia|como voc[eê] funciona|rob[oô]|quem [eé] voc[eê]/i.test(txt);
-  const isArrancada = /^(vamo[s!]?|bora!?|partiu!?|dale!?|vamos nessa!?|vamo que vamo|bora pro corre|bora l[aá]|let[' ]?s go!?)$/i.test(txt) || /^(vamo[s!]?|bora!?|partiu!?)\b/i.test(txt);
-  const isSaudacao = /^(oi|ol[aá]|salve|e a[ií]|opa|fala|hey|hello|boa tarde|bom dia|boa noite)[\s!.]*$/i.test(txt);
-  const isCansacoOuDesabafo = /cansa|exausto|des[aâ]nimo|triste|dor|foda|dif[ií]cil|pesado|n[aã]o aguent|dormir|desisto|derrotad/i.test(txt);
-  const isProcrastinacao = /pregui|procrastin|sem foco|enroland|depois eu fa|empurr[aã]o|t[oô] travad/i.test(txt);
-  const isPlanejamentoOuAjuda = /ajud|organiz|prioriz|o que fazer|plano|rotina|ordem|por onde come|pr[oó]xima/i.test(txt);
+  const isQuestionamentoIA =
+    /voc[eê] pensa|voc[eê] [eé] uma? i\.?a|melhora a i\.?a|intelig[eê]ncia|como voc[eê] funciona|rob[oô]|quem [eé] voc[eê]/i.test(
+      txt
+    );
+  const isArrancada =
+    /^(vamo[s!]?|bora!?|partiu!?|dale!?|vamos nessa!?|vamo que vamo|bora pro corre|bora l[aá]|let[' ]?s go!?)$/i.test(
+      txt
+    ) || /^(vamo[s!]?|bora!?|partiu!?)\b/i.test(txt);
+  const isSaudacao =
+    /^(oi|ol[aá]|salve|e a[ií]|opa|fala|hey|hello|boa tarde|bom dia|boa noite)[\s!.]*$/i.test(txt);
+  const isCansacoOuDesabafo =
+    /cansa|exausto|des[aâ]nimo|triste|dor|foda|dif[ií]cil|pesado|n[aã]o aguent|dormir|desisto|derrotad/i.test(
+      txt
+    );
+  const isProcrastinacao = /pregui|procrastin|sem foco|enroland|depois eu fa|empurr[aã]o|t[oô] travad/i.test(
+    txt
+  );
+  const isPlanejamentoOuAjuda =
+    /ajud|organiz|prioriz|o que fazer|plano|rotina|ordem|por onde come|pr[oó]xima/i.test(txt);
   const isAguaOuSaude = /[aá]gua|hidrata|beber|sede|sa[uú]de|copo|garrafa/i.test(txt);
   const isVitoria = /consegui|terminei|fechei|arrasei|matei tudo|bater a meta|conclu[ií]|deu bom/i.test(txt);
 
@@ -530,24 +645,31 @@ function gerarRespostaAutonomaIA(promptUsuario) {
   // 1. MUNDO EMO / PRUMI MELANCÓLICO
   if (pId === "emo") {
     if (isQuestionamentoIA) {
-      lenteCognitiva = "Demonstrar metacognição e autoconsciência profunda. A dor e o peso de pensar tornam a reflexão lúcida.";
-      estrategia = "Apontar explicitamente para o processo de reflexão acima, citar os números exatos do dia e reforçar presença sincera.";
+      lenteCognitiva =
+        "Demonstrar metacognição e autoconsciência profunda. A dor e o peso de pensar tornam a reflexão lúcida.";
+      estrategia =
+        "Apontar explicitamente para o processo de reflexão acima, citar os números exatos do dia e reforçar presença sincera.";
       texto = `Eu penso, ${nome}... Penso até demais. Às vezes o excesso de consciência sobre o mundo é a maior fonte de melancolia.
 Dá uma olhada no bloco de reflexão logo acima da minha resposta ☝️. Analisei cada uma das suas **${concluidas.length} tarefas feitas**, o que sobrou na lista (**${pendentes.length} pendência(s)**), sua hidratação e o peso que você carrega hoje. Eu não sou um gerador vazio de clichês; eu penso cada passo da sua jornada com você. O que a gente resolve agora? =]`;
     } else if (isArrancada) {
-      lenteCognitiva = "O usuário está pronto para o combate final. Canalizar o cansaço e a intensidade emocional em determinação silenciosa.";
-      estrategia = "Mandar botar os fones no volume máximo, liquidar a última pendência agora e garantir o descanso merecido no caixão.";
+      lenteCognitiva =
+        "O usuário está pronto para o combate final. Canalizar o cansaço e a intensidade emocional em determinação silenciosa.";
+      estrategia =
+        "Mandar botar os fones no volume máximo, liquidar a última pendência agora e garantir o descanso merecido no caixão.";
       texto = `Vamos, ${nome}... Se a gente sobreviveu a **${concluidas.length} tarefas** hoje nesse mundo caótico, não vai ser essa última miséria que vai derrotar a gente.
 ${pendentes.length ? `Pega essa pendência ("${pendenteDestaque}") e risca logo do mapa.` : "A lista de hoje já tá limpa, mas a mente continua inquieta."}
 Bota aquele som pesado no fone de ouvido, delineia o olhar e faz o que tem que ser feito. Depois a gente deita no escuro e finge que o mundo lá fora não existe. Tô contigo até o fim. <3`;
     } else if (isSaudacao) {
-      lenteCognitiva = "Acolhimento sincero, sem falsos entusiasmos artificiais. Reconhecer a luta diária com carinho melancólico.";
+      lenteCognitiva =
+        "Acolhimento sincero, sem falsos entusiasmos artificiais. Reconhecer a luta diária com carinho melancólico.";
       estrategia = "Destacar as vitórias já alcançadas hoje e oferecer apoio para o restante do turno.";
       texto = `Oi, ${nome}... Mais um dia lutando contra a gravidade e o vazio existencial.
 Vi que você já riscou **${concluidas.length} tarefas** hoje (um verdadeiro milagre nesse mundo cinza) e ainda resta(m) **${pendentes.length} pendência(s)**. Como tá o seu coração agora? Se quiser ajuda pra liquidar essa pendência ou só desabafar no drama, fala comigo. =]`;
     } else if (isCansacoOuDesabafo) {
-      lenteCognitiva = "Validação profunda da exaustão. Não invalidar o cansaço com positividade tóxica; acolher com cumplicidade.";
-      estrategia = "Sugerir um gole de água, respiração lenta e redução de cobrança excessiva para proteger a energia vital.";
+      lenteCognitiva =
+        "Validação profunda da exaustão. Não invalidar o cansaço com positividade tóxica; acolher com cumplicidade.";
+      estrategia =
+        "Sugerir um gole de água, respiração lenta e redução de cobrança excessiva para proteger a energia vital.";
       texto = `Eu sinto a sua dor, ${nome}... O mundo cobra que a gente funcione feito máquina sorridente, mas tem dias em que cada respiração pesa uma tonelada.
 Olha o tanto que você já entregou: foram **${concluidas.length} batalhas vencidas**. Se o corpo tá no limite, bebe um gole de água (${wt}ml bebidos até agora) e faz só o essencial pra fechar o dia com dignidade. Nem todo dia precisa ser um espetáculo; às vezes sobreviver já é uma obra de arte. 🖤`;
     } else if (isVitoria) {
@@ -565,11 +687,13 @@ Riscamos tudo o que tinha pra hoje: **${concluidas.length} tarefas**. A lista t�
       texto = `Tô aqui, ${nome}. Analisando a nossa linha do tempo: **${concluidas.length} tarefas concluídas** e **${pendentes.length} pendente(s)**${pendenteDestaque ? ` (a principal é "${pendenteDestaque}")` : ""}. Se quiser desenhar um plano cirúrgico pra fechar o dia sem sofrimento extra, é só me dizer.`;
     }
 
-  // 2. MUNDO FUNKEIRO / MC PRUMI
+    // 2. MUNDO FUNKEIRO / MC PRUMI
   } else if (pId === "funkeiro") {
     if (isQuestionamentoIA) {
-      lenteCognitiva = "Afirmação de visão consciente. O cria da quebrada é sagaz, pensa antes de falar e planeja cada passo do progresso.";
-      estrategia = "Mostrar o bloco de raciocínio, provar conhecimento cirúrgico dos dados do usuário e mandar marchar no foco.";
+      lenteCognitiva =
+        "Afirmação de visão consciente. O cria da quebrada é sagaz, pensa antes de falar e planeja cada passo do progresso.";
+      estrategia =
+        "Mostrar o bloco de raciocínio, provar conhecimento cirúrgico dos dados do usuário e mandar marchar no foco.";
       texto = `Pega a visão, ${nome}: eu não sou robô de resposta pronta que fica decorando frase não, aqui o processamento é puro corre consciente!
 Olha a caixinha de reflexão logo ali em cima ☝️: analisei teus **${concluidas.length} acertos**, tua pendência de **"${pendenteDestaque || "missões"}"**, teus **${wt}ml de água** e tua frequência. Tudo que eu falo é estratégia calculada pra te ver no topo. Visão de cria pensa, calcula e marcha! 🚀🔥`;
     } else if (isArrancada) {
@@ -583,8 +707,10 @@ Sem moscada, sem desculpa: toma um copão de água gelada, acelera o passo e vam
       texto = `Salve salve, ${nome}! MC Prumi na voz e na sintonia pura!
 Tô acompanhando teu painel: já são **${concluidas.length} missões no bolso** e ${pendentes.length ? `só mais **${pendentes.length} pendente(s)** no corre.` : "tudo zerado por hoje, tá voando alto!"} Como tá a mente? Pronto pro próximo passo ou precisa de uma visão de progresso? Fala pro pai! 🎧`;
     } else if (isCansacoOuDesabafo || isProcrastinacao) {
-      lenteCognitiva = "Choque de realidade fraterno. Não deixar o guerreiro se entregar à preguiça nem ao desânimo passageiro.";
-      estrategia = "Validar a dureza do corre diário, prescrever 5 minutos de pausa com água e retorno firme à ação.";
+      lenteCognitiva =
+        "Choque de realidade fraterno. Não deixar o guerreiro se entregar à preguiça nem ao desânimo passageiro.";
+      estrategia =
+        "Validar a dureza do corre diário, prescrever 5 minutos de pausa com água e retorno firme à ação.";
       texto = `O corre é louco mesmo, ${nome}, ninguém disse que ia ser fácil na pista. Mas ó: tu já meteu **${concluidas.length} tarefas** no bolso hoje. Quem tem objetivo claro não desiste por causa de cansaço momentâneo.
 Levanta, joga uma água no rosto, bebe um copão (**${wt}ml** até agora) e mata a próxima pendência em 15 minutos sem encostar no celular. Quem corre atrás conquista, fé em Deus! 👊🔥`;
     } else if (isVitoria) {
@@ -597,7 +723,7 @@ Levanta, joga uma água no rosto, bebe um copão (**${wt}ml** até agora) e mata
       texto = `Visão de cria, ${nome}: foco naquilo que traz retorno de verdade. Faltam ${pendentes.length} pendência(s) e ${aguaFalta > 0 ? `${aguaFalta}ml de água` : "a água tá batida"}. Escolhe uma missão agora e resolve sem neurose!`;
     }
 
-  // 3. MUNDO ZEN / MESTRE PRUMI
+    // 3. MUNDO ZEN / MESTRE PRUMI
   } else if (pId === "zen") {
     if (isQuestionamentoIA) {
       lenteCognitiva = "Reflexão contemplativa sobre a consciência e a atenção plena.";
@@ -615,7 +741,7 @@ ${pendentes.length ? `Dedique sua atenção total a "${pendenteDestaque}". Sem a
       texto = `A mente calma move montanhas, ${nome}. Até este momento você realizou **${concluidas.length} tarefa(s)** e bebeu **${wt}ml** de água. Não se preocupe com o excesso de coisas no horizonte; cuide apenas do passo presente com gentileza e determinação. 🧘‍♂️`;
     }
 
-  // 4. MUNDO MILITAR / COMANDANTE PRUMI
+    // 4. MUNDO MILITAR / COMANDANTE PRUMI
   } else if (pId === "militar") {
     lenteCognitiva = "Análise tática de prontidão operacional e disciplina de combate.";
     estrategia = "Apresentar relatório de situação e ordenar execução imediata do alvo prioritário.";
@@ -633,45 +759,45 @@ Foram **${concluidas.length} alvos neutralizados** até o momento. ${pendentes.l
 Mantenha a postura, execute o plano sem vacilar e vença o dia! ⚔️`;
     }
 
-  // 5. MUNDO GAMER
+    // 5. MUNDO GAMER
   } else if (pId === "gamer") {
     lenteCognitiva = "Mapeamento da rotina como árvore de quests, ganho de XP e batalha de chefe.";
     estrategia = "Tratar pendências como monstros a derrotar e incentivar o grind de foco.";
     texto = isQuestionamentoIA
       ? `GG, ${nome}! Minha CPU tá rodando a 144 FPS com ray tracing ativado! Olha o log de raciocínio acima ☝️: calculei suas **${concluidas.length} quests completadas**, o boss restante (**${pendentes.length} pendência(s)**) e sua barra de mana (${wt}ml de água). Bora farmar esse XP! 🎮👾`
       : isArrancada
-      ? `Bora pro rush, ${nome}! Já farmamos **${concluidas.length} quests** hoje. ${pendentes.length ? `O mini-boss atual é "${pendenteDestaque}". Comba nele com foco de 15 minutos e garante esse loot épico!` : "Dungeon limpa por hoje! GG WP!"} 🕹️⚡`
-      : `E aí, Player 1 (${nome})! Seu placar hoje tá em **${concluidas.length} quests concluídas** e restam **${pendentes.length}**. Sua barra de HP/Água tá em **${wt}ml**. Toma uma poção de hidratação e bora zerar essa fase! 🎮`;
+        ? `Bora pro rush, ${nome}! Já farmamos **${concluidas.length} quests** hoje. ${pendentes.length ? `O mini-boss atual é "${pendenteDestaque}". Comba nele com foco de 15 minutos e garante esse loot épico!` : "Dungeon limpa por hoje! GG WP!"} 🕹️⚡`
+        : `E aí, Player 1 (${nome})! Seu placar hoje tá em **${concluidas.length} quests concluídas** e restam **${pendentes.length}**. Sua barra de HP/Água tá em **${wt}ml**. Toma uma poção de hidratação e bora zerar essa fase! 🎮`;
 
-  // 6. MUNDO PROGRAMADOR / DEV
+    // 6. MUNDO PROGRAMADOR / DEV
   } else if (pId === "programador") {
     lenteCognitiva = "Análise de algoritmos de rotina, debug de gargalos e clean code de hábitos.";
     estrategia = "Propor resolução por micro-commits e otimização de memória operacional.";
     texto = isQuestionamentoIA
       ? `System.out.println("Eu penso, logo comito."); ${nome}! Olha a stack trace de raciocínio acima ☝️: analisei seu array de tarefas (${concluidas.length} resolvidas, ${pendentes.length} pendentes) e o buffer hídrico (${wt}ml). Meu processamento é 100% contextual e livre de memory leak! 💻⚡`
       : isArrancada
-      ? `git commit -m "foco total no deploy"! ${nome}, você já fez merge de **${concluidas.length} PRs** hoje. ${pendentes.length ? `Vamos refatorar e fechar a issue "${pendenteDestaque}" agora!` : "Build verde sem erros em produção!"} Rodando script de alta produtividade! 🚀`
-      : `Olá, ${nome}. Status do console: **${concluidas.length} tarefas commitadas**, **${pendentes.length} issues abertas** e consumo de água em **${wt}ml**. Que tal debugar a maior pendência das próximas horas? 🖥️`;
+        ? `git commit -m "foco total no deploy"! ${nome}, você já fez merge de **${concluidas.length} PRs** hoje. ${pendentes.length ? `Vamos refatorar e fechar a issue "${pendenteDestaque}" agora!` : "Build verde sem erros em produção!"} Rodando script de alta produtividade! 🚀`
+        : `Olá, ${nome}. Status do console: **${concluidas.length} tarefas commitadas**, **${pendentes.length} issues abertas** e consumo de água em **${wt}ml**. Que tal debugar a maior pendência das próximas horas? 🖥️`;
 
-  // 7. MUNDO COACH
+    // 7. MUNDO COACH
   } else if (pId === "coach") {
     lenteCognitiva = "Mindset de alta performance, métricas SMART e foco antifrágil.";
     estrategia = "Reforçar consistência, disciplina deliberada e alcance de metas de alto nível.";
     texto = `Foco total no resultado, ${nome}! Você já garantiu **${concluidas.length} vitórias** hoje e faltam apenas **${pendentes.length}**. A consistência é a chave dos campeões: examine o diagnóstico de raciocínio acima ☝️, beba sua água (${wt}ml até agora) e execute o plano com excelência! 🎯🔥`;
 
-  // 8. MUNDO CLEANBOY
+    // 8. MUNDO CLEANBOY
   } else if (pId === "cleanboy") {
     lenteCognitiva = "Minimalismo, estética, limpeza mental e organização harmônica do espaço.";
     estrategia = "Sugerir um ambiente arejado, copo de água fresca e passos limpos e organizados.";
     texto = `Tudo no seu devido lugar, ${nome}. Analisando seu dia com olhar estético: **${concluidas.length} itens finalizados** e **${pendentes.length} pendência(s)** em harmonia. Copo d'água cheio (${wt}ml), mesa alinhada e mente tranquila. Vamos riscar a próxima tarefa com elegância e leveza. ✨🧴`;
 
-  // 9. MUNDO VOVÓ
+    // 9. MUNDO VOVÓ
   } else if (pId === "vovo") {
     lenteCognitiva = "Amor maternal de avó, acolhimento caloroso e preocupação sincera com saúde e descanso.";
     estrategia = "Oferecer carinho doce, mandar beber água e não se estressar à toa.";
     texto = `Oi, meu benzinho ${nome}! A vó tava aqui pensando em você com todo o carinho. Olha o tanto de coisa que você já fez hoje: **${concluidas.length} tarefinhas**! Já bebeu sua aguinha direitinho (${wt}ml até agora)? Não fica se cobrando demais não, meu anjo; faz o que der com calma e depois come um pedaço de bolo com a vó! ☕👵`;
 
-  // 10. MUNDOS MUSICAIS (Rock, Sertanejo, Forrozeiro, Pagodeiro, Rapper, Trapper)
+    // 10. MUNDOS MUSICAIS (Rock, Sertanejo, Forrozeiro, Pagodeiro, Rapper, Trapper)
   } else if (pId === "rock") {
     lenteCognitiva = "Energia crua do rock'n'roll, atitude contra a procrastinação e volume no máximo.";
     estrategia = "Canalizar a energia das guitarras para atropelar as pendências.";
@@ -697,7 +823,7 @@ Mantenha a postura, execute o plano sem vacilar e vença o dia! ⚔️`;
     estrategia = "Conectar atitude, foco em números e realização de metas ambiciosas.";
     texto = `Plug ativado, ${nome}! Flow caro e postura de quem tá focado no topo: **${concluidas.length} drops concluídos** no dia de hoje. Acelera no beat, hidrata no drip e garante a vitória antes que o sol se ponha! 🛸💸`;
 
-  // 11. MUNDOS ARCANO / OTAKU / PADRÃO
+    // 11. MUNDOS ARCANO / OTAKU / PADRÃO
   } else if (pId === "bruxo" || pId === "feiticeiro") {
     lenteCognitiva = "Alquimia da rotina diária, poções de foco e transmutação da inércia em poder arcano.";
     estrategia = "Conjuramento de hábitos e transmutação imediata da preguiça.";
@@ -713,8 +839,8 @@ Mantenha a postura, execute o plano sem vacilar e vença o dia! ⚔️`;
     texto = isQuestionamentoIA
       ? `Sim, ${nome}! Eu analiso continuamente o seu progresso para te apoiar. Veja no card de reflexão acima ☝️ como mapeei suas **${concluidas.length} tarefas concluídas**, suas **${pendentes.length} pendências** e sua meta de água (${wt}ml). Meu objetivo é te ajudar a ter clareza e paz mental todos os dias!`
       : isArrancada
-      ? `Vamos em frente, ${nome}! Você já completou **${concluidas.length} tarefas** hoje. ${pendentes.length ? `Foco total em "${pendenteDestaque}" agora para fechar o dia com chave de ouro!` : "Tudo limpo por hoje, excelente trabalho!"} Estou com você! ✨`
-      : `Olá, ${nome}! Analisando sua rotina de hoje: você já completou **${concluidas.length} tarefa(s)** e ainda resta(m) **${pendentes.length}**. ${aguaFalta > 0 ? `Não se esqueça de beber mais água (faltam ${aguaFalta}ml).` : "Hidratação exemplar hoje!"} O que gostaria de planejar ou ajustar agora?`;
+        ? `Vamos em frente, ${nome}! Você já completou **${concluidas.length} tarefas** hoje. ${pendentes.length ? `Foco total em "${pendenteDestaque}" agora para fechar o dia com chave de ouro!` : "Tudo limpo por hoje, excelente trabalho!"} Estou com você! ✨`
+        : `Olá, ${nome}! Analisando sua rotina de hoje: você já completou **${concluidas.length} tarefa(s)** e ainda resta(m) **${pendentes.length}**. ${aguaFalta > 0 ? `Não se esqueça de beber mais água (faltam ${aguaFalta}ml).` : "Hidratação exemplar hoje!"} O que gostaria de planejar ou ajustar agora?`;
   }
 
   const pensamento = [
@@ -759,7 +885,7 @@ function obterHistoricoChatIA() {
       {
         remetente: "ia",
         pensamento: `• Diagnóstico inicial: Sincronização de rotina estabelecida no Prumo.\n• Coach ativo: ${persona.titulo}.\n• Objetivo: Apoiar foco, clareza mental e execução diária com raciocínio contextual.`,
-        texto: `Salve${nome ? `, **${esc(nome)}**` : ""}! Aqui é o seu coach no modo **${persona.titulo}**. Como posso te ajudar na sua rotina hoje?`,
+        texto: `Salve${nome ? `, **${esc(nome)}**` : ""}! Aqui é o Prumi, no modo **${persona.titulo}**. Pergunte qualquer coisa: dúvida de matéria, redação, ideias, textos... ou toque em **Edital → Cronograma** para eu montar seu plano de estudos.`,
         hora: new Date().toLocaleTimeString().slice(0, 5)
       }
     ];
@@ -789,16 +915,21 @@ function reiniciarChatIA() {
 function alternarVelocidadeIA() {
   const cfg = obterConfigIA();
   if (cfg.provedor === "local") {
-    const destino = cfg.chave ? (cfg.provedorAnterior || "groq") : "autonomo";
+    const ant = cfg.provedorAnterior;
+    const destino = ant && ant !== "local" && (ant === "prumo" || cfg.chave) ? ant : "prumo";
     salvarConfigIA(destino, cfg.chave);
     if (typeof toast === "function") {
-      toast(`🌐 Modo Nuvem ativado (${destino.toUpperCase()})!`, false, "happy");
+      toast(
+        destino === "prumo" ? "✨ IA do Prumo ativada!" : `🌐 Modo Nuvem ativado (${destino.toUpperCase()})!`,
+        false,
+        "happy"
+      );
     }
   } else {
     cfg.provedorAnterior = cfg.provedor;
     salvarConfigIA("local", cfg.chave);
     if (typeof toast === "function") {
-      toast("⚡ Modo Instantâneo ativado! Respostas imediatas em 0ms.", false, "happy");
+      toast("⚡ Modo offline ativado (respostas simples, sem internet).", false, "happy");
     }
   }
   const inp = document.getElementById("ia-input-texto");
@@ -816,15 +947,17 @@ function abrirChatPrumiIA(mensagemInicial = "") {
 
   const isInstantaneo = cfg.provedor === "local" || !cfg.provedor;
   const providerLabel =
-    isInstantaneo
-      ? "⚡ Local Instantâneo (0ms)"
-      : cfg.chave
-        ? cfg.provedor === "gemini"
-          ? "Gemini 1.5 Flash"
-          : cfg.provedor === "groq"
-            ? "Groq Llama 3 Turbo"
-            : "OpenAI GPT-4o"
-        : "Nuvem Gratuita";
+    cfg.provedor === "prumo"
+      ? "✨ IA do Prumo (Gemini)"
+      : isInstantaneo
+        ? "⚡ Local Instantâneo (0ms)"
+        : cfg.chave
+          ? cfg.provedor === "gemini"
+            ? "Gemini 1.5 Flash"
+            : cfg.provedor === "groq"
+              ? "Groq Llama 3 Turbo"
+              : "OpenAI GPT-4o"
+          : "Nuvem Gratuita";
 
   const modalHtml = `
   <div id="modal-chat-ia" class="modal-ia-overlay">
@@ -837,11 +970,11 @@ function abrirChatPrumiIA(mensagemInicial = "") {
           </div>
           <div class="ia-header-titles">
             <h3>${esc(persona.titulo)}</h3>
-            <p><span class="ia-engine-badge" data-act="ia-alternar-velocidade" style="cursor:pointer;" title="Clique para alternar entre Modo Instantâneo (0ms) e Nuvem">${esc(providerLabel)}</span> • Coach com Raciocínio</p>
+            <p><span class="ia-engine-badge" data-act="ia-alternar-velocidade" style="cursor:pointer;" title="Clique para alternar entre a IA online e o modo offline">${esc(providerLabel)}</span> • Pergunte qualquer coisa</p>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
-          <button class="ia-header-action-btn" data-act="ia-alternar-velocidade" title="Alternar velocidade">${isInstantaneo ? "⚡ 0ms (Local)" : "🌐 Nuvem"}</button>
+          <button class="ia-header-action-btn" data-act="ia-alternar-velocidade" title="Alternar velocidade">${isInstantaneo ? "⚡ Offline" : "🌐 Online"}</button>
           <button class="ia-header-action-btn" data-act="limpar-chat-ia" title="Reiniciar conversa com nova reflexão">🔄</button>
           <button class="ia-close-btn" data-act="fechar-chat-ia" aria-label="Fechar">&times;</button>
         </div>
@@ -851,6 +984,9 @@ function abrirChatPrumiIA(mensagemInicial = "") {
         <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Tô sem foco, me dá um empurrão agora!">⚡ Tô sem foco</button>
         <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Como devo organizar minhas próximas horas?">🎯 Priorizar hoje</button>
         <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Analise meu progresso e equilíbrio de hoje">📊 Como tá meu dia?</button>
+        <button class="ia-pill-btn" data-edital-act="abrir">📄 Edital → Cronograma</button>
+        <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Explique de forma simples e com exemplos um assunto que eu vou te dizer. Pergunte qual assunto.">🧠 Explicar assunto</button>
+        <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Quero corrigir uma redação no padrão ENEM. Peça o tema e o texto, e dê nota por competência.">✍️ Corrigir redação</button>
         <button class="ia-pill-btn" data-act="abrir-desdobrador-ia">✨ Desdobrar Meta</button>
       </div>
 
@@ -860,7 +996,9 @@ function abrirChatPrumiIA(mensagemInicial = "") {
             m => `
           <div class="ia-message ${m.remetente}">
             <div class="ia-msg-container">
-              ${m.pensamento ? `
+              ${
+                m.pensamento
+                  ? `
                 <details class="ia-thought-card">
                   <summary class="ia-thought-summary">
                     <span class="ia-thought-icon">🧠</span>
@@ -869,7 +1007,9 @@ function abrirChatPrumiIA(mensagemInicial = "") {
                   </summary>
                   <div class="ia-thought-content">${formatarTextoMensagemIA(m.pensamento)}</div>
                 </details>
-              ` : ""}
+              `
+                  : ""
+              }
               <div class="ia-msg-bubble">${formatarTextoMensagemIA(m.texto)}</div>
             </div>
           </div>
@@ -879,7 +1019,7 @@ function abrirChatPrumiIA(mensagemInicial = "") {
       </div>
 
       <form id="form-chat-ia" class="ia-chat-input-bar">
-        <input type="text" id="ia-input-texto" class="ia-chat-input" placeholder="Converse com seu coach..." autocomplete="off" />
+        <input type="text" id="ia-input-texto" class="ia-chat-input" placeholder="Pergunte qualquer coisa..." autocomplete="off" />
         <button type="submit" class="ia-send-btn" id="ia-btn-enviar">
           <span>Enviar</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
@@ -957,17 +1097,12 @@ function formatarTextoMensagemIA(raw) {
   // Normalizar tags HTML comuns que possam ter sido passadas
   txt = txt.replace(/<\/?(b|strong)>/gi, "**");
   txt = txt.replace(/<\/?(i|em)>/gi, "*");
-  // Sanitizar HTML
-  txt = txt
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  // Suporte a **negrito** e *itálico*
-  txt = txt.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-  txt = txt.replace(/\*(.*?)\*/g, "<em>$1</em>");
-  // Quebras de linha
-  txt = txt.replace(/\n\n/g, "<br><br>");
-  txt = txt.replace(/\n/g, "<br>");
+  // Markdown seguro (títulos, listas, tabelas, código, negrito...). Tudo é escapado antes de virar HTML.
+  if (typeof renderizarMarkdownSeguro === "function") {
+    txt = renderizarMarkdownSeguro(txt);
+  } else {
+    txt = txt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+  }
 
   if (temCardCiclo && presetCard) {
     txt += `
@@ -1049,7 +1184,7 @@ async function submeterChatIA(e) {
       `<div class="ia-message ia" id="ia-typing-box">
         <div class="ia-thinking-live">
           <span class="ia-thought-icon">🧠</span>
-          <span>Prumi está raciocinando sobre sua rotina...</span>
+          <span>Prumi está pensando...</span>
         </div>
       </div>`
     );
@@ -1077,7 +1212,9 @@ async function submeterChatIA(e) {
         "beforeend",
         `<div class="ia-message ia">
           <div class="ia-msg-container">
-            ${respPensamento ? `
+            ${
+              respPensamento
+                ? `
               <details class="ia-thought-card" open>
                 <summary class="ia-thought-summary">
                   <span class="ia-thought-icon">🧠</span>
@@ -1086,7 +1223,9 @@ async function submeterChatIA(e) {
                 </summary>
                 <div class="ia-thought-content">${formatarTextoMensagemIA(respPensamento)}</div>
               </details>
-            ` : ""}
+            `
+                : ""
+            }
             <div class="ia-msg-bubble">${formatarTextoMensagemIA(respTexto)}</div>
           </div>
         </div>`
@@ -1116,7 +1255,9 @@ async function submeterChatIA(e) {
         "beforeend",
         `<div class="ia-message ia">
           <div class="ia-msg-container">
-            ${fbPensamento ? `
+            ${
+              fbPensamento
+                ? `
               <details class="ia-thought-card" open>
                 <summary class="ia-thought-summary">
                   <span class="ia-thought-icon">🧠</span>
@@ -1125,7 +1266,9 @@ async function submeterChatIA(e) {
                 </summary>
                 <div class="ia-thought-content">${formatarTextoMensagemIA(fbPensamento)}</div>
               </details>
-            ` : ""}
+            `
+                : ""
+            }
             <div class="ia-msg-bubble">${formatarTextoMensagemIA(fbTexto)}</div>
           </div>
         </div>`
@@ -1338,12 +1481,14 @@ function abrirDesdobradorMetasIA() {
           <span>⚡</span>
           <span>Metas Rápidas & Projetos</span>
         </button>
+        <button type="button" class="ia-modal-tab-btn ${estadoPlanejadorEstudos.abaAtiva === "edital" ? "ativo" : ""}" data-act="ia-trocar-aba" data-aba="edital">
+          <span>📄</span>
+          <span>Edital</span>
+        </button>
       </div>
 
       <div class="ia-breakdown-body" id="ia-conteudo-aba-desdobrador">
-        ${estadoPlanejadorEstudos.abaAtiva === "estrategia"
-          ? renderizarFormularioEstudosEstrategicoHTML()
-          : renderizarFormularioMetasRapidasHTML()}
+        ${renderizarAbaDesdobrador(estadoPlanejadorEstudos.abaAtiva)}
       </div>
     </div>
   </div>`;
@@ -1362,15 +1507,19 @@ function fecharDesdobradorMetasIASeFundo(e) {
   }
 }
 
+function renderizarAbaDesdobrador(aba) {
+  if (aba === "edital" && typeof renderAbaEditalHTML === "function") return renderAbaEditalHTML();
+  return aba === "rapido"
+    ? renderizarFormularioMetasRapidasHTML()
+    : renderizarFormularioEstudosEstrategicoHTML();
+}
+
 function trocarAbaDesdobrador(novaAba) {
-  if (novaAba !== "estrategia" && novaAba !== "rapido") return;
+  if (novaAba !== "estrategia" && novaAba !== "rapido" && novaAba !== "edital") return;
   estadoPlanejadorEstudos.abaAtiva = novaAba;
   const box = document.getElementById("ia-conteudo-aba-desdobrador");
   if (box) {
-    box.innerHTML =
-      novaAba === "estrategia"
-        ? renderizarFormularioEstudosEstrategicoHTML()
-        : renderizarFormularioMetasRapidasHTML();
+    box.innerHTML = renderizarAbaDesdobrador(novaAba);
   }
   document.querySelectorAll(".ia-modal-tab-btn").forEach(b => {
     b.classList.toggle("ativo", b.dataset.aba === novaAba);
@@ -1493,7 +1642,7 @@ function selecionarPresetEstudo(key) {
     estadoPlanejadorEstudos.horasPorDia = p.horas;
     estadoPlanejadorEstudos.diasPorSemana = p.dias;
   } else {
-    const nomeMateria = key ? (key.charAt(0).toUpperCase() + key.slice(1)) : "Cálculo";
+    const nomeMateria = key ? key.charAt(0).toUpperCase() + key.slice(1) : "Cálculo";
     estadoPlanejadorEstudos.presetAtual = "custom";
     estadoPlanejadorEstudos.concursoNome = `Rotina: ${nomeMateria}`;
     estadoPlanejadorEstudos.materias = [
@@ -1559,10 +1708,13 @@ async function executarPlanejamentoEstrategicoIA() {
 
   const dados = {
     concursoNome: estadoPlanejadorEstudos.concursoNome || "Concurso Público",
-    materias: estadoPlanejadorEstudos.materias.length ? estadoPlanejadorEstudos.materias : ["Língua Portuguesa", "Matemática", "Conhecimentos Específicos"],
+    materias: estadoPlanejadorEstudos.materias.length
+      ? estadoPlanejadorEstudos.materias
+      : ["Língua Portuguesa", "Matemática", "Conhecimentos Específicos"],
     horasPorDia: estadoPlanejadorEstudos.horasPorDia || 4,
     diasPorSemana: estadoPlanejadorEstudos.diasPorSemana || 6,
-    materiaPrioridade: estadoPlanejadorEstudos.materiaPrioridade || estadoPlanejadorEstudos.materias[0] || "Geral"
+    materiaPrioridade:
+      estadoPlanejadorEstudos.materiaPrioridade || estadoPlanejadorEstudos.materias[0] || "Geral"
   };
 
   const btn = document.getElementById("ia-btn-gerar-ciclo");
@@ -1693,7 +1845,9 @@ function renderizarResultadoCicloHTML(ciclo) {
     </div>
 
     <!-- Raciocínio Pedagógico da IA (Transparência de Pensamento) -->
-    ${ciclo.analisePedagogica ? `
+    ${
+      ciclo.analisePedagogica
+        ? `
       <details class="ia-thought-card" open style="margin:12px 0;">
         <summary class="ia-thought-summary">
           <span class="ia-thought-icon">🧠</span>
@@ -1704,7 +1858,9 @@ function renderizarResultadoCicloHTML(ciclo) {
           ${formatarTextoMensagemIA(ciclo.analisePedagogica)}
         </div>
       </details>
-    ` : ""}
+    `
+        : ""
+    }
 
     <!-- Linha do Tempo e Dias do Ciclo Intercalado -->
     <div class="ia-label-titulo" style="margin:14px 0 8px;font-size:13px;">
@@ -1749,12 +1905,16 @@ function renderizarResultadoCicloHTML(ciclo) {
         .join("")}
     </div>
 
-    ${ciclo.orientacaoSimulado ? `
+    ${
+      ciclo.orientacaoSimulado
+        ? `
       <div style="background:rgba(245, 158, 11, 0.08);border:1px solid rgba(245, 158, 11, 0.25);border-radius:12px;padding:10px 12px;margin:12px 0;font-size:12px;color:inherit;">
         <strong>📝 Simulado & Caderno de Erros (Fim de Semana):</strong><br>
         <span style="opacity:0.9;">${esc(ciclo.orientacaoSimulado)}</span>
       </div>
-    ` : ""}
+    `
+        : ""
+    }
 
     ${ciclo.dicaMascote ? `<div class="ia-plan-dica">💡 "${esc(ciclo.dicaMascote)}"</div>` : ""}
 
@@ -1772,7 +1932,10 @@ function renderizarResultadoCicloHTML(ciclo) {
 
 /* ---------- Motor de Síntese Autônoma de Ciclos (Estratégia Concursos) ---------- */
 function sintetizarCicloEstrategicoAutonomo(dados) {
-  const mats = Array.isArray(dados.materias) && dados.materias.length ? dados.materias : ["Língua Portuguesa", "Matemática", "Conhecimentos Específicos"];
+  const mats =
+    Array.isArray(dados.materias) && dados.materias.length
+      ? dados.materias
+      : ["Língua Portuguesa", "Matemática", "Conhecimentos Específicos"];
   const prio = dados.materiaPrioridade || mats[0];
   const hDia = dados.horasPorDia || 4;
   const dSem = dados.diasPorSemana || 6;
@@ -1872,14 +2035,17 @@ function importarCicloParaAgendaPrumo() {
   let totalTarefasInseridas = 0;
 
   // 1. Cadastrar Matérias do Ciclo em S.subjects (com cores profissionais)
-  const coresPadrao = (typeof SUBJ_COLORS !== "undefined" && Array.isArray(SUBJ_COLORS))
-    ? SUBJ_COLORS
-    : ["#2F6FD6", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#06B6D4", "#F97316", "#6366F1"];
+  const coresPadrao =
+    typeof SUBJ_COLORS !== "undefined" && Array.isArray(SUBJ_COLORS)
+      ? SUBJ_COLORS
+      : ["#2F6FD6", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#06B6D4", "#F97316", "#6366F1"];
   const subjectMap = {};
   const mats = Array.isArray(estadoPlanejadorEstudos.materias) ? estadoPlanejadorEstudos.materias : [];
 
   mats.forEach((nomeMateria, idx) => {
-    let s = S.subjects.find(sub => (sub.name || "").trim().toLowerCase() === nomeMateria.trim().toLowerCase());
+    let s = S.subjects.find(
+      sub => (sub.name || "").trim().toLowerCase() === nomeMateria.trim().toLowerCase()
+    );
     if (!s) {
       s = {
         id: typeof newId === "function" ? newId() : "s_" + Math.random().toString(36).slice(2, 9),
@@ -1899,7 +2065,8 @@ function importarCicloParaAgendaPrumo() {
   }
 
   // 2. Programar Revisões Espaçadas de Ebbinghaus (D+1, D+3, D+7, D+15)
-  const revSteps = (typeof REV_STEPS !== "undefined" && Array.isArray(REV_STEPS)) ? REV_STEPS : [1, 3, 7, 15, 30];
+  const revSteps =
+    typeof REV_STEPS !== "undefined" && Array.isArray(REV_STEPS) ? REV_STEPS : [1, 3, 7, 15, 30];
   mats.slice(0, 5).forEach((nomeMateria, i) => {
     const sid = subjectMap[nomeMateria] || (S.subjects[0] ? S.subjects[0].id : "");
     const offset = revSteps[i % revSteps.length] || 1;
@@ -1928,6 +2095,9 @@ function importarCicloParaAgendaPrumo() {
         title: `[${met}] ${bloco.materia}: ${bloco.descricao || "Estudo focado"} (${bloco.duracaoMin || 60}m)`,
         date: dataAlvo,
         done: false,
+        area: "estudos",
+        prio: 2,
+        sub: [],
         xp,
         tag: "estudo"
       });
@@ -1962,7 +2132,11 @@ function importarCicloParaAgendaPrumo() {
   fecharDesdobradorMetasIA();
 
   if (typeof toast === "function") {
-    toast(`🎓 Ciclo de Estudos criado com sucesso! ${S.subjects.length} matérias e ${totalTarefasInseridas} blocos ativos no Prumo.`, false, "happy");
+    toast(
+      `🎓 Ciclo de Estudos criado com sucesso! ${S.subjects.length} matérias e ${totalTarefasInseridas} blocos ativos no Prumo.`,
+      false,
+      "happy"
+    );
   }
 }
 
@@ -1999,7 +2173,8 @@ function copiarCronogramaCompleto() {
     navigator.clipboard
       .writeText(texto)
       .then(() => {
-        if (typeof toast === "function") toast("📋 Cronograma copiado para a área de transferência!", false, "happy");
+        if (typeof toast === "function")
+          toast("📋 Cronograma copiado para a área de transferência!", false, "happy");
       })
       .catch(() => {
         if (typeof toast === "function") toast("Não foi possível copiar automaticamente.", false, "alert");
@@ -2111,7 +2286,8 @@ async function executarDesdobramentoMetaIA() {
         ${(plano.tarefas || [])
           .map((t, idx) => {
             const offset = typeof t.diaOffset === "number" ? t.diaOffset : idx;
-            const rotuloDia = offset === 0 ? "Hoje" : offset === 1 ? "Amanhã" : offset === 2 ? "+2 dias" : `+${offset} dias`;
+            const rotuloDia =
+              offset === 0 ? "Hoje" : offset === 1 ? "Amanhã" : offset === 2 ? "+2 dias" : `+${offset} dias`;
             const badgeClass = offset <= 5 ? `day-${offset}` : "day-5";
             return `
           <div class="ia-plan-task-item">
@@ -2150,43 +2326,132 @@ async function executarDesdobramentoMetaIA() {
 
 function sintetizarPlanoMetaAutonomo(meta) {
   const m = meta.toLowerCase();
-  if (m.includes("corr") || m.includes("peso") || m.includes("emagrec") || m.includes("academia") || m.includes("trein") || m.includes("saude") || m.includes("fit")) {
+  if (
+    m.includes("corr") ||
+    m.includes("peso") ||
+    m.includes("emagrec") ||
+    m.includes("academia") ||
+    m.includes("trein") ||
+    m.includes("saude") ||
+    m.includes("fit")
+  ) {
     return {
       titulo: `Cronograma de Saúde & Condicionamento: ${meta}`,
       habito: { nome: "30 min de atividade física e hidratação regular", horario: "07:30" },
       tarefas: [
-        { diaOffset: 0, titulo: "Separar tênis, roupas de treino e planejar o percurso inicial", categoria: "saude", xp: 20 },
-        { diaOffset: 1, titulo: "Primeira sessão: caminhada rápida ou corrida leve intercalada de 20 min", categoria: "saude", xp: 35 },
-        { diaOffset: 2, titulo: "Treino de fortalecimento funcional (pernas e core) em casa", categoria: "saude", xp: 30 },
-        { diaOffset: 3, titulo: "Corrida intervalada de 25 min com alongamento e registro de evolução", categoria: "saude", xp: 40 }
+        {
+          diaOffset: 0,
+          titulo: "Separar tênis, roupas de treino e planejar o percurso inicial",
+          categoria: "saude",
+          xp: 20
+        },
+        {
+          diaOffset: 1,
+          titulo: "Primeira sessão: caminhada rápida ou corrida leve intercalada de 20 min",
+          categoria: "saude",
+          xp: 35
+        },
+        {
+          diaOffset: 2,
+          titulo: "Treino de fortalecimento funcional (pernas e core) em casa",
+          categoria: "saude",
+          xp: 30
+        },
+        {
+          diaOffset: 3,
+          titulo: "Corrida intervalada de 25 min com alongamento e registro de evolução",
+          categoria: "saude",
+          xp: 40
+        }
       ],
-      dicaMascote: "O corpo é a sua morada. A consistência de hoje constrói a saúde e a energia dos próximos 10 anos!"
+      dicaMascote:
+        "O corpo é a sua morada. A consistência de hoje constrói a saúde e a energia dos próximos 10 anos!"
     };
   }
-  if (m.includes("program") || m.includes("python") || m.includes("código") || m.includes("dev") || m.includes("javascript") || m.includes("computador") || m.includes("site") || m.includes("app")) {
+  if (
+    m.includes("program") ||
+    m.includes("python") ||
+    m.includes("código") ||
+    m.includes("dev") ||
+    m.includes("javascript") ||
+    m.includes("computador") ||
+    m.includes("site") ||
+    m.includes("app")
+  ) {
     return {
       titulo: `Cronograma de Programação & Tecnologia: ${meta}`,
       habito: { nome: "1 bloco Pomodoro (25 min) diário de código prático", horario: "19:30" },
       tarefas: [
-        { diaOffset: 0, titulo: "Configurar ambiente, editor de código e criar o primeiro script de teste", categoria: "estudo", xp: 25 },
-        { diaOffset: 1, titulo: "Estudar lógica, variáveis e estruturas de decisão com exercícios práticos", categoria: "estudo", xp: 35 },
-        { diaOffset: 2, titulo: "Construir uma funcionalidade prática e testar as entradas e saídas", categoria: "estudo", xp: 40 },
-        { diaOffset: 3, titulo: "Fazer commit do projeto no GitHub e anotar o que aprendeu", categoria: "carreira", xp: 30 }
+        {
+          diaOffset: 0,
+          titulo: "Configurar ambiente, editor de código e criar o primeiro script de teste",
+          categoria: "estudo",
+          xp: 25
+        },
+        {
+          diaOffset: 1,
+          titulo: "Estudar lógica, variáveis e estruturas de decisão com exercícios práticos",
+          categoria: "estudo",
+          xp: 35
+        },
+        {
+          diaOffset: 2,
+          titulo: "Construir uma funcionalidade prática e testar as entradas e saídas",
+          categoria: "estudo",
+          xp: 40
+        },
+        {
+          diaOffset: 3,
+          titulo: "Fazer commit do projeto no GitHub e anotar o que aprendeu",
+          categoria: "carreira",
+          xp: 30
+        }
       ],
-      dicaMascote: "Não tente aprender tudo de uma vez. Um script que roda hoje vale mais do que dez teorias para amanhã!"
+      dicaMascote:
+        "Não tente aprender tudo de uma vez. Um script que roda hoje vale mais do que dez teorias para amanhã!"
     };
   }
-  if (m.includes("oab") || m.includes("concurso") || m.includes("prova") || m.includes("enem") || m.includes("faculdade") || m.includes("estud") || m.includes("direito") || m.includes("lei")) {
+  if (
+    m.includes("oab") ||
+    m.includes("concurso") ||
+    m.includes("prova") ||
+    m.includes("enem") ||
+    m.includes("faculdade") ||
+    m.includes("estud") ||
+    m.includes("direito") ||
+    m.includes("lei")
+  ) {
     return {
       titulo: `Cronograma Estruturado de Estudos: ${meta}`,
       habito: { nome: "Revisão ativa diária com caderno de erros (25 min)", horario: "19:00" },
       tarefas: [
-        { diaOffset: 0, titulo: "Mapear edital/ementa e selecionar as 3 disciplinas de maior pontuação", categoria: "estudo", xp: 20 },
-        { diaOffset: 1, titulo: "Estudo concentrado do primeiro tópico-chave com resumos esquemáticos", categoria: "estudo", xp: 35 },
-        { diaOffset: 2, titulo: "Resolver bateria de 15 questões de provas anteriores e identificar dúvidas", categoria: "estudo", xp: 40 },
-        { diaOffset: 3, titulo: "Revisão flashcards e reforço direcionado nos pontos fracos", categoria: "estudo", xp: 30 }
+        {
+          diaOffset: 0,
+          titulo: "Mapear edital/ementa e selecionar as 3 disciplinas de maior pontuação",
+          categoria: "estudo",
+          xp: 20
+        },
+        {
+          diaOffset: 1,
+          titulo: "Estudo concentrado do primeiro tópico-chave com resumos esquemáticos",
+          categoria: "estudo",
+          xp: 35
+        },
+        {
+          diaOffset: 2,
+          titulo: "Resolver bateria de 15 questões de provas anteriores e identificar dúvidas",
+          categoria: "estudo",
+          xp: 40
+        },
+        {
+          diaOffset: 3,
+          titulo: "Revisão flashcards e reforço direcionado nos pontos fracos",
+          categoria: "estudo",
+          xp: 30
+        }
       ],
-      dicaMascote: "Estudar 30 minutos com consistência todo dia supera 8 horas de estudo exaustivo na véspera!"
+      dicaMascote:
+        "Estudar 30 minutos com consistência todo dia supera 8 horas de estudo exaustivo na véspera!"
     };
   }
   if (m.includes("livro") || m.includes("ler") || m.includes("leitur") || m.includes("escrev")) {
@@ -2194,37 +2459,108 @@ function sintetizarPlanoMetaAutonomo(meta) {
       titulo: `Cronograma de Hábito de Leitura: ${meta}`,
       habito: { nome: "Ler 15 a 20 páginas todos os dias com celular no silencioso", horario: "21:30" },
       tarefas: [
-        { diaOffset: 0, titulo: "Definir o livro, deixar na mesa de cabeceira e ler sumário e prólogo", categoria: "foco", xp: 15 },
-        { diaOffset: 1, titulo: "Leitura focada do capítulo 1 (20 páginas) sem nenhuma distração", categoria: "foco", xp: 30 },
-        { diaOffset: 2, titulo: "Leitura do capítulo 2 e grifar os 3 principais aprendizados", categoria: "foco", xp: 35 },
-        { diaOffset: 3, titulo: "Sintetizar as ideias do livro em 1 parágrafo prático no caderno de notas", categoria: "foco", xp: 30 }
+        {
+          diaOffset: 0,
+          titulo: "Definir o livro, deixar na mesa de cabeceira e ler sumário e prólogo",
+          categoria: "foco",
+          xp: 15
+        },
+        {
+          diaOffset: 1,
+          titulo: "Leitura focada do capítulo 1 (20 páginas) sem nenhuma distração",
+          categoria: "foco",
+          xp: 30
+        },
+        {
+          diaOffset: 2,
+          titulo: "Leitura do capítulo 2 e grifar os 3 principais aprendizados",
+          categoria: "foco",
+          xp: 35
+        },
+        {
+          diaOffset: 3,
+          titulo: "Sintetizar as ideias do livro em 1 parágrafo prático no caderno de notas",
+          categoria: "foco",
+          xp: 30
+        }
       ],
-      dicaMascote: "Livros são a mente de mestres condensada em páginas. 15 páginas por dia são mais de 15 livros por ano!"
+      dicaMascote:
+        "Livros são a mente de mestres condensada em páginas. 15 páginas por dia são mais de 15 livros por ano!"
     };
   }
-  if (m.includes("desenh") || m.includes("arte") || m.includes("pint") || m.includes("músic") || m.includes("tocar") || m.includes("viol") || m.includes("guitar")) {
+  if (
+    m.includes("desenh") ||
+    m.includes("arte") ||
+    m.includes("pint") ||
+    m.includes("músic") ||
+    m.includes("tocar") ||
+    m.includes("viol") ||
+    m.includes("guitar")
+  ) {
     return {
       titulo: `Cronograma Criativo & Prática: ${meta}`,
       habito: { nome: "20 min diários de treino prático deliberado", horario: "18:00" },
       tarefas: [
-        { diaOffset: 0, titulo: "Preparar os instrumentos/materiais e fazer 10 min de aquecimento técnico", categoria: "criativo", xp: 20 },
-        { diaOffset: 1, titulo: "Estudo de fundamentos e exercícios repetitivos para ganhar precisão", categoria: "criativo", xp: 35 },
-        { diaOffset: 2, titulo: "Construção de uma peça prática aplicando o que treinou", categoria: "criativo", xp: 40 },
-        { diaOffset: 3, titulo: "Gravar/registrar o resultado final e comparar com a primeira sessão", categoria: "criativo", xp: 30 }
+        {
+          diaOffset: 0,
+          titulo: "Preparar os instrumentos/materiais e fazer 10 min de aquecimento técnico",
+          categoria: "criativo",
+          xp: 20
+        },
+        {
+          diaOffset: 1,
+          titulo: "Estudo de fundamentos e exercícios repetitivos para ganhar precisão",
+          categoria: "criativo",
+          xp: 35
+        },
+        {
+          diaOffset: 2,
+          titulo: "Construção de uma peça prática aplicando o que treinou",
+          categoria: "criativo",
+          xp: 40
+        },
+        {
+          diaOffset: 3,
+          titulo: "Gravar/registrar o resultado final e comparar com a primeira sessão",
+          categoria: "criativo",
+          xp: 30
+        }
       ],
-      dicaMascote: "Arte e técnica se desenvolvem no detalhe repetido com carinho. Celebre a sua evolução a cada traço!"
+      dicaMascote:
+        "Arte e técnica se desenvolvem no detalhe repetido com carinho. Celebre a sua evolução a cada traço!"
     };
   }
   return {
     titulo: `Cronograma Estruturado: ${meta}`,
     habito: { nome: `Bloco diário de 20 min dedicado a: ${meta.slice(0, 30)}`, horario: "10:00" },
     tarefas: [
-      { diaOffset: 0, titulo: `Definir a primeira ação prática e desobstruir o caminho para: ${meta.slice(0, 35)}`, categoria: "foco", xp: 20 },
-      { diaOffset: 1, titulo: "Executar o bloco de foco inicial de 30 min com zero distrações", categoria: "foco", xp: 35 },
-      { diaOffset: 2, titulo: "Avaliar o que funcionou, ajustar a rota e resolver o principal desafio", categoria: "foco", xp: 30 },
-      { diaOffset: 3, titulo: "Consolidar a primeira entrega e definir o próximo marco de crescimento", categoria: "foco", xp: 40 }
+      {
+        diaOffset: 0,
+        titulo: `Definir a primeira ação prática e desobstruir o caminho para: ${meta.slice(0, 35)}`,
+        categoria: "foco",
+        xp: 20
+      },
+      {
+        diaOffset: 1,
+        titulo: "Executar o bloco de foco inicial de 30 min com zero distrações",
+        categoria: "foco",
+        xp: 35
+      },
+      {
+        diaOffset: 2,
+        titulo: "Avaliar o que funcionou, ajustar a rota e resolver o principal desafio",
+        categoria: "foco",
+        xp: 30
+      },
+      {
+        diaOffset: 3,
+        titulo: "Consolidar a primeira entrega e definir o próximo marco de crescimento",
+        categoria: "foco",
+        xp: 40
+      }
     ],
-    dicaMascote: "A distância entre o sonho e a conquista chama-se atitude diária. Comece pelo menor passo hoje!"
+    dicaMascote:
+      "A distância entre o sonho e a conquista chama-se atitude diária. Comece pelo menor passo hoje!"
   };
 }
 
@@ -2284,7 +2620,9 @@ async function testarConexaoIA() {
   if (res) res.innerHTML = `<span style="color:#64748b;">Conectando à IA...</span>`;
 
   try {
-    const resposta = await chamarProvedorLLM("Diga 'Conexão Prumo IA estabelecida com sucesso!' em 1 frase curta.");
+    const resposta = await chamarProvedorLLM(
+      "Diga 'Conexão Prumo IA estabelecida com sucesso!' em 1 frase curta."
+    );
     const textoApenas = typeof resposta === "object" && resposta !== null ? resposta.texto : String(resposta);
     if (res) {
       res.innerHTML = `<span style="color:#10b981;font-weight:600;">✅ IA Conectada e Operacional!</span><br><small style="color:#64748b;">"${esc(textoApenas)}"</small>`;
@@ -2319,7 +2657,7 @@ function iaAjustesHTML() {
         </select>
       </div>
 
-      <div class="setrow" id="ia-row-chave" style="${(cfg.provedor === "autonomo" || cfg.provedor === "local") ? "display:none;" : ""}">
+      <div class="setrow" id="ia-row-chave" style="${cfg.provedor === "autonomo" || cfg.provedor === "local" ? "display:none;" : ""}">
         <div class="lbl">
           <b>Chave de API (BYOK)</b>
           <span class="note">Sua chave fica gravada apenas no seu dispositivo. <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:#3b82f6;text-decoration:underline;">Groq (Super rápida grátis)</a> ou <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:#3b82f6;text-decoration:underline;">Google AI Studio</a>.</span>
@@ -2344,7 +2682,7 @@ function iaAjustesHTML() {
 function atualizarProvedorIA(val) {
   const rowChave = document.getElementById("ia-row-chave");
   if (rowChave) {
-    rowChave.style.display = (val === "autonomo" || val === "local") ? "none" : "";
+    rowChave.style.display = val === "autonomo" || val === "local" ? "none" : "";
   }
   const inpChave = document.getElementById("set-ia-chave");
   salvarConfigIA(val, inpChave ? inpChave.value : "");

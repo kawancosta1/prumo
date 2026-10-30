@@ -102,7 +102,8 @@ const blank = () => ({
   habits: [],
   habitLog: {},
   journal: {},
-  pro: { ativo: false, plano: "gratis", desde: null, origem: "servidor" }
+  pro: { ativo: false, plano: "gratis", desde: null, origem: "servidor" },
+  cronogramaEdital: null
 });
 
 let S = blank(),
@@ -170,8 +171,31 @@ function normalize(x) {
     if (typeof b.questionStats.goal !== "number" || b.questionStats.goal <= 0) b.questionStats.goal = 30;
   }
   if (!b.equip || typeof b.equip !== "object") b.equip = {};
-  const MUNDOS_VALIDOS = ["zen", "rock", "emo", "otaku", "gamer", "programador", "bruxo", "feiticeiro", "cleanboy", "coach", "forrozeiro", "funkeiro", "pagodeiro", "rapper", "sertanejo", "trapper", "vovo"];
-  if (!b.persona || (typeof PERSONAS !== "undefined" && Object.keys(PERSONAS).length > 0 ? !PERSONAS[b.persona] : !MUNDOS_VALIDOS.includes(b.persona))) {
+  const MUNDOS_VALIDOS = [
+    "zen",
+    "rock",
+    "emo",
+    "otaku",
+    "gamer",
+    "programador",
+    "bruxo",
+    "feiticeiro",
+    "cleanboy",
+    "coach",
+    "forrozeiro",
+    "funkeiro",
+    "pagodeiro",
+    "rapper",
+    "sertanejo",
+    "trapper",
+    "vovo"
+  ];
+  if (
+    !b.persona ||
+    (typeof PERSONAS !== "undefined" && Object.keys(PERSONAS).length > 0
+      ? !PERSONAS[b.persona]
+      : !MUNDOS_VALIDOS.includes(b.persona))
+  ) {
     b.persona = "zen";
   }
   if (typeof ITEM !== "undefined" && Object.keys(ITEM).length > 20) {

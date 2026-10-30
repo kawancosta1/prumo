@@ -1,451 +1,502 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Prumo — Hábitos, Rotina, Leituras e Pets Vintage</title>
-<meta name="description" content="Prumo é seu companheiro diário para rotinas saudáveis, foco, leituras e cuidados com pets interativos no estilo de animação clássica dos anos 1930." />
-<meta name="keywords" content="rotina, hábitos, leituras, estante virtual, produtividade, pets virtuais, foco, anos 1930, cuphead, tarefas diárias" />
-<meta name="author" content="Prumo" />
-<link rel="canonical" href="https://prumo-66d76.web.app/" />
-<meta property="og:title" content="Prumo — Hábitos, Rotina, Leituras e Pets Vintage" />
-<meta property="og:description" content="Acompanhe seus hábitos, estante de leituras e cuide de pets interativos em um universo aconchegante inspirado na animação clássica dos anos 1930." />
-<meta property="og:url" content="https://prumo-66d76.web.app/" />
-<meta property="og:type" content="website" />
-<meta property="og:image" content="https://prumo-66d76.web.app/icones/icone-512.png" />
-<meta property="og:site_name" content="Prumo" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Prumo — Hábitos, Rotina, Leituras e Pets Vintage" />
-<meta name="twitter:description" content="Acompanhe seus hábitos, estante de leituras e cuide de pets interativos em um universo aconchegante inspirado na animação clássica dos anos 1930." />
-<meta name="twitter:image" content="https://prumo-66d76.web.app/icones/icone-512.png" />
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Prumo",
-  "alternateName": "Prumo App",
-  "url": "https://prumo-66d76.web.app/",
-  "description": "Seu companheiro diário para rotinas saudáveis, foco, estante de leituras e pets interativos no estilo clássico dos anos 1930.",
-  "inLanguage": "pt-BR"
-}
-</script>
-<link rel="manifest" href="manifest.webmanifest" />
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#3F7FD9" />
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#151413" />
-<link rel="icon" type="image/x-icon" href="favicon.ico" />
-<link rel="icon" type="image/png" sizes="192x192" href="icones/icone-192.png" />
-<link rel="apple-touch-icon" href="icones/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="Prumo" />
-<meta name="format-detection" content="telephone=no" />
-<meta name="claude:viewport-fit-sides" content="cover" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap"
-/>
-<!-- fontes dos mundos: carregam sem travar a primeira pintura (o navegador só baixa as que a tela usa) -->
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Caveat:wght@600&family=Pirata+One&family=Metal+Mania&family=Rye&family=DM+Serif+Display&family=Anton&family=Bungee&family=Righteous&family=Bowlby+One&family=Fredoka:wght@700&family=Press+Start+2P&family=M+PLUS+Rounded+1c:wght@800&family=VT323&family=Cormorant+Garamond:wght@700&family=Oswald:wght@700&family=Lora:wght@700&family=Cinzel+Decorative:wght@700&family=Griffy&family=Bangers&display=swap"
-  media="print"
-  id="fontes-mundos"
-/>
-<noscript
-  ><link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Caveat:wght@600&family=Pirata+One&family=Metal+Mania&family=Rye&family=DM+Serif+Display&family=Anton&family=Bungee&family=Righteous&family=Bowlby+One&family=Fredoka:wght@700&family=Press+Start+2P&family=M+PLUS+Rounded+1c:wght@800&family=VT323&family=Cormorant+Garamond:wght@700&family=Oswald:wght@700&family=Lora:wght@700&family=Cinzel+Decorative:wght@700&family=Griffy&family=Bangers&display=swap"
-/></noscript>
-<!-- Estilos do app (cada arquivo cuida de uma parte) -->
-<link rel="stylesheet" href="estilos/base.css?v=6" />
-<link rel="stylesheet" href="estilos/mascote.css?v=7" />
-<link rel="stylesheet" href="estilos/recursos.css?v=27" />
-<link rel="stylesheet" href="estilos/animacoes.css?v=6" />
-<link rel="stylesheet" href="estilos/responsivo.css?v=8" />
-<link rel="stylesheet" href="estilos/melhorias-gerais.css?v=1" />
-<link rel="stylesheet" href="estilos/social-expansao.css?v=1" />
-<link rel="stylesheet" href="estilos/pets-expansao.css?v=1" />
-<link rel="stylesheet" href="estilos/estante-expansao.css?v=1" />
-<link rel="stylesheet" href="estilos/leitura-averiguacao.css" />
-<link rel="stylesheet" href="estilos/visual-supremo.css" />
-<link rel="stylesheet" href="estilos/pets-cinematica-aaa.css" />
-<link rel="stylesheet" href="estilos/pets-masterpiece-aaa.css" />
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Prumo — Hábitos, Rotina, Leituras e Pets Vintage</title>
+    <meta
+      name="description"
+      content="Prumo é seu companheiro diário para rotinas saudáveis, foco, leituras e cuidados com pets interativos no estilo de animação clássica dos anos 1930."
+    />
+    <meta
+      name="keywords"
+      content="rotina, hábitos, leituras, estante virtual, produtividade, pets virtuais, foco, anos 1930, cuphead, tarefas diárias"
+    />
+    <meta name="author" content="Prumo" />
+    <link rel="canonical" href="https://prumo-66d76.web.app/" />
+    <meta property="og:title" content="Prumo — Hábitos, Rotina, Leituras e Pets Vintage" />
+    <meta
+      property="og:description"
+      content="Acompanhe seus hábitos, estante de leituras e cuide de pets interativos em um universo aconchegante inspirado na animação clássica dos anos 1930."
+    />
+    <meta property="og:url" content="https://prumo-66d76.web.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://prumo-66d76.web.app/icones/icone-512.png" />
+    <meta property="og:site_name" content="Prumo" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Prumo — Hábitos, Rotina, Leituras e Pets Vintage" />
+    <meta
+      name="twitter:description"
+      content="Acompanhe seus hábitos, estante de leituras e cuide de pets interativos em um universo aconchegante inspirado na animação clássica dos anos 1930."
+    />
+    <meta name="twitter:image" content="https://prumo-66d76.web.app/icones/icone-512.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Prumo",
+        "alternateName": "Prumo App",
+        "url": "https://prumo-66d76.web.app/",
+        "description": "Seu companheiro diário para rotinas saudáveis, foco, estante de leituras e pets interativos no estilo clássico dos anos 1930.",
+        "inLanguage": "pt-BR"
+      }
+    </script>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#3F7FD9" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#151413" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icones/icone-192.png" />
+    <link rel="apple-touch-icon" href="icones/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Prumo" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="claude:viewport-fit-sides" content="cover" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap"
+    />
+    <!-- fontes dos mundos: carregam sem travar a primeira pintura (o navegador só baixa as que a tela usa) -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Caveat:wght@600&family=Pirata+One&family=Metal+Mania&family=Rye&family=DM+Serif+Display&family=Anton&family=Bungee&family=Righteous&family=Bowlby+One&family=Fredoka:wght@700&family=Press+Start+2P&family=M+PLUS+Rounded+1c:wght@800&family=VT323&family=Cormorant+Garamond:wght@700&family=Oswald:wght@700&family=Lora:wght@700&family=Cinzel+Decorative:wght@700&family=Griffy&family=Bangers&display=swap"
+      media="print"
+      id="fontes-mundos"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Caveat:wght@600&family=Pirata+One&family=Metal+Mania&family=Rye&family=DM+Serif+Display&family=Anton&family=Bungee&family=Righteous&family=Bowlby+One&family=Fredoka:wght@700&family=Press+Start+2P&family=M+PLUS+Rounded+1c:wght@800&family=VT323&family=Cormorant+Garamond:wght@700&family=Oswald:wght@700&family=Lora:wght@700&family=Cinzel+Decorative:wght@700&family=Griffy&family=Bangers&display=swap"
+    /></noscript>
+    <!-- Estilos do app (cada arquivo cuida de uma parte) -->
+    <link rel="stylesheet" href="estilos/base.css?v=6" />
+    <link rel="stylesheet" href="estilos/mascote.css?v=7" />
+    <link rel="stylesheet" href="estilos/recursos.css?v=27" />
+    <link rel="stylesheet" href="estilos/animacoes.css?v=6" />
+    <link rel="stylesheet" href="estilos/responsivo.css?v=8" />
+    <link rel="stylesheet" href="estilos/melhorias-gerais.css?v=1" />
+    <link rel="stylesheet" href="estilos/social-expansao.css?v=1" />
+    <link rel="stylesheet" href="estilos/pets-expansao.css?v=1" />
+    <link rel="stylesheet" href="estilos/estante-expansao.css?v=1" />
+    <link rel="stylesheet" href="estilos/leitura-averiguacao.css" />
+    <link rel="stylesheet" href="estilos/visual-supremo.css" />
+    <link rel="stylesheet" href="estilos/pets-cinematica-aaa.css" />
+    <link rel="stylesheet" href="estilos/pets-masterpiece-aaa.css" />
     <link rel="stylesheet" href="estilos/pets-cuphead-shaders.css" />
-<link rel="stylesheet" href="estilos/melhorias-cognitivas.css" />
-<link rel="stylesheet" href="estilos/prumo-pro.css" />
-<link rel="stylesheet" href="estilos/valuation-metrics.css" />
-<link rel="stylesheet" href="estilos/diferenciais-saas.css" />
-<link rel="stylesheet" href="estilos/ia-prumo.css" />
-<link rel="stylesheet" href="estilos/estudos-avancados.css" />
+    <link rel="stylesheet" href="estilos/melhorias-cognitivas.css" />
+    <link rel="stylesheet" href="estilos/prumo-pro.css" />
+    <link rel="stylesheet" href="estilos/valuation-metrics.css" />
+    <link rel="stylesheet" href="estilos/diferenciais-saas.css" />
+    <link rel="stylesheet" href="estilos/ia-prumo.css" />
+    <link rel="stylesheet" href="estilos/estudos-avancados.css" />
+    <link rel="stylesheet" href="estilos/ia-edital.css" />
     <link rel="stylesheet" href="estilos/cenario-upgrade-visual.css" />
-<!-- Decoração própria de cada mundo -->
-<link rel="stylesheet" href="estilos/mundos/emo.css?v=7" />
-<link rel="stylesheet" href="estilos/mundos/extras.css?v=2" />
-<link rel="stylesheet" href="estilos/mundos/skins.css?v=1" />
-<link rel="stylesheet" href="estilos/mundos/feiticeiro.css?v=1" />
-<link rel="stylesheet" href="estilos/mundos/bruxo.css?v=1" />
-<link rel="stylesheet" href="estilos/mundos/otaku.css?v=1" />
-<link rel="stylesheet" href="estilos/novidades.css?v=1" />
-<link rel="stylesheet" href="estilos/pets.css?v=1" />
-<link rel="stylesheet" href="estilos/mundos/rock.css?v=12" />
-<link rel="stylesheet" href="estilos/mundos/visual-expansao.css" />
-<link rel="stylesheet" href="estilos/mundos/referencias.css" />
-</head>
-<body>
-<noscript>
-  <div style="padding: 24px; font-family: system-ui, sans-serif; text-align: center; background: #fff8e7; color: #333;">
-    <h2>Prumo — Hábitos, Rotina, Leituras e Pets Vintage</h2>
-    <p>O Prumo é uma plataforma acolhedora para organizar rotinas diárias, manter o foco nos estudos, acompanhar sua estante de livros e cuidar de pets virtuais interativos inspirados na arte clássica dos anos 1930.</p>
-    <p>Para utilizar todas as interações e recursos interativos, por favor ative o JavaScript no seu navegador.</p>
-  </div>
-</noscript>
-<header class="sr-only">
-  <h1>Sua rotina diária, foco e leitura com pets animados estilo anos 30</h1>
-  <p>O Prumo é uma plataforma acolhedora e completa para organizar sua vida diária, cultivar hábitos saudáveis e acompanhar suas leituras em um ambiente artístico inspirado na animação clássica de 1930.</p>
-  <section>
-    <h2>Organização e Produtividade com Afeto</h2>
-    <p>Planeje seu dia com tarefas organizadas por áreas de vida, blocos de foco para estudos e trabalho, e acompanhamento rítmico de metas pessoais sem sobrecarga mental.</p>
-  </section>
-  <section>
-    <h2>Saúde e Hidratação Contínua</h2>
-    <p>Monitore sua ingestão diária de água copo a copo, registre hábitos importantes e acompanhe sequências saudáveis ao longo de toda a semana.</p>
-  </section>
-  <section>
-    <h2>Estante Virtual e Metas de Leitura</h2>
-    <p>Organize seus livros lidos, acompanhe o progresso de páginas decoradas, estabeleça desafios literários e compartilhe suas leituras com amigos.</p>
-  </section>
-  <section>
-    <h2>Mascotes e Bichinhos Virtuais Interativos</h2>
-    <p>Adote e cuide de pets virtuais com animação elástica e estética retrô de celulose desenhada à mão: Gatinho, Cachorrinho, Coelhinho, Hamster, Corujinha mística e Mini Dragão.</p>
-  </section>
-</header>
-<div class="wrap">
-  <header class="top">
-    <div class="brandrow">
-      <div class="brand">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-          <path d="M12 2v13" />
-          <path d="M8 15l4 7 4-7z" fill="currentColor" /></svg
-        >Prumo
-        <span class="badge-pro-vip" data-act="abrir-pro" title="Conhecer o Prumo PRO">⭐ PRO</span>
-        <button class="barra-som-asmr" id="btn-musica-topo" data-act="abrir-player-musica" title="Player de Música Lo-Fi & Foco">🎵 Música & Foco</button>
+    <!-- Decoração própria de cada mundo -->
+    <link rel="stylesheet" href="estilos/mundos/emo.css?v=7" />
+    <link rel="stylesheet" href="estilos/mundos/extras.css?v=2" />
+    <link rel="stylesheet" href="estilos/mundos/skins.css?v=1" />
+    <link rel="stylesheet" href="estilos/mundos/feiticeiro.css?v=1" />
+    <link rel="stylesheet" href="estilos/mundos/bruxo.css?v=1" />
+    <link rel="stylesheet" href="estilos/mundos/otaku.css?v=1" />
+    <link rel="stylesheet" href="estilos/novidades.css?v=1" />
+    <link rel="stylesheet" href="estilos/pets.css?v=1" />
+    <link rel="stylesheet" href="estilos/mundos/rock.css?v=12" />
+    <link rel="stylesheet" href="estilos/mundos/visual-expansao.css" />
+    <link rel="stylesheet" href="estilos/mundos/referencias.css" />
+  </head>
+  <body>
+    <noscript>
+      <div
+        style="
+          padding: 24px;
+          font-family: system-ui, sans-serif;
+          text-align: center;
+          background: #fff8e7;
+          color: #333;
+        "
+      >
+        <h2>Prumo — Hábitos, Rotina, Leituras e Pets Vintage</h2>
+        <p>
+          O Prumo é uma plataforma acolhedora para organizar rotinas diárias, manter o foco nos estudos,
+          acompanhar sua estante de livros e cuidar de pets virtuais interativos inspirados na arte clássica
+          dos anos 1930.
+        </p>
+        <p>
+          Para utilizar todas as interações e recursos interativos, por favor ative o JavaScript no seu
+          navegador.
+        </p>
       </div>
-      <div class="right">
-        <div class="sync" id="sync" data-tab="ajustes" role="button" tabindex="0">
-          <i></i><span>Carregando…</span>
+    </noscript>
+    <header class="sr-only">
+      <h1>Sua rotina diária, foco e leitura com pets animados estilo anos 30</h1>
+      <p>
+        O Prumo é uma plataforma acolhedora e completa para organizar sua vida diária, cultivar hábitos
+        saudáveis e acompanhar suas leituras em um ambiente artístico inspirado na animação clássica de 1930.
+      </p>
+      <section>
+        <h2>Organização e Produtividade com Afeto</h2>
+        <p>
+          Planeje seu dia com tarefas organizadas por áreas de vida, blocos de foco para estudos e trabalho, e
+          acompanhamento rítmico de metas pessoais sem sobrecarga mental.
+        </p>
+      </section>
+      <section>
+        <h2>Saúde e Hidratação Contínua</h2>
+        <p>
+          Monitore sua ingestão diária de água copo a copo, registre hábitos importantes e acompanhe
+          sequências saudáveis ao longo de toda a semana.
+        </p>
+      </section>
+      <section>
+        <h2>Estante Virtual e Metas de Leitura</h2>
+        <p>
+          Organize seus livros lidos, acompanhe o progresso de páginas decoradas, estabeleça desafios
+          literários e compartilhe suas leituras com amigos.
+        </p>
+      </section>
+      <section>
+        <h2>Mascotes e Bichinhos Virtuais Interativos</h2>
+        <p>
+          Adote e cuide de pets virtuais com animação elástica e estética retrô de celulose desenhada à mão:
+          Gatinho, Cachorrinho, Coelhinho, Hamster, Corujinha mística e Mini Dragão.
+        </p>
+      </section>
+    </header>
+    <div class="wrap">
+      <header class="top">
+        <div class="brandrow">
+          <div class="brand">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            >
+              <path d="M12 2v13" />
+              <path d="M8 15l4 7 4-7z" fill="currentColor" /></svg
+            >Prumo
+            <span class="badge-pro-vip" data-act="abrir-pro" title="Conhecer o Prumo PRO">⭐ PRO</span>
+          </div>
+          <div class="right">
+            <div class="sync" id="sync" data-tab="ajustes" role="button" tabindex="0">
+              <i></i><span>Carregando…</span>
+            </div>
+            <button class="icon topo-bt" id="busca-bt" aria-label="Buscar" title="Buscar (Ctrl+K)">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-4-4" />
+              </svg>
+            </button>
+            <button class="icon topo-bt" id="amigos-bt" data-tab="amigos" aria-label="Amigos" title="Amigos">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="9" cy="8" r="3.5" />
+                <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+                <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
+                <path d="M18.5 14.5A6.5 6.5 0 0 1 21.5 20" />
+              </svg>
+            </button>
+            <button
+              class="icon topo-bt"
+              id="sino"
+              data-tab="avisos"
+              aria-label="Avisos"
+              title="Avisos"
+              hidden
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                <path d="M10.3 21a1.9 1.9 0 0 0 3.4 0" /></svg
+              ><b id="sino-n" class="sino-n" hidden>0</b>
+            </button>
+            <button class="coins" id="coins" data-tab="prumi" aria-label="Gotas">
+              <svg class="drop" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2.5s-6.5 7.2-6.5 12a6.5 6.5 0 0 0 13 0c0-4.8-6.5-12-6.5-12z" /></svg
+              ><b id="coinsn">0</b>
+            </button>
+            <button class="icon" id="gear" data-tab="ajustes" aria-label="Ajustes" title="Ajustes">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
-        <button class="icon topo-bt" id="busca-bt" aria-label="Buscar" title="Buscar (Ctrl+K)">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-4-4" />
-          </svg>
-        </button>
-        <button
-          class="icon topo-bt"
-          id="amigos-bt"
-          data-tab="amigos"
-          aria-label="Amigos"
-          title="Amigos"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="9" cy="8" r="3.5" />
-            <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
-            <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
-            <path d="M18.5 14.5A6.5 6.5 0 0 1 21.5 20" />
-          </svg>
-        </button>
-        <button class="icon topo-bt" id="sino" data-tab="avisos" aria-label="Avisos" title="Avisos" hidden>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-            <path d="M10.3 21a1.9 1.9 0 0 0 3.4 0" /></svg
-          ><b id="sino-n" class="sino-n" hidden>0</b>
-        </button>
-        <button class="coins" id="coins" data-tab="prumi" aria-label="Gotas">
-          <svg class="drop" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2.5s-6.5 7.2-6.5 12a6.5 6.5 0 0 0 13 0c0-4.8-6.5-12-6.5-12z" /></svg
-          ><b id="coinsn">0</b>
-        </button>
-        <button class="icon" id="gear" data-tab="ajustes" aria-label="Ajustes" title="Ajustes">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="3" />
-            <path
-              d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"
-            />
-          </svg>
-        </button>
-      </div>
+        <nav class="tabs" id="tabs" aria-label="Seções">
+          <span class="ind noanim" id="ind" aria-hidden="true"></span>
+          <button data-tab="hoje">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 11l3 3 8-8" />
+              <path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9" /></svg
+            >Hoje
+          </button>
+          <button data-tab="estudos">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M2 5h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z" />
+              <path d="M22 5h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z" /></svg
+            >Estudos
+          </button>
+          <button data-tab="dieta">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 2.5s-6 6.6-6 11a6 6 0 0 0 12 0c0-4.4-6-11-6-11z" /></svg
+            >Água
+          </button>
+          <button data-tab="social">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="8" r="3.5" />
+              <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+              <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
+              <path d="M18.5 14.5A6.5 6.5 0 0 1 21.5 20" /></svg
+            >Social
+          </button>
+          <button data-tab="estante">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 21h18" />
+              <rect x="4" y="5" width="4" height="16" rx="1" />
+              <rect x="9" y="3" width="4" height="18" rx="1" />
+              <path d="M15.5 7.5l3.8-1 3.2 13.6-3.8 1z" /></svg
+            >Estante
+          </button>
+          <button data-tab="prumi">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 1v4" />
+              <path
+                d="M12 5c4.4 0 6.5 3 6.5 6 0 3.5-3 6.5-6.5 11.5C8.5 17.5 5.5 14.5 5.5 11c0-3 2.1-6 6.5-6z"
+              /></svg
+            >Prumi
+          </button>
+          <button data-tab="feedback">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z" />
+              <path d="M8.5 11h7M8.5 14.5h4" /></svg
+            >Feedback
+          </button>
+        </nav>
+      </header>
+      <main id="main" aria-live="polite"></main>
     </div>
-    <nav class="tabs" id="tabs" aria-label="Seções">
-      <span class="ind noanim" id="ind" aria-hidden="true"></span>
-      <button data-tab="hoje">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M9 11l3 3 8-8" />
-          <path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9" /></svg
-        >Hoje
-      </button>
-      <button data-tab="estudos">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M2 5h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z" />
-          <path d="M22 5h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z" /></svg
-        >Estudos
-      </button>
-      <button data-tab="dieta">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M12 2.5s-6 6.6-6 11a6 6 0 0 0 12 0c0-4.4-6-11-6-11z" /></svg
-        >Água
-      </button>
-      <button data-tab="social">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="9" cy="8" r="3.5" />
-          <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
-          <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
-          <path d="M18.5 14.5A6.5 6.5 0 0 1 21.5 20" /></svg
-        >Social
-      </button>
-      <button data-tab="estante">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M3 21h18" />
-          <rect x="4" y="5" width="4" height="16" rx="1" />
-          <rect x="9" y="3" width="4" height="18" rx="1" />
-          <path d="M15.5 7.5l3.8-1 3.2 13.6-3.8 1z" /></svg
-        >Estante
-      </button>
-      <button data-tab="prumi">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M12 1v4" />
-          <path
-            d="M12 5c4.4 0 6.5 3 6.5 6 0 3.5-3 6.5-6.5 11.5C8.5 17.5 5.5 14.5 5.5 11c0-3 2.1-6 6.5-6z"
-          /></svg
-        >Prumi
-      </button>
-      <button data-tab="feedback">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z" />
-          <path d="M8.5 11h7M8.5 14.5h4" /></svg
-        >Feedback
-      </button>
-    </nav>
-  </header>
-  <main id="main" aria-live="polite"></main>
-</div>
-<div id="toast" class="toast" hidden></div>
-<input type="file" id="importfile" accept=".json,application/json" hidden />
-<canvas id="fxc" aria-hidden="true"></canvas>
-<div id="onb" class="onb" hidden role="dialog" aria-label="Boas-vindas"></div>
+    <div id="toast" class="toast" hidden></div>
+    <input type="file" id="importfile" accept=".json,application/json" hidden />
+    <canvas id="fxc" aria-hidden="true"></canvas>
+    <div id="onb" class="onb" hidden role="dialog" aria-label="Boas-vindas"></div>
 
-<!-- Scripts do app. A ordem importa: cada arquivo usa coisas dos anteriores. -->
-<script src="js/i18n.js"></script>
-<script src="js/whitelabel.js"></script>
-<script src="js/util.js?v=7"></script>
-<script src="js/relato-erros.js?v=1"></script>
-<script src="js/firebase-config.js?v=11"></script>
-<script src="js/captura-rapida.js"></script>
-<script src="js/estado.js?v=27"></script>
-<script src="js/calculos.js"></script>
-<script src="js/componentes.js?v=12"></script>
-<script src="js/mascote/desenho.js?v=8"></script>
-<script src="js/mascote/roupas-base.js"></script>
-<script src="js/mascote/falas.js?v=4"></script>
-<script src="js/personalidades.js"></script>
-<script src="js/temas.js?v=6"></script>
-<script src="js/mundos/emo.js?v=7"></script>
-<script src="js/mundos/emo-roupas.js?v=7"></script>
-<script src="js/mundos/emo-efeitos.js?v=9"></script>
-<script src="js/mundos/emo-extras.js?v=2"></script>
-<script src="js/mundos/rock.js?v=11"></script>
-<script src="js/mundos/rock-roupas.js?v=12"></script>
-<script src="js/mundos/rock-efeitos.js?v=12"></script>
-<script src="js/mundos/rock-extras.js?v=2"></script>
-<script src="js/mundos/sertanejo.js"></script>
-<script src="js/mundos/cleanboy.js"></script>
-<script src="js/mundos/rapper.js"></script>
-<script src="js/mundos/trapper.js"></script>
-<script src="js/mundos/pagodeiro.js"></script>
-<script src="js/mundos/funkeiro.js"></script>
-<script src="js/mundos/forrozeiro.js"></script>
-<script src="js/mundos/gamer.js"></script>
-<script src="js/mundos/otaku.js"></script>
-<script src="js/mundos/programador.js"></script>
-<script src="js/mundos/zen.js"></script>
-<script src="js/mundos/coach.js"></script>
-<script src="js/mundos/vovo.js"></script>
-<script src="js/mundos/feiticeiro.js?v=1"></script>
-<script src="js/mundos/bruxo.js?v=1"></script>
-<script src="js/eventos.js?v=6"></script>
-<script src="js/mundos/base-extras.js?v=1"></script>
-<script src="js/mundos/sertanejo-extras.js?v=1"></script>
-<script src="js/mundos/forrozeiro-extras.js?v=1"></script>
-<script src="js/mundos/pagodeiro-extras.js?v=1"></script>
-<script src="js/mundos/funkeiro-extras.js?v=1"></script>
-<script src="js/mundos/rapper-extras.js?v=1"></script>
-<script src="js/mundos/trapper-extras.js?v=1"></script>
-<script src="js/mundos/gamer-extras.js?v=1"></script>
-<script src="js/mundos/otaku-extras.js?v=1"></script>
-<script src="js/mundos/programador-extras.js?v=1"></script>
-<script src="js/mundos/zen-extras.js?v=1"></script>
-<script src="js/mundos/coach-extras.js?v=1"></script>
-<script src="js/mundos/vovo-extras.js?v=1"></script>
-<script src="js/mundos/cleanboy-extras.js?v=1"></script>
-<script src="js/mundos/feiticeiro-extras.js?v=1"></script>
-<script src="js/mundos/feiticeiro-mais.js?v=1"></script>
-<script src="js/mundos/bruxo-extras.js?v=1"></script>
-<script src="js/mundos/bruxo-mais.js?v=1"></script>
-<script src="js/mundos/otaku-mais.js?v=1"></script>
-<script src="js/mundos/mundos-mais.js?v=1"></script>
-<script src="js/mundos/visual-expansao.js"></script>
-<script src="js/mundos/referencias.js"></script>
-<script src="js/mascote/calcados-calcas.js"></script>
+    <!-- Scripts do app. A ordem importa: cada arquivo usa coisas dos anteriores. -->
+    <script src="js/i18n.js"></script>
+    <script src="js/whitelabel.js"></script>
+    <script src="js/util.js?v=7"></script>
+    <script src="js/relato-erros.js?v=1"></script>
+    <script src="js/firebase-config.js?v=11"></script>
+    <script src="js/captura-rapida.js"></script>
+    <script src="js/estado.js?v=27"></script>
+    <script src="js/calculos.js"></script>
+    <script src="js/componentes.js?v=12"></script>
+    <script src="js/mascote/desenho.js?v=8"></script>
+    <script src="js/mascote/roupas-base.js"></script>
+    <script src="js/mascote/falas.js?v=4"></script>
+    <script src="js/personalidades.js"></script>
+    <script src="js/temas.js?v=6"></script>
+    <script src="js/mundos/emo.js?v=7"></script>
+    <script src="js/mundos/emo-roupas.js?v=7"></script>
+    <script src="js/mundos/emo-efeitos.js?v=9"></script>
+    <script src="js/mundos/emo-extras.js?v=2"></script>
+    <script src="js/mundos/rock.js?v=11"></script>
+    <script src="js/mundos/rock-roupas.js?v=12"></script>
+    <script src="js/mundos/rock-efeitos.js?v=12"></script>
+    <script src="js/mundos/rock-extras.js?v=2"></script>
+    <script src="js/mundos/sertanejo.js"></script>
+    <script src="js/mundos/cleanboy.js"></script>
+    <script src="js/mundos/rapper.js"></script>
+    <script src="js/mundos/trapper.js"></script>
+    <script src="js/mundos/pagodeiro.js"></script>
+    <script src="js/mundos/funkeiro.js"></script>
+    <script src="js/mundos/forrozeiro.js"></script>
+    <script src="js/mundos/gamer.js"></script>
+    <script src="js/mundos/otaku.js"></script>
+    <script src="js/mundos/programador.js"></script>
+    <script src="js/mundos/zen.js"></script>
+    <script src="js/mundos/coach.js"></script>
+    <script src="js/mundos/vovo.js"></script>
+    <script src="js/mundos/feiticeiro.js?v=1"></script>
+    <script src="js/mundos/bruxo.js?v=1"></script>
+    <script src="js/eventos.js?v=6"></script>
+    <script src="js/mundos/base-extras.js?v=1"></script>
+    <script src="js/mundos/sertanejo-extras.js?v=1"></script>
+    <script src="js/mundos/forrozeiro-extras.js?v=1"></script>
+    <script src="js/mundos/pagodeiro-extras.js?v=1"></script>
+    <script src="js/mundos/funkeiro-extras.js?v=1"></script>
+    <script src="js/mundos/rapper-extras.js?v=1"></script>
+    <script src="js/mundos/trapper-extras.js?v=1"></script>
+    <script src="js/mundos/gamer-extras.js?v=1"></script>
+    <script src="js/mundos/otaku-extras.js?v=1"></script>
+    <script src="js/mundos/programador-extras.js?v=1"></script>
+    <script src="js/mundos/zen-extras.js?v=1"></script>
+    <script src="js/mundos/coach-extras.js?v=1"></script>
+    <script src="js/mundos/vovo-extras.js?v=1"></script>
+    <script src="js/mundos/cleanboy-extras.js?v=1"></script>
+    <script src="js/mundos/feiticeiro-extras.js?v=1"></script>
+    <script src="js/mundos/feiticeiro-mais.js?v=1"></script>
+    <script src="js/mundos/bruxo-extras.js?v=1"></script>
+    <script src="js/mundos/bruxo-mais.js?v=1"></script>
+    <script src="js/mundos/otaku-mais.js?v=1"></script>
+    <script src="js/mundos/mundos-mais.js?v=1"></script>
+    <script src="js/mundos/visual-expansao.js"></script>
+    <script src="js/mundos/referencias.js"></script>
+    <script src="js/mascote/calcados-calcas.js"></script>
     <script src="js/mundos/indice.js"></script>
-<script src="js/conquistas.js?v=11"></script>
-<script src="js/leitura.js?v=7"></script>
-<script src="js/leitura-averiguacao.js"></script>
-<script src="js/visual-supremo.js"></script>
-<script src="js/pets-cinematica-aaa.js"></script>
-<script src="js/pets-masterpiece-aaa.js"></script>
+    <script src="js/conquistas.js?v=11"></script>
+    <script src="js/leitura.js?v=7"></script>
+    <script src="js/leitura-averiguacao.js"></script>
+    <script src="js/visual-supremo.js"></script>
+    <script src="js/pets-cinematica-aaa.js"></script>
+    <script src="js/pets-masterpiece-aaa.js"></script>
     <script src="js/pets-cuphead-shaders.js"></script>
-<script src="js/melhorias-cognitivas.js"></script>
-<script src="js/audio-paisagens.js"></script>
-<script src="js/musica-prumo.js"></script>
-<script src="js/estante-enfeites.js?v=13"></script>
-<script src="js/capas.js?v=10"></script>
-<script src="js/quarto.js?v=14"></script>
-<script src="js/quarto-mundos.js?v=1"></script>
-<script src="js/casa.js?v=1"></script>
-<script src="js/agenda.js"></script>
-<script src="js/efeitos.js?v=12"></script>
-<script src="js/sons.js?v=12"></script>
-<script src="js/notificacoes.js?v=2"></script>
-<script src="js/humor.js"></script>
-<script src="js/parceria.js?v=11"></script>
-<script src="js/internet2000.js?v=10"></script>
-<script src="js/conta.js?v=11"></script>
-<script src="js/amigos.js?v=20"></script>
-<script src="js/quarto-extras.js?v=1"></script>
+    <script src="js/melhorias-cognitivas.js"></script>
+    <script src="js/audio-paisagens.js"></script>
+    <script src="js/estante-enfeites.js?v=13"></script>
+    <script src="js/capas.js?v=10"></script>
+    <script src="js/quarto.js?v=14"></script>
+    <script src="js/quarto-mundos.js?v=1"></script>
+    <script src="js/casa.js?v=1"></script>
+    <script src="js/agenda.js"></script>
+    <script src="js/efeitos.js?v=12"></script>
+    <script src="js/sons.js?v=12"></script>
+    <script src="js/notificacoes.js?v=2"></script>
+    <script src="js/humor.js"></script>
+    <script src="js/parceria.js?v=11"></script>
+    <script src="js/internet2000.js?v=10"></script>
+    <script src="js/conta.js?v=11"></script>
+    <script src="js/amigos.js?v=20"></script>
+    <script src="js/quarto-extras.js?v=1"></script>
     <script src="js/cenario-upgrade-visual.js"></script>
-<script src="js/pets.js?v=1"></script>
-<script src="js/pets-passeio.js?v=1"></script>
-<script src="js/pets-evolucao.js?v=1"></script>
-<script src="js/pets-interacao.js?v=1"></script>
-<script src="js/pwa.js?v=10"></script>
-<script src="js/lembretes.js?v=1"></script>
-<script src="js/diferenciais-saas.js"></script>
-<script src="js/mini-ia.js"></script>
-<script src="js/ia-prumo.js"></script>
-<script src="js/estudos-avancados.js"></script>
-<script src="js/telas/hoje.js?v=16"></script>
-<script src="js/telas/estudos.js?v=12"></script>
-<script src="js/telas/agua-dieta.js"></script>
-<script src="js/telas/habitos-social.js?v=10"></script>
-<script src="js/telas/perfil.js?v=10"></script>
-<script src="js/telas/estante.js?v=18"></script>
-<script src="js/leitura-dia.js?v=3"></script>
-<script src="js/leitura-metas.js?v=2"></script>
-<script src="js/resumo-semana.js?v=1"></script>
-<script src="js/telas/amigos.js?v=16"></script>
-<script src="js/telas/prumi.js?v=7"></script>
-<script src="js/telas/ajustes.js?v=16"></script>
-<script src="js/telas/feedback.js?v=2"></script>
-<script src="js/telas/entrar.js?v=2"></script>
-<script src="js/telas/boas-vindas.js?v=7"></script>
-<script src="js/render.js?v=10"></script>
-<script src="js/acoes.js?v=14"></script>
-<script src="js/leitura-estudo.js?v=2"></script>
-<script src="js/leitura-amigos.js?v=1"></script>
-<script src="js/tempo.js?v=6"></script>
-<script src="js/exemplos.js"></script>
-<script src="js/inicio.js?v=10"></script>
-<script src="js/mudanca.js?v=1"></script>
-<script src="js/versoes.js?v=1"></script>
-<script src="js/organizar.js?v=1"></script>
-<script src="js/habitos-mais.js?v=1"></script>
-<script src="js/app-mais.js?v=1"></script>
-<script src="js/social-mais.js?v=1"></script>
-<script src="js/atalhos.js?v=1"></script>
-<script src="js/melhorias-gerais.js?v=1"></script>
-<script src="js/social-expansao.js?v=1"></script>
-<script src="js/pets-expansao.js?v=1"></script>
-<script src="js/estante-expansao.js?v=1"></script>
-<script src="js/prumo-pro.js"></script>
-<script src="js/valuation-metrics.js"></script>
-</body>
+    <script src="js/pets.js?v=1"></script>
+    <script src="js/pets-passeio.js?v=1"></script>
+    <script src="js/pets-evolucao.js?v=1"></script>
+    <script src="js/pets-interacao.js?v=1"></script>
+    <script src="js/pwa.js?v=10"></script>
+    <script src="js/lembretes.js?v=1"></script>
+    <script src="js/diferenciais-saas.js"></script>
+    <script src="js/mini-ia.js"></script>
+    <script src="js/ia-prumo.js"></script>
+    <script src="js/estudos-avancados.js"></script>
+    <script src="js/markdown-ia.js"></script>
+    <script src="js/ia-servidor.js"></script>
+    <script src="js/edital.js"></script>
+    <script src="js/telas/hoje.js?v=16"></script>
+    <script src="js/telas/estudos.js?v=12"></script>
+    <script src="js/telas/agua-dieta.js"></script>
+    <script src="js/telas/habitos-social.js?v=10"></script>
+    <script src="js/telas/perfil.js?v=10"></script>
+    <script src="js/telas/estante.js?v=18"></script>
+    <script src="js/leitura-dia.js?v=3"></script>
+    <script src="js/leitura-metas.js?v=2"></script>
+    <script src="js/resumo-semana.js?v=1"></script>
+    <script src="js/telas/amigos.js?v=16"></script>
+    <script src="js/telas/prumi.js?v=7"></script>
+    <script src="js/telas/ajustes.js?v=16"></script>
+    <script src="js/telas/feedback.js?v=2"></script>
+    <script src="js/telas/entrar.js?v=2"></script>
+    <script src="js/telas/boas-vindas.js?v=7"></script>
+    <script src="js/render.js?v=10"></script>
+    <script src="js/acoes.js?v=14"></script>
+    <script src="js/leitura-estudo.js?v=2"></script>
+    <script src="js/leitura-amigos.js?v=1"></script>
+    <script src="js/tempo.js?v=6"></script>
+    <script src="js/exemplos.js"></script>
+    <script src="js/inicio.js?v=10"></script>
+    <script src="js/mudanca.js?v=1"></script>
+    <script src="js/versoes.js?v=1"></script>
+    <script src="js/organizar.js?v=1"></script>
+    <script src="js/habitos-mais.js?v=1"></script>
+    <script src="js/app-mais.js?v=1"></script>
+    <script src="js/social-mais.js?v=1"></script>
+    <script src="js/atalhos.js?v=1"></script>
+    <script src="js/melhorias-gerais.js?v=1"></script>
+    <script src="js/social-expansao.js?v=1"></script>
+    <script src="js/pets-expansao.js?v=1"></script>
+    <script src="js/estante-expansao.js?v=1"></script>
+    <script src="js/prumo-pro.js"></script>
+    <script src="js/valuation-metrics.js"></script>
+  </body>
 </html>

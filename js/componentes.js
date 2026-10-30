@@ -7,9 +7,10 @@
 let tarefasSelecionadas = new Set();
 
 function taskRow(x, { showDate = false } = {}) {
-  const isSelected = typeof tarefasSelecionadas !== "undefined" && tarefasSelecionadas && tarefasSelecionadas.has(x.id);
+  const isSelected =
+    typeof tarefasSelecionadas !== "undefined" && tarefasSelecionadas && tarefasSelecionadas.has(x.id);
   const open = openTask === x.id,
-    subDone = x.sub.filter(s => s.done).length;
+    subDone = (Array.isArray(x.sub) ? x.sub : []).filter(s => s.done).length;
   const meta = [];
   if (showDate) meta.push(`<span class="due soon" style="padding:1px 6px">${esc(relDay(x.date))}</span>`);
   if (x.time) meta.push(`<span class="mono">${esc(x.time)}</span>`);

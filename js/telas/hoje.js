@@ -95,6 +95,7 @@ function viewHoje() {
           : ""
     }
     ${isToday && typeof isDiaDeRespiro === "function" && isDiaDeRespiro(t) ? renderBannerRespiroHTML(t) : ""}
+    ${isToday && typeof cartaoEditalHojeHTML === "function" ? cartaoEditalHojeHTML() : ""}
     ${isToday && pedidos.length && !parceriaAtiva() ? `<button class="card pedido" data-tab="social"><span><b>${esc(pedidos[0].nome || "Alguém")}</b> quer juntar o Prumi com o seu. Toque para ver.</span></button>` : ""}
     ${isToday ? `<div class="stats"><span>${textoMundo("tarefas", "Tarefas")} <b>${done}/${tasks.length}</b></span><span>Água <b>${fmtML(waterToday())}</b> de ${fmtML(S.waterGoal)}</span>${habitsToday.length ? `<span>Hábitos <b>${habitsToday.filter(h => habitDone(h, t)).length}/${habitsToday.length}</b></span>` : ""}${S.sessions.some(s => s.date === t) ? `<span>Estudo <b>${fmtMin(S.sessions.filter(s => s.date === t).reduce((a, b) => a + b.min, 0))}</b></span>` : ""}</div>` : tasks.length ? `<div class="stats"><span>${textoMundo("tarefas", "Tarefas")} <b>${done}/${tasks.length}</b></span></div>` : ""}
     ${tasks.length ? `<div class="progress"><span data-to="${Math.round((done / tasks.length) * 100)}" style="width:${fx.enter ? 0 : lastProg}%"></span></div>` : ""}
@@ -171,7 +172,9 @@ function barraSelecaoTarefasHTML(tasks, dia) {
   if (!tasks || !tasks.length) return "";
   const feitas = tasks.filter(x => x.done).length;
   const pendentes = tasks.filter(x => !x.done).length;
-  const selCount = tasks.filter(x => typeof tarefasSelecionadas !== "undefined" && tarefasSelecionadas && tarefasSelecionadas.has(x.id)).length;
+  const selCount = tasks.filter(
+    x => typeof tarefasSelecionadas !== "undefined" && tarefasSelecionadas && tarefasSelecionadas.has(x.id)
+  ).length;
   const todasSel = tasks.length > 0 && selCount === tasks.length;
 
   if (selCount > 0) {
@@ -278,7 +281,11 @@ if (typeof ACOES_EXTRAS !== "undefined") {
     commit();
     toast(`${qtd} ${qtd === 1 ? "tarefa apagada" : "tarefas apagadas"}`, true, "worried");
     if (typeof react === "function") {
-      react("worried", `${qtd} ${qtd === 1 ? "tarefa foi apagada" : "tarefas foram apagadas"}. Se foi sem querer, dá pra desfazer ali embaixo.`, 2800);
+      react(
+        "worried",
+        `${qtd} ${qtd === 1 ? "tarefa foi apagada" : "tarefas foram apagadas"}. Se foi sem querer, dá pra desfazer ali embaixo.`,
+        2800
+      );
     }
   };
 }

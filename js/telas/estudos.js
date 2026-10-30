@@ -35,6 +35,7 @@ function viewEstudos() {
   <section class="block">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
       <h1 class="h1" style="margin:0;">Estudos<small>${total ? `${fmtMin(total)} nesta semana` : textoMundo("vazioEstudos", "Nenhum estudo registrado nesta semana")}${streak ? ` · ${streak} ${streak === 1 ? "dia seguido" : "dias seguidos"} estudando` : ""}</small></h1>
+      <button class="btn small" data-edital-act="abrir" style="display:inline-flex;align-items:center;gap:6px;font-weight:700;">📄 Importar edital</button>
       <button class="btn primary small" data-act="abrir-desdobrador-ia" style="display:inline-flex;align-items:center;gap:6px;font-weight:700;">🧠 Gerar Cronograma IA</button>
     </div>
   </section>
@@ -56,7 +57,7 @@ function viewEstudos() {
         ${busy ? `<button class="btn ghost" data-act="reset">Zerar</button>` : ""}
       </div>
       ${timer.acc > 0 && !timer.running && S.persona === "otaku" ? `<div class="intervalo-comercial-anime">📺 <b>Intervalo Comercial do Episódio</b>: hora de esticar os braços e fazer um alongamento ninja!</div>` : ""}
-      ${typeof renderVitrolaEstudoHTML === "function" ? renderVitrolaEstudoHTML() : (somDoMundo() ? `<div class="row">${botaoSom("chuva", textoMundo("somFocoNome", "Chuva durante o foco"))}</div>` : "")}
+      ${typeof renderVitrolaEstudoHTML === "function" ? renderVitrolaEstudoHTML() : somDoMundo() ? `<div class="row">${botaoSom("chuva", textoMundo("somFocoNome", "Chuva durante o foco"))}</div>` : ""}
       <span class="note">Quando o tempo acaba, toca um aviso e o relógio continua contando o tempo extra. Ao concluir, os minutos vão para a matéria.</span>
     </div>`
         : `<div class="empty">
