@@ -97,6 +97,7 @@
     <link rel="stylesheet" href="estilos/admin.css" />
     <link rel="stylesheet" href="estilos/exportacao.css" />
     <link rel="stylesheet" href="estilos/theme-dark-contrast.css" />
+    <link rel="stylesheet" href="estilos/desktop.css" />
     <!-- Decoração própria de cada mundo -->
     <link rel="stylesheet" href="estilos/mundos/emo.css?v=7" />
     <link rel="stylesheet" href="estilos/mundos/extras.css?v=2" />
@@ -240,6 +241,26 @@
               <svg class="drop" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 2.5s-6.5 7.2-6.5 12a6.5 6.5 0 0 0 13 0c0-4.8-6.5-12-6.5-12z" /></svg
               ><b id="coinsn">0</b>
+            </button>
+            <button
+              class="icon topo-bt"
+              id="layout-toggle-bt"
+              data-act="toggle-layout"
+              aria-label="Alternar Layout Computador/Celular"
+              title="Alternar entre modo Computador e Celular"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
             </button>
             <button class="icon" id="gear" data-tab="ajustes" aria-label="Ajustes" title="Ajustes">
               <svg
@@ -485,6 +506,7 @@
     <script src="js/motor-exportacao.js"></script>
     <script src="js/servicos-firebase.js"></script>
     <script src="js/telas/admin.js"></script>
+    <script src="js/layout-manager.js"></script>
     <script src="js/render.js?v=10"></script>
     <script src="js/acoes.js?v=14"></script>
     <script src="js/leitura-estudo.js?v=2"></script>

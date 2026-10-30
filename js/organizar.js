@@ -216,7 +216,7 @@ ACOES_EXTRAS["prova-estudar"] = (b, id) => {
   if (!S.subjects.length) {
     tab = "estudos";
     render();
-    return toast("Cadastre a matéria pra usar o foco");
+    return toast("Cadastre a disciplina para iniciar a sessão de foco.");
   }
   const p = typeof planoDoDia === "function" ? planoDoDia(e) : null;
   timer.subjectId =
@@ -231,7 +231,7 @@ ACOES_EXTRAS["prova-estudar"] = (b, id) => {
   tab = "estudos";
   render();
   window.scrollTo(0, 0);
-  toast(`Foco de ${timer.goal} min pra ${e.title}. Bora!`, false, "focus");
+  toast(`Foco de ${timer.goal} min iniciado para ${e.title}. Bom estudo!`, false, "focus");
 };
 
 /** Tudo que entra na aba Hoje (chamado por js/telas/hoje.js). */

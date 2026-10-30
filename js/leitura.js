@@ -289,7 +289,7 @@ async function lerCodigoDeBarras() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
   } catch (e) {
-    toast("Sem acesso à câmera. Dá pra digitar o ISBN.", false, "worried");
+    toast("Câmera indisponível. Você pode digitar o ISBN manualmente.", false, "worried");
     return;
   }
   const detector = new BarcodeDetector({ formats: ["ean_13"] });

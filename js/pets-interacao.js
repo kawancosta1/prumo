@@ -223,7 +223,7 @@ document.addEventListener("keydown", e => e.key === "Escape" && fecharMenuPet())
 /* 7. chamar pelo nome */
 function chamarPet(id) {
   const a = (id && passeio.agentes.get(id)) || agentePrincipal();
-  if (!a) return toast("Liga o passeio pelas páginas pra chamar o pet.");
+  if (!a) return toast("Ative o passeio pelas páginas para chamar o pet.");
   if (a.pose === "dormindo") acordar(a);
   a.ancora = null;
   a.preso = false;
@@ -249,7 +249,7 @@ document.addEventListener("keydown", e => {
 /* 8. vem comigo: segue o ponteiro por 15 segundos */
 function vemComigo(id) {
   const a = (id && passeio.agentes.get(id)) || agentePrincipal();
-  if (!a) return toast("Liga o passeio pelas páginas pra ele te seguir.");
+  if (!a) return toast("Ative o passeio pelas páginas para que ele te acompanhe.");
   if (a.pose === "dormindo") acordar(a);
   clearInterval(a.seguindo);
   a.ancora = null;
@@ -272,8 +272,9 @@ function vemComigo(id) {
 /* 9. jogar petisco no chão */
 function jogarPetisco(id) {
   const a = (id && passeio.agentes.get(id)) || agentePrincipal();
-  if (!a) return toast("Liga o passeio pelas páginas pra jogar petisco.");
-  if (S.coins < 1) return toast("Falta 1 gota pro petisco.", false, "worried");
+  if (!a) return toast("Ative o passeio pelas páginas para oferecer um petisco.");
+  if (S.coins < 1)
+    return toast("Saldo insuficiente: você precisa de 1 gota para o petisco.", false, "worried");
   earn(-1);
   const n = document.getElementById("coinsn");
   if (n) n.textContent = S.coins;

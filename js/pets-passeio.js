@@ -530,7 +530,7 @@ function passeioAbraco(id) {
 /* ---------- bolinha ---------- */
 function passeioBolinha(id) {
   const a = passeio.agentes.get(id);
-  if (!a) return toast("Liga o passeio pelas páginas pra brincar de bolinha.");
+  if (!a) return toast("Ative o passeio pelas páginas para brincar de bolinha.");
   const W = larguraTela(),
     chao = chaoPasseio();
   const bola = document.createElement("span");
@@ -693,7 +693,7 @@ function cicloPasseio() {
     andarAte(principal, larguraTela() / 2 - PET_TAM / 2, chaoPasseio(), () => {
       somDoPet(principal.pet);
       reagir(principal, "pulando", 1200);
-      toast(`${principal.pet.nome} tá pedindo pra você beber água!`, false, "drink");
+      toast(`${principal.pet.nome} lembrou você de beber água!`, false, "drink");
     });
     return;
   }

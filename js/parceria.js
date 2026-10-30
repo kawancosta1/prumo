@@ -238,7 +238,7 @@ function desfazerParceria() {
 function enviarMimo(tipo) {
   if (!parceriaAtiva()) return;
   if (Date.now() < mimoCooldown)
-    return toast("Calma, espera uns segundinhos pra mandar outro", false, "happy");
+    return toast("Aguarde alguns instantes para enviar outro mimo.", false, "happy");
   mimoCooldown = Date.now() + 15000;
   S.parceria.mimoEnviado = { para: S.parceria.id, tipo, em: Date.now() };
   persist();

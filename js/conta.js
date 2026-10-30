@@ -99,7 +99,7 @@ async function entrarComGoogle() {
     if (e && /popup-blocked|operation-not-supported/.test(e.code || ""))
       return auth.signInWithRedirect(provedor);
     if (e && e.code !== "auth/popup-closed-by-user")
-      toast("Não deu pra entrar agora. Tenta de novo?", false, "worried");
+      toast("Não foi possível autenticar agora. Tente novamente.", false, "worried");
   }
 }
 

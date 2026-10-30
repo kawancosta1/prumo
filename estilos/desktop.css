@@ -1,0 +1,189 @@
+/*
+  estilos/desktop.css - Otimização de Layout para Computadores, Monitores e Viewports Amplas.
+  Adapta a visualização para desktop widescreen (grid de múltiplas colunas, painéis laterais inteligentes)
+  mantendo compatibilidade 100% fluida com celular via display: contents.
+*/
+
+/* No celular (ou modo mobile forçado), os wrappers de coluna agem como invisíveis no DOM */
+.desktop-split-view,
+.desktop-sidebar-pane,
+.desktop-main-pane,
+.ajustes-grid-desktop {
+  display: contents;
+}
+
+/* ==========================================================================
+   MODO COMPUTADOR / DESKTOP (Widescreen >= 960px ou forçado via data-layout="desktop")
+   ========================================================================== */
+@media (min-width: 960px) {
+  :root:not([data-layout="mobile"]) {
+    --desktop-sidebar-width: 440px;
+  }
+
+  :root:not([data-layout="mobile"]) .wrap {
+    max-width: 1240px;
+    padding-inline: 36px;
+    margin: 0 auto;
+  }
+
+  :root:not([data-layout="mobile"]) header.top {
+    padding-block: 22px 14px;
+    border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+    margin-bottom: 24px;
+  }
+
+  :root:not([data-layout="mobile"]) .brandrow {
+    max-width: 1240px;
+    margin: 0 auto 12px;
+  }
+
+  /* Barra de abas no Desktop: espaçosa, centralizada e com ícones elegantes */
+  :root:not([data-layout="mobile"]) nav.tabs {
+    max-width: 860px;
+    margin: 12px auto 0;
+    padding: 6px;
+    gap: 6px;
+    border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  }
+
+  :root:not([data-layout="mobile"]) nav.tabs button {
+    flex-direction: row;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 13.5px;
+    border-radius: 8px;
+  }
+
+  :root:not([data-layout="mobile"]) nav.tabs button svg {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Grid Split View: Divisão inteligente de 2 colunas para Computador */
+  :root:not([data-layout="mobile"]) .desktop-split-view {
+    display: grid;
+    grid-template-columns: var(--desktop-sidebar-width) minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+    width: 100%;
+  }
+
+  /* Painel Lateral Sticky (Mascote, Água, Coach IA e Timer) */
+  :root:not([data-layout="mobile"]) .desktop-sidebar-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+  }
+
+  :root:not([data-layout="mobile"]) .desktop-sidebar-pane::-webkit-scrollbar {
+    width: 4px;
+  }
+  :root:not([data-layout="mobile"]) .desktop-sidebar-pane::-webkit-scrollbar-thumb {
+    background: var(--line, rgba(0, 0, 0, 0.2));
+    border-radius: 4px;
+  }
+
+  /* Painel Principal (Tarefas, Calendário, Edital, Gráficos) */
+  :root:not([data-layout="mobile"]) .desktop-main-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+  }
+
+  /* Ajustes no Card do Mascote no Desktop */
+  :root:not([data-layout="mobile"]) .hero-card,
+  :root:not([data-layout="mobile"]) .card-coach-ia {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    border-radius: 16px;
+  }
+  [data-theme="dark"] :root:not([data-layout="mobile"]) .hero-card,
+  [data-theme="dark"] :root:not([data-layout="mobile"]) .card-coach-ia {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Estante de Livros em Grid Widescreen (3 a 4 colunas) */
+  :root:not([data-layout="mobile"]) .estante-livros-grid,
+  :root:not([data-layout="mobile"]) .estante-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+  }
+
+  /* Tela de Ajustes em 2 Colunas */
+  :root:not([data-layout="mobile"]) .ajustes-grid-desktop {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* DataGrid de Administração aproveitando 100% da viewport */
+  :root:not([data-layout="mobile"]) .admin-wrap {
+    max-width: 100%;
+    padding-inline: 0;
+  }
+  :root:not([data-layout="mobile"]) .admin-datagrid {
+    font-size: 0.92rem;
+  }
+  :root:not([data-layout="mobile"]) .admin-datagrid th,
+  :root:not([data-layout="mobile"]) .admin-datagrid td {
+    padding: 14px 18px;
+  }
+}
+
+/* ==========================================================================
+   FORÇAR MODO DESKTOP MESMO EM JANELAS COMPACTAS (Se data-layout="desktop")
+   ========================================================================== */
+html[data-layout="desktop"] .wrap {
+  max-width: 1240px;
+  padding-inline: 24px;
+}
+html[data-layout="desktop"] .desktop-split-view {
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+  gap: 24px;
+}
+html[data-layout="desktop"] .desktop-sidebar-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+html[data-layout="desktop"] .desktop-main-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ==========================================================================
+   FORÇAR MODO CELULAR (Se data-layout="mobile")
+   ========================================================================== */
+html[data-layout="mobile"] .wrap {
+  max-width: 580px !important;
+  margin: 0 auto !important;
+}
+html[data-layout="mobile"] .desktop-split-view,
+html[data-layout="mobile"] .desktop-sidebar-pane,
+html[data-layout="mobile"] .desktop-main-pane,
+html[data-layout="mobile"] .ajustes-grid-desktop {
+  display: contents !important;
+}
+
+/* Botão indicador do modo na barra de topo */
+#layout-toggle-bt {
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+#layout-toggle-bt:hover {
+  transform: scale(1.08);
+}

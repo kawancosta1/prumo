@@ -4,114 +4,126 @@
 "use strict";
 
 function viewAjustes() {
+  const layoutAtual = typeof obterLayoutSalvo === "function" ? obterLayoutSalvo() : "auto";
   return `
   <section class="block"><h1 class="h1">Ajustes<small>Metas, horários e seus dados</small></h1></section>
-  <section class="block">
-    <h2 class="h2">Você</h2>
-    <div class="setbox">
-      ${contaHTML()}
-      <div class="setrow"><div class="lbl"><b>Privacidade</b><span class="note">${S.consentimento ? `Você aceitou a política em ${fmtShort(ymd(new Date(S.consentimento.em)))}.` : "Como o Prumo guarda e usa seus dados."}</span></div><a class="btn small ghost" href="privacidade.html" target="_blank" rel="noopener">Ler a política</a></div>
-      <div class="setrow"><div class="lbl"><b>Feedback</b><span class="note">Mande ideias, problemas ou elogios para a gente.</span></div><button class="btn small ghost" data-tab="feedback">Escrever</button></div>
-      <div class="setrow"><div class="lbl"><b>Aparência</b><span class="note">Automático segue o tema do aparelho.</span></div><div class="seg" role="group">${[
-        ["auto", "Auto"],
-        ["light", "Claro"],
-        ["dark", "Escuro"]
-      ]
-        .map(([k, l]) => `<button data-act="mode" data-m="${k}" aria-pressed="${S.mode === k}">${l}</button>`)
-        .join("")}</div></div>
-      <div class="setrow"><div class="lbl"><b>Agenda dos lembretes</b><span class="note">Google abre o evento num toque. Samsung e Apple baixam um arquivo com alarme.</span></div><select id="set-cal" data-change="set-cal">${Object.entries(
-        CALS
-      )
-        .map(([k, v]) => `<option value="${k}" ${S.calendar === k ? "selected" : ""}>${v}</option>`)
-        .join("")}</select></div>
-      <div class="setrow"><div class="lbl"><b>Rever boas-vindas</b><span class="note">Abre de novo a apresentação do Prumi.</span></div><button class="btn small" data-act="reonb">Abrir</button></div>
-      <div class="setrow"><div class="lbl"><b>Como o Prumi te chama</b><span class="note">Aparece nas mensagens do mascote.</span></div><input id="set-name" type="text" value="${esc(S.name)}" data-change="set-name" maxlength="30" style="width:160px" autocomplete="off"></div>
-      <div class="setrow"><div class="lbl"><b>Tratamento</b><span class="note">Como o Prumi se refere a você nas falas.</span></div><div class="seg" role="group"><button data-act="gender" data-g="m" aria-pressed="${(S.gender || "m") === "m"}">Ele/Dele</button><button data-act="gender" data-g="f" aria-pressed="${S.gender === "f"}">Ela/Dela</button><button data-act="gender" data-g="n" aria-pressed="${S.gender === "n"}">Neutro</button></div></div>
-      <div class="setrow"><div class="lbl"><b>Idioma / Language</b><span class="note">Interface em Português ou Inglês (Global).</span></div><div class="seg" role="group"><button data-act="idioma" data-l="pt" aria-pressed="${(S.idioma || "pt") === "pt"}">🇧🇷 Português</button><button data-act="idioma" data-l="en" aria-pressed="${S.idioma === "en"}">🇺🇸 English</button></div></div>
-    </div>
-  </section>
-  <section class="block">
-    <h2 class="h2">Prumo PRO ⭐ & Assinatura</h2>
-    <div class="setbox">
-      <div class="setrow">
-        <div class="lbl">
-          <b>Plano & Licença</b>
-          <span class="note">${typeof obterStatusPrumoPro === "function" && obterStatusPrumoPro().ativo ? `Licença Ativa: Plano ${esc(obterStatusPrumoPro().plano.toUpperCase())}` : "Modo Gratuito (Tarefas e Água essenciais)"}</span>
+  <div class="ajustes-grid-desktop">
+    <div>
+      <section class="block">
+        <h2 class="h2">Você</h2>
+        <div class="setbox">
+          ${contaHTML()}
+          <div class="setrow"><div class="lbl"><b>Privacidade</b><span class="note">${S.consentimento ? `Você aceitou a política em ${fmtShort(ymd(new Date(S.consentimento.em)))}.` : "Como o Prumo guarda e usa seus dados."}</span></div><a class="btn small ghost" href="privacidade.html" target="_blank" rel="noopener">Ler a política</a></div>
+          <div class="setrow"><div class="lbl"><b>Feedback</b><span class="note">Mande ideias, problemas ou elogios para a gente.</span></div><button class="btn small ghost" data-tab="feedback">Escrever</button></div>
+          <div class="setrow"><div class="lbl"><b>Aparência</b><span class="note">Automático segue o tema do aparelho.</span></div><div class="seg" role="group">${[
+            ["auto", "Auto"],
+            ["light", "Claro"],
+            ["dark", "Escuro"]
+          ]
+            .map(
+              ([k, l]) => `<button data-act="mode" data-m="${k}" aria-pressed="${S.mode === k}">${l}</button>`
+            )
+            .join("")}</div></div>
+          <div class="setrow"><div class="lbl"><b>Layout da Tela</b><span class="note">Adaptação automática para a tela, ou force Computador (Widescreen) ou Celular.</span></div><div class="seg" role="group"><button data-act="set-layout" data-layout="auto" aria-pressed="${layoutAtual === "auto"}">Auto</button><button data-act="set-layout" data-layout="desktop" aria-pressed="${layoutAtual === "desktop"}">🖥️ PC</button><button data-act="set-layout" data-layout="mobile" aria-pressed="${layoutAtual === "mobile"}">📱 Celular</button></div></div>
+          <div class="setrow"><div class="lbl"><b>Agenda dos lembretes</b><span class="note">Google abre o evento num toque. Samsung e Apple baixam um arquivo com alarme.</span></div><select id="set-cal" data-change="set-cal">${Object.entries(
+            CALS
+          )
+            .map(([k, v]) => `<option value="${k}" ${S.calendar === k ? "selected" : ""}>${v}</option>`)
+            .join("")}</select></div>
+          <div class="setrow"><div class="lbl"><b>Rever boas-vindas</b><span class="note">Abre de novo a apresentação do Prumi.</span></div><button class="btn small" data-act="reonb">Abrir</button></div>
+          <div class="setrow"><div class="lbl"><b>Como o Prumi te chama</b><span class="note">Aparece nas mensagens do mascote.</span></div><input id="set-name" type="text" value="${esc(S.name)}" data-change="set-name" maxlength="30" style="width:160px" autocomplete="off"></div>
+          <div class="setrow"><div class="lbl"><b>Tratamento</b><span class="note">Como o Prumi se refere a você nas falas.</span></div><div class="seg" role="group"><button data-act="gender" data-g="m" aria-pressed="${(S.gender || "m") === "m"}">Ele/Dele</button><button data-act="gender" data-g="f" aria-pressed="${S.gender === "f"}">Ela/Dela</button><button data-act="gender" data-g="n" aria-pressed="${S.gender === "n"}">Neutro</button></div></div>
+          <div class="setrow"><div class="lbl"><b>Idioma / Language</b><span class="note">Interface em Português ou Inglês (Global).</span></div><div class="seg" role="group"><button data-act="idioma" data-l="pt" aria-pressed="${(S.idioma || "pt") === "pt"}">🇧🇷 Português</button><button data-act="idioma" data-l="en" aria-pressed="${S.idioma === "en"}">🇺🇸 English</button></div></div>
         </div>
-        <button class="btn small primary" data-act="abrir-pro">${typeof obterStatusPrumoPro === "function" && obterStatusPrumoPro().ativo ? "Gerenciar" : "Desbloquear PRO"}</button>
-      </div>
-      <div class="setrow">
-        <div class="lbl">
-          <b>Relatório Executivo Clínico (PDF)</b>
-          <span class="note">Gera parecer de rotina, sono e equilíbrio formatado para impressão A4.</span>
+      </section>
+      <section class="block">
+        <h2 class="h2">Prumo PRO ⭐ & Assinatura</h2>
+        <div class="setbox">
+          <div class="setrow">
+            <div class="lbl">
+              <b>Plano & Licença</b>
+              <span class="note">${typeof obterStatusPrumoPro === "function" && obterStatusPrumoPro().ativo ? `Licença Ativa: Plano ${esc(obterStatusPrumoPro().plano.toUpperCase())}` : "Modo Gratuito (Tarefas e Água essenciais)"}</span>
+            </div>
+            <button class="btn small primary" data-act="abrir-pro">${typeof obterStatusPrumoPro === "function" && obterStatusPrumoPro().ativo ? "Gerenciar" : "Desbloquear PRO"}</button>
+          </div>
+          <div class="setrow">
+            <div class="lbl">
+              <b>Relatório Executivo Clínico (PDF)</b>
+              <span class="note">Gera parecer de rotina, sono e equilíbrio formatado para impressão A4.</span>
+            </div>
+            <button class="btn small" data-act="imprimir-relatorio-executivo">Imprimir / Salvar PDF</button>
+          </div>
+          <div class="setrow">
+            <div class="lbl">
+              <b>Painel Administrativo (CRUD DataGrid)</b>
+              <span class="note">Gerenciamento de entidades, catálogo e sincronia em tempo real com Firestore.</span>
+            </div>
+            <button class="btn small" data-tab="admin">Abrir DataGrid</button>
+          </div>
         </div>
-        <button class="btn small" data-act="imprimir-relatorio-executivo">Imprimir / Salvar PDF</button>
-      </div>
-      <div class="setrow">
-        <div class="lbl">
-          <b>Painel Administrativo (CRUD DataGrid)</b>
-          <span class="note">Gerenciamento de entidades, catálogo e sincronia em tempo real com Firestore.</span>
+      </section>
+      <section class="block">
+        <h2 class="h2">Gestao e Valuation (M&A)</h2>
+        <div class="setbox">
+          <div class="setrow">
+            <div class="lbl">
+              <b>Metricas de Negocio & Valuation do App</b>
+              <span class="note">Painel executivo com valuation de R$ 30k+, margens operacionais e simulador de faturamento para proprietarios e investidores.</span>
+            </div>
+            <button class="btn small primary" data-act="abrir-valuation">Abrir Painel</button>
+          </div>
         </div>
-        <button class="btn small" data-tab="admin">Abrir DataGrid</button>
-      </div>
+      </section>
     </div>
-  </section>
-  ${typeof iaAjustesHTML === "function" ? iaAjustesHTML() : ""}
-  ${notificacoesAjustesHTML()}
-  ${
-    somDoMundo()
-      ? `<section class="block">
-    <h2 class="h2">${textoMundo("sonsTitulo", "Sons do clima")}</h2>
-    <div class="setbox">
-      <div class="setrow"><div class="lbl"><b>${textoMundo("somFocoNome", "Chuva no foco")}</b><span class="note">${textoMundo("somFocoDica", "Chuva ambiente enquanto o cronômetro roda.")}</span></div>${botaoSom("chuva", textoMundo("somFoco", "Chuva"))}</div>
-      <div class="setrow"><div class="lbl"><b>${textoMundo("somTarefaNome", "Virar página")}</b><span class="note">${textoMundo("somTarefaDica", "Toca ao concluir uma tarefa.")}</span></div>${botaoSom("pagina", textoMundo("somTarefa", "Página"))}</div>
-    </div>
-  </section>`
-      : ""
-  }
-  ${typeof efeitosMundoAjustesHTML === "function" ? efeitosMundoAjustesHTML() : ""}
-  <section class="block">
-    <h2 class="h2">Água</h2>
-    <div class="setbox">
-      <div class="setrow"><div class="lbl"><b>Meta diária</b><span class="note">Em mL. Você pode subir ou descer quando quiser.</span></div><input id="set-goal" type="number" min="500" max="8000" step="50" value="${S.waterGoal}" data-change="set-goal" style="width:110px"></div>
-      <div class="setrow"><div class="lbl"><b>Botões rápidos</b><span class="note">Os 4 volumes que aparecem para tocar (mL).</span></div><div class="row" style="gap:6px">${S.cups.map((c, i) => `<input id="set-cup${i}" type="number" min="10" max="3000" step="10" value="${c}" data-change="set-cup" data-i="${i}" style="width:76px" aria-label="Botão ${i + 1}">`).join("")}</div></div>
-      <div class="setrow"><div class="lbl"><b>Acordo às</b><span class="note">Usado no ritmo de água e nos lembretes.</span></div><input id="set-wake" type="time" value="${esc(S.wake)}" data-change="set-wake"></div>
-      <div class="setrow"><div class="lbl"><b>Durmo às</b></div><input id="set-sleep" type="time" value="${esc(S.sleep)}" data-change="set-sleep"></div>
-    </div>
-  </section>
-  <section class="block">
-    <h2 class="h2">Seus dados</h2>
-    <div class="setbox">
-      <div class="setrow"><div class="lbl"><b>Onde fica salvo</b><span class="note">${ref ? (typeof modoFirebase === "function" && modoFirebase() ? "Na sua conta do Prumo. Entrando nela no celular e no PC você vê tudo igual." : "Na sua conta Claude. Abrindo este mesmo link no celular e no PC você vê tudo igual.") : "Só neste aparelho. Entre numa conta (em Conta, aqui em Ajustes) para guardar na nuvem e ver em outros aparelhos."}</span></div></div>
-      <div class="setrow"><div class="lbl"><b>Espaço usado</b><span class="note">${Math.max(1, Math.round(tamanhoDados / 1000))} KB de ${LIMITE_DADOS / 1000} KB${usoDados() >= 0.75 ? ". Está quase cheio: faça um backup e apague livros, fichas ou fotos antigas." : "."}</span><div class="progress uso-dados ${usoDados() >= 0.75 ? "cheio" : ""}"><span style="width:${Math.max(1, Math.round(usoDados() * 100))}%"></span></div></div></div>
-      ${typeof pendenciasHTML === "function" ? pendenciasHTML() : ""}
-      ${relatoErrosAjustesHTML()}
-      <div class="setrow"><div class="lbl"><b>Fazer backup</b><span class="note">Baixa um arquivo .json com tudo.</span></div><button class="btn small" data-act="export">Baixar backup</button></div>
-      <div class="setrow"><div class="lbl"><b>Restaurar backup</b><span class="note">Substitui os dados atuais pelos do arquivo. Dá para desfazer logo depois.</span></div><button class="btn small" data-act="import">Escolher arquivo</button></div>
-      ${typeof versoesAjustesHTML === "function" ? versoesAjustesHTML() : ""}
-      <div class="setrow"><div class="lbl"><b>Apagar tudo</b><span class="note">Remove todas as tarefas, matérias, registros e listas.</span></div><button class="btn small danger" data-act="wipe">${wipeArmed ? "Toque de novo para confirmar" : "Apagar tudo"}</button></div>
-    </div>
-    <textarea id="exportbox" hidden readonly aria-label="Backup em texto"></textarea>
-  </section>
-  <section class="block">
-    <h2 class="h2">Gestao e Valuation (M&A)</h2>
-    <div class="setbox">
-      <div class="setrow">
-        <div class="lbl">
-          <b>Metricas de Negocio & Valuation do App</b>
-          <span class="note">Painel executivo com valuation de R$ 30k+, margens operacionais e simulador de faturamento para proprietarios e investidores.</span>
+
+    <div>
+      ${typeof iaAjustesHTML === "function" ? iaAjustesHTML() : ""}
+      ${notificacoesAjustesHTML()}
+      ${
+        somDoMundo()
+          ? `<section class="block">
+        <h2 class="h2">${textoMundo("sonsTitulo", "Sons do clima")}</h2>
+        <div class="setbox">
+          <div class="setrow"><div class="lbl"><b>${textoMundo("somFocoNome", "Chuva no foco")}</b><span class="note">${textoMundo("somFocoDica", "Chuva ambiente enquanto o cronômetro roda.")}</span></div>${botaoSom("chuva", textoMundo("somFoco", "Chuva"))}</div>
+          <div class="setrow"><div class="lbl"><b>${textoMundo("somTarefaNome", "Virar página")}</b><span class="note">${textoMundo("somTarefaDica", "Toca ao concluir uma tarefa.")}</span></div>${botaoSom("pagina", textoMundo("somTarefa", "Página"))}</div>
         </div>
-        <button class="btn small primary" data-act="abrir-valuation">Abrir Painel</button>
-      </div>
+      </section>`
+          : ""
+      }
+      ${typeof efeitosMundoAjustesHTML === "function" ? efeitosMundoAjustesHTML() : ""}
+      <section class="block">
+        <h2 class="h2">Água</h2>
+        <div class="setbox">
+          <div class="setrow"><div class="lbl"><b>Meta diária</b><span class="note">Em mL. Você pode subir ou descer quando quiser.</span></div><input id="set-goal" type="number" min="500" max="8000" step="50" value="${S.waterGoal}" data-change="set-goal" style="width:110px"></div>
+          <div class="setrow"><div class="lbl"><b>Botões rápidos</b><span class="note">Os 4 volumes que aparecem para tocar (mL).</span></div><div class="row" style="gap:6px">${S.cups.map((c, i) => `<input id="set-cup${i}" type="number" min="10" max="3000" step="10" value="${c}" data-change="set-cup" data-i="${i}" style="width:76px" aria-label="Botão ${i + 1}">`).join("")}</div></div>
+          <div class="setrow"><div class="lbl"><b>Acordo às</b><span class="note">Usado no ritmo de água e nos lembretes.</span></div><input id="set-wake" type="time" value="${esc(S.wake)}" data-change="set-wake"></div>
+          <div class="setrow"><div class="lbl"><b>Durmo às</b></div><input id="set-sleep" type="time" value="${esc(S.sleep)}" data-change="set-sleep"></div>
+        </div>
+      </section>
+      <section class="block">
+        <h2 class="h2">Seus dados</h2>
+        <div class="setbox">
+          <div class="setrow"><div class="lbl"><b>Onde fica salvo</b><span class="note">${ref ? (typeof modoFirebase === "function" && modoFirebase() ? "Na sua conta do Prumo. Entrando nela no celular e no PC você vê tudo igual." : "Na sua conta Claude. Abrindo este mesmo link no celular e no PC você vê tudo igual.") : "Só neste aparelho. Entre numa conta (em Conta, aqui em Ajustes) para guardar na nuvem e ver em outros aparelhos."}</span></div></div>
+          <div class="setrow"><div class="lbl"><b>Espaço usado</b><span class="note">${Math.max(1, Math.round(tamanhoDados / 1000))} KB de ${LIMITE_DADOS / 1000} KB${usoDados() >= 0.75 ? ". Está quase cheio: faça um backup e apague livros, fichas ou fotos antigas." : "."}</span><div class="progress uso-dados ${usoDados() >= 0.75 ? "cheio" : ""}"><span style="width:${Math.max(1, Math.round(usoDados() * 100))}%"></span></div></div></div>
+          ${typeof pendenciasHTML === "function" ? pendenciasHTML() : ""}
+          ${relatoErrosAjustesHTML()}
+          <div class="setrow"><div class="lbl"><b>Fazer backup</b><span class="note">Baixa um arquivo .json com tudo.</span></div><button class="btn small" data-act="export">Baixar backup</button></div>
+          <div class="setrow"><div class="lbl"><b>Restaurar backup</b><span class="note">Substitui os dados atuais pelos do arquivo. Dá para desfazer logo depois.</span></div><button class="btn small" data-act="import">Escolher arquivo</button></div>
+          ${typeof versoesAjustesHTML === "function" ? versoesAjustesHTML() : ""}
+          <div class="setrow"><div class="lbl"><b>Apagar tudo</b><span class="note">Remove todas as tarefas, matérias, registros e listas.</span></div><button class="btn small danger" data-act="wipe">${wipeArmed ? "Toque de novo para confirmar" : "Apagar tudo"}</button></div>
+        </div>
+        <textarea id="exportbox" hidden readonly aria-label="Backup em texto"></textarea>
+      </section>
+      <section class="block">
+        <h2 class="h2">Como usar a captura rápida</h2>
+        <div class="card" style="font-size:14px">
+          <span><b>Datas:</b> hoje, amanhã, depois de amanhã, segunda… domingo, 25/12, dia 15</span>
+          <span><b>Horário:</b> 19h, 19h30, 19:30, às 7h, meio-dia</span>
+          <span><b>Área:</b> #estudo, #dieta, #social, #geral</span>
+          <span><b>Prioridade:</b> !1 alta, !2 média, !3 baixa</span>
+          <span><b>Repetir:</b> todo dia, dias úteis, toda segunda, toda semana, todo mês</span>
+        </div>
+      </section>
     </div>
-  </section>
-    <h2 class="h2">Como usar a captura rápida</h2>
-    <div class="card" style="font-size:14px">
-      <span><b>Datas:</b> hoje, amanhã, depois de amanhã, segunda… domingo, 25/12, dia 15</span>
-      <span><b>Horário:</b> 19h, 19h30, 19:30, às 7h, meio-dia</span>
-      <span><b>Área:</b> #estudo, #dieta, #social, #geral</span>
-      <span><b>Prioridade:</b> !1 alta, !2 média, !3 baixa</span>
-      <span><b>Repetir:</b> todo dia, dias úteis, toda segunda, toda semana, todo mês</span>
-    </div>
-  </section>`;
+  </div>`;
 }

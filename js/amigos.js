@@ -171,7 +171,7 @@ async function adicionarAmigo(quem) {
         "worried"
       );
     }
-    toast("Não consegui mandar o pedido agora. Confere a internet e tenta de novo.", false, "worried");
+    toast("Não foi possível enviar a solicitação. Verifique a conexão e tente novamente.", false, "worried");
   }
 }
 async function aceitarAmigo(id) {
@@ -575,7 +575,7 @@ async function apagarConta() {
     alert("Conta apagada. Seus dados continuam só neste aparelho.");
     location.reload();
   } catch (e) {
-    toast("Não consegui apagar tudo agora. Tenta de novo daqui a pouco.", false, "worried");
+    toast("Não foi possível apagar os dados agora. Tente novamente em instantes.", false, "worried");
   }
 }
 

@@ -885,6 +885,13 @@ document.addEventListener("click", e => {
       applyTheme();
       commit();
       break;
+    case "set-layout":
+      if (typeof aplicarLayout === "function") {
+        aplicarLayout(b.dataset.layout);
+        commit();
+        render();
+      }
+      break;
     case "gender":
       S.gender = b.dataset.g;
       commit();

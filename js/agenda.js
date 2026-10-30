@@ -76,7 +76,7 @@ async function saveIcs(o) {
   } catch (e) {
     if (e && e.code === "declined") return;
   }
-  toast("Não deu pra baixar aqui. Use o Google Agenda em Ajustes.", false, "worried");
+  toast("Não foi possível transferir o arquivo. Configure o Google Agenda em Ajustes.", false, "worried");
 }
 
 function calLink(o, label) {
