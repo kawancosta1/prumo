@@ -55,6 +55,11 @@ const wavePath = a => `M-120 0Q-105 ${-a} -90 0T-60 0T-30 0T0 0T30 0T60 0T90 0T1
 const hostTheme = document.documentElement.getAttribute("data-theme");
 
 function isDark() {
+  try {
+    const pt = localStorage.getItem("prumo-theme");
+    if (pt === "dark") return true;
+    if (pt === "light") return false;
+  } catch (_) {}
   if (S.mode === "dark") return true;
   if (S.mode === "light") return false;
   if (hostTheme === "dark") return true;
@@ -141,6 +146,8 @@ function applyTheme(personaOverride, varOverride) {
   const r = document.documentElement,
     set = (n, val) => r.style.setProperty(n, val);
   r.setAttribute("data-theme", dark ? "dark" : "light");
+  r.classList.toggle("dark", dark);
+  if (document.body) document.body.classList.toggle("dark", dark);
   set("--bg", bg);
   set("--surface", surf);
   set("--ink", ink);

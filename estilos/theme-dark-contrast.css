@@ -1,0 +1,59 @@
+/* estilos/theme-dark-contrast.css - Variantes de alto contraste e assets no tema escuro (Module C) */
+html.dark,
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Contraste dos Mascotes em Modo Escuro */
+html.dark .prumi-svg,
+html.dark .mascote-svg,
+[data-theme="dark"] .prumi-svg,
+[data-theme="dark"] .mascote-svg {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+}
+
+html.dark .prumi-olhos,
+[data-theme="dark"] .prumi-olhos {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.4));
+}
+
+/* Carrossel e Cards com Contraste Aprimorado */
+html.dark .card,
+html.dark .setbox,
+html.dark .carousel-card,
+html.dark .vitrola-foco-card,
+[data-theme="dark"] .card,
+[data-theme="dark"] .setbox,
+[data-theme="dark"] .carousel-card,
+[data-theme="dark"] .vitrola-foco-card {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Indicadores de abas e botões de contraste */
+html.dark #ind,
+[data-theme="dark"] #ind {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Botão Flutuante / Switcher de Tema Rápido */
+.theme-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  background: var(--surface, #f1f5f9);
+  color: var(--ink, #0f172a);
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+html.dark .theme-switch-btn,
+[data-theme="dark"] .theme-switch-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f1f5f9;
+}
