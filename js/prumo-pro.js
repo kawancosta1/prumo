@@ -48,6 +48,13 @@ const PLANOS_PRO = {
   Aqui o app só lê. O estado S.pro só vale com origem "servidor", então editar o próprio
   salvamento ou chamar funções pelo console não libera o PRO.
 */
+/** Escapa texto de pessoa antes de entrar em HTML/SVG (nome vem do usuário ou de backup importado) */
+function escPro(v) {
+  return String(v ?? "").replace(
+    /[&<>"']/g,
+    c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]
+  );
+}
 const PAGAMENTO_API = "https://southamerica-east1-prumo-66d76.cloudfunctions.net";
 let licencaEscutandoUid = null;
 let licencaParar = null;
@@ -345,14 +352,14 @@ function gerarRelatorioExecutivoPDF(estado = null, periodo = "Outubro / 2026") {
         </div>
         <div style="text-align: right;">
           <strong style="font-size: 14px;">${dataHoje}</strong><br/>
-          <span style="font-size: 12px; color: #666;">Período: ${periodo}</span>
+          <span style="font-size: 12px; color: #666;">Período: ${escPro(periodo)}</span>
         </div>
       </div>
 
       <div class="relatorio-grid">
         <div class="relatorio-secao">
           <h3 style="margin-top: 0; font-size: 14px; text-transform: uppercase;">1. Identificação & Equilíbrio Geral</h3>
-          <p><strong>Titular:</strong> ${nome}</p>
+          <p><strong>Titular:</strong> ${escPro(nome)}</p>
           <p><strong>Índice de Equilíbrio Biopsicossocial:</strong> ${analise.scoreEquilibrio} / 100</p>
           <p><strong>Diagnóstico de Rotina:</strong> ${analise.diagnostico}</p>
           <p><strong>Classificação de Risco de Estafa:</strong> ${analise.riscoBurnout.toUpperCase()}</p>
@@ -815,7 +822,7 @@ function gerarCertificadoDisciplinaPro(estado = null, diasSequencia = 30) {
     <text x="400" y="90" font-family="'Instrument Sans', sans-serif" font-size="28" font-weight="800" fill="#1e293b" text-anchor="middle" letter-spacing="2">PRUMO PRODUCTIVITY OS</text>
     <text x="400" y="125" font-family="'Instrument Sans', sans-serif" font-size="14" font-weight="600" fill="#f59e0b" text-anchor="middle" letter-spacing="4">CERTIFICADO OFICIAL DE DISCIPLINA & ALTO DESEMPENHO</text>
     <text x="400" y="210" font-family="Georgia, serif" font-size="18" font-style="italic" fill="#64748b" text-anchor="middle">Certificamos com honra e distinção que</text>
-    <text x="400" y="270" font-family="'Instrument Sans', sans-serif" font-size="36" font-weight="800" fill="#0f172a" text-anchor="middle">${nome}</text>
+    <text x="400" y="270" font-family="'Instrument Sans', sans-serif" font-size="36" font-weight="800" fill="#0f172a" text-anchor="middle">${escPro(nome)}</text>
     <text x="400" y="325" font-family="Georgia, serif" font-size="16" fill="#334155" text-anchor="middle">concluiu com êxito a jornada contínua de <tspan font-weight="700" fill="#d97706">${dias} dias ininterruptos</tspan> de foco,</text>
     <text x="400" y="355" font-family="Georgia, serif" font-size="16" fill="#334155" text-anchor="middle">alcançando maestria no gerenciamento de rotina e consistência comportamental.</text>
     <circle cx="400" cy="445" r="40" fill="#f59e0b" stroke="#d97706" stroke-width="4"/>

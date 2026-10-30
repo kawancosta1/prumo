@@ -254,6 +254,36 @@ module.exports = async url => {
       })()
     `);
     ok(resHoje, "Hoje: coach bloqueado sem PRO e completo com PRO");
+
+    // 18. Nome com HTML não vira marcação no relatório nem no certificado
+    const resXss = ev(`
+      (() => {
+        const mau = '<img src=x onerror=alert(1)>"';
+        const r = gerarRelatorioExecutivoPDF({ name: mau }, '<b>periodo</b>');
+        const c = gerarCertificadoDisciplinaPro({ name: mau }, 30);
+        return !r.includes("<img") && !r.includes("<b>periodo") && r.includes("&lt;img") && !c.includes("<img") && c.includes("&lt;img");
+      })()
+    `);
+    ok(resXss, "nome e período são escapados no relatório e no certificado");
+
+    // 19. O tema escuro do app é html[data-theme=dark]; nenhum CSS pode depender de classe .dark (nunca é aplicada)
+    const fs = require("fs");
+    const path = require("path");
+    const css = [];
+    const varrer = d =>
+      fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+        const p = path.join(d, e.name);
+        if (e.isDirectory()) varrer(p);
+        else if (p.endsWith(".css")) css.push(p);
+      });
+    varrer(path.join(__dirname, "..", "estilos"));
+    const mortos = css
+      .filter(p => /body\.dark|(^|[\s,>])\.dark\s/m.test(fs.readFileSync(p, "utf8")))
+      .map(p => path.basename(p));
+    ok(
+      mortos.length === 0,
+      "CSS do tema escuro usa data-theme (arquivos com .dark morto: " + mortos.join(",") + ")"
+    );
   } finally {
     fechar();
   }

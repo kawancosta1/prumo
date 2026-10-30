@@ -46,13 +46,19 @@ body.alto-contraste {
   --card: #ffffff !important;
   --border: #000000 !important;
   --muted: #222222 !important;
+  --ink: #000000 !important;
+  --surface: #ffffff !important;
+  --line: #000000 !important;
 }
-body.dark.alto-contraste {
+:root[data-theme="dark"] body.alto-contraste {
   --text: #ffffff !important;
   --bg: #000000 !important;
   --card: #0c0c0c !important;
   --border: #ffffff !important;
   --muted: #dddddd !important;
+  --ink: #ffffff !important;
+  --surface: #0c0c0c !important;
+  --line: #ffffff !important;
 }
 
 /* Respeito estrito a sensibilidade vestibular (prefers-reduced-motion) */

@@ -14,8 +14,14 @@
   z-index: 9998;
 }
 @keyframes animHaloToque {
-  0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.9; }
-  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
 }
 
 /* Chuva de corações físicos */
@@ -27,14 +33,24 @@
   animation: quedaCoracaoParabolica 2.2s ease-in forwards;
 }
 @keyframes quedaCoracaoParabolica {
-  0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
-  15% { opacity: 1; }
-  100% { transform: translateY(100vh) rotate(45deg); opacity: 0; }
+  0% {
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(45deg);
+    opacity: 0;
+  }
 }
 
 /* Borda pulsante de sintonia mútua */
 .borda-sintonia-mutua {
-  box-shadow: inset 0 0 15px var(--accent, #4F6E4B), 0 0 10px var(--accent, #4F6E4B);
+  box-shadow:
+    inset 0 0 15px var(--accent, #4f6e4b),
+    0 0 10px var(--accent, #4f6e4b);
   transition: box-shadow 0.5s ease;
 }
 
@@ -43,26 +59,43 @@
   position: relative;
   padding: 16px;
   border-radius: 4px;
-  font-family: 'Instrument Sans', system-ui, sans-serif;
+  font-family: "Instrument Sans", system-ui, sans-serif;
   box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .postit-card-dupla:hover {
   transform: scale(1.03) rotate(0deg) !important;
   box-shadow: 4px 8px 18px rgba(0, 0, 0, 0.12);
   z-index: 10;
 }
-.postit-amarelo { background-color: #fff9c4; color: #5d4037; }
-.postit-lavanda { background-color: #ede7f6; color: #4527a0; }
-.postit-menta   { background-color: #e8f5e9; color: #1b5e20; }
-.postit-pessego { background-color: #fbe9e7; color: #bf360c; }
+.postit-amarelo {
+  background-color: #fff9c4;
+  color: #5d4037;
+}
+.postit-lavanda {
+  background-color: #ede7f6;
+  color: #4527a0;
+}
+.postit-menta {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+.postit-pessego {
+  background-color: #fbe9e7;
+  color: #bf360c;
+}
 
 /* Quadro de cortiça skeuomórfico */
 .mural-cortica-container {
   background-color: #d7ccc8;
-  background-image: radial-gradient(#bcaaa4 15%, transparent 16%), radial-gradient(#a1887f 15%, transparent 16%);
+  background-image:
+    radial-gradient(#bcaaa4 15%, transparent 16%), radial-gradient(#a1887f 15%, transparent 16%);
   background-size: 16px 16px;
-  background-position: 0 0, 8px 8px;
+  background-position:
+    0 0,
+    8px 8px;
   border: 8px solid #8d6e63;
   border-radius: 12px;
   padding: 20px;
@@ -79,7 +112,9 @@
   background: radial-gradient(circle at 35% 35%, #e53935, #b71c1c);
   color: #fff;
   font-weight: 700;
-  box-shadow: inset 1px 1px 2px rgba(255,255,255,0.4), 1px 3px 6px rgba(0,0,0,0.3);
+  box-shadow:
+    inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+    1px 3px 6px rgba(0, 0, 0, 0.3);
   font-size: 16px;
   border: 1px solid #c62828;
 }
@@ -99,11 +134,16 @@
   animation: canecasToucAnim 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 @keyframes canecasToucAnim {
-  0% { transform: scale(0.8) rotate(-15deg); }
-  50% { transform: scale(1.15) rotate(10deg); }
-  100% { transform: scale(1) rotate(0deg); }
+  0% {
+    transform: scale(0.8) rotate(-15deg);
+  }
+  50% {
+    transform: scale(1.15) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
 }
-
 
 /* ========================================================
    LOTES 51 A 100: MIMOS, PRIVACIDADE, RETROSPECTIVA,
@@ -127,8 +167,12 @@
   animation: balancoEnvelopeAnim 2s ease-in-out infinite alternate;
 }
 @keyframes balancoEnvelopeAnim {
-  0% { transform: translateY(0) rotate(-2deg); }
-  100% { transform: translateY(-6px) rotate(2deg); }
+  0% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  100% {
+    transform: translateY(-6px) rotate(2deg);
+  }
 }
 
 /* Blur de privacidade em janela desfocada */
@@ -158,7 +202,9 @@
   font-size: 22px;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.2s ease, transform 0.15s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
 }
 .celula-velha-afetiva:hover {
   background: var(--accent-soft, #e2e8f0);
@@ -182,7 +228,6 @@
   transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-
 /* ========================================================
    LOTES 101 A 200: CLUBES, CARTAS POSTAIS, VOZ,
    FEEDS, MURAL COLETIVO E CERTIFICADOS SOCIAIS
@@ -197,10 +242,20 @@
   animation: vooPomboAnim 3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 @keyframes vooPomboAnim {
-  0% { transform: translate(-50px, 100vh) scale(0.6) rotate(15deg); opacity: 0; }
-  20% { opacity: 1; }
-  70% { transform: translate(50vw, 30vh) scale(1.1) rotate(-5deg); }
-  100% { transform: translate(80vw, 15vh) scale(0.9) rotate(0deg); opacity: 0.9; }
+  0% {
+    transform: translate(-50px, 100vh) scale(0.6) rotate(15deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  70% {
+    transform: translate(50vw, 30vh) scale(1.1) rotate(-5deg);
+  }
+  100% {
+    transform: translate(80vw, 15vh) scale(0.9) rotate(0deg);
+    opacity: 0.9;
+  }
 }
 
 /* Papel de carta vintage envelhecido */
@@ -212,7 +267,7 @@
   border-radius: 6px;
   padding: 20px;
   box-shadow: 0 4px 14px rgba(93, 64, 55, 0.08);
-  font-family: 'Caveat', cursive, sans-serif;
+  font-family: "Caveat", cursive, sans-serif;
   font-size: 18px;
   line-height: 24px;
   color: #3e2723;
@@ -243,7 +298,7 @@
   border: 2px dotted #b0bec5;
   background: #fff;
   border-radius: 2px;
-  box-shadow: 1px 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Visualizador de onda sonora */
@@ -259,13 +314,17 @@
 }
 .barra-onda-som {
   width: 3px;
-  background: var(--accent, #4F6E4B);
+  background: var(--accent, #4f6e4b);
   border-radius: 2px;
   animation: pulsoOndaAnim 1s ease-in-out infinite alternate;
 }
 @keyframes pulsoOndaAnim {
-  0% { height: 6px; }
-  100% { height: 22px; }
+  0% {
+    height: 6px;
+  }
+  100% {
+    height: 22px;
+  }
 }
 
 /* Polaroid coletiva */
@@ -273,7 +332,7 @@
   background: #ffffff;
   padding: 12px 12px 24px 12px;
   border-radius: 4px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   transform: rotate(-1.5deg);
   text-align: center;
   border: 1px solid #e0e0e0;
@@ -290,7 +349,7 @@
 }
 .polaroid-coletiva-legenda {
   margin-top: 10px;
-  font-family: 'Caveat', cursive, sans-serif;
+  font-family: "Caveat", cursive, sans-serif;
   font-size: 16px;
   color: #424242;
 }
@@ -303,6 +362,19 @@
   cursor: pointer;
 }
 @keyframes brilhoPegadaAnim {
-  0% { transform: scale(0.9); opacity: 0.6; }
-  100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 4px #ffd700); }
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 1;
+    filter: drop-shadow(0 0 4px #ffd700);
+  }
+}
+
+/* Cartões de papel branco: texto escuro mesmo no tema escuro (senão herda a cor clara e some) */
+.selo-postal-card,
+.polaroid-coletiva-card {
+  color: #1e293b;
 }

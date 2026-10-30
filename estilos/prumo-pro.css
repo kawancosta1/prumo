@@ -46,8 +46,8 @@
 }
 [data-theme="dark"] .card-coach-ia,
 html[data-theme="dark"] .card-coach-ia,
-body.dark .card-coach-ia,
-.dark .card-coach-ia {
+[data-theme="dark"] .card-coach-ia,
+[data-theme="dark"] .card-coach-ia {
   background: linear-gradient(145deg, rgba(28, 22, 44, 0.96) 0%, rgba(18, 14, 30, 0.94) 100%);
   border-color: rgba(167, 139, 250, 0.3);
   box-shadow:
@@ -107,8 +107,8 @@ body.dark .card-coach-ia,
 }
 [data-theme="dark"] .coach-meta-principal,
 html[data-theme="dark"] .coach-meta-principal,
-body.dark .coach-meta-principal,
-.dark .coach-meta-principal {
+[data-theme="dark"] .coach-meta-principal,
+[data-theme="dark"] .coach-meta-principal {
   background: rgba(139, 92, 246, 0.2);
   border-color: rgba(167, 139, 250, 0.35);
   color: #f3e8ff;
@@ -154,8 +154,8 @@ body.dark .coach-meta-principal,
 }
 [data-theme="dark"] .modal-pro-conteudo,
 html[data-theme="dark"] .modal-pro-conteudo,
-body.dark .modal-pro-conteudo,
-.dark .modal-pro-conteudo {
+[data-theme="dark"] .modal-pro-conteudo,
+[data-theme="dark"] .modal-pro-conteudo {
   background: #191627;
   color: #f8fafc;
   box-shadow:
@@ -219,8 +219,8 @@ body.dark .modal-pro-conteudo,
 }
 [data-theme="dark"] .plano-card,
 html[data-theme="dark"] .plano-card,
-body.dark .plano-card,
-.dark .plano-card {
+[data-theme="dark"] .plano-card,
+[data-theme="dark"] .plano-card {
   background: #211c34;
   border-color: rgba(255, 255, 255, 0.1);
 }
@@ -281,8 +281,8 @@ body.dark .plano-card,
 }
 [data-theme="dark"] .lista-vantagens-pro li,
 html[data-theme="dark"] .lista-vantagens-pro li,
-body.dark .lista-vantagens-pro li,
-.dark .lista-vantagens-pro li {
+[data-theme="dark"] .lista-vantagens-pro li,
+[data-theme="dark"] .lista-vantagens-pro li {
   color: #cbd5e1;
 }
 
@@ -297,8 +297,8 @@ body.dark .lista-vantagens-pro li,
 }
 [data-theme="dark"] .area-pix-box,
 html[data-theme="dark"] .area-pix-box,
-body.dark .area-pix-box,
-.dark .area-pix-box {
+[data-theme="dark"] .area-pix-box,
+[data-theme="dark"] .area-pix-box {
   background: #161324;
   border-color: rgba(255, 255, 255, 0.15);
 }
@@ -315,8 +315,8 @@ body.dark .area-pix-box,
 }
 [data-theme="dark"] .pix-codigo-input,
 html[data-theme="dark"] .pix-codigo-input,
-body.dark .pix-codigo-input,
-.dark .pix-codigo-input {
+[data-theme="dark"] .pix-codigo-input,
+[data-theme="dark"] .pix-codigo-input {
   background: #0f0d18;
   color: #f8fafc;
   border-color: rgba(255, 255, 255, 0.2);

@@ -24,23 +24,35 @@
   transform-origin: bottom center;
 }
 @keyframes respiracaoPetAnim {
-  0% { transform: scale(1, 1); }
-  100% { transform: scale(1.025, 0.975); }
+  0% {
+    transform: scale(1, 1);
+  }
+  100% {
+    transform: scale(1.025, 0.975);
+  }
 }
 
 /* Partícula de sono Zzz */
 .particula-sono-zzz {
   position: absolute;
   color: #7986cb;
-  font-family: 'Fredoka', cursive, sans-serif;
+  font-family: "Fredoka", cursive, sans-serif;
   font-weight: 700;
   pointer-events: none;
   animation: flutuacaoZzzAnim 2.8s ease-out forwards;
 }
 @keyframes flutuacaoZzzAnim {
-  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
-  20% { opacity: 0.9; }
-  100% { transform: translate(35px, -60px) scale(1.3); opacity: 0; }
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(35px, -60px) scale(1.3);
+    opacity: 0;
+  }
 }
 
 /* Aura de nível de estudo do pet */
@@ -52,12 +64,25 @@
   animation: pulsoAuraPetAnim 2.4s ease-in-out infinite alternate;
 }
 @keyframes pulsoAuraPetAnim {
-  0% { transform: scale(0.96); opacity: 0.4; }
-  100% { transform: scale(1.08); opacity: 0.85; filter: blur(4px); }
+  0% {
+    transform: scale(0.96);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.08);
+    opacity: 0.85;
+    filter: blur(4px);
+  }
 }
-.aura-azul    { box-shadow: 0 0 20px rgba(33, 150, 243, 0.6); }
-.aura-roxo    { box-shadow: 0 0 24px rgba(156, 39, 176, 0.7); }
-.aura-dourado { box-shadow: 0 0 30px rgba(255, 215, 0, 0.85); }
+.aura-azul {
+  box-shadow: 0 0 20px rgba(33, 150, 243, 0.6);
+}
+.aura-roxo {
+  box-shadow: 0 0 24px rgba(156, 39, 176, 0.7);
+}
+.aura-dourado {
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.85);
+}
 
 /* Balão de pensamento e sonhos do pet */
 .balao-sonho-pet {
@@ -74,8 +99,12 @@
   animation: flutuaSonhoAnim 3s ease-in-out infinite alternate;
 }
 @keyframes flutuaSonhoAnim {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-5px); }
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-5px);
+  }
 }
 
 /* Sombra projetada oval dinâmica */
@@ -86,7 +115,10 @@
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.15);
   border-radius: 50%;
-  transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+  transition:
+    width 0.2s ease,
+    height 0.2s ease,
+    opacity 0.2s ease;
 }
 
 /* Pêlo ou cauda abanando suavemente */
@@ -95,10 +127,13 @@
   animation: abanaCaudaAnim 0.8s ease-in-out infinite alternate;
 }
 @keyframes abanaCaudaAnim {
-  0% { transform: rotate(-8deg); }
-  100% { transform: rotate(12deg); }
+  0% {
+    transform: rotate(-8deg);
+  }
+  100% {
+    transform: rotate(12deg);
+  }
 }
-
 
 /* ========================================================
    LOTES 301 A 400: HABILIDADES, PASSEIOS, FENG SHUI,
@@ -155,8 +190,12 @@
   pointer-events: none;
 }
 @keyframes rotacaoCosmicaAnim {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Efeito de gotículas escorrendo na janela chuvosa */
@@ -176,9 +215,17 @@
   animation: escorreGotaAnim 1.8s linear infinite;
 }
 @keyframes escorreGotaAnim {
-  0% { transform: translateY(-20px); opacity: 0; }
-  30% { opacity: 0.8; }
-  100% { transform: translateY(180px); opacity: 0; }
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(180px);
+    opacity: 0;
+  }
 }
 
 /* Pegada fosforescente no escuro */
@@ -186,10 +233,24 @@
   position: absolute;
   font-size: 16px;
   color: #a7f3d0;
-  text-shadow: 0 0 6px #10b981, 0 0 12px #34d399;
+  text-shadow:
+    0 0 6px #10b981,
+    0 0 12px #34d399;
   animation: pulsarFosforescenteAnim 2s ease-in-out infinite alternate;
 }
 @keyframes pulsarFosforescenteAnim {
-  0% { opacity: 0.4; transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1.05); }
+  0% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* Balão e polaroid brancos: texto escuro mesmo no tema escuro */
+.balao-sonho-pet,
+.polaroid-passeio-card {
+  color: #1e293b;
 }
