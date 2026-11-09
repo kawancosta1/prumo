@@ -377,18 +377,17 @@ exports.chatIA = onRequest(
     const mensagem = ia.limparTexto(corpo.mensagem, modoJson ? ia.MAX_EDITAL : ia.MAX_MENSAGEM).trim();
     if (!mensagem) return res.status(400).json({ erro: "Escreva uma mensagem." });
 
+    const refLic = db.doc(`licencas/${user.uid}`);
     const refUso = db.doc(`iaUso/${user.uid}`);
-    const sLic = await db.doc(`licencas/${user.uid}`).get();
-    const l = sLic.exists ? sLic.data() : {};
-    const pro =
-      l.ativo === true &&
-      (l.vitalicio === true || (typeof l.expiraEm === "number" && l.expiraEm > Date.now()));
-
-    const cota = await db.runTransaction(async t => {
-      const s = await t.get(refUso);
-      const r = ia.contarUso(s.exists ? s.data() : null, Date.now(), pro);
+    const { cota, pro } = await db.runTransaction(async t => {
+      const [sLic, sUso] = await Promise.all([t.get(refLic), t.get(refUso)]);
+      const l = sLic.exists ? sLic.data() : {};
+      const ehPro =
+        l.ativo === true &&
+        (l.vitalicio === true || (typeof l.expiraEm === "number" && l.expiraEm > Date.now()));
+      const r = ia.contarUso(sUso.exists ? sUso.data() : null, Date.now(), ehPro);
       if (r.ok) t.set(refUso, r.uso);
-      return r;
+      return { cota: r, pro: ehPro };
     });
     if (!cota.ok) {
       return res.status(429).json({

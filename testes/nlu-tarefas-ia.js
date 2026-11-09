@@ -295,6 +295,51 @@ module.exports = async function (url) {
         !analiseTribunal.materias.some(m => /autodeclara|isencao/i.test(m.nome)),
       "separa subitens inline estilo Cebraspe (1, 2, 3, 3.1, 3.2) sem números colados e corta Anexo de Autodeclaração"
     );
+
+    // 13. Contexto enriquecido de 7 dias + tarefas atrasadas em obterContextoUsuarioPrumo()
+    const ctxEnriquecido = ev(`(() => {
+      const ontem = addDays(today(), -1);
+      S.tasks.push({ id: "tk_atrasada_teste", title: "Revisar Limites ICMC", date: ontem, done: false });
+      return obterContextoUsuarioPrumo();
+    })()`);
+    ok(
+      ctxEnriquecido.includes("Tarefas atrasadas de dias anteriores") &&
+        ctxEnriquecido.includes("Revisar Limites ICMC") &&
+        ctxEnriquecido.includes("Agenda dos próximos 7 dias:") &&
+        ctxEnriquecido.includes("Edital ativo:"),
+      "obterContextoUsuarioPrumo inclui tarefas atrasadas, agenda de 7 dias e edital ativo"
+    );
+
+    // 14. Comando operacional: reagendar tarefas atrasadas para amanhã + desfazer (Undo)
+    const amanhaData = ev(`addDays(today(), 1)`);
+    const ontemData = ev(`addDays(today(), -1)`);
+    const respRemarcar = await ev(`chamarProvedorLLM("remarca minhas tarefas atrasadas para amanha", [])`);
+    const dataAposRemarcar = ev(`S.tasks.find(x => x.id === "tk_atrasada_teste").date`);
+    ok(
+      String(respRemarcar).includes("[[ACAO_TAREFAS_REMARCADAS:") && dataAposRemarcar === amanhaData,
+      "comando 'remarca minhas tarefas atrasadas para amanha' move tarefa atrasada para amanhã em 0ms"
+    );
+    ev(`ACOES_EXTRAS["ia-desfazer-remarcacao-chat"]()`);
+    const dataAposUndo = ev(`S.tasks.find(x => x.id === "tk_atrasada_teste").date`);
+    ok(dataAposUndo === ontemData, "botão 'Desfazer reagendamento' restaura a data original da tarefa");
+
+    // 15. Comando operacional: criar flashcards SM-2 pelo chat
+    const fcAntes = ev(`Array.isArray(S.flashcards) ? S.flashcards.length : 0`);
+    const respFc = await ev(`chamarProvedorLLM("cria 3 flashcards sobre Calculo", [])`);
+    const fcDepois = ev(`S.flashcards.length`);
+    ok(
+      String(respFc).includes("[[ACAO_FLASHCARD:") && fcDepois === fcAntes + 3,
+      "comando 'cria 3 flashcards sobre Calculo' gera e salva 3 flashcards SM-2 em S.flashcards"
+    );
+
+    // 16. Comando operacional: registrar água pelo chat
+    const aguaAntes = ev(`waterToday()`);
+    const respAgua = await ev(`chamarProvedorLLM("bebi 500ml de agua", [])`);
+    const aguaDepois = ev(`waterToday()`);
+    ok(
+      String(respAgua).includes("+500ml") && aguaDepois === aguaAntes + 500,
+      "comando 'bebi 500ml de agua' soma 500ml na hidratação diária imediatamente"
+    );
   } finally {
     fechar();
   }

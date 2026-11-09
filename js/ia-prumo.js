@@ -143,15 +143,63 @@ function obterPersonaAtual() {
   return PERSONA_PROMPTS[pId] || PERSONA_PROMPTS.padrao;
 }
 
-/* ---------- Contexto em Tempo Real do Usuário ---------- */
+/* ---------- Contexto em Tempo Real do Usuário (Visão Completa 7 Dias + Estudos) ---------- */
 function obterContextoUsuarioPrumo() {
   if (typeof S === "undefined" || !S) {
     return "Usuário iniciando no Prumo. Sem dados cadastrados ainda.";
   }
   const t = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
-  const tarefasHoje = Array.isArray(S.tasks) ? S.tasks.filter(x => x.date === t) : [];
+  const todasTarefas = Array.isArray(S.tasks) ? S.tasks : [];
+  const tarefasHoje = todasTarefas.filter(x => x.date === t);
   const concluidas = tarefasHoje.filter(x => x.done).map(x => x.title || x.txt || "Tarefa");
-  const pendentes = tarefasHoje.filter(x => !x.done).map(x => x.title || x.txt || "Tarefa");
+  const pendentes = tarefasHoje
+    .filter(x => !x.done)
+    .map(x => `${x.title || x.txt || "Tarefa"}${x.time ? ` (${x.time})` : ""}`);
+  const atrasadas = todasTarefas
+    .filter(x => x.date && x.date < t && !x.done)
+    .slice(0, 8)
+    .map(x => `${x.title || x.txt || "Tarefa"} (${x.date})`);
+
+  // Visão da agenda dos próximos 7 dias (horários ocupados e carga diária)
+  const diasNomes = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  const grade7Dias = [];
+  for (let i = 0; i < 7; i++) {
+    const dt = typeof addDays === "function" ? addDays(t, i) : t;
+    const dObj = new Date(dt + "T12:00:00");
+    const diaSem = diasNomes[dObj.getDay()] || "";
+    const doDia = todasTarefas.filter(x => x.date === dt && !x.done);
+    if (doDia.length) {
+      const resumoDia = doDia
+        .slice(0, 4)
+        .map(x => `${x.time ? x.time + " " : ""}${x.title || x.txt || "Tarefa"}`)
+        .join("; ");
+      grade7Dias.push(`${diaSem} (${dt}): ${doDia.length} tarefa(s) [${resumoDia}]`);
+    } else {
+      grade7Dias.push(`${diaSem} (${dt}): Livre`);
+    }
+  }
+
+  // Matérias, Edital ativo, Flashcards, Questões e Caderno de Erros
+  const materias =
+    Array.isArray(S.subjects) && S.subjects.length
+      ? S.subjects.map(m => m.name).join(", ")
+      : "Nenhuma cadastrada";
+  const editalAtivo =
+    S.cronogramaEdital && S.cronogramaEdital.nome
+      ? `${S.cronogramaEdital.nome} (${(S.cronogramaEdital.plano && S.cronogramaEdital.plano.blocos && S.cronogramaEdital.plano.blocos.length) || 0} blocos planejados)`
+      : "Nenhum edital ativo";
+  const flashcardsVencidos = Array.isArray(S.flashcards)
+    ? S.flashcards.filter(f => !f.due || f.due <= t).length
+    : 0;
+  const qStats =
+    S.questionStats && S.questionStats.date === t ? S.questionStats : { done: 0, correct: 0, goal: 20 };
+  const errosPendentes = Array.isArray(S.errorLog)
+    ? S.errorLog
+        .filter(e => !e.resolved)
+        .slice(0, 4)
+        .map(e => e.topic || e.note || "Tópico")
+    : [];
+
   const aguaAtual = typeof waterToday === "function" ? waterToday() : 0;
   const metaAgua = S.waterGoal || 2000;
   const streak = S.streak || 0;
@@ -163,10 +211,16 @@ function obterContextoUsuarioPrumo() {
   return `
 DADOS DO USUÁRIO NO PRUMO:
 - Nome: ${nome}
-- Turno atual: ${turno} (${hora}h)
+- Data de hoje: ${t} | Turno atual: ${turno} (${hora}h)
 - Nível do mascote: Nível ${nivel} | Dias seguidos de foco: ${streak} dias
 - Tarefas concluídas hoje (${concluidas.length}): ${concluidas.length ? concluidas.join(", ") : "Nenhuma ainda"}
 - Tarefas pendentes hoje (${pendentes.length}): ${pendentes.length ? pendentes.join(", ") : "Nenhuma pendência"}
+- Tarefas atrasadas de dias anteriores (${atrasadas.length}): ${atrasadas.length ? atrasadas.join(", ") : "Nenhuma atrasada"}
+- Agenda dos próximos 7 dias: ${grade7Dias.join(" | ")}
+- Matérias de estudo: ${materias}
+- Edital ativo: ${editalAtivo}
+- Bateria de questões hoje: ${qStats.done}/${qStats.goal || 20} feitas (${qStats.correct} acertos) | Flashcards para revisar hoje: ${flashcardsVencidos}
+- Pontos de atenção no Caderno de Erros: ${errosPendentes.length ? errosPendentes.join(", ") : "Nenhum erro pendente"}
 - Hidratação: ${aguaAtual}ml bebidos de ${metaAgua}ml meta
 - Mundo / Personalidade ativa: ${S.persona || "padrão"}
 `;
@@ -268,11 +322,309 @@ async function pesquisarMateriaEInstituicaoOnline(promptUsuario) {
   return "";
 }
 
+/* ---------- Executor de Comandos Operacionais do Chat (0ms / Tool Use Direto) ---------- */
+function resolverDataAlvoComandoIA(textoAlvo, hojeStr) {
+  const s = String(textoAlvo || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+  const add = typeof addDays === "function" ? addDays : (d, n) => d;
+  if (/\bdepois\s+de\s+amanha\b/.test(s)) return { data: add(hojeStr, 2), rotulo: "Depois de amanhã" };
+  if (/\bamanha\b/.test(s)) return { data: add(hojeStr, 1), rotulo: "Amanhã" };
+  if (/\bhoje\b/.test(s)) return { data: hojeStr, rotulo: "Hoje" };
+
+  const mapaDias = [
+    { rx: /\bdomingo\b/, dow: 0, nome: "Domingo" },
+    { rx: /\bsegunda(?:-feira)?\b/, dow: 1, nome: "Segunda-feira" },
+    { rx: /\bterca(?:-feira)?\b/, dow: 2, nome: "Terça-feira" },
+    { rx: /\bquarta(?:-feira)?\b/, dow: 3, nome: "Quarta-feira" },
+    { rx: /\bquinta(?:-feira)?\b/, dow: 4, nome: "Quinta-feira" },
+    { rx: /\bsexta(?:-feira)?\b/, dow: 5, nome: "Sexta-feira" },
+    { rx: /\bsabado\b/, dow: 6, nome: "Sábado" }
+  ];
+  for (const item of mapaDias) {
+    if (item.rx.test(s)) {
+      const dHoje = new Date(hojeStr + "T12:00:00");
+      let diff = (item.dow - dHoje.getDay() + 7) % 7;
+      if (diff === 0) diff = 7;
+      const dt = add(hojeStr, diff);
+      return { data: dt, rotulo: `${item.nome} (${dt})` };
+    }
+  }
+  return { data: add(hojeStr, 1), rotulo: "Amanhã" };
+}
+
+function executarComandoOperacionalChatIA(promptUsuario) {
+  if (!promptUsuario || typeof S === "undefined" || !S) return null;
+  const raw = String(promptUsuario).trim();
+  const norm = raw
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  const hojeStr = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
+
+  // 1. Comando de Reagendamento de Tarefas Atrasadas ou Pendentes
+  const matchRemarcar = norm.match(
+    /\b(?:remarca(?:r)?|adia(?:r)?|move(?:r)?|joga(?:r)?|passa(?:r)?|transfere|transferir|empurra(?:r)?)\s+(?:as\s+|minhas\s+|todas\s+as\s+)?(?:tarefas?\s+)?(atrasadas?|pendentes?|de\s+hoje|nao\s+feitas?)(?:\s+de\s+hoje)?(?:\s+(?:para|pra|pro)\s+(.+))?$/i
+  );
+  if (matchRemarcar && Array.isArray(S.tasks)) {
+    const tipoFiltro = matchRemarcar[1] || "atrasadas";
+    const destinoBruto = matchRemarcar[2] || "amanha";
+    const { data: dataDestino, rotulo: rotuloDestino } = resolverDataAlvoComandoIA(destinoBruto, hojeStr);
+    const ehSomenteAtrasadas = /atrasad/.test(tipoFiltro);
+
+    const alvos = S.tasks.filter(tk => {
+      if (!tk || tk.done) return false;
+      if (ehSomenteAtrasadas) return tk.date && tk.date < hojeStr;
+      return tk.date && tk.date <= hojeStr && tk.date !== dataDestino;
+    });
+
+    if (!alvos.length) {
+      const txtSemAlvo = ehSomenteAtrasadas
+        ? `🎉 Você está em dia! Não há **nenhuma tarefa atrasada** de dias anteriores para remarcar.`
+        : `✅ Não encontrei tarefas pendentes para mover para **${rotuloDestino}**.`;
+      return {
+        pensamento: `• 🔄 **Reagendamento Inteligente:** Verificado \`S.tasks\` — 0 tarefas elegíveis.`,
+        texto: txtSemAlvo,
+        toString() {
+          return this.texto;
+        }
+      };
+    }
+
+    const snapshotUndo = alvos.map(tk => ({
+      id: tk.id,
+      dateAnterior: tk.date,
+      titulo: tk.title || tk.txt || "Tarefa"
+    }));
+    if (typeof window !== "undefined") {
+      window.__ultimasTarefasRemarcadasIA = snapshotUndo;
+    }
+    alvos.forEach(tk => {
+      tk.date = dataDestino;
+    });
+    if (typeof commit === "function") commit();
+    if (typeof render === "function") render();
+
+    const listaMovidas = alvos
+      .slice(0, 6)
+      .map(tk => `• **${tk.title || tk.txt || "Tarefa"}**${tk.time ? ` *(às ${tk.time})*` : ""}`)
+      .join("\n");
+    const txtResp = `🔄 Pronto! Reagendei **${alvos.length} tarefa(s)** para **${rotuloDestino}** (${dataDestino}):\n\n${listaMovidas}\n\n[[ACAO_TAREFAS_REMARCADAS:${alvos.length}:${dataDestino}]]`;
+    return {
+      pensamento: `• 🔄 **Execução Direta (0ms):** ${alvos.length} tarefa(s) reagendada(s) para ${dataDestino} com snapshot de Undo.`,
+      texto: txtResp,
+      toString() {
+        return this.texto;
+      }
+    };
+  }
+
+  // 2. Comando de Geração e Salvamento Direto de Flashcards SM-2 pelo Chat
+  const matchFlashcards = raw.match(
+    /\b(?:cria(?:r)?|gera(?:r)?|faz(?:er)?|monta(?:r)?|adiciona(?:r)?)\s+(?:(\d+)\s+)?(?:flash\s*cards?|cards?\s+de\s+revis[ãa]o|cart[õo]es\s+de\s+estudo)\s+(?:de|sobre|para|da\s+mat[ée]ria)\s+(.+)$/i
+  );
+  if (matchFlashcards) {
+    const qtdPedida = Math.max(2, Math.min(8, parseInt(matchFlashcards[1], 10) || 4));
+    const temaBruto = matchFlashcards[2].replace(/[.!?]+$/, "").trim();
+    const temaNorm = temaBruto
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    if (!Array.isArray(S.subjects)) S.subjects = [];
+    if (!Array.isArray(S.flashcards)) S.flashcards = [];
+
+    // Localiza ou cria a matéria em S.subjects
+    let subj = S.subjects.find(
+      s =>
+        s &&
+        s.name &&
+        s.name
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "") === temaNorm
+    );
+    const bancoPresets =
+      typeof PRESETS_FLASHCARDS_ACADEMICOS === "object" && PRESETS_FLASHCARDS_ACADEMICOS
+        ? PRESETS_FLASHCARDS_ACADEMICOS
+        : {};
+    let chavePreset = Object.keys(bancoPresets).find(
+      k => temaNorm.includes(k.replace("_", " ")) || temaNorm.includes(k)
+    );
+    if (!chavePreset) {
+      if (/calculo|derivada|integral|limite/.test(temaNorm)) chavePreset = "calculo";
+      else if (/vetores|geometria\s+analitica|\bga\b/.test(temaNorm)) chavePreset = "ga";
+      else if (/algebra\s+linear|matriz|autovalor/.test(temaNorm)) chavePreset = "algebra_linear";
+      else if (/algoritmo|estrutura\s+de\s+dados|programacao|\bed\b/.test(temaNorm)) chavePreset = "ed";
+      else if (/constitucional|direito|administrativo|penal|civil/.test(temaNorm)) chavePreset = "direito";
+      else if (/portugues|gramatica|crase|redacao/.test(temaNorm)) chavePreset = "portugues";
+    }
+
+    const nomePresetBruto =
+      chavePreset && bancoPresets[chavePreset]
+        ? String(
+            bancoPresets[chavePreset].nome ||
+              bancoPresets[chavePreset].materia ||
+              bancoPresets[chavePreset].titulo ||
+              ""
+          )
+        : "";
+    const nomeMateria = subj
+      ? subj.name
+      : nomePresetBruto
+        ? nomePresetBruto.replace(/\s*\([^)]*\)/, "")
+        : temaBruto.charAt(0).toUpperCase() + temaBruto.slice(1);
+
+    if (!subj) {
+      const novoId = typeof uid === "function" ? uid() : "subj_" + Date.now();
+      subj = {
+        id: novoId,
+        name: nomeMateria,
+        color: (chavePreset && bancoPresets[chavePreset] && bancoPresets[chavePreset].cor) || "#8B5CF6",
+        goalHoursWeek: 6
+      };
+      S.subjects.push(subj);
+    }
+
+    const cardsBase =
+      chavePreset && bancoPresets[chavePreset] && Array.isArray(bancoPresets[chavePreset].cards)
+        ? bancoPresets[chavePreset].cards
+        : [
+            {
+              frente: `Qual é o conceito central e definição de ${nomeMateria}?`,
+              verso: `Domine os fundamentos, propriedades-chave e aplicações práticas de ${nomeMateria} em questões de prova.`
+            },
+            {
+              frente: `Quais são as pegadinhas mais cobradas em provas sobre ${nomeMateria}?`,
+              verso: `Atenção às exceções de regra, condições de contorno e termos absolutos ("sempre", "nunca", "exclusivamente") em ${nomeMateria}.`
+            },
+            {
+              frente: `Como estruturar a revisão ativa de ${nomeMateria}?`,
+              verso: `1. Recuperação ativa sem olhar o material; 2. Resolução de questões; 3. Registro de falhas no Caderno de Erros.`
+            },
+            {
+              frente: `Fórmula / Regra essencial de ${nomeMateria} para memorização espaçada:`,
+              verso: `Verifique as hipóteses antes de aplicar a regra direta e confira as unidades/exceções exigidas pela banca.`
+            }
+          ];
+
+    const criados = [];
+    for (let i = 0; i < Math.min(qtdPedida, cardsBase.length); i++) {
+      const c = cardsBase[i];
+      const novoCard = {
+        id: (typeof uid === "function" ? uid() : "fc_" + Date.now()) + "_" + i,
+        subjectId: subj.id,
+        front: c.frente,
+        back: c.verso,
+        repetitions: 0,
+        interval: 1,
+        easeFactor: 2.5,
+        due: hojeStr,
+        created: hojeStr
+      };
+      S.flashcards.push(novoCard);
+      criados.push(novoCard);
+    }
+
+    if (typeof commit === "function") commit();
+    if (typeof render === "function") render();
+
+    const previewCards = criados
+      .map((c, idx) => `${idx + 1}. **Frente:** ${c.front}\n   *Verso:* ${c.back}`)
+      .join("\n\n");
+    const txtResp = `🗂️ Criei e salvei **${criados.length} flashcards SM-2** na matéria **${nomeMateria}** prontos para revisão hoje:\n\n${previewCards}\n\n[[ACAO_FLASHCARD:${chavePreset || "geral"}:${nomeMateria}]]`;
+    return {
+      pensamento: `• 🗂️ **Geração Direta de Flashcards (0ms):** ${criados.length} cartões SM-2 inseridos em \`S.flashcards\` na matéria ${nomeMateria}.`,
+      texto: txtResp,
+      toString() {
+        return this.texto;
+      }
+    };
+  }
+
+  // 3. Comando de Registro Rápido de Hidratação (Água) pelo Chat
+  const matchAgua = norm.match(
+    /\b(?:bebi|tomei|registra(?:r)?|adiciona(?:r)?|marca(?:r)?)\s+(\d+(?:[.,]\d+)?)\s*(ml|l|litros?|copos?)\s*(?:de\s+agua)?\b/i
+  );
+  if (matchAgua && /\b(?:agua|ml|litros?|copos?)\b/.test(norm)) {
+    const valorNum = parseFloat(String(matchAgua[1]).replace(",", "."));
+    const unidade = (matchAgua[2] || "ml").toLowerCase();
+    let mlAdicionar = 0;
+    if (unidade.startsWith("l")) mlAdicionar = Math.round(valorNum * 1000);
+    else if (unidade.startsWith("copo")) mlAdicionar = Math.round(valorNum * 250);
+    else mlAdicionar = Math.round(valorNum);
+
+    if (mlAdicionar > 0 && mlAdicionar <= 5000) {
+      if (typeof addWater === "function") {
+        addWater(mlAdicionar);
+      } else {
+        if (!S.water || typeof S.water !== "object") S.water = {};
+        if (!Array.isArray(S.water[hojeStr])) S.water[hojeStr] = [];
+        S.water[hojeStr].push({
+          id: typeof uid === "function" ? uid() : "w_" + Date.now(),
+          ml: mlAdicionar,
+          time: new Date().toTimeString().slice(0, 5)
+        });
+        if (typeof commit === "function") commit();
+        if (typeof render === "function") render();
+      }
+
+      const totalHoje = typeof waterToday === "function" ? waterToday() : mlAdicionar;
+      const meta = S.waterGoal || 2000;
+      const pct = Math.min(100, Math.round((totalHoje / meta) * 100));
+      const txtResp = `💧 Boa! Registrei **+${mlAdicionar}ml** de água hoje.\n\n• **Progresso de Hidratação:** **${totalHoje}ml / ${meta}ml** (${pct}% da meta diária concluída).`;
+      return {
+        pensamento: `• 💧 **Hidratação Registrada (0ms):** +${mlAdicionar}ml adicionados em \`S.water["${hojeStr}"]\`. Total: ${totalHoje}ml.`,
+        texto: txtResp,
+        toString() {
+          return this.texto;
+        }
+      };
+    }
+  }
+
+  return null;
+}
+
+function desfazerUltimaRemarcacaoIA() {
+  const lista =
+    typeof window !== "undefined" && Array.isArray(window.__ultimasTarefasRemarcadasIA)
+      ? window.__ultimasTarefasRemarcadasIA
+      : [];
+  if (!lista.length || typeof S === "undefined" || !S || !Array.isArray(S.tasks)) {
+    if (typeof toast === "function") toast("Nenhum reagendamento recente para desfazer.");
+    return 0;
+  }
+  let restauradas = 0;
+  lista.forEach(item => {
+    const tk = S.tasks.find(x => x && x.id === item.id);
+    if (tk && item.dateAnterior) {
+      tk.date = item.dateAnterior;
+      restauradas++;
+    }
+  });
+  window.__ultimasTarefasRemarcadasIA = [];
+  if (typeof commit === "function") commit();
+  if (typeof render === "function") render();
+  if (typeof toast === "function") {
+    toast(`↩️ Reagendamento desfeito (${restauradas} tarefa(s) restaurada(s))!`, false, "happy");
+  }
+  return restauradas;
+}
+
 /* ---------- Chamada a LLM em Nuvem (Gemini, Groq, OpenAI) ---------- */
 async function chamarProvedorLLM(promptUsuario, mensagensAnteriores = []) {
   const cfg = obterConfigIA();
 
-  // 0. Comandos naturais de criação de tarefa ou confirmação de blocos semanais executam imediatamente
+  // 0. Comandos operacionais diretos (reagendar tarefas, criar flashcards, registrar água) executam em 0ms
+  const respOperacional = executarComandoOperacionalChatIA(promptUsuario);
+  if (respOperacional) {
+    return respOperacional;
+  }
+
+  // 0.1. Comandos naturais de criação de tarefa ou confirmação de blocos semanais executam imediatamente
   if (
     (typeof ehComandoDeTarefa === "function" && ehComandoDeTarefa(promptUsuario)) ||
     (typeof MiniPrumoAI !== "undefined" &&
@@ -662,6 +1014,11 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
 
 /* ---------- Motor Neuro-Contextual Autônomo (Offline / Sem Chave) ---------- */
 function gerarRespostaAutonomaIA(promptUsuario) {
+  const respOperacional = executarComandoOperacionalChatIA(promptUsuario);
+  if (respOperacional) {
+    return respOperacional;
+  }
+
   const pId = typeof S !== "undefined" && S && S.persona ? S.persona : "padrao";
   const persona = obterPersonaAtual();
   const nome = (typeof S !== "undefined" && S && S.name) || "parça";
@@ -1220,6 +1577,15 @@ function formatarTextoMensagemIA(raw) {
     txt = txt.replace(/\[\[ACAO_CRONOGRAMA_EDITAL_PDF\]\]/g, "");
   }
 
+  let cardTarefasRemarcadas = null;
+  if (txt.includes("[[ACAO_TAREFAS_REMARCADAS:")) {
+    const m = txt.match(/\[\[ACAO_TAREFAS_REMARCADAS:(\d+):([^\]]+)\]\]/);
+    if (m) {
+      cardTarefasRemarcadas = { qtd: Number(m[1]), dataDestino: m[2] };
+    }
+    txt = txt.replace(/\[\[ACAO_TAREFAS_REMARCADAS:[^\]]+\]\]/g, "");
+  }
+
   // Normalizar tags HTML comuns que possam ter sido passadas
   txt = txt.replace(/<\/?(b|strong)>/gi, "**");
   txt = txt.replace(/<\/?(i|em)>/gi, "*");
@@ -1361,6 +1727,18 @@ function formatarTextoMensagemIA(raw) {
         ${itensHtml}
       </div>`;
     }
+  }
+
+  if (cardTarefasRemarcadas) {
+    txt += `
+    <div style="margin-top:14px;padding:12px;background:rgba(59,130,246,0.08);border-radius:14px;border:1.5px solid rgba(59,130,246,0.3);text-align:center;">
+      <div style="font-weight:800;font-size:13px;color:#2563EB;margin-bottom:6px;">🔄 ${esc(String(cardTarefasRemarcadas.qtd))} tarefa(s) reagendada(s) para ${esc(cardTarefasRemarcadas.dataDestino)}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+        <button type="button" class="btn ghost small" data-act="ia-desfazer-remarcacao-chat" style="font-weight:800;padding:6px 14px;border-radius:10px;">
+          ↩️ Desfazer reagendamento
+        </button>
+      </div>
+    </div>`;
   }
 
   return txt;
@@ -3252,6 +3630,9 @@ if (typeof ACOES_EXTRAS !== "undefined") {
       }
     }
   };
+  ACOES_EXTRAS["ia-desfazer-remarcacao-chat"] = () => {
+    desfazerUltimaRemarcacaoIA();
+  };
 }
 
 // Delegação de cliques para botões com data-act (garante resposta direta em qualquer contexto)
@@ -3388,6 +3769,12 @@ document.addEventListener("click", e => {
     e.preventDefault();
     if (ACOES_EXTRAS["ia-trocar-cargo-edital-chat"])
       ACOES_EXTRAS["ia-trocar-cargo-edital-chat"](btnTrocarCargoChat);
+    return;
+  }
+  const btnDesfazerRemarcacao = e.target.closest("[data-act='ia-desfazer-remarcacao-chat']");
+  if (btnDesfazerRemarcacao) {
+    e.preventDefault();
+    desfazerUltimaRemarcacaoIA();
     return;
   }
 
