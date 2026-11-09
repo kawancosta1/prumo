@@ -1073,6 +1073,7 @@ function abrirChatPrumiIA(mensagemInicial = "") {
       </div>
 
       <div class="ia-quick-pills">
+        <button class="ia-pill-btn" data-act="ia-anexar-pdf">📎 Enviar PDF de Edital</button>
         <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Tô sem foco, me dá um empurrão agora!">⚡ Tô sem foco</button>
         <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Como devo organizar minhas próximas horas?">🎯 Priorizar hoje</button>
         <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Analise meu progresso e equilíbrio de hoje">📊 Como tá meu dia?</button>
@@ -1111,7 +1112,11 @@ function abrirChatPrumiIA(mensagemInicial = "") {
       </div>
 
       <form id="form-chat-ia" class="ia-chat-input-bar">
-        <input type="text" id="ia-input-texto" class="ia-chat-input" placeholder="Pergunte qualquer coisa..." autocomplete="off" />
+        <input type="file" id="ia-input-pdf" accept=".pdf,.txt,.md,application/pdf,text/plain" hidden />
+        <button type="button" class="ia-attach-btn" id="ia-btn-anexar-pdf" data-act="ia-anexar-pdf" title="Enviar PDF de Edital para montar cronograma" style="display:inline-flex;align-items:center;gap:4px;padding:8px 11px;border-radius:10px;border:1.5px solid var(--border,#cbd5e1);background:var(--surface,#fff);color:var(--text,#0f172a);font-weight:700;font-size:12.5px;cursor:pointer;flex-shrink:0;">
+          <span>📎 PDF</span>
+        </button>
+        <input type="text" id="ia-input-texto" class="ia-chat-input" placeholder="Pergunte qualquer coisa ou envie um PDF..." autocomplete="off" />
         <button type="submit" class="ia-send-btn" id="ia-btn-enviar">
           <span>Enviar</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
@@ -1210,6 +1215,11 @@ function formatarTextoMensagemIA(raw) {
     txt = txt.replace(/\[\[ACAO_PROPOR_BLOCOS_SEMANA:[^\]]+\]\]/g, "");
   }
 
+  const temCardEditalPDF = txt.includes("[[ACAO_CRONOGRAMA_EDITAL_PDF]]");
+  if (temCardEditalPDF) {
+    txt = txt.replace(/\[\[ACAO_CRONOGRAMA_EDITAL_PDF\]\]/g, "");
+  }
+
   // Normalizar tags HTML comuns que possam ter sido passadas
   txt = txt.replace(/<\/?(b|strong)>/gi, "**");
   txt = txt.replace(/<\/?(i|em)>/gi, "*");
@@ -1279,6 +1289,22 @@ function formatarTextoMensagemIA(raw) {
     </div>`;
   }
 
+  if (temCardEditalPDF) {
+    txt += `
+    <div style="margin-top:14px;padding:14px;background:rgba(16,185,129,0.08);border-radius:14px;border:1.5px solid rgba(16,185,129,0.3);text-align:center;">
+      <div style="font-weight:800;font-size:13.5px;color:#059669;margin-bottom:4px;">📄 Cronograma do Edital Pronto!</div>
+      <div style="font-size:12px;color:var(--muted,#64748b);margin-bottom:10px;">Importe as próximas 2 semanas direto para as suas tarefas ou abra o planejador para ajustar pesos e horas:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+        <button type="button" class="btn primary small" data-act="ia-importar-edital-chat" style="background:#10B981;font-weight:800;padding:8px 16px;border-radius:10px;">
+          📲 Importar para minhas Tarefas (2 semanas)
+        </button>
+        <button type="button" class="btn ghost small" data-act="ia-abrir-edital-chat" style="font-weight:800;padding:8px 14px;border-radius:10px;">
+          ⚙️ Ajustar Pesos / Horas
+        </button>
+      </div>
+    </div>`;
+  }
+
   if (idsTarefasCriadas.length && typeof S === "object" && S && Array.isArray(S.tasks)) {
     const tarefas = idsTarefasCriadas.map(id => S.tasks.find(x => x.id === id)).filter(Boolean);
     if (tarefas.length) {
@@ -1315,6 +1341,174 @@ function formatarTextoMensagemIA(raw) {
   }
 
   return txt;
+}
+
+async function processarArquivoEditalNoChatIA(arquivo) {
+  if (!arquivo) return;
+  const nomeArq = String(arquivo.name || "edital.pdf").slice(0, 80);
+  const stream = document.getElementById("ia-chat-stream");
+  const msgUser = `📎 Enviei o edital: **${nomeArq}**`;
+
+  chatIaHistorico.push({
+    remetente: "user",
+    texto: msgUser,
+    hora: new Date().toLocaleTimeString().slice(0, 5)
+  });
+
+  if (stream) {
+    stream.insertAdjacentHTML(
+      "beforeend",
+      `<div class="ia-message user"><div class="ia-msg-container"><div class="ia-msg-bubble">${formatarTextoMensagemIA(msgUser)}</div></div></div>`
+    );
+    stream.insertAdjacentHTML(
+      "beforeend",
+      `<div class="ia-message ia" id="ia-typing-box">
+        <div class="ia-thinking-live">
+          <span class="ia-thought-icon">📄</span>
+          <span>Lendo PDF do edital e gerando cronograma das matérias...</span>
+        </div>
+      </div>`
+    );
+    stream.scrollTop = stream.scrollHeight;
+  }
+
+  try {
+    const extrair =
+      typeof extrairTextoDePDF === "function"
+        ? extrairTextoDePDF
+        : a => (a && typeof a.text === "function" ? a.text() : Promise.resolve(""));
+    const textoBruto = await extrair(arquivo);
+    const hoje = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
+    const analise =
+      typeof analisarEdital === "function"
+        ? await analisarEdital(textoBruto, hoje)
+        : { nome: nomeArq.replace(/\.[^.]+$/, ""), dataProva: "", materias: [], fonte: "local" };
+
+    let respPensamento = "";
+    let respTexto = "";
+
+    if (!analise || !Array.isArray(analise.materias) || !analise.materias.length) {
+      respPensamento = [
+        `📄 **LEITOR DE EDITAL PDF (${nomeArq})**`,
+        `• 📝 **Caracteres extraídos:** ${(textoBruto || "").length}`,
+        `• ⚠️ **Diagnóstico:** O PDF não continha texto selecionável de disciplinas ou parece ser digitalizado como imagem.`
+      ].join("\n");
+      respTexto = `Recebi o arquivo **${nomeArq}**, mas não encontrei a lista de disciplinas com tópicos selecionáveis nele (pode ser um PDF escaneado como imagem ou sem a seção de Conteúdo Programático).\n\nVocê pode colar o texto do conteúdo programático diretamente aqui ou abrir o planejador completo clicando abaixo:\n\n[[ACAO_CRONOGRAMA_EDITAL_PDF]]`;
+    } else {
+      const nomeEdital = analise.nome || nomeArq.replace(/\.[^.]+$/, "");
+      const horasDia =
+        typeof estadoEdital !== "undefined" && estadoEdital.cfg ? estadoEdital.cfg.horasDia || 3 : 3;
+      const diasSemana =
+        typeof estadoEdital !== "undefined" && estadoEdital.cfg ? estadoEdital.cfg.diasSemana || 6 : 6;
+      const dataProva =
+        analise.dataProva ||
+        (typeof estadoEdital !== "undefined" && estadoEdital.cfg ? estadoEdital.cfg.dataProva || "" : "");
+
+      const plano =
+        typeof gerarCronogramaEdital === "function"
+          ? gerarCronogramaEdital({
+              materias: analise.materias,
+              horasDia,
+              diasSemana,
+              dataProva,
+              inicio: hoje
+            })
+          : null;
+
+      if (typeof estadoEdital !== "undefined") {
+        estadoEdital.texto = String(textoBruto || "").slice(0, 60000);
+        estadoEdital.analise = analise;
+        if (dataProva) estadoEdital.cfg.dataProva = dataProva;
+        estadoEdital.plano = plano && !plano.erro ? plano : null;
+      }
+
+      const totalTopicos = analise.materias.reduce((acc, m) => acc + (m.topicos ? m.topicos.length : 0), 0);
+      const listaMaterias = analise.materias
+        .map((m, idx) => `${idx + 1}. **${m.nome}** — ${m.topicos.length} tópico(s) *(Peso ${m.peso || 1})*`)
+        .join("\n");
+
+      const previaDias =
+        plano && Array.isArray(plano.dias)
+          ? plano.dias
+              .slice(0, 3)
+              .map(d => {
+                const dataFmt = d.data.split("-").reverse().slice(0, 2).join("/");
+                const bTxt = d.blocos.map(b => `${b.materia} (${b.titulo})`).join(" + ");
+                return `• **${dataFmt}:** ${bTxt}`;
+              })
+              .join("\n")
+          : "";
+
+      respPensamento = [
+        `📄 **PARSER DE EDITAL PDF & GERADOR DE CRONOGRAMA**`,
+        `• 📎 **Arquivo Recebido:** "${nomeArq}" (${(textoBruto || "").length} caracteres lidos)`,
+        `• 📚 **Disciplinas Identificadas:** ${analise.materias.length} matérias e ${totalTopicos} tópicos programáticos`,
+        `• 📅 **Data da Prova:** ${dataProva ? dataProva.split("-").reverse().join("/") : "Não informada (ciclo de 12 semanas)"}`,
+        `• ⚡ **Cronograma Calculado:** ${plano && plano.resumo ? `${plano.resumo.totalDias} dias de estudo (${plano.resumo.horasTotais}h totais, ${plano.resumo.cobertura}% de cobertura do edital)` : "Pronto para ajuste"}`
+      ].join("\n");
+
+      respTexto = `Li o seu edital **${nomeEdital}** e já montei o cronograma completo para todas as matérias! 🎯📄
+
+**📚 Disciplinas encontradas (${analise.materias.length} matérias · ${totalTopicos} tópicos):**
+${listaMaterias}
+
+${
+  plano && plano.resumo
+    ? `**🗓️ Resumo do Cronograma Gerado (${horasDia}h/dia · ${diasSemana} dias/semana):**
+• **Total:** ${plano.resumo.totalDias} dias de estudo (${plano.resumo.horasTotais}h no total) cobrindo **${plano.resumo.cobertura}%** dos tópicos com teoria, questões, revisões semanais e simulados.${dataProva ? `\n• **Prova detectada:** ${dataProva.split("-").reverse().join("/")}` : ""}
+
+**Prévia dos primeiros dias:**
+${previaDias}`
+    : ""
+}
+
+Clique em **📲 Importar para minhas Tarefas** abaixo para já lançar as próximas 2 semanas na sua agenda do Prumo:
+
+[[ACAO_CRONOGRAMA_EDITAL_PDF]]`;
+    }
+
+    const typing = document.getElementById("ia-typing-box");
+    if (typing) typing.remove();
+
+    chatIaHistorico.push({
+      remetente: "ia",
+      texto: respTexto,
+      pensamento: respPensamento,
+      hora: new Date().toLocaleTimeString().slice(0, 5)
+    });
+    salvarHistoricoChatIA();
+
+    if (stream) {
+      stream.insertAdjacentHTML(
+        "beforeend",
+        `<div class="ia-message ia">
+          <div class="ia-msg-container">
+            ${
+              respPensamento
+                ? `
+              <details class="ia-thought-card" open>
+                <summary class="ia-thought-summary">
+                  <span class="ia-thought-icon">🧠</span>
+                  <span class="ia-thought-title">Processo de Reflexão</span>
+                  <span class="ia-thought-chevron">▾</span>
+                </summary>
+                <div class="ia-thought-content">${formatarTextoMensagemIA(respPensamento)}</div>
+              </details>
+            `
+                : ""
+            }
+            <div class="ia-msg-bubble">${formatarTextoMensagemIA(respTexto)}</div>
+          </div>
+        </div>`
+      );
+      stream.scrollTop = stream.scrollHeight;
+    }
+    return { pensamento: respPensamento, texto: respTexto };
+  } catch (err) {
+    const typing = document.getElementById("ia-typing-box");
+    if (typing) typing.remove();
+    return null;
+  }
 }
 
 async function submeterChatIA(e) {
@@ -2964,6 +3158,38 @@ if (typeof ACOES_EXTRAS !== "undefined") {
       if (typeof render === "function") render();
     }
   };
+  ACOES_EXTRAS["ia-anexar-pdf"] = () => {
+    const inp = document.getElementById("ia-input-pdf");
+    if (inp) inp.click();
+  };
+  ACOES_EXTRAS["ia-importar-edital-chat"] = () => {
+    if (
+      typeof estadoEdital !== "undefined" &&
+      estadoEdital.plano &&
+      typeof importarCronogramaEdital === "function"
+    ) {
+      const nome = (estadoEdital.analise && estadoEdital.analise.nome) || "Edital";
+      const r = importarCronogramaEdital(estadoEdital.plano, nome, 14);
+      fecharChatPrumiIA();
+      if (typeof toast === "function") {
+        toast(
+          r && r.n
+            ? `📄 ${r.n} blocos do edital importados para suas tarefas!`
+            : "Cronograma do edital atualizado na agenda!",
+          false,
+          "happy"
+        );
+      }
+      if (typeof render === "function") render();
+    } else if (typeof abrirEditalPrumo === "function") {
+      fecharChatPrumiIA();
+      abrirEditalPrumo();
+    }
+  };
+  ACOES_EXTRAS["ia-abrir-edital-chat"] = () => {
+    fecharChatPrumiIA();
+    if (typeof abrirEditalPrumo === "function") abrirEditalPrumo();
+  };
 }
 
 // Delegação de cliques para botões com data-act (garante resposta direta em qualquer contexto)
@@ -3073,6 +3299,26 @@ document.addEventListener("click", e => {
       MiniPrumoAI.gerarBlocosSemanaisMateria(MiniPrumoAI.obterPropostaSemanaPendente());
       if (typeof render === "function") render();
     }
+    return;
+  }
+  const btnAnexarPdf = e.target.closest("[data-act='ia-anexar-pdf']");
+  if (btnAnexarPdf) {
+    e.preventDefault();
+    const inp = document.getElementById("ia-input-pdf");
+    if (inp) inp.click();
+    return;
+  }
+  const btnImpEditalChat = e.target.closest("[data-act='ia-importar-edital-chat']");
+  if (btnImpEditalChat) {
+    e.preventDefault();
+    if (ACOES_EXTRAS["ia-importar-edital-chat"]) ACOES_EXTRAS["ia-importar-edital-chat"]();
+    return;
+  }
+  const btnAbrEditalChat = e.target.closest("[data-act='ia-abrir-edital-chat']");
+  if (btnAbrEditalChat) {
+    e.preventDefault();
+    fecharChatPrumiIA();
+    if (typeof abrirEditalPrumo === "function") abrirEditalPrumo();
     return;
   }
 
@@ -3247,8 +3493,14 @@ document.addEventListener("submit", e => {
   }
 });
 
-// Delegação de alteração de campos (Ajustes da IA e Prioridade)
+// Delegação de alteração de campos (Ajustes da IA, Upload de PDF no Chat e Prioridade)
 document.addEventListener("change", e => {
+  if (e.target && e.target.id === "ia-input-pdf" && e.target.files && e.target.files[0]) {
+    const arq = e.target.files[0];
+    e.target.value = "";
+    processarArquivoEditalNoChatIA(arq);
+    return;
+  }
   if (e.target && e.target.id === "set-ia-provedor") {
     atualizarProvedorIA(e.target.value);
     return;
@@ -3300,6 +3552,7 @@ if (typeof window !== "undefined") {
   window.fecharChatPrumiIA = fecharChatPrumiIA;
   window.fecharChatPrumiIASeFundo = fecharChatPrumiIASeFundo;
   window.submeterChatIA = submeterChatIA;
+  window.processarArquivoEditalNoChatIA = processarArquivoEditalNoChatIA;
   window.enviarMensagemRapidaIA = enviarMensagemRapidaIA;
   window.abrirDesdobradorMetasIA = abrirDesdobradorMetasIA;
   window.fecharDesdobradorMetasIA = fecharDesdobradorMetasIA;

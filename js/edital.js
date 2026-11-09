@@ -547,14 +547,277 @@ function edPesoPadrao(nome) {
   return 1;
 }
 
+/** Decodifica strings literais (texto) e hexadecimais <FEFF...> de operadores de texto PDF (Tj / TJ) */
+function edDecodificarLiteralPDF(str) {
+  let out = "";
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (ch === "\\" && i + 1 < str.length) {
+      const nx = str[i + 1];
+      if (nx >= "0" && nx <= "7") {
+        const oct = str.slice(i + 1, i + 4).match(/^[0-7]{1,3}/)[0];
+        out += String.fromCharCode(parseInt(oct, 8));
+        i += oct.length;
+      } else if (nx === "n") {
+        out += "\n";
+        i++;
+      } else if (nx === "r") {
+        out += "\r";
+        i++;
+      } else if (nx === "t") {
+        out += " ";
+        i++;
+      } else if (nx === "\n" || nx === "\r") {
+        i++;
+      } else {
+        out += nx;
+        i++;
+      }
+    } else {
+      out += ch;
+    }
+  }
+  return out;
+}
+
+function edDecodificarHexPDF(hex) {
+  const limpo = hex.replace(/[^0-9A-Fa-f]/g, "");
+  if (!limpo) return "";
+  if (limpo.toUpperCase().startsWith("FEFF")) {
+    let out = "";
+    for (let i = 4; i + 3 < limpo.length; i += 4) {
+      out += String.fromCharCode(parseInt(limpo.slice(i, i + 4), 16));
+    }
+    return out;
+  }
+  let out = "";
+  for (let i = 0; i + 1 < limpo.length; i += 2) {
+    out += String.fromCharCode(parseInt(limpo.slice(i, i + 2), 16));
+  }
+  return out;
+}
+
+function edExtrairOperadoresTextoPDF(conteudoStream) {
+  const linhas = [];
+  let linhaAtual = "";
+  const blocosBT = conteudoStream.match(/BT[\s\S]*?ET/g) || [conteudoStream];
+  for (const bloco of blocosBT) {
+    const reToken = /\((?:\\.|[^\\()])*\)|<[0-9A-Fa-f\s]+>|\[(?:\\.|[^\]])*\]\s*TJ|\b(?:Td|TD|ET)\b|T\*|'/g;
+    let m;
+    while ((m = reToken.exec(bloco))) {
+      const tok = m[0];
+      if (tok === "Td" || tok === "TD" || tok === "T*" || tok === "ET" || tok === "'") {
+        if (linhaAtual.trim()) {
+          linhas.push(linhaAtual.trim());
+          linhaAtual = "";
+        }
+      } else if (tok.startsWith("(") && tok.endsWith(")")) {
+        linhaAtual += edDecodificarLiteralPDF(tok.slice(1, -1));
+      } else if (tok.startsWith("<") && tok.includes(">")) {
+        linhaAtual += edDecodificarHexPDF(tok.slice(1, tok.indexOf(">")));
+      } else if (tok.startsWith("[")) {
+        const subRe = /\((?:\\.|[^\\()])*\)|<[0-9A-Fa-f\s]+>|(-?\d+(?:\.\d+)?)/g;
+        let sm;
+        while ((sm = subRe.exec(tok))) {
+          const st = sm[0];
+          if (st.startsWith("(")) {
+            linhaAtual += edDecodificarLiteralPDF(st.slice(1, -1));
+          } else if (st.startsWith("<")) {
+            linhaAtual += edDecodificarHexPDF(st.slice(1, -1));
+          } else if (sm[1] && parseFloat(sm[1]) < -120) {
+            linhaAtual += " ";
+          }
+        }
+      }
+    }
+    if (linhaAtual.trim()) {
+      linhas.push(linhaAtual.trim());
+      linhaAtual = "";
+    }
+  }
+  return linhas.join("\n");
+}
+
+function edBytesParaLatin1(bytes) {
+  if (typeof TextDecoder !== "undefined") {
+    try {
+      return new TextDecoder("latin1").decode(bytes);
+    } catch (_) {}
+  }
+  let out = "";
+  const tam = bytes.length;
+  const bloco = 8192;
+  for (let i = 0; i < tam; i += bloco) {
+    out += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + bloco, tam)));
+  }
+  return out;
+}
+
+async function edDescomprimirBytes(bytes, formato) {
+  if (typeof DecompressionStream === "undefined") return null;
+  try {
+    const ds = new DecompressionStream(formato);
+    const writer = ds.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    const resp = new Response(ds.readable);
+    const ab = await resp.arrayBuffer();
+    return new Uint8Array(ab);
+  } catch (_) {
+    return null;
+  }
+}
+
+/**
+ * Extrai o texto de um arquivo PDF (ou .txt/.md), funcionando tanto online (via pdf.js quando disponível)
+ * quanto 100% offline no navegador/dispositivo via parser nativo de streams PDF.
+ */
+async function extrairTextoDePDF(entrada) {
+  if (!entrada) return "";
+  if (typeof entrada === "string") {
+    if (!entrada.startsWith("%PDF-")) return entrada;
+    return edExtrairOperadoresTextoPDF(entrada);
+  }
+
+  // Se for arquivo de texto simples (.txt / .md)
+  if (
+    entrada &&
+    typeof entrada.name === "string" &&
+    /\.(txt|md)$/i.test(entrada.name) &&
+    typeof entrada.text === "function"
+  ) {
+    return await entrada.text();
+  }
+
+  let bytes;
+  if (entrada instanceof Uint8Array) {
+    bytes = entrada;
+  } else if (entrada instanceof ArrayBuffer) {
+    bytes = new Uint8Array(entrada);
+  } else if (entrada && typeof entrada.arrayBuffer === "function") {
+    bytes = new Uint8Array(await entrada.arrayBuffer());
+  } else if (typeof FileReader !== "undefined" && entrada instanceof Blob) {
+    bytes = await new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(new Uint8Array(fr.result));
+      fr.onerror = () => reject(new Error("Falha ao ler arquivo"));
+      fr.readAsArrayBuffer(entrada);
+    });
+  } else {
+    return "";
+  }
+
+  // Verificar assinatura %PDF-
+  const cabecalhoAscii = String.fromCharCode(...bytes.slice(0, Math.min(8, bytes.length)));
+  if (!cabecalhoAscii.startsWith("%PDF-")) {
+    try {
+      return new TextDecoder("utf-8").decode(bytes);
+    } catch (_) {
+      return String.fromCharCode(...bytes.slice(0, 60000));
+    }
+  }
+
+  // 1. Se pdfjsLib estiver carregado na janela, usar extração completa página a página
+  if (typeof window !== "undefined" && window.pdfjsLib && typeof window.pdfjsLib.getDocument === "function") {
+    try {
+      const doc = await window.pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+      const paginasTxt = [];
+      const maxPag = Math.min(doc.numPages || 1, 80);
+      for (let p = 1; p <= maxPag; p++) {
+        const page = await doc.getPage(p);
+        const tc = await page.getTextContent();
+        let ultY = null;
+        let buf = "";
+        for (const item of tc.items || []) {
+          const y = item.transform ? Math.round(item.transform[5]) : null;
+          if (ultY !== null && y !== null && Math.abs(y - ultY) > 4) {
+            paginasTxt.push(buf.trim());
+            buf = "";
+          }
+          buf += (buf && !buf.endsWith(" ") ? " " : "") + (item.str || "");
+          ultY = y;
+        }
+        if (buf.trim()) paginasTxt.push(buf.trim());
+      }
+      const juntado = paginasTxt.filter(Boolean).join("\n");
+      if (juntado.trim().length > 20) return juntado;
+    } catch (_) {}
+  }
+
+  // 2. Extrator PDF Nativo Offline (Lê streams comprimidos FlateDecode e não-comprimidos)
+  const latin1 = edBytesParaLatin1(bytes);
+  const partesTexto = [];
+  const reStream = /stream\r?\n/g;
+  let m;
+  while ((m = reStream.exec(latin1))) {
+    const startIdx = m.index + m[0].length;
+    const endIdx = latin1.indexOf("endstream", startIdx);
+    if (endIdx === -1) break;
+    let fimReal = endIdx;
+    if (latin1[fimReal - 1] === "\n") fimReal--;
+    if (latin1[fimReal - 1] === "\r") fimReal--;
+
+    const dictAntes = latin1.slice(Math.max(0, m.index - 260), m.index);
+    const fatia = bytes.slice(startIdx, fimReal);
+    let conteudoStr = "";
+
+    if (/\/FlateDecode\b/.test(dictAntes)) {
+      let decomp = await edDescomprimirBytes(fatia, "deflate");
+      if (!decomp) decomp = await edDescomprimirBytes(fatia, "deflate-raw");
+      if (decomp) {
+        conteudoStr = edBytesParaLatin1(decomp);
+      }
+    } else if (!/\/(?:DCTDecode|JPXDecode|JBIG2Decode|CCITTFaxDecode)\b/.test(dictAntes)) {
+      conteudoStr = latin1.slice(startIdx, fimReal);
+    }
+
+    if (
+      conteudoStr &&
+      (conteudoStr.includes("Tj") || conteudoStr.includes("TJ") || conteudoStr.includes("BT"))
+    ) {
+      const extraido = edExtrairOperadoresTextoPDF(conteudoStr);
+      if (extraido.trim()) partesTexto.push(extraido.trim());
+    }
+    reStream.lastIndex = endIdx + 9;
+  }
+
+  if (partesTexto.length) {
+    return partesTexto.join("\n");
+  }
+
+  // Fallback: extrair operadores do corpo inteiro
+  return edExtrairOperadoresTextoPDF(latin1);
+}
+
 /** Lê o texto do edital sem internet. Devolve { nome, dataProva, materias:[{nome,peso,topicos,sugerido}], fonte } */
 function analisarEditalLocal(texto, ref) {
   const bruto = String(texto || "");
-  const linhas = bruto
+  const linhasBrutas = bruto
     .replace(/\r\n?/g, "\n")
     .split("\n")
     .map(l => l.replace(/\s+/g, " ").trim())
     .filter(Boolean);
+
+  // Expandir linhas onde o PDF juntou "DISCIPLINA: 1. Tópico A; 2. Tópico B" na mesma linha
+  const linhas = [];
+  for (const l of linhasBrutas) {
+    const mInline = /^([A-ZÀ-Ýa-zà-ÿ\s–-]{3,55}?)\s*[:–-]\s*(.+)$/.exec(l);
+    if (mInline) {
+      const possivelCab = mInline[1].trim();
+      const resto = mInline[2].trim();
+      const nCab = edNorm(possivelCab.replace(/^(?:\d{1,2}[.)]|[IVX]{1,4}\s*[-–.)])\s+/, ""));
+      const ehConhecida =
+        Boolean(TOPICOS_PADRAO[nCab] || ALIAS_DISCIPLINAS[nCab]) ||
+        (edRazaoMaiuscula(possivelCab) >= 0.85 && ED_PALAVRAS_DISCIPLINA.test(nCab));
+      if (ehConhecida && resto.length >= 8) {
+        linhas.push(possivelCab + ":");
+        linhas.push(resto);
+        continue;
+      }
+    }
+    linhas.push(l);
+  }
+
   const secoes = [];
   let atual = null;
   for (const l of linhas) {
@@ -995,8 +1258,8 @@ function renderAbaEditalHTML() {
     <div class="note" style="margin:8px 0 4px;">ou cole o conteúdo programático do edital:</div>
     <textarea id="ed-texto" class="ed-texto" rows="7" maxlength="60000" placeholder="Cole aqui o conteúdo programático do edital (disciplinas e tópicos)...">${edEsc(st.texto)}</textarea>
     <div class="ed-linha">
-      <label class="btn small" for="ed-arquivo">📎 Abrir arquivo .txt</label>
-      <input type="file" id="ed-arquivo" accept=".txt,.md,text/plain" hidden />
+      <label class="btn small" for="ed-arquivo">📎 Enviar PDF ou .txt do edital</label>
+      <input type="file" id="ed-arquivo" accept=".pdf,.txt,.md,application/pdf,text/plain" hidden />
       <button type="button" class="btn small primary" data-edital-act="analisar" ${st.carregando ? "disabled" : ""}>${st.carregando ? "⏳ Lendo..." : "🔎 Analisar edital"}</button>
     </div>
     <div class="note">Dica: abra o PDF do edital, copie o "Conteúdo Programático" e cole aqui. Entrando na conta, a IA organiza por disciplina; sem conta, uso o leitor do aparelho.</div>
@@ -1266,17 +1529,27 @@ if (typeof document !== "undefined") {
     }
     if (t.id === "ed-arquivo" && t.files && t.files[0]) {
       const f = t.files[0];
-      if (f.size > 1.5 * 1024 * 1024) {
-        estadoEdital.msg = "Arquivo grande demais. Cole só o conteúdo programático.";
+      if (f.size > 15 * 1024 * 1024) {
+        estadoEdital.msg = "Arquivo grande demais (máx. 15 MB).";
         return atualizarAbaEdital();
       }
-      const fr = new FileReader();
-      fr.onload = () => {
-        estadoEdital.texto = String(fr.result || "").slice(0, 60000);
-        estadoEdital.msg = `Arquivo "${edLimparStr(f.name, 60)}" aberto. Toque em Analisar edital.`;
-        atualizarAbaEdital();
-      };
-      fr.readAsText(f);
+      estadoEdital.carregando = true;
+      estadoEdital.msg = `Lendo "${edLimparStr(f.name, 60)}"...`;
+      atualizarAbaEdital();
+      extrairTextoDePDF(f)
+        .then(txt => {
+          estadoEdital.carregando = false;
+          estadoEdital.texto = String(txt || "").slice(0, 60000);
+          estadoEdital.msg = `Arquivo "${edLimparStr(f.name, 60)}" lido. Analisando disciplinas...`;
+          atualizarAbaEdital();
+          if (estadoEdital.texto.trim().length >= 20) edAnalisar();
+        })
+        .catch(() => {
+          estadoEdital.carregando = false;
+          estadoEdital.msg =
+            "Não foi possível ler esse arquivo PDF. Tente colar o texto do conteúdo programático.";
+          atualizarAbaEdital();
+        });
     }
   });
 }
@@ -1287,6 +1560,7 @@ if (typeof window !== "undefined") {
     EXAMES_EDITAIS,
     buscarTopicosPadrao,
     montarPresetEdital,
+    extrairTextoDePDF,
     analisarEditalLocal,
     analisarEdital,
     edValidarResultadoIA,

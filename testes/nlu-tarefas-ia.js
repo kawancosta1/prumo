@@ -125,6 +125,70 @@ module.exports = async function (url) {
     );
     const temMateriaICMC = ev(`S.subjects.some(s => s.name.includes("Cálculo") && s.name.includes("ICMC"))`);
     ok(temMateriaICMC, "cadastra a matéria 'Cálculo (ICMC-USP)' automaticamente em S.subjects");
+
+    // 10. Envio de PDF de Edital no Chat da IA -> extração de matérias, cronograma e importação para Tarefas
+    const textoExtraidoPDF = await ev(`(async () => {
+      const pdfStr = [
+        "%PDF-1.4",
+        "1 0 obj << /Length 260 >> stream",
+        "BT",
+        "(EDITAL CONCURSO PUBLICO 2027) Tj T*",
+        "(Prova objetiva em 15/12/2027) Tj T*",
+        "(LINGUA PORTUGUESA) Tj T*",
+        "(1. Interpretacao de textos; 2. Concordancia verbal; 3. Crase.) Tj T*",
+        "(DIREITO CONSTITUCIONAL) Tj T*",
+        "(1. Direitos e garantias fundamentais; 2. Organizacao do Estado.) Tj",
+        "ET",
+        "endstream endobj",
+        "%%EOF"
+      ].join("\\n");
+      const bytes = new Uint8Array(pdfStr.length);
+      for (let i = 0; i < pdfStr.length; i++) bytes[i] = pdfStr.charCodeAt(i) & 0xff;
+      const fakeFile = {
+        name: "edital-concurso.pdf",
+        type: "application/pdf",
+        size: bytes.byteLength,
+        arrayBuffer: async () => bytes.buffer
+      };
+      const txt = await extrairTextoDePDF(fakeFile);
+      await processarArquivoEditalNoChatIA(fakeFile);
+      return txt;
+    })()`);
+    ok(
+      textoExtraidoPDF.includes("LINGUA PORTUGUESA") && textoExtraidoPDF.includes("DIREITO CONSTITUCIONAL"),
+      "extrairTextoDePDF decodifica operadores de texto de arquivo PDF nativamente"
+    );
+    const qtdDiscEdital = ev(
+      `estadoEdital && estadoEdital.analise && estadoEdital.analise.materias ? estadoEdital.analise.materias.length : 0`
+    );
+    ok(
+      qtdDiscEdital >= 2 &&
+        ev(`!!(estadoEdital && estadoEdital.plano && estadoEdital.plano.dias.length > 0)`),
+      "processarArquivoEditalNoChatIA extrai as matérias do PDF e gera o cronograma automaticamente: " +
+        qtdDiscEdital +
+        " matérias"
+    );
+    const ultimaMsgChat = ev(
+      `chatIaHistorico[chatIaHistorico.length - 1] ? chatIaHistorico[chatIaHistorico.length - 1].texto : ""`
+    );
+    ok(
+      ultimaMsgChat.includes("[[ACAO_CRONOGRAMA_EDITAL_PDF]]"),
+      "chat exibe o resumo do edital com o card interativo [[ACAO_CRONOGRAMA_EDITAL_PDF]]"
+    );
+    const htmlCardEdital = ev(`formatarTextoMensagemIA(${JSON.stringify(ultimaMsgChat)})`);
+    ok(
+      htmlCardEdital.includes("ia-importar-edital-chat") &&
+        htmlCardEdital.includes("Importar para minhas Tarefas"),
+      "card do PDF no chat renderiza botão para importar o cronograma para as Tarefas"
+    );
+    const antesImportEdital = ev(`S.tasks.length`);
+    ev(`ACOES_EXTRAS["ia-importar-edital-chat"]()`);
+    const depoisImportEdital = ev(`S.tasks.length`);
+    ok(
+      depoisImportEdital > antesImportEdital,
+      "clicar em importar cronograma do PDF no chat adiciona os blocos de estudo em S.tasks: +" +
+        (depoisImportEdital - antesImportEdital)
+    );
   } finally {
     fechar();
   }
