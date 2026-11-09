@@ -332,13 +332,18 @@ module.exports = async function (url) {
       "comando 'cria 3 flashcards sobre Calculo' gera e salva 3 flashcards SM-2 em S.flashcards"
     );
 
-    // 16. Comando operacional: registrar água pelo chat
+    // 16. Comando operacional: registrar água pelo chat (algarismos e por extenso como "eu bebi um litro de agua")
     const aguaAntes = ev(`waterToday()`);
     const respAgua = await ev(`chamarProvedorLLM("bebi 500ml de agua", [])`);
-    const aguaDepois = ev(`waterToday()`);
+    const aguaDepois500 = ev(`waterToday()`);
+    const respAguaExtenso = await ev(`chamarProvedorLLM("eu bebi um litro de agua", [])`);
+    const aguaDepois1500 = ev(`waterToday()`);
     ok(
-      String(respAgua).includes("+500ml") && aguaDepois === aguaAntes + 500,
-      "comando 'bebi 500ml de agua' soma 500ml na hidratação diária imediatamente"
+      String(respAgua).includes("+500ml") &&
+        aguaDepois500 === aguaAntes + 500 &&
+        String(respAguaExtenso).includes("+1000ml") &&
+        aguaDepois1500 === aguaAntes + 1500,
+      "comandos 'bebi 500ml de agua' e 'eu bebi um litro de agua' somam 500ml e 1000ml na hidratação diária imediatamente"
     );
   } finally {
     fechar();

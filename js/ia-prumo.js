@@ -355,6 +355,62 @@ function resolverDataAlvoComandoIA(textoAlvo, hojeStr) {
   return { data: add(hojeStr, 1), rotulo: "Amanhã" };
 }
 
+function converterNumeroExtensoIA(str) {
+  if (!str) return NaN;
+  const limpo = String(str).trim().replace(",", ".");
+  if (/^\d+(?:\.\d+)?$/.test(limpo)) return parseFloat(limpo);
+  const mapa = {
+    meio: 0.5,
+    meia: 0.5,
+    um: 1,
+    uma: 1,
+    dois: 2,
+    duas: 2,
+    tres: 3,
+    quatro: 4,
+    cinco: 5,
+    seis: 6,
+    sete: 7,
+    oito: 8,
+    nove: 9,
+    dez: 10
+  };
+  return mapa[limpo] !== undefined ? mapa[limpo] : NaN;
+}
+
+function extrairMlComandoAgua(norm) {
+  // Exige verbo de ingestão/registro OU menção explícita a água com medida
+  const temVerboAgua =
+    /\b(?:bebi|tomei|registra(?:r)?|adiciona(?:r)?|marca(?:r)?|coloca(?:r)?|anota(?:r)?|ingeri|hidratei)\b/.test(
+      norm
+    );
+  const temPalavraAgua = /\b(?:agua|dagua|d'agua|d\s+agua|hidratacao)\b/.test(norm);
+  if (!temVerboAgua && !temPalavraAgua) return 0;
+
+  // Padrão com quantidade (algarismo ou por extenso) + unidade + opcional "e meio/meia"
+  const rxQtdUnidade =
+    /\b(\d+(?:[.,]\d+)?|meio|meia|um|uma|dois|duas|tres|quatro|cinco|seis|sete|oito|nove|dez)\s*(ml|mililitros?|l|litros?|copos?|garrafinhas?|garrafas?)\b(?:\s*e\s*(meio|meia))?/i;
+  const m = norm.match(rxQtdUnidade);
+  if (m) {
+    let qtd = converterNumeroExtensoIA(m[1]);
+    if (isNaN(qtd)) return 0;
+    if (m[3]) qtd += 0.5;
+    const un = m[2].toLowerCase();
+    // Se a unidade for apenas "l" ou "ml" sem mencionar água, exige verbo de hidratação
+    if (!temPalavraAgua && !temVerboAgua) return 0;
+    if (un.startsWith("l")) return Math.round(qtd * 1000);
+    if (un.startsWith("copo")) return Math.round(qtd * 250);
+    if (un.startsWith("garraf")) return Math.round(qtd * 500);
+    return Math.round(qtd);
+  }
+
+  // Caso a pessoa diga apenas "bebi agua" / "tomei agua" / "bebi um pouco de agua"
+  if (/\b(?:bebi|tomei|ingeri)\s+(?:um\s+pouco\s+de\s+)?(?:agua|dagua|d'agua)\b/.test(norm)) {
+    return 250;
+  }
+  return 0;
+}
+
 function executarComandoOperacionalChatIA(promptUsuario) {
   if (!promptUsuario || typeof S === "undefined" || !S) return null;
   const raw = String(promptUsuario).trim();
@@ -366,7 +422,7 @@ function executarComandoOperacionalChatIA(promptUsuario) {
 
   // 1. Comando de Reagendamento de Tarefas Atrasadas ou Pendentes
   const matchRemarcar = norm.match(
-    /\b(?:remarca(?:r)?|adia(?:r)?|move(?:r)?|joga(?:r)?|passa(?:r)?|transfere|transferir|empurra(?:r)?)\s+(?:as\s+|minhas\s+|todas\s+as\s+)?(?:tarefas?\s+)?(atrasadas?|pendentes?|de\s+hoje|nao\s+feitas?)(?:\s+de\s+hoje)?(?:\s+(?:para|pra|pro)\s+(.+))?$/i
+    /\b(?:remarca(?:r)?|adia(?:r)?|move(?:r)?|joga(?:r)?|passa(?:r)?|transfere|transferir|empurra(?:r)?)\s+(?:as\s+|minhas\s+|todas\s+as\s+|o\s+que\s+(?:ta|esta|ficou)\s+)?(?:tarefas?\s+|pendencias?\s+)?(atrasad[oa]s?|pendentes?|de\s+hoje|nao\s+feit[oa]s?)(?:\s+de\s+hoje)?(?:\s+(?:para|pra|pro)\s+(.+))?$/i
   );
   if (matchRemarcar && Array.isArray(S.tasks)) {
     const tipoFiltro = matchRemarcar[1] || "atrasadas";
@@ -423,10 +479,16 @@ function executarComandoOperacionalChatIA(promptUsuario) {
 
   // 2. Comando de Geração e Salvamento Direto de Flashcards SM-2 pelo Chat
   const matchFlashcards = raw.match(
-    /\b(?:cria(?:r)?|gera(?:r)?|faz(?:er)?|monta(?:r)?|adiciona(?:r)?)\s+(?:(\d+)\s+)?(?:flash\s*cards?|cards?\s+de\s+revis[ãa]o|cart[õo]es\s+de\s+estudo)\s+(?:de|sobre|para|da\s+mat[ée]ria)\s+(.+)$/i
+    /\b(?:cria(?:r)?|gera(?:r)?|faz(?:er)?|monta(?:r)?|adiciona(?:r)?|quero)\s+(?:(\d+|um|uma|dois|duas|tr[êe]s|quatro|cinco|seis|sete|oito|uns|alguns)\s+)?(?:flash\s*cards?|cards?\s+de\s+revis[ãa]o|cart[õo]es\s+de\s+estudo)\s+(?:de|sobre|para|da\s+mat[ée]ria)\s+(.+)$/i
   );
   if (matchFlashcards) {
-    const qtdPedida = Math.max(2, Math.min(8, parseInt(matchFlashcards[1], 10) || 4));
+    const numConvertido = converterNumeroExtensoIA(
+      String(matchFlashcards[1] || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+    );
+    const qtdPedida = Math.max(1, Math.min(8, !isNaN(numConvertido) ? Math.round(numConvertido) : 4));
     const temaBruto = matchFlashcards[2].replace(/[.!?]+$/, "").trim();
     const temaNorm = temaBruto
       .toLowerCase()
@@ -545,44 +607,33 @@ function executarComandoOperacionalChatIA(promptUsuario) {
   }
 
   // 3. Comando de Registro Rápido de Hidratação (Água) pelo Chat
-  const matchAgua = norm.match(
-    /\b(?:bebi|tomei|registra(?:r)?|adiciona(?:r)?|marca(?:r)?)\s+(\d+(?:[.,]\d+)?)\s*(ml|l|litros?|copos?)\s*(?:de\s+agua)?\b/i
-  );
-  if (matchAgua && /\b(?:agua|ml|litros?|copos?)\b/.test(norm)) {
-    const valorNum = parseFloat(String(matchAgua[1]).replace(",", "."));
-    const unidade = (matchAgua[2] || "ml").toLowerCase();
-    let mlAdicionar = 0;
-    if (unidade.startsWith("l")) mlAdicionar = Math.round(valorNum * 1000);
-    else if (unidade.startsWith("copo")) mlAdicionar = Math.round(valorNum * 250);
-    else mlAdicionar = Math.round(valorNum);
-
-    if (mlAdicionar > 0 && mlAdicionar <= 5000) {
-      if (typeof addWater === "function") {
-        addWater(mlAdicionar);
-      } else {
-        if (!S.water || typeof S.water !== "object") S.water = {};
-        if (!Array.isArray(S.water[hojeStr])) S.water[hojeStr] = [];
-        S.water[hojeStr].push({
-          id: typeof uid === "function" ? uid() : "w_" + Date.now(),
-          ml: mlAdicionar,
-          time: new Date().toTimeString().slice(0, 5)
-        });
-        if (typeof commit === "function") commit();
-        if (typeof render === "function") render();
-      }
-
-      const totalHoje = typeof waterToday === "function" ? waterToday() : mlAdicionar;
-      const meta = S.waterGoal || 2000;
-      const pct = Math.min(100, Math.round((totalHoje / meta) * 100));
-      const txtResp = `💧 Boa! Registrei **+${mlAdicionar}ml** de água hoje.\n\n• **Progresso de Hidratação:** **${totalHoje}ml / ${meta}ml** (${pct}% da meta diária concluída).`;
-      return {
-        pensamento: `• 💧 **Hidratação Registrada (0ms):** +${mlAdicionar}ml adicionados em \`S.water["${hojeStr}"]\`. Total: ${totalHoje}ml.`,
-        texto: txtResp,
-        toString() {
-          return this.texto;
-        }
-      };
+  const mlAdicionar = extrairMlComandoAgua(norm);
+  if (mlAdicionar > 0 && mlAdicionar <= 5000) {
+    if (typeof addWater === "function") {
+      addWater(mlAdicionar);
+    } else {
+      if (!S.water || typeof S.water !== "object") S.water = {};
+      if (!Array.isArray(S.water[hojeStr])) S.water[hojeStr] = [];
+      S.water[hojeStr].push({
+        id: typeof uid === "function" ? uid() : "w_" + Date.now(),
+        ml: mlAdicionar,
+        time: new Date().toTimeString().slice(0, 5)
+      });
+      if (typeof commit === "function") commit();
+      if (typeof render === "function") render();
     }
+
+    const totalHoje = typeof waterToday === "function" ? waterToday() : mlAdicionar;
+    const meta = S.waterGoal || 2000;
+    const pct = Math.min(100, Math.round((totalHoje / meta) * 100));
+    const txtResp = `💧 Boa! Registrei **+${mlAdicionar}ml** de água hoje.\n\n• **Progresso de Hidratação:** **${totalHoje}ml / ${meta}ml** (${pct}% da meta diária concluída).`;
+    return {
+      pensamento: `• 💧 **Hidratação Registrada (0ms):** +${mlAdicionar}ml adicionados em \`S.water["${hojeStr}"]\`. Total: ${totalHoje}ml.`,
+      texto: txtResp,
+      toString() {
+        return this.texto;
+      }
+    };
   }
 
   return null;
