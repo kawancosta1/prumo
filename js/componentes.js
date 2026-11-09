@@ -14,6 +14,7 @@ function taskRow(x, { showDate = false } = {}) {
   const meta = [];
   if (showDate) meta.push(`<span class="due soon" style="padding:1px 6px">${esc(relDay(x.date))}</span>`);
   if (x.time) meta.push(`<span class="mono">${esc(x.time)}</span>`);
+  if (x.dur) meta.push(`<span class="mono">${esc(fmtMin(x.dur))}</span>`);
   meta.push(`<span class="chip">${AREAS[x.area] || "Geral"}</span>`);
   if (S.persona === "otaku") {
     const rankLetra = ["C", "B", "A", "S"][x.prio || 0];
@@ -45,7 +46,7 @@ function taskRow(x, { showDate = false } = {}) {
       </label>
       <button class="check" data-act="toggle" data-id="${x.id}" aria-pressed="${!!x.done}" aria-label="Concluir ${esc(x.title)}">${ICON.check}</button>
       <div class="main clickable" data-act="open" data-id="${x.id}"><span class="title">${esc(x.title)}</span><span class="meta">${meta.join("<span>·</span>")}</span></div>
-      ${calLink({ title: x.title, date: x.date, time: x.time, dur: 60, recur: RRULE[x.repeat] || "" })}
+      ${calLink({ title: x.title, date: x.date, time: x.time, dur: x.dur || 60, recur: RRULE[x.repeat] || "" })}
       <button class="icon" data-act="open" data-id="${x.id}" aria-expanded="${open}" aria-label="Detalhes">${ICON.more}</button>
     </div>
     ${open ? taskDetail(x) : ""}

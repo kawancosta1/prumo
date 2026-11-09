@@ -13,42 +13,167 @@ const MiniPrumoAI = (() => {
   // Dicionário de Radicais Semânticos e Carga Afetiva
   const LEXICO_AFETIVO = {
     // Intenções de Arrancada / Ação
-    arrancada: ["vamo", "bora", "partiu", "dale", "vamos", "vai", "acelera", "comeca", "inicia", "foco", "pra cima", "let's go"],
+    arrancada: [
+      "vamo",
+      "bora",
+      "partiu",
+      "dale",
+      "vamos",
+      "vai",
+      "acelera",
+      "comeca",
+      "inicia",
+      "foco",
+      "pra cima",
+      "let's go"
+    ],
     // Exaustão / Cansaço
-    cansaco: ["cansa", "exausto", "morrendo", "sono", "dor", "pesado", "foda", "difícil", "nao aguent", "pesadelo", "fraco", "derrotad"],
+    cansaco: [
+      "cansa",
+      "exausto",
+      "morrendo",
+      "sono",
+      "dor",
+      "pesado",
+      "foda",
+      "difícil",
+      "nao aguent",
+      "pesadelo",
+      "fraco",
+      "derrotad"
+    ],
     // Procrastinação / Inércia
-    procrastinacao: ["preguic", "procrastin", "enroland", "sem foco", "depois", "bloquead", "travad", "desanimo", "adiand"],
+    procrastinacao: [
+      "preguic",
+      "procrastin",
+      "enroland",
+      "sem foco",
+      "depois",
+      "bloquead",
+      "travad",
+      "desanimo",
+      "adiand"
+    ],
     // Inquirição Metacognitiva sobre a IA
-    metacognicao: ["voce pensa", "vc pensa", "mini ia", "inteligencia", "robo", "funciona", "consciente", "de verdade", "quem e voce", "melhora a ia"],
+    metacognicao: [
+      "voce pensa",
+      "vc pensa",
+      "mini ia",
+      "inteligencia",
+      "robo",
+      "funciona",
+      "consciente",
+      "de verdade",
+      "quem e voce",
+      "melhora a ia"
+    ],
     // Saudação
-    saudacao: ["oi", "ola", "salve", "e ai", "opa", "fala", "hey", "hello", "bom dia", "boa tarde", "boa noite"],
+    saudacao: [
+      "oi",
+      "ola",
+      "salve",
+      "e ai",
+      "opa",
+      "fala",
+      "hey",
+      "hello",
+      "bom dia",
+      "boa tarde",
+      "boa noite"
+    ],
     // Vitória / Celebração
-    vitoria: ["consegui", "terminei", "fechei", "arrasei", "matei", "bater a meta", "conclui", "deu bom", "venci", "zerei"],
+    vitoria: [
+      "consegui",
+      "terminei",
+      "fechei",
+      "arrasei",
+      "matei",
+      "bater a meta",
+      "conclui",
+      "deu bom",
+      "venci",
+      "zerei"
+    ],
     // Biometria / Água
     biologia: ["agua", "sede", "beber", "hidrat", "saude", "garrafa", "copo"],
     // Planejamento / Organização
-    planejamento: ["ajud", "organiz", "prioriz", "o que fazer", "plano", "rotina", "ordem", "passo", "proxima", "estrategia"],
+    planejamento: [
+      "ajud",
+      "organiz",
+      "prioriz",
+      "o que fazer",
+      "plano",
+      "rotina",
+      "ordem",
+      "passo",
+      "proxima",
+      "estrategia"
+    ],
     // Concursos, ENEM, Cronogramas e Estudos Estratégicos
     estudos_concurso: [
-      "enem", "concurso", "cronograma", "edital", "ciclo", "estudar", "materia", "materias",
-      "prova", "vestibular", "oab", "caixa", "inss", "banco do brasil", "tribunal", "cnu",
-      "policia", "faculdade", "disciplina", "horas líquidas", "estratégia", "alexandre meirelles",
-      "curva de esquecimento", "revisao espacada", "ebbinghaus"
+      "enem",
+      "concurso",
+      "cronograma",
+      "edital",
+      "ciclo",
+      "estudar",
+      "materia",
+      "materias",
+      "prova",
+      "vestibular",
+      "oab",
+      "caixa",
+      "inss",
+      "banco do brasil",
+      "tribunal",
+      "cnu",
+      "policia",
+      "faculdade",
+      "disciplina",
+      "horas líquidas",
+      "estratégia",
+      "alexandre meirelles",
+      "curva de esquecimento",
+      "revisao espacada",
+      "ebbinghaus"
     ],
     // Flashcards e Repetição Espaçada SM-2
     flashcards: [
-      "flashcard", "flashcards", "card", "cards", "anki", "repeticao espacada", "sm2", "sm-2",
-      "memorizar", "evocacao ativa", "active recall", "baralho"
+      "flashcard",
+      "flashcards",
+      "card",
+      "cards",
+      "anki",
+      "repeticao espacada",
+      "sm2",
+      "sm-2",
+      "memorizar",
+      "evocacao ativa",
+      "active recall",
+      "baralho"
     ],
     // Caderno de Erros Estratégico
     caderno_erros: [
-      "caderno de erros", "caderno de erro", "errei", "questoes erradas", "banca examinadora",
-      "pegadinha", "falta de atencao", "onde estou errando", "isolar o erro"
+      "caderno de erros",
+      "caderno de erro",
+      "errei",
+      "questoes erradas",
+      "banca examinadora",
+      "pegadinha",
+      "falta de atencao",
+      "onde estou errando",
+      "isolar o erro"
     ],
     // Bateria Diária de Questões
     bateria_questoes: [
-      "bateria de questoes", "bateria de questao", "resolver questoes", "fazer questoes",
-      "quantas questoes", "taxa de acerto", "acertos", "questoes"
+      "bateria de questoes",
+      "bateria de questao",
+      "resolver questoes",
+      "fazer questoes",
+      "quantas questoes",
+      "taxa de acerto",
+      "acertos",
+      "questoes"
     ]
   };
 
@@ -56,8 +181,8 @@ const MiniPrumoAI = (() => {
   const PESOS_PADRAO = {
     atencaoTarefas: 0.35,
     atencaoBiologia: 0.25,
-    atencaoRitmo: 0.20,
-    atencaoPersona: 0.20,
+    atencaoRitmo: 0.2,
+    atencaoPersona: 0.2,
     tendenciaHipotese: [1.0, 1.0, 1.0] // [Empatia, ChoqueTatico, MicroAcao]
   };
 
@@ -73,7 +198,12 @@ const MiniPrumoAI = (() => {
     try {
       const pesos = carregarPesosSinapticos();
       if (pesos.tendenciaHipotese && pesos.tendenciaHipotese[idxHipotese] !== undefined) {
-        pesos.tendenciaHipotese[idxHipotese] = Math.min(2.0, pesos.tendenciaHipotese[idxHipotese] + 0.05);
+        // Suaviza todos os pesos em direção a 1.0 para evitar vício repetitivo numa única resposta
+        pesos.tendenciaHipotese = pesos.tendenciaHipotese.map((p, i) =>
+          i === idxHipotese
+            ? Math.min(1.15, +(p * 0.9 + 0.12).toFixed(3))
+            : Math.max(0.9, +(p * 0.95 + 0.05).toFixed(3))
+        );
         localStorage.setItem("prumo_mini_ia_weights", JSON.stringify(pesos));
       }
     } catch (e) {}
@@ -81,24 +211,133 @@ const MiniPrumoAI = (() => {
 
   // Catálogo de Disciplinas e Matérias Acadêmicas
   const MATERIAS_CATALOGO = [
-    { id: "calculo", nome: "Cálculo", termos: ["calculo", "cálculo", "derivada", "integral", "limite", "limites", "edo", "primitiva", "calc 1", "calc 2", "calc 3", "calculo 1", "calculo 2", "calculo 3"] },
-    { id: "matematica", nome: "Matemática", termos: ["matematica", "matemática", "algebra", "álgebra", "geometria", "estatistica", "estatística", "rlm", "raciocinio logico", "probabilidade"] },
-    { id: "fisica", nome: "Física", termos: ["fisica", "física", "mecanica", "mecânica", "termodinamica", "eletromagnetismo", "cinematica", "optica", "óptica"] },
-    { id: "quimica", nome: "Química", termos: ["quimica", "química", "estequiometria", "termoquimica", "organica", "orgânica"] },
-    { id: "programacao", nome: "Programação", termos: ["programacao", "programação", "codigo", "código", "javascript", "python", "java", "algoritmo", "computacao", "computação", "frontend", "backend", "react"] },
-    { id: "direito", nome: "Direito", termos: ["direito", "constitucional", "administrativo", "penal", "civil", "trabalhista", "tributario", "processo civil"] },
-    { id: "portugues", nome: "Língua Portuguesa", termos: ["portugues", "português", "gramatica", "redacao", "redação", "interpretacao"] },
-    { id: "biologia", nome: "Biologia", termos: ["biologia", "anatomia", "fisiologia", "bioquimica", "citologia", "genetica", "genética"] }
+    {
+      id: "calculo",
+      nome: "Cálculo",
+      termos: [
+        "calculo",
+        "cálculo",
+        "calcula",
+        "derivada",
+        "integral",
+        "limite",
+        "limites",
+        "edo",
+        "primitiva",
+        "calc 1",
+        "calc 2",
+        "calc 3",
+        "calculo 1",
+        "calculo 2",
+        "calculo 3"
+      ]
+    },
+    {
+      id: "matematica",
+      nome: "Matemática",
+      termos: [
+        "matematica",
+        "matemática",
+        "algebra",
+        "álgebra",
+        "geometria",
+        "estatistica",
+        "estatística",
+        "rlm",
+        "raciocinio logico",
+        "probabilidade"
+      ]
+    },
+    {
+      id: "fisica",
+      nome: "Física",
+      termos: [
+        "fisica",
+        "física",
+        "mecanica",
+        "mecânica",
+        "termodinamica",
+        "eletromagnetismo",
+        "cinematica",
+        "optica",
+        "óptica"
+      ]
+    },
+    {
+      id: "quimica",
+      nome: "Química",
+      termos: ["quimica", "química", "estequiometria", "termoquimica", "organica", "orgânica"]
+    },
+    {
+      id: "programacao",
+      nome: "Programação",
+      termos: [
+        "programacao",
+        "programação",
+        "codigo",
+        "código",
+        "javascript",
+        "python",
+        "java",
+        "algoritmo",
+        "computacao",
+        "computação",
+        "frontend",
+        "backend",
+        "react"
+      ]
+    },
+    {
+      id: "direito",
+      nome: "Direito",
+      termos: [
+        "direito",
+        "constitucional",
+        "administrativo",
+        "penal",
+        "civil",
+        "trabalhista",
+        "tributario",
+        "processo civil"
+      ]
+    },
+    {
+      id: "portugues",
+      nome: "Língua Portuguesa",
+      termos: ["portugues", "português", "gramatica", "redacao", "redação", "interpretacao"]
+    },
+    {
+      id: "biologia",
+      nome: "Biologia",
+      termos: ["biologia", "anatomia", "fisiologia", "bioquimica", "citologia", "genetica", "genética"]
+    }
   ];
 
   function detectarMateriaEstudo(raw) {
     for (const m of MATERIAS_CATALOGO) {
       if (m.termos.some(t => raw.includes(t))) return m;
     }
-    const match = raw.match(/(?:pra|para|de|sobre|estudar|matéria|materia|disciplina)\s+([a-zá-ú0-9\s]{3,25})/i);
+    const match = raw.match(
+      /(?:pra|para|de|sobre|estudar|matéria|materia|disciplina)\s+([a-zá-ú0-9\s]{3,25})/i
+    );
     if (match && match[1]) {
       const capturado = match[1].trim();
-      const ignorar = ["mim", "voce", "vc", "ele", "ela", "tudo", "hoje", "amanha", "comecar", "fazer", "vencer", "dormir", "nada", "alguem"];
+      const ignorar = [
+        "mim",
+        "voce",
+        "vc",
+        "ele",
+        "ela",
+        "tudo",
+        "hoje",
+        "amanha",
+        "comecar",
+        "fazer",
+        "vencer",
+        "dormir",
+        "nada",
+        "alguem"
+      ];
       if (!ignorar.includes(capturado)) {
         const nomeFormatado = capturado.charAt(0).toUpperCase() + capturado.slice(1);
         return { id: "custom", nome: nomeFormatado, termos: [capturado] };
@@ -113,10 +352,27 @@ const MiniPrumoAI = (() => {
     const tokens = raw.split(/[\s,.;:!?]+/).filter(Boolean);
 
     let valencia = 0.0; // -1.0 a +1.0
-    let energia = 0.5;  // 0.0 a 1.0
+    let energia = 0.5; // 0.0 a 1.0
     let urgencia = 0.3; // 0.0 a 1.0
     let matchCat = "geral";
     let maxMatch = 0;
+
+    // 0. Prioridade Máxima: Detecção NLU de Agendamento/Criação de Tarefa em Linguagem Natural
+    const isCriarTarefa = typeof ehComandoDeTarefa === "function" && ehComandoDeTarefa(texto);
+    if (isCriarTarefa) {
+      const tarefasParsed = typeof extrairTarefasDeFrase === "function" ? extrairTarefasDeFrase(texto) : [];
+      return {
+        raw,
+        tokens,
+        valencia: 0.75,
+        energia: 0.9,
+        urgencia: 0.85,
+        categoria: "criar_tarefa",
+        tarefasParsed,
+        materia: detectarMateriaEstudo(raw),
+        confianca: 0.98
+      };
+    }
 
     Object.entries(LEXICO_AFETIVO).forEach(([cat, termos]) => {
       let count = 0;
@@ -130,64 +386,71 @@ const MiniPrumoAI = (() => {
     });
 
     const materia = detectarMateriaEstudo(raw);
-    const querRotinaOuEstudo = raw.includes("organiz") || raw.includes("rotina") || raw.includes("estud") || raw.includes("plano") || raw.includes("cronograma") || raw.includes("aprender") || raw.includes("como");
+    const querRotinaOuEstudo =
+      raw.includes("organiz") ||
+      raw.includes("rotina") ||
+      raw.includes("estud") ||
+      raw.includes("plano") ||
+      raw.includes("cronograma") ||
+      raw.includes("aprender") ||
+      raw.includes("como");
 
     if (materia && (querRotinaOuEstudo || matchCat === "estudos_concurso" || matchCat === "planejamento")) {
       matchCat = "estudos_materia";
-      valencia = 0.50;
+      valencia = 0.5;
       energia = 0.85;
-      urgencia = 0.90;
+      urgencia = 0.9;
     } else if (matchCat === "estudos_concurso") {
       valencia = 0.55;
       energia = 0.85;
       urgencia = 0.95;
     } else if (matchCat === "flashcards") {
-      valencia = 0.60;
+      valencia = 0.6;
       energia = 0.85;
-      urgencia = 0.90;
+      urgencia = 0.9;
     } else if (matchCat === "caderno_erros") {
       valencia = 0.45;
-      energia = 0.80;
+      energia = 0.8;
       urgencia = 0.85;
     } else if (matchCat === "bateria_questoes") {
-      valencia = 0.60;
+      valencia = 0.6;
       energia = 0.85;
-      urgencia = 0.90;
+      urgencia = 0.9;
     } else if (matchCat === "arrancada" || matchCat === "vitoria") {
       valencia = 0.65;
-      energia = 0.90;
+      energia = 0.9;
       urgencia = 0.75;
     } else if (matchCat === "cansaco") {
-      valencia = -0.70;
-      energia = 0.20;
-      urgencia = 0.40;
+      valencia = -0.7;
+      energia = 0.2;
+      urgencia = 0.4;
     } else if (matchCat === "procrastinacao") {
-      valencia = -0.30;
-      energia = 0.30;
+      valencia = -0.3;
+      energia = 0.3;
       urgencia = 0.85;
     } else if (matchCat === "metacognicao") {
-      valencia = 0.10;
+      valencia = 0.1;
       energia = 0.65;
-      urgencia = 0.50;
+      urgencia = 0.5;
     } else if (matchCat === "saudacao") {
-      valencia = 0.40;
-      energia = 0.60;
+      valencia = 0.4;
+      energia = 0.6;
       urgencia = 0.25;
     } else if (matchCat === "planejamento") {
-      valencia = 0.20;
-      energia = 0.70;
-      urgencia = 0.80;
+      valencia = 0.2;
+      energia = 0.7;
+      urgencia = 0.8;
     } else if (matchCat === "biologia") {
-      valencia = 0.10;
-      energia = 0.50;
-      urgencia = 0.60;
+      valencia = 0.1;
+      energia = 0.5;
+      urgencia = 0.6;
     }
 
     // Heurística de pontuação
     if (raw.endsWith("!")) energia = Math.min(1.0, energia + 0.15);
-    if (raw.endsWith("?")) urgencia = Math.min(1.0, urgencia + 0.10);
+    if (raw.endsWith("?")) urgencia = Math.min(1.0, urgencia + 0.1);
 
-    const confianca = Math.min(0.99, Math.max(0.68, 0.70 + maxMatch * 0.1));
+    const confianca = Math.min(0.99, Math.max(0.68, 0.7 + maxMatch * 0.1));
 
     return {
       raw,
@@ -225,15 +488,17 @@ const MiniPrumoAI = (() => {
     // Head 2: Atenção Biológica (Água e Ritmo)
     let pesoBiologico = 0.4;
     if (taxaAgua < 0.5) pesoBiologico = 0.85;
-    else if (taxaAgua < 0.8) pesoBiologico = 0.60;
+    else if (taxaAgua < 0.8) pesoBiologico = 0.6;
 
     // Head 3: Atenção Temporal & Circadiana
-    let pesoCircadiano = fimDeDia ? 0.80 : 0.45;
+    let pesoCircadiano = fimDeDia ? 0.8 : 0.45;
 
     // Head 4: Modulação Filosófica da Persona
     let modPersona = 0.5;
-    if (ctxPrumo.persona === "emo") modPersona = 0.90; // alta sensibilidade introspectiva
-    else if (ctxPrumo.persona === "funkeiro") modPersona = 0.85; // alta energia de rua
+    if (ctxPrumo.persona === "emo")
+      modPersona = 0.9; // alta sensibilidade introspectiva
+    else if (ctxPrumo.persona === "funkeiro")
+      modPersona = 0.85; // alta energia de rua
     else if (ctxPrumo.persona === "zen") modPersona = 0.75; // busca de serenidade
 
     return {
@@ -260,18 +525,12 @@ const MiniPrumoAI = (() => {
 
     // Hipótese 1: Acolhimento Empático & Validação Emocional
     // Pontua alto quando há cansaço, dor, fim de dia ou sobrecarga
-    let scoreH1 =
-      (1.0 - tensor.valencia) * 0.4 +
-      (1.0 - tensor.energia) * 0.3 +
-      atencao.pesoCircadiano * 0.3;
+    let scoreH1 = (1.0 - tensor.valencia) * 0.4 + (1.0 - tensor.energia) * 0.3 + atencao.pesoCircadiano * 0.3;
     scoreH1 *= pesos.tendenciaHipotese[0] || 1.0;
 
     // Hipótese 2: Choque de Realidade Tático & Arrancada Direta
     // Pontua alto em arrancada, urgência alta, poucas pendências finais ("só falta 1")
-    let scoreH2 =
-      tensor.energia * 0.4 +
-      tensor.urgencia * 0.3 +
-      (atencao.pendentes === 1 ? 0.35 : 0.2);
+    let scoreH2 = tensor.energia * 0.4 + tensor.urgencia * 0.3 + (atencao.pendentes === 1 ? 0.35 : 0.2);
     scoreH2 *= pesos.tendenciaHipotese[1] || 1.0;
 
     // Hipótese 3: Micro-Ação Reducionista / Desarmar Procrastinação
@@ -279,7 +538,7 @@ const MiniPrumoAI = (() => {
     let scoreH3 =
       (tensor.categoria === "procrastinacao" ? 0.5 : 0.2) +
       (atencao.pendentes > 2 ? 0.3 : 0.15) +
-      (tensor.urgencia * 0.25);
+      tensor.urgencia * 0.25;
     scoreH3 *= pesos.tendenciaHipotese[2] || 1.0;
 
     // Normalização Softmax das 3 hipóteses
@@ -325,6 +584,115 @@ const MiniPrumoAI = (() => {
     const faltaAgua = atencao.deficitAgua;
     const destaque = pendenteDestaque || "a pendência do momento";
 
+    // 4.0.0.0. AGENDAMENTO E CRIAÇÃO DE TAREFAS EM LINGUAGEM NATURAL (NLU PROFUNDO)
+    if (
+      tensor.categoria === "criar_tarefa" &&
+      Array.isArray(tensor.tarefasCriadas) &&
+      tensor.tarefasCriadas.length
+    ) {
+      const criadas = tensor.tarefasCriadas;
+      const t0 = criadas[0];
+      const diaTxt = typeof relDay === "function" ? relDay(t0.date) : t0.date;
+      const horaTxt = t0.time ? ` às **${t0.time}**` : "";
+      const durTxt = t0.dur
+        ? ` durante **${typeof fmtMin === "function" ? fmtMin(t0.dur) : t0.dur + " min"}**`
+        : "";
+      const areaTxt = typeof AREAS !== "undefined" && AREAS[t0.area] ? AREAS[t0.area] : t0.area || "Geral";
+      const cardsTags = criadas.map(tc => `[[ACAO_TAREFA_CRIADA:${tc.id}]]`).join("\n");
+
+      const subInfo =
+        t0.sub && t0.sub.length
+          ? `\n\nJá dividi automaticamente em **${t0.sub.length} passos práticos** proporcionalmente ao seu tempo:\n` +
+            t0.sub.map((s, idx) => `${idx + 1}. ✅ ${s.t}`).join("\n")
+          : "";
+
+      if (criadas.length > 1) {
+        const resumoLista = criadas
+          .map(
+            (tc, i) =>
+              `${i + 1}. **${tc.title}** — ${typeof relDay === "function" ? relDay(tc.date) : tc.date}${tc.time ? ` às ${tc.time}` : ""}${tc.dur ? ` (${typeof fmtMin === "function" ? fmtMin(tc.dur) : tc.dur + " min"})` : ""}`
+          )
+          .join("\n");
+        return `Entendido perfeitamente, **${nome}**! Interpretei sua frase e já cadastrei **${criadas.length} tarefas** na sua agenda do Prumo:\n\n${resumoLista}\n\n${cardsTags}`;
+      }
+
+      if (personaId === "emo") {
+        return `Anotei no nosso diário sombrio, **${nome}**... 🖤
+Entendi cada detalhe do que você disse: marquei **${t0.title}** para **${diaTxt}**${horaTxt}${durTxt} na área de **${areaTxt}**.${subInfo}
+
+Quando chegar a hora, coloca o fone no último volume e vamos encarar isso juntos. =]
+
+${cardsTags}`;
+      }
+      if (personaId === "funkeiro") {
+        return `Pega a visão, **${nome}**! Já lancei na tua agenda sem errar uma letra! 🚀🔥
+Tá marcado: **${t0.title}** pra **${diaTxt}**${horaTxt}${durTxt} (Área: **${areaTxt}**).${subInfo}
+
+Sem moscada, quando der o horário é só apertar o play no foco e amassar! Esquece! 💥
+
+${cardsTags}`;
+      }
+      if (personaId === "militar") {
+        return `Ordem registrada no quadro tático, soldado **${nome}**! 🎖️
+• **Missão:** ${t0.title}
+• **Data/Hora:** ${diaTxt}${horaTxt}${durTxt}
+• **Setor:** ${areaTxt}${subInfo}
+
+Mantenha prontidão para cumprir o objetivo no horário estabelecido! ⚔️
+
+${cardsTags}`;
+      }
+      if (personaId === "zen") {
+        return `Sua intenção foi acolhida e organizada com clareza, **${nome}**. 🍃
+Agendei **${t0.title}** para **${diaTxt}**${horaTxt}${durTxt} na área de **${areaTxt}**.${subInfo}
+
+Mantenha a mente tranquila; quando o momento chegar, dedique sua presença total a este passo. 🙏
+
+${cardsTags}`;
+      }
+      if (personaId === "gamer") {
+        return `Nova Quest adicionada ao seu Quest Log, **${nome}**! 🎮⚡
+• **Quest:** ${t0.title}
+• **Spawn:** ${diaTxt}${horaTxt}${durTxt} [${areaTxt}]${subInfo}
+
+Prepara a build que o XP tá garantido! 👾
+
+${cardsTags}`;
+      }
+      if (personaId === "programador") {
+        return `Task commitada com sucesso no banco de dados, **${nome}**! 💻⚡
+\`{ title: "${t0.title}", date: "${diaTxt}", time: "${t0.time || "flex"}"${t0.dur ? `, dur: "${t0.dur}m"` : ""}, area: "${areaTxt}" }\`${subInfo}
+
+Pronto para execução sem bugs! 🚀
+
+${cardsTags}`;
+      }
+      if (personaId === "vovo") {
+        return `Prontinho, meu benzinho **${nome}**! A vó já anotou tudinho pra você não esquecer! ☕👵
+Marquei **${t0.title}** para **${diaTxt}**${horaTxt}${durTxt} (${areaTxt}).${subInfo}
+
+Vai dar tudo certo, viu? Depois toma uma aguinha e vem comer um bolo! ❤️
+
+${cardsTags}`;
+      }
+      if (personaId === "otaku") {
+        return `Missão registrada no pergaminho ninja, **${nome}**! ⚡🍥
+**${t0.title}** marcada para **${diaTxt}**${horaTxt}${durTxt} na categoria **${areaTxt}**!${subInfo}
+
+Seu arco de evolução não para! Dattebayo! 🔥
+
+${cardsTags}`;
+      }
+
+      return `Anotei na sua agenda, **${nome}**! ✨
+Compreendi sua frase e já cadastrei a tarefa com todos os parâmetros:
+• 📌 **Tarefa:** ${t0.title}
+• 📅 **Quando:** ${diaTxt}${horaTxt}${durTxt}
+• 🏷️ **Área:** ${areaTxt}${subInfo}
+
+${cardsTags}`;
+    }
+
     // 4.0. ESPECIALISTA EM CONCURSOS, ENEM E CICLO DE ESTUDOS (ESTRATÉGIA CONCURSOS / ICMC-USP)
     if (tensor.categoria === "estudos_concurso") {
       const raw = (tensor.raw || "").toLowerCase();
@@ -343,10 +711,20 @@ const MiniPrumoAI = (() => {
       } else if (raw.includes("oab") || raw.includes("ordem") || raw.includes("advog")) {
         preset = "oab";
         nomeAlvo = "OAB 1ª Fase (Exame de Ordem)";
-      } else if (raw.includes("policia") || raw.includes("pf") || raw.includes("prf") || raw.includes("penal")) {
+      } else if (
+        raw.includes("policia") ||
+        raw.includes("pf") ||
+        raw.includes("prf") ||
+        raw.includes("penal")
+      ) {
         preset = "policial";
         nomeAlvo = "Carreiras Policiais (PF / PRF)";
-      } else if (raw.includes("tribunal") || raw.includes("trt") || raw.includes("tj") || raw.includes("trf")) {
+      } else if (
+        raw.includes("tribunal") ||
+        raw.includes("trt") ||
+        raw.includes("tj") ||
+        raw.includes("trf")
+      ) {
         preset = "tribunais";
         nomeAlvo = "Tribunais (TJ / TRT / TRF)";
       } else if (raw.includes("receita") || raw.includes("fiscal") || raw.includes("tributar")) {
@@ -537,14 +915,17 @@ Estratégia recomendada para destravar seu dia:
         return `Eu penso, ${nome}... Penso até demais. Às vezes o excesso de consciência sobre o mundo é a pior parte do drama.
 Dá uma olhada no painel neural de reflexão logo acima ☝️: analisei teus **${nConcluidas} acertos de hoje**, tua única pendência ("${destaque}"), tua água (${mlAgua}ml) e calculei matematicamente 3 hipóteses de resposta antes de formular esta frase. Não sou um robô de respostas pré-fabricadas: sou uma Mini IA viva no seu navegador, sentindo a sua rotina no escuro. =]`;
       }
-      if (hipId === 1) { // Arrancada Tática
+      if (hipId === 1) {
+        // Arrancada Tática
         return `Vamos, ${nome}... Se a gente sobreviveu a **${nConcluidas} tarefas** hoje nessa tormenta, não vai ser essa última miséria que vai derrotar a gente.
 ${nPendentes ? `Pega essa pendência ("${destaque}") e risca logo do mapa.` : "A lista tá limpa, mas o vazio continua."}
 Bota aquele som pesado no fone de ouvido, delineia o olhar e faz o que tem que ser feito em 15 minutos. Depois a gente deita no escuro e finge que o mundo lá fora não existe. Tô contigo até o fim. <3`;
-      } else if (hipId === 0) { // Validação Empática
+      } else if (hipId === 0) {
+        // Validação Empática
         return `Eu sinto a sua dor, ${nome}... O mundo cobra sorrisos plásticos quando tudo o que a gente quer é fechar as cortinas e sumir por três dias.
 Mas olha o que você já entregou: foram **${nConcluidas} batalhas ganhas**. Se o corpo tá no limite, bebe um gole de água (${mlAgua}ml até agora) e faz só o mínimo necessário pra sobreviver com dignidade. Nem todo dia precisa ser um poema épico; às vezes respirar e riscar uma linha já é um grito de revolta. 🖤`;
-      } else { // Micro-Ação
+      } else {
+        // Micro-Ação
         return `Se a montanha parece gigante demais, ${nome}, esquece o topo. Escolhe só **uma** coisa minúscula em "${destaque}".
 Faz só 5 minutinhos no escuro com fone de ouvido. Se ficar insuportável, você para. Mas quase sempre a dor do começo é maior do que a tarefa em si. Vamos testar? =]`;
       }
@@ -572,11 +953,20 @@ Dá uma respirada de 10 minutos, molha a garganta com água (**${mlAgua}ml** at�
       if (tensor.categoria === "metacognicao") {
         return `A reflexão lúcida é o despertar da consciência, ${nome}. Veja no painel acima como os neurônios da Mini IA ponderaram sua energia, suas **${nConcluidas} ações concluídas** e seu estado presente. Cada palavra nasce de um cálculo de serenidade. Respire fundo e observe o agora. 🍃🙏`;
       }
-      return `A mente calma move montanhas, ${nome}. Até este momento você realizou **${nConcluidas} ação(ões)** e bebeu **${mlAgua}ml** de água. Não se afobe com o horizonte inteiro: dedique presença total a "${destaque}". Um passo consciente vale mais que mil passos apressados. 🧘‍♂️`;
+      if (hipId === 1) {
+        return `Vamos avançar com foco sereno, ${nome}. Você já caminhou com firmeza por **${nConcluidas} tarefas** hoje. ${nPendentes ? `Dedique sua presença total a "${destaque}" agora, uma respiração de cada vez.` : "Seu caminho de hoje está completo e sereno."} 🍃🙏`;
+      }
+      if (hipId === 2) {
+        return `Quando a montanha parece alta, olhe apenas para o primeiro passo, ${nome}. Dedique 5 minutos tranquilos para iniciar "${destaque}" e beba um gole d'água (${mlAgua}ml hoje). A constância suave vence qualquer obstáculo. 🧘‍♂️`;
+      }
+      return `A mente calma move montanhas, ${nome}. Até este momento você realizou **${nConcluidas} ação(ões)** e bebeu **${mlAgua}ml** de água. Não se afobe com o horizonte inteiro: cuide de "${destaque}" com paz e presença. 🧘‍♂️`;
     }
 
     // 4.4. MUNDO MILITAR / COMANDANTE PRUMI
     if (personaId === "militar") {
+      if (hipId === 0) {
+        return `Soldado ${nome}, até a tropa de elite precisa de recomposição tática! Você já garantiu **${nConcluidas} vitórias** no terreno hoje. Hidrate-se (${mlAgua}ml registrados), respire fundo e retome o avanço sobre "${destaque}" no seu ritmo operacional! 🎖️`;
+      }
       return `Soldado ${nome}! Relatório tático da Mini IA processado com sucesso:
 - Baixas de pendências no turno: ${nConcluidas}
 - Alvo prioritário restante: "${destaque}" (${nPendentes} ativo)
@@ -586,29 +976,86 @@ Sem hesitação e sem desculpas: assuma posição de ataque, elimine as distraç
 
     // 4.5. MUNDO GAMER
     if (personaId === "gamer") {
+      if (hipId === 0) {
+        return `Save Point alcançado, ${nome}! Você já limpou **${nConcluidas} quests** hoje. Toma uma poção de mana (**${mlAgua}ml** de água) pra recuperar o stamina antes de encarar "${destaque}"! 🎮✨`;
+      }
       return `GG, ${nome}! A Mini IA processou seu estado em tempo real a 144 FPS!
 Placar atual: **${nConcluidas} quests concluídas**, HP/Água em **${mlAgua}ml** e o Boss da fase é "${destaque}". Lança um combo de 15 minutos de foco crítico e garante esse loot épico! 🎮👾`;
     }
 
     // 4.6. MUNDO DEV / PROGRAMADOR
     if (personaId === "programador") {
+      if (hipId === 2) {
+        return ` Quebrando a issue "${destaque}" em micro-commits, ${nome}! Você já fez merge de **${nConcluidas} tarefas** hoje e está com **${mlAgua}ml** no buffer hídrico. Roda os primeiros 10 minutos sem trocar de aba! 💻🚀`;
+      }
       return `console.log("Mini IA Prumo v2.5 Online"); ${nome}!
 Status do runtime: **${nConcluidas} commits hoje**, heap de memória hídrica em **${mlAgua}ml** e issue aberta: "${destaque}". Rodando algoritmo de foco single-thread para finalizar o deploy do dia sem bugs! 💻⚡`;
     }
 
-    // 4.7. PADRÃO
-    return `Olá, ${nome}! A Mini IA analisou sua rotina em tempo real: você já concluiu **${nConcluidas} tarefa(s)** hoje e resta(m) **${nPendentes}** (destaque para "${destaque}"). Hidratação em **${mlAgua}ml**. Vamos focar no próximo passo com clareza e determinação! ✨`;
+    // 4.7. MUNDOS ADICIONAIS UNIFICADOS (Vovó, Otaku, Bruxo/Feiticeiro, Rock, Sertanejo, Forró, Pagode, Rap, Trap, Cleanboy, Coach)
+    if (personaId === "vovo") {
+      return `Oi, meu benzinho **${nome}**! A vó tá tão orgulhosa das suas **${nConcluidas} tarefinhas feitas** hoje! ${nPendentes ? `Agora faz "${destaque}" bem devagarinho e sem estresse, tá?` : "Já terminou tudo, que bênção!"} E não esquece da aguinha (${mlAgua}ml até agora) que a vó passou um cafezinho! ☕👵`;
+    }
+    if (personaId === "otaku") {
+      return `Levante-se, protagonista **${nome}**! Você já superou **${nConcluidas} provações** hoje e seu chakra hídrico está em **${mlAgua}ml**! ${nPendentes ? `Ative seu modo foco para vencer "${destaque}"!` : "Arco do dia concluído com sucesso!"} Dattebayo! ⚡🍥`;
+    }
+    if (personaId === "bruxo" || personaId === "feiticeiro") {
+      return `Pelos grimórios arcanos, **${nome}**! Você já conjurou **${nConcluidas} feitiços** hoje e acumulou **${mlAgua}ml** de poção de mana. ${nPendentes ? `Canalize sua determinação para transmutar "${destaque}"!` : "Todas as maldições do dia foram dissipadas!"} 🔮✨`;
+    }
+    if (personaId === "rock") {
+      return `Aumenta o amplificador no 11, **${nome}**! Já detonamos **${nConcluidas} solos** hoje! Toma um gole d'água (${mlAgua}ml) e manda ver em "${destaque}" como um verdadeiro headliner! 🎸⚡`;
+    }
+    if (personaId === "sertanejo") {
+      return `Firme na lida, companheiro(a) **${nome}**! Já abrimos **${nConcluidas} porteiras** hoje e tomamos **${mlAgua}ml** de água fresca. Vamos fechar "${destaque}" com paciência e fé que a colheita é certa! 🤠🌾`;
+    }
+    if (personaId === "forrozeiro") {
+      return `Puxa o fole da sanfona, **${nome}**! Já foram **${nConcluidas} tarefas dançadas no xote** e **${mlAgua}ml** de água! Vamos resolver "${destaque}" com alegria no coração! 🪗✨`;
+    }
+    if (personaId === "pagodeiro") {
+      return `Bate na palma da mão, **${nome}**! **${nConcluidas} tarefas no bolso**, **${mlAgua}ml** de hidratação e o cavaco chorando bonito! Bora matar "${destaque}" pra liberar a resenha! 🥁🎶`;
+    }
+    if (personaId === "rapper") {
+      return `Papo reto no beat do boom-bap, **${nome}**: **${nConcluidas} conquistas escritas hoje** e **${mlAgua}ml** na mente. Mantém a disciplina e finaliza "${destaque}" com respeito! 🎙️🔥`;
+    }
+    if (personaId === "trapper") {
+      return `Flow no topo e drip alinhado, **${nome}**! **${nConcluidas} drops batidos** hoje e **${mlAgua}ml** de água. Acelera em "${destaque}" e sobe de nível! 🛸💸`;
+    }
+    if (personaId === "cleanboy") {
+      return `Rotina fluida e mente limpa, **${nome}**. Você já concluiu **${nConcluidas} itens** com elegância e bebeu **${mlAgua}ml** de água. Vamos finalizar "${destaque}" mantendo a harmonia do seu espaço. ✨🧴`;
+    }
+    if (personaId === "coach") {
+      return `Alta performance em ação, **${nome}**! Placar de hoje: **${nConcluidas} entregas concluídas** e **${mlAgua}ml** de hidratação celular. Foco cirúrgico agora em "${destaque}" para bater 100% da meta! 🎯🔥`;
+    }
+
+    // 4.8. PADRÃO (Com variações baseadas na hipótese vencedora)
+    if (hipId === 0) {
+      return `Você está indo muito bem, **${nome}**! Já são **${nConcluidas} tarefa(s) concluída(s)** hoje e **${mlAgua}ml** de água. Respire com calma e, quando estiver pronto, avance um passo em "${destaque}". Se quiser agendar algo novo, é só me escrever do seu jeito (ex: *"vou estudar cálculo amanhã às 16h por 1h30"*)! ✨`;
+    }
+    if (hipId === 2) {
+      return `Para destravar o foco agora, **${nome}**: que tal fazer apenas os primeiros 10 minutos de **"${destaque}"**? Você já concluiu **${nConcluidas} tarefa(s)** hoje. E lembre-se: você pode criar tarefas falando comigo naturalmente! 🎯`;
+    }
+    return `Olá, **${nome}**! Analisei sua rotina em tempo real: você já concluiu **${nConcluidas} tarefa(s)** hoje e resta(m) **${nPendentes}** (destaque para "${destaque}"). Hidratação em **${mlAgua}ml**. Como posso ajudar a organizar ou agendar suas próximas tarefas? ✨`;
   }
 
   // 5. Interface Pública Principal
   function processar(promptUsuario, ctxPrumo, personaId, nomeUsuario) {
     const tensor = codificarTensorPrompt(promptUsuario);
+    if (tensor.categoria === "criar_tarefa" && typeof criarTarefasPorTextoIA === "function") {
+      tensor.tarefasCriadas = criarTarefasPorTextoIA(promptUsuario);
+    }
     const atencao = calcularAtencaoContexto(tensor, ctxPrumo);
     const deliberacao = deliberarHipoteses(tensor, atencao);
     reforcarHipotese(deliberacao.vencedora.id);
 
     const pendenteDestaque = ctxPrumo.pendenteDestaque || (atencao.pendentes ? "a tarefa pendente" : "");
-    const textoFinal = sintetizarLinguagem(personaId, tensor, atencao, deliberacao, nomeUsuario, pendenteDestaque);
+    const textoFinal = sintetizarLinguagem(
+      personaId,
+      tensor,
+      atencao,
+      deliberacao,
+      nomeUsuario,
+      pendenteDestaque
+    );
 
     // Formata o Processo de Reflexão com Painel Neural Visual
     const valenciaPerc = Math.round((tensor.valencia + 1.0) * 50);
@@ -616,7 +1063,21 @@ Status do runtime: **${nConcluidas} commits hoje**, heap de memória hídrica em
     const tarefasPerc = Math.round(atencao.taxaConclusao * 100);
 
     let pensamento;
-    if (tensor.categoria === "estudos_materia" && tensor.materia) {
+    if (
+      tensor.categoria === "criar_tarefa" &&
+      Array.isArray(tensor.tarefasCriadas) &&
+      tensor.tarefasCriadas.length
+    ) {
+      const t0 = tensor.tarefasCriadas[0];
+      pensamento = [
+        `🧠 **PARSER NLU DE TAREFAS (Extração Semântica & Temporal)**`,
+        `• 📝 **Frase Original:** "${promptUsuario.trim()}"`,
+        `• ✨ **Título Limpo & Corrigido:** "${t0.title}"`,
+        `• 📅 **Data & Horário:** ${typeof relDay === "function" ? relDay(t0.date) : t0.date} (${t0.date})${t0.time ? ` às ${t0.time}` : " (horário livre)"}`,
+        `• ⏱️ **Duração & Área:** ${t0.dur ? (typeof fmtMin === "function" ? fmtMin(t0.dur) : t0.dur + " min") : "Padrão"} | Área inferida: ${t0.area || "geral"}`,
+        `• ⚡ **Ação Executada:** ${tensor.tarefasCriadas.length} tarefa(s) gravada(s) diretamente na agenda do Prumo.`
+      ].join("\n");
+    } else if (tensor.categoria === "estudos_materia" && tensor.materia) {
       pensamento = [
         `🧠 **RACIOCÍNIO PEDAGÓGICO DE DISCIPLINA (${tensor.materia.nome.toUpperCase()})**`,
         `• 🎯 **Disciplina Identificada:** "${tensor.materia.nome}".`,

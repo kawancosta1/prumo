@@ -18,26 +18,36 @@ const forms = {
   quick() {
     const raw = getV("q");
     if (!raw) return;
-    const p = parseQuick(raw, selDay);
-    if (!p.title) return (toast("Escreva o nome da tarefa"), undefined);
-    const nid = newId();
-    S.tasks.push({
-      id: nid,
-      title: p.title,
-      area: p.area || "geral",
-      date: p.date,
-      time: p.time,
-      done: false,
-      prio: p.prio,
-      repeat: p.repeat,
-      sub: []
+    const lista =
+      typeof extrairTarefasDeFrase === "function" && extrairTarefasDeFrase(raw, selDay).length > 1
+        ? extrairTarefasDeFrase(raw, selDay)
+        : [parseQuick(raw, selDay)];
+    const validas = lista.filter(it => it && it.title);
+    if (!validas.length) return (toast("Escreva o nome da tarefa"), undefined);
+    const p = validas[0];
+    validas.forEach(item => {
+      const nid = newId();
+      S.tasks.push({
+        id: nid,
+        title: item.title,
+        area: item.area || "geral",
+        date: item.date,
+        time: item.time,
+        dur: item.dur || 0,
+        done: false,
+        prio: item.prio,
+        repeat: item.repeat,
+        sub: []
+      });
+      fx.newId = nid;
     });
     document.getElementById("q").value = "";
-    fx.newId = nid;
     if (p.date !== selDay) toast(`Adicionada para ${relDay(p.date)}`);
     react(
       "happy",
-      `Anotado pra <b>${esc(relDay(p.date))}</b>${p.time ? ` às ${p.time}` : ""}. ${p.repeat ? "E eu repito pra você." : "Deixa comigo."}`,
+      validas.length > 1
+        ? `Anotei <b>${validas.length} tarefas</b> pra <b>${esc(relDay(p.date))}</b>!`
+        : `Anotado pra <b>${esc(relDay(p.date))}</b>${p.time ? ` às ${p.time}` : ""}${p.dur ? ` (${fmtMin(p.dur)})` : ""}. ${p.repeat ? "E eu repito pra você." : "Deixa comigo."}`,
       2400
     );
     return "q";
@@ -499,14 +509,16 @@ document.addEventListener("click", e => {
     case "focus":
       if (x) {
         if (!S.subjects.length) {
-          tab = "estudos";
-          render();
-          toast("Cadastre uma matéria para usar o foco");
-          break;
+          const mMat = x.title.match(
+            /\b(Cálculo|Física|Química|Matemática|Biologia|História|Geografia|Português|Inglês|Programação|Estatística|Redação|Filosofia|Sociologia|Anatomia|Direito)\b/i
+          );
+          const nomeSubj = mMat ? mMat[1] : x.title.slice(0, 32);
+          S.subjects.push({ id: newId(), name: nomeSubj, color: SUBJ_COLORS[0] });
         }
         const m = S.subjects.find(s => norm(x.title).includes(norm(s.name.replace(/^exemplo:\s*/i, ""))));
         if (m) timer.subjectId = m.id;
         else if (!timer.subjectId) timer.subjectId = S.subjects[0].id;
+        if (x.dur > 0) timer.goal = Math.max(5, Math.min(240, x.dur));
         timer.label = x.title;
         timer.acc = 0;
         timer.beeped = false;

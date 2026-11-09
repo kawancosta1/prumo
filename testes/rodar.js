@@ -160,7 +160,8 @@ const servidor = http.createServer((req, res) => {
     ["Módulo Comercial Prumo PRO", () => require("./prumo-pro")(url)],
     ["Pagamento (servidor)", () => require("./pagamentos")()],
     ["Edital e Mini Gemini (IA)", () => require("./edital")(url)],
-    ["Upgrade MVP (Modules A-E)", () => require("./upgrade-mvp")(url)]
+    ["Upgrade MVP (Modules A-E)", () => require("./upgrade-mvp")(url)],
+    ["IA e Linguagem Natural de Tarefas (NLU)", () => require("./nlu-tarefas-ia")(url)]
   ];
   let falhas = 0;
   for (const [nome, rodar] of suites) {

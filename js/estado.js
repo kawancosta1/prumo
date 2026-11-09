@@ -149,6 +149,7 @@ function normalize(x) {
   b.tasks.forEach(t => {
     t.prio = t.prio || 0;
     t.repeat = t.repeat || "";
+    t.dur = +t.dur || 0;
     t.sub = Array.isArray(t.sub) ? t.sub : [];
   });
   b.habits.forEach(h => {

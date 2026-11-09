@@ -16,9 +16,11 @@ const orgDados = () => {
 };
 const minParaHM = m => `${pad(Math.floor(m / 60) % 24)}:${pad(m % 60)}`;
 
-/** Quanto tempo uma tarefa deve levar (palpite): mais subtarefas, mais tempo. */
+/** Quanto tempo uma tarefa deve levar (palpite): usa x.dur se definido, ou mais subtarefas, mais tempo. */
 const duracaoTarefa = x =>
-  Math.max(30, Math.min(90, (x.sub || []).filter(s => !s.done).length * 15 || (x.prio >= 3 ? 45 : 30)));
+  x.dur > 0
+    ? Math.max(10, Math.min(360, x.dur))
+    : Math.max(30, Math.min(90, (x.sub || []).filter(s => !s.done).length * 15 || (x.prio >= 3 ? 45 : 30)));
 
 /** Plano do dia: lista de { x, ini, fim, fixa } em minutos do dia. */
 function planoDoDiaHoje() {
@@ -123,7 +125,7 @@ const MODELOS_PASSOS = [
     ["Separar o que precisa dizer", "Escrever", "Revisar e mandar"]
   ]
 ];
-function passosPara(titulo) {
+function passosPara(titulo, dur = 0) {
   const t = norm(titulo);
   // "fazer X e Y, Z" vira um passo para cada parte
   const partes = titulo
@@ -131,6 +133,21 @@ function passosPara(titulo) {
     .map(s => s.trim())
     .filter(s => s.length > 2);
   if (partes.length >= 2) return partes.slice(0, 6).map(s => s.replace(/^./, c => c.toUpperCase()));
+  if (
+    dur >= 45 &&
+    /prova|estud|revis|materia|matéria|exerc|lista|calculo|cálculo|fisica|física|quimica|química|matematica|programacao|direito|portugues|ingles|biologia|historia/.test(
+      t
+    )
+  ) {
+    const tTeoria = Math.max(10, Math.round((dur * 0.25) / 5) * 5);
+    const tRev = Math.max(10, Math.round((dur * 0.2) / 5) * 5);
+    const tPratica = Math.max(15, dur - tTeoria - tRev);
+    return [
+      `Teoria ativa e fórmulas principais (${tTeoria} min)`,
+      `Resolução prática de exercícios no papel (${tPratica} min)`,
+      `Conferir gabarito e registrar no Caderno de Erros (${tRev} min)`
+    ];
+  }
   const modelo = MODELOS_PASSOS.find(([re]) => re.test(t));
   return modelo
     ? modelo[1]
@@ -140,7 +157,7 @@ ACOES_EXTRAS["quebrar-passos"] = (b, id) => {
   const x = S.tasks.find(k => k.id === id);
   if (!x) return;
   const ja = new Set(x.sub.map(s => norm(s.t)));
-  const novos = passosPara(x.title).filter(p => !ja.has(norm(p)));
+  const novos = passosPara(x.title, x.dur || 0).filter(p => !ja.has(norm(p)));
   if (!novos.length) return toast("Os passos já estão aí!");
   novos.forEach(p => x.sub.push({ id: newId(), t: p, done: false }));
   commit();

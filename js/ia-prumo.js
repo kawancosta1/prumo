@@ -216,6 +216,11 @@ function separarPensamentoECorpo(raw) {
 async function chamarProvedorLLM(promptUsuario, mensagensAnteriores = []) {
   const cfg = obterConfigIA();
 
+  // 0. Comandos naturais de criação de tarefa (NLU) executam imediatamente no Prumo
+  if (typeof ehComandoDeTarefa === "function" && ehComandoDeTarefa(promptUsuario)) {
+    return gerarRespostaAutonomaIA(promptUsuario);
+  }
+
   // IA do Prumo no servidor (Gemini): responde qualquer assunto, sem a pessoa precisar de chave
   if (cfg.provedor === "prumo") {
     const r = await chamarServidorIA({
@@ -248,7 +253,7 @@ async function chamarProvedorLLM(promptUsuario, mensagensAnteriores = []) {
     };
   }
 
-  // 0. Modo Local Instantâneo (ICMC-USP) - Resposta imediata em 0ms sem latência de rede
+  // Modo Local Instantâneo (ICMC-USP) - Resposta imediata em 0ms sem latência de rede
   if (cfg.provedor === "local" || !cfg.provedor) {
     return gerarRespostaAutonomaIA(promptUsuario);
   }
@@ -298,7 +303,7 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
       });
 
       const controller = new AbortController();
-      const timerId = setTimeout(() => controller.abort(), 4000);
+      const timerId = setTimeout(() => controller.abort(), 15000);
 
       const resp = await fetch(url, {
         method: "POST",
@@ -344,7 +349,7 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
       messages.push({ role: "user", content: promptUsuario });
 
       const controller = new AbortController();
-      const timerId = setTimeout(() => controller.abort(), 4000);
+      const timerId = setTimeout(() => controller.abort(), 15000);
 
       const resp = await fetch(endpoint, {
         method: "POST",
@@ -372,7 +377,7 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
     }
   }
 
-  // 3. Nuvem Gratuita Global Sem Chave (Pollinations com timeout rigoroso de 3.5s)
+  // 3. Nuvem Gratuita Global Sem Chave (Pollinations com timeout de 15s)
   if (cfg.provedor === "autonomo" || (!cfg.chave && cfg.provedor !== "local")) {
     try {
       const messages = [{ role: "system", content: systemInstruction }];
@@ -385,7 +390,7 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
       messages.push({ role: "user", content: promptUsuario });
 
       const controller = new AbortController();
-      const timerId = setTimeout(() => controller.abort(), 3500);
+      const timerId = setTimeout(() => controller.abort(), 15000);
 
       const resp = await fetch("https://text.pollinations.ai/", {
         method: "POST",
@@ -440,7 +445,7 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(cfg.chave)}`;
       const controller = new AbortController();
-      const timerId = setTimeout(() => controller.abort(), 3500);
+      const timerId = setTimeout(() => controller.abort(), 15000);
 
       const resp = await fetch(url, {
         method: "POST",
@@ -490,7 +495,7 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
           : "https://api.openai.com/v1/chat/completions";
       const modelo = cfg.provedor === "groq" ? "llama-3.3-70b-versatile" : "gpt-4o-mini";
       const controller = new AbortController();
-      const timerId = setTimeout(() => controller.abort(), 3500);
+      const timerId = setTimeout(() => controller.abort(), 15000);
 
       const resp = await fetch(endpoint, {
         method: "POST",
@@ -524,11 +529,11 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
     }
   }
 
-  // 3. Provedor Gratuito Real Global (Pollinations com timeout de segurança de 3.5s)
+  // 3. Provedor Gratuito Real Global (Pollinations com timeout de segurança de 15s)
   if (cfg.provedor === "autonomo" || (!cfg.chave && cfg.provedor !== "local")) {
     try {
       const controller = new AbortController();
-      const timerId = setTimeout(() => controller.abort(), 3500);
+      const timerId = setTimeout(() => controller.abort(), 15000);
 
       const resp = await fetch("https://text.pollinations.ai/", {
         method: "POST",
@@ -1094,6 +1099,16 @@ function formatarTextoMensagemIA(raw) {
     txt = txt.replace(/\[\[ACAO_BATERIA_QUESTOES\]\]/g, "");
   }
 
+  const idsTarefasCriadas = [];
+  if (txt.includes("[[ACAO_TAREFA_CRIADA:")) {
+    const matches = txt.match(/\[\[ACAO_TAREFA_CRIADA:([^\]]+)\]\]/g) || [];
+    matches.forEach(tag => {
+      const m = tag.match(/\[\[ACAO_TAREFA_CRIADA:([^\]]+)\]\]/);
+      if (m && m[1]) idsTarefasCriadas.push(m[1]);
+    });
+    txt = txt.replace(/\[\[ACAO_TAREFA_CRIADA:[^\]]+\]\]/g, "");
+  }
+
   // Normalizar tags HTML comuns que possam ter sido passadas
   txt = txt.replace(/<\/?(b|strong)>/gi, "**");
   txt = txt.replace(/<\/?(i|em)>/gi, "*");
@@ -1146,6 +1161,41 @@ function formatarTextoMensagemIA(raw) {
         ⚡ Ir para Bateria de Questões
       </button>
     </div>`;
+  }
+
+  if (idsTarefasCriadas.length && typeof S === "object" && S && Array.isArray(S.tasks)) {
+    const tarefas = idsTarefasCriadas.map(id => S.tasks.find(x => x.id === id)).filter(Boolean);
+    if (tarefas.length) {
+      const itensHtml = tarefas
+        .map(x => {
+          const dt =
+            x.date === today()
+              ? "Hoje"
+              : x.date === addDays(today(), 1)
+                ? "Amanhã"
+                : typeof fmtDate === "function"
+                  ? fmtDate(x.date)
+                  : x.date;
+          const hr = x.time ? ` · ⏰ ${esc(x.time)}` : "";
+          const dr = x.dur ? ` · ⏱️ ${esc(fmtMin(x.dur))}` : "";
+          return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--surface,#fff);border-radius:10px;border:1px solid var(--border,#e2e8f0);margin-bottom:6px;text-align:left;">
+            <div>
+              <div style="font-weight:800;font-size:13px;color:var(--text,#0f172a);">✅ ${esc(x.title)}</div>
+              <div style="font-size:11.5px;color:var(--muted,#64748b);">📅 ${esc(dt)}${hr}${dr}</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn small primary" data-act="ia-focar-tarefa-chat" data-id="${esc(x.id)}" style="padding:5px 10px;font-size:11.5px;border-radius:8px;font-weight:700;">▶️ Focar</button>
+              <button type="button" class="btn small ghost" data-act="ia-ver-tarefa-chat" data-id="${esc(x.id)}" style="padding:5px 10px;font-size:11.5px;border-radius:8px;font-weight:700;">📅 Ver</button>
+            </div>
+          </div>`;
+        })
+        .join("");
+      txt += `
+      <div style="margin-top:14px;padding:12px;background:rgba(16,185,129,0.08);border-radius:14px;border:1.5px solid rgba(16,185,129,0.3);">
+        <div style="font-weight:800;font-size:12.5px;color:#059669;margin-bottom:8px;">📌 Tarefa(s) agendada(s) no seu Prumo:</div>
+        ${itensHtml}
+      </div>`;
+    }
   }
 
   return txt;
@@ -2763,6 +2813,30 @@ if (typeof ACOES_EXTRAS !== "undefined") {
     tab = "estudos";
     render();
   };
+  ACOES_EXTRAS["ia-focar-tarefa-chat"] = b => {
+    const id = b && b.dataset ? b.dataset.id : "";
+    fecharChatPrumiIA();
+    if (!id) return;
+    const tmp = document.createElement("button");
+    tmp.setAttribute("data-act", "focus");
+    tmp.setAttribute("data-id", id);
+    tmp.style.display = "none";
+    document.body.appendChild(tmp);
+    tmp.click();
+    tmp.remove();
+  };
+  ACOES_EXTRAS["ia-ver-tarefa-chat"] = b => {
+    const id = b && b.dataset ? b.dataset.id : "";
+    const tk = id && S && Array.isArray(S.tasks) ? S.tasks.find(x => x.id === id) : null;
+    fecharChatPrumiIA();
+    if (tk && tk.date && tk.date !== today()) {
+      tab = "agenda";
+      selDate = tk.date;
+    } else {
+      tab = "hoje";
+    }
+    render();
+  };
 }
 
 // Delegação de cliques para botões com data-act (garante resposta direta em qualquer contexto)
@@ -2826,6 +2900,37 @@ document.addEventListener("click", e => {
     e.preventDefault();
     fecharChatPrumiIA();
     tab = "estudos";
+    render();
+    return;
+  }
+  const btnFocarChat = e.target.closest("[data-act='ia-focar-tarefa-chat']");
+  if (btnFocarChat) {
+    e.preventDefault();
+    const id = btnFocarChat.dataset.id;
+    fecharChatPrumiIA();
+    if (id) {
+      const tmp = document.createElement("button");
+      tmp.setAttribute("data-act", "focus");
+      tmp.setAttribute("data-id", id);
+      tmp.style.display = "none";
+      document.body.appendChild(tmp);
+      tmp.click();
+      tmp.remove();
+    }
+    return;
+  }
+  const btnVerChat = e.target.closest("[data-act='ia-ver-tarefa-chat']");
+  if (btnVerChat) {
+    e.preventDefault();
+    const id = btnVerChat.dataset.id;
+    const tk = id && S && Array.isArray(S.tasks) ? S.tasks.find(x => x.id === id) : null;
+    fecharChatPrumiIA();
+    if (tk && tk.date && tk.date !== today()) {
+      tab = "agenda";
+      selDate = tk.date;
+    } else {
+      tab = "hoje";
+    }
     render();
     return;
   }
