@@ -345,6 +345,37 @@ module.exports = async function (url) {
         aguaDepois1500 === aguaAntes + 1500,
       "comandos 'bebi 500ml de agua' e 'eu bebi um litro de agua' somam 500ml e 1000ml na hidratação diária imediatamente"
     );
+
+    // 17. Tool Calling (<acao>{...}</acao>) retornado pela API de IA (Gemini / Pollinations / Groq)
+    const resToolCalling = await ev(`(async () => {
+      const original = window.chamarServidorIA;
+      S.iaConfig = { provedor: "prumo", chave: "", modelo: "", temperatura: 0.7 };
+      const aguaInicial = waterToday();
+      const tasksInicial = S.tasks.length;
+      const fcInicial = S.flashcards.length;
+
+      window.chamarServidorIA = async () => ({
+        texto: "Show, hidratação é tudo!\\n<acao>{\\"tipo\\":\\"registrar_agua\\",\\"ml\\":750}</acao>\\n<acao>{\\"tipo\\":\\"criar_tarefa\\",\\"titulo\\":\\"Revisar Álgebra Linear\\",\\"data\\":\\"" + today() + "\\",\\"hora\\":\\"18:00\\",\\"duracaoMin\\":60,\\"area\\":\\"estudo\\"}</acao>\\n<acao>{\\"tipo\\":\\"criar_flashcards\\",\\"materia\\":\\"Álgebra Linear\\",\\"cards\\":[{\\"frente\\":\\"O que é autovetor?\\",\\"verso\\":\\"Vetor não nulo cuja direção não muda pela transformação.\\"}]}</acao>"
+      });
+
+      const r = await chamarProvedorLLM("fala comigo e organiza tudo", []);
+      window.chamarServidorIA = original;
+      return {
+        texto: r.texto,
+        aguaDelta: waterToday() - aguaInicial,
+        tasksDelta: S.tasks.length - tasksInicial,
+        fcDelta: S.flashcards.length - fcInicial
+      };
+    })()`);
+    ok(
+      !resToolCalling.texto.includes("<acao>") &&
+        resToolCalling.aguaDelta === 750 &&
+        resToolCalling.tasksDelta === 1 &&
+        resToolCalling.fcDelta === 1 &&
+        resToolCalling.texto.includes("[[ACAO_TAREFA_CRIADA:") &&
+        resToolCalling.texto.includes("[[ACAO_FLASHCARD:"),
+      "Tool Calling (<acao>{...}</acao>) da API de IA executa registrar_agua, criar_tarefa e criar_flashcards automaticamente"
+    );
   } finally {
     fechar();
   }

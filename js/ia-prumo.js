@@ -226,6 +226,128 @@ DADOS DO USUÁRIO NO PRUMO:
 `;
 }
 
+/* ---------- Executor de Tool Calling (<acao>{...}</acao>) vindo da API de IA ---------- */
+function executarAcoesGeradasPelaIA(raw) {
+  if (!raw || typeof raw !== "string" || !raw.includes("<acao>")) return String(raw || "");
+  if (typeof S === "undefined" || !S) return raw.replace(/<acao>[\s\S]*?<\/acao>/gi, "").trim();
+
+  const hojeStr = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
+  const sufixosCards = [];
+  let alterouEstado = false;
+
+  const textoLimpo = raw
+    .replace(/<acao>([\s\S]*?)<\/acao>/gi, (_, jsonBruto) => {
+      try {
+        const cmd = typeof lerJsonDaIA === "function" ? lerJsonDaIA(jsonBruto) : JSON.parse(jsonBruto.trim());
+        if (!cmd || typeof cmd !== "object") return "";
+        const tipo = String(cmd.tipo || "").toLowerCase();
+
+        if (tipo === "registrar_agua") {
+          const ml = Math.max(50, Math.min(5000, Math.round(Number(cmd.ml) || 250)));
+          if (typeof addWater === "function") {
+            addWater(ml);
+          } else {
+            if (!S.water || typeof S.water !== "object") S.water = {};
+            if (!Array.isArray(S.water[hojeStr])) S.water[hojeStr] = [];
+            S.water[hojeStr].push({
+              id: typeof uid === "function" ? uid() : "w_" + Date.now(),
+              ml,
+              time: new Date().toTimeString().slice(0, 5)
+            });
+            alterouEstado = true;
+          }
+          const totalHoje = typeof waterToday === "function" ? waterToday() : ml;
+          const meta = S.waterGoal || 2000;
+          const pct = Math.min(100, Math.round((totalHoje / meta) * 100));
+          sufixosCards.push(
+            `\n\n💧 **+${ml}ml registrados!** Progresso de hoje: **${totalHoje}ml / ${meta}ml** (${pct}%).`
+          );
+        } else if (tipo === "criar_tarefa" && cmd.titulo) {
+          if (!Array.isArray(S.tasks)) S.tasks = [];
+          const novoId = typeof uid === "function" ? uid() : "t_ia_" + Date.now();
+          S.tasks.push({
+            id: novoId,
+            title: String(cmd.titulo).slice(0, 100),
+            date: /^\d{4}-\d{2}-\d{2}$/.test(cmd.data || "") ? cmd.data : hojeStr,
+            time: /^\d{2}:\d{2}$/.test(cmd.hora || "") ? cmd.hora : "",
+            dur: Math.max(10, Math.min(480, Math.round(Number(cmd.duracaoMin) || 60))),
+            area: ["estudo", "trabalho", "dieta", "casa", "lazer"].includes(cmd.area) ? cmd.area : "estudo",
+            prio: [1, 2, 3].includes(Number(cmd.prioridade)) ? Number(cmd.prioridade) : 2,
+            done: false
+          });
+          alterouEstado = true;
+          sufixosCards.push(`\n[[ACAO_TAREFA_CRIADA:${novoId}]]`);
+        } else if (tipo === "remarcar_tarefas" && Array.isArray(S.tasks)) {
+          const dataDestino = /^\d{4}-\d{2}-\d{2}$/.test(cmd.dataDestino || "")
+            ? cmd.dataDestino
+            : typeof addDays === "function"
+              ? addDays(hojeStr, 1)
+              : hojeStr;
+          const ehAtrasadas = String(cmd.filtro || "atrasadas") === "atrasadas";
+          const alvos = S.tasks.filter(tk => {
+            if (!tk || tk.done) return false;
+            return ehAtrasadas
+              ? tk.date && tk.date < hojeStr
+              : tk.date && tk.date <= hojeStr && tk.date !== dataDestino;
+          });
+          if (alvos.length) {
+            if (typeof window !== "undefined") {
+              window.__ultimasTarefasRemarcadasIA = alvos.map(tk => ({
+                id: tk.id,
+                dateAnterior: tk.date,
+                titulo: tk.title || tk.txt || "Tarefa"
+              }));
+            }
+            alvos.forEach(tk => {
+              tk.date = dataDestino;
+            });
+            alterouEstado = true;
+            sufixosCards.push(`\n[[ACAO_TAREFAS_REMARCADAS:${alvos.length}:${dataDestino}]]`);
+          }
+        } else if (tipo === "criar_flashcards" && Array.isArray(cmd.cards) && cmd.cards.length) {
+          if (!Array.isArray(S.subjects)) S.subjects = [];
+          if (!Array.isArray(S.flashcards)) S.flashcards = [];
+          const nomeMat = String(cmd.materia || "Estudos").slice(0, 60);
+          let subj = S.subjects.find(s => s && s.name && s.name.toLowerCase() === nomeMat.toLowerCase());
+          if (!subj) {
+            subj = {
+              id: typeof uid === "function" ? uid() : "subj_" + Date.now(),
+              name: nomeMat,
+              color: "#8B5CF6",
+              goalHoursWeek: 6
+            };
+            S.subjects.push(subj);
+          }
+          cmd.cards.slice(0, 8).forEach((c, idx) => {
+            if (c && (c.frente || c.front) && (c.verso || c.back)) {
+              S.flashcards.push({
+                id: (typeof uid === "function" ? uid() : "fc_" + Date.now()) + "_" + idx,
+                subjectId: subj.id,
+                front: String(c.frente || c.front).slice(0, 220),
+                back: String(c.verso || c.back).slice(0, 350),
+                repetitions: 0,
+                interval: 1,
+                easeFactor: 2.5,
+                due: hojeStr,
+                created: hojeStr
+              });
+            }
+          });
+          alterouEstado = true;
+          sufixosCards.push(`\n[[ACAO_FLASHCARD:geral:${nomeMat}]]`);
+        }
+      } catch (_) {}
+      return "";
+    })
+    .trim();
+
+  if (alterouEstado) {
+    if (typeof commit === "function") commit();
+    if (typeof render === "function") render();
+  }
+  return textoLimpo + sufixosCards.join("");
+}
+
 /* ---------- Parser de Raciocínio (Chain of Thought) ---------- */
 function separarPensamentoECorpo(raw) {
   if (!raw)
@@ -236,7 +358,7 @@ function separarPensamentoECorpo(raw) {
         return this.texto;
       }
     };
-  let texto = String(raw);
+  let texto = executarAcoesGeradasPelaIA(String(raw));
   let pensamento = "";
 
   // 1. Tags XML: <thought>...</thought> ou <think>...</think>
@@ -750,10 +872,13 @@ async function chamarProvedorLLM(promptUsuario, mensagensAnteriores = []) {
 
   const persona = obterPersonaAtual();
   const contexto = obterContextoUsuarioPrumo();
+  const instrucoesTools =
+    typeof montarInstrucoesFerramentasIA === "function" ? montarInstrucoesFerramentasIA() : "";
 
   const systemInstruction = `${persona.estilo}
 Você é o assistente e coach interativo dentro do aplicativo Prumo.
 ${contexto}
+${instrucoesTools}
 
 DIRETRIZES COGNITIVAS OBRIGATÓRIAS:
 1. RACIOCÍNIO EXPLÍCITO (<thought>...</thought>):
@@ -761,7 +886,7 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
 - 🔍 Intenção do usuário e estado emocional.
 - 📊 Diagnóstico Prumo: tarefas concluídas vs pendentes, hidratação, streak.
 - 🎭 Lente da Persona (${persona.titulo}): como sua personalidade única interpreta essa situação.
-- 💡 Decisão Tática: qual conselho ou choque de realidade é o mais cirúrgico e humano.
+- 💡 Decisão Tática: qual conselho ou ação no app é o mais cirúrgico e humano.
 
 2. RESPOSTA FINAL (Fora das tags <thought>):
 - Responda em português do Brasil, mantendo de forma autêntica o tom da persona ${persona.titulo}.
@@ -769,54 +894,56 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
 - Use os dados reais do usuário (cite tarefas reais ou hidratação).
 - NUNCA use tags HTML como <b> ou <br> — use apenas Markdown padrão (**negrito**, *itálico*).`;
 
-  // 1. Google Gemini 1.5 Flash (Oficial Google com chave)
+  // 1. Google Gemini 2.0 Flash / 1.5 Flash (Oficial Google com chave)
   if (cfg.provedor === "gemini" && cfg.chave) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(cfg.chave)}`;
-      const contents = [];
+    for (const modGemini of ["gemini-2.0-flash", "gemini-1.5-flash"]) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modGemini}:generateContent?key=${encodeURIComponent(cfg.chave)}`;
+        const contents = [];
 
-      const rawHist = (mensagensAnteriores || []).slice(-6);
-      rawHist.forEach(m => {
-        const role = m.remetente === "user" ? "user" : "model";
-        if (contents.length > 0 && contents[contents.length - 1].role === role) {
-          contents[contents.length - 1].parts[0].text += "\n" + (m.texto || "");
-        } else {
-          contents.push({ role, parts: [{ text: m.texto || "" }] });
-        }
-      });
-      while (contents.length > 0 && contents[0].role !== "user") {
-        contents.shift();
-      }
-      contents.push({
-        role: "user",
-        parts: [{ text: promptUsuario }]
-      });
-
-      const controller = new AbortController();
-      const timerId = setTimeout(() => controller.abort(), 15000);
-
-      const resp = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: systemInstruction }] },
-          contents,
-          generationConfig: {
-            temperature: cfg.temperatura || 0.7,
-            maxOutputTokens: 1000
+        const rawHist = (mensagensAnteriores || []).slice(-6);
+        rawHist.forEach(m => {
+          const role = m.remetente === "user" ? "user" : "model";
+          if (contents.length > 0 && contents[contents.length - 1].role === role) {
+            contents[contents.length - 1].parts[0].text += "\n" + (m.texto || "");
+          } else {
+            contents.push({ role, parts: [{ text: m.texto || "" }] });
           }
-        })
-      });
-      clearTimeout(timerId);
+        });
+        while (contents.length > 0 && contents[0].role !== "user") {
+          contents.shift();
+        }
+        contents.push({
+          role: "user",
+          parts: [{ text: promptUsuario }]
+        });
 
-      if (resp.ok) {
-        const data = await resp.json();
-        const textoResp = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (textoResp) return separarPensamentoECorpo(textoResp);
+        const controller = new AbortController();
+        const timerId = setTimeout(() => controller.abort(), 15000);
+
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+            contents,
+            generationConfig: {
+              temperature: cfg.temperatura || 0.7,
+              maxOutputTokens: 1000
+            }
+          })
+        });
+        clearTimeout(timerId);
+
+        if (resp.ok) {
+          const data = await resp.json();
+          const textoResp = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (textoResp) return separarPensamentoECorpo(textoResp);
+        }
+      } catch (err) {
+        console.warn("[IA Prumo] Falha ou timeout no Gemini (" + modGemini + "):", err);
       }
-    } catch (err) {
-      console.warn("[IA Prumo] Falha ou timeout no Gemini, usando motor local:", err);
     }
   }
 
@@ -867,7 +994,7 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
     }
   }
 
-  // 3. Nuvem Gratuita Global Sem Chave (Pollinations com timeout de 15s)
+  // 3. Nuvem Gratuita Global Sem Chave (OpenAI-compatible via Pollinations)
   if (cfg.provedor === "autonomo" || (!cfg.chave && cfg.provedor !== "local")) {
     try {
       const messages = [{ role: "system", content: systemInstruction }];
@@ -880,9 +1007,9 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
       messages.push({ role: "user", content: promptUsuario });
 
       const controller = new AbortController();
-      const timerId = setTimeout(() => controller.abort(), 15000);
+      const timerId = setTimeout(() => controller.abort(), 18000);
 
-      const resp = await fetch("https://text.pollinations.ai/", {
+      const resp = await fetch("https://text.pollinations.ai/openai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
@@ -895,8 +1022,9 @@ Antes de responder, você DEVE pensar detalhadamente dentro das tags <thought> e
       clearTimeout(timerId);
 
       if (resp.ok) {
-        const textoResp = await resp.text();
-        if (textoResp && textoResp.trim().length > 0) {
+        const data = await resp.json().catch(() => null);
+        const textoResp = data?.choices?.[0]?.message?.content;
+        if (textoResp && String(textoResp).trim().length > 0) {
           return separarPensamentoECorpo(textoResp);
         }
       }
@@ -1019,13 +1147,13 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
     }
   }
 
-  // 3. Provedor Gratuito Real Global (Pollinations com timeout de segurança de 15s)
+  // 3. Provedor Gratuito Real Global (OpenAI-compatible via Pollinations)
   if (cfg.provedor === "autonomo" || (!cfg.chave && cfg.provedor !== "local")) {
     try {
       const controller = new AbortController();
-      const timerId = setTimeout(() => controller.abort(), 15000);
+      const timerId = setTimeout(() => controller.abort(), 18000);
 
-      const resp = await fetch("https://text.pollinations.ai/", {
+      const resp = await fetch("https://text.pollinations.ai/openai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
@@ -1039,20 +1167,23 @@ async function chamarLLMModoJSON(promptSistema, promptUsuario) {
             }
           ],
           model: "openai",
-          jsonMode: true,
-          temperature: 0.5
+          temperature: 0.3
         })
       });
       clearTimeout(timerId);
 
       if (resp.ok) {
-        const txt = await resp.text();
+        const data = await resp.json().catch(() => null);
+        const txt = data?.choices?.[0]?.message?.content;
         if (txt) {
-          const jsonLimpo = txt
-            .replace(/```json/g, "")
-            .replace(/```/g, "")
-            .trim();
-          return JSON.parse(jsonLimpo);
+          return typeof lerJsonDaIA === "function"
+            ? lerJsonDaIA(txt)
+            : JSON.parse(
+                txt
+                  .replace(/```json/g, "")
+                  .replace(/```/g, "")
+                  .trim()
+              );
         }
       }
     } catch (err) {
