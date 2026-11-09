@@ -1568,6 +1568,109 @@ function alternarVelocidadeIA() {
   abrirChatPrumiIA(msgPendente);
 }
 
+function iconeGeminiSparkleSVG(tam = 22, classe = "") {
+  return `<svg class="ia-gemini-sparkle-svg ${classe}" width="${tam}" height="${tam}" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <linearGradient id="geminiGradPrumo" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4285F4"/>
+        <stop offset="50%" stop-color="#9B72CB"/>
+        <stop offset="100%" stop-color="#D96570"/>
+      </linearGradient>
+    </defs>
+    <path d="M14 2C14 8.62742 19.3726 14 26 14C19.3726 14 14 19.3726 14 26C14 19.3726 8.62742 14 2 14C8.62742 14 14 8.62742 14 2Z" fill="url(#geminiGradPrumo)"/>
+  </svg>`;
+}
+
+function renderTypingGeminiHTML(rotulo = "Pensando...") {
+  return `<div class="ia-message ia" id="ia-typing-box">
+    <div class="ia-gemini-msg-avatar is-thinking">${iconeGeminiSparkleSVG(22, "spin")}</div>
+    <div class="ia-msg-container" style="width:100%;">
+      <div class="ia-thinking-live">
+        <span class="ia-thought-icon">✨</span>
+        <span>${esc(rotulo)}</span>
+      </div>
+      <div class="ia-gemini-shimmer" aria-hidden="true">
+        <div class="ia-gemini-shimmer-line w-85"></div>
+        <div class="ia-gemini-shimmer-line w-65"></div>
+        <div class="ia-gemini-shimmer-line w-45"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMensagemChatGeminiHTML(m) {
+  if (!m) return "";
+  if (m.remetente === "user") {
+    return `<div class="ia-message user">
+      <div class="ia-msg-container">
+        <div class="ia-msg-bubble">${formatarTextoMensagemIA(m.texto)}</div>
+      </div>
+    </div>`;
+  }
+  return `<div class="ia-message ia">
+    <div class="ia-gemini-msg-avatar">${iconeGeminiSparkleSVG(22)}</div>
+    <div class="ia-msg-container">
+      ${
+        m.pensamento
+          ? `<details class="ia-thought-card">
+              <summary class="ia-thought-summary">
+                <span class="ia-thought-icon">✨</span>
+                <span class="ia-thought-title">Mostrar raciocínio</span>
+                <span class="ia-thought-chevron">▾</span>
+              </summary>
+              <div class="ia-thought-content">${formatarTextoMensagemIA(m.pensamento)}</div>
+            </details>`
+          : ""
+      }
+      <div class="ia-msg-bubble">${formatarTextoMensagemIA(m.texto)}</div>
+      <div class="ia-gemini-msg-actions">
+        <button type="button" class="ia-gemini-act-btn" data-act="ia-copiar-msg-chat" title="Copiar resposta">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span>Copiar</span>
+        </button>
+        <button type="button" class="ia-gemini-act-btn" data-act="ia-regenerar-msg-chat" title="Gerar nova resposta">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          <span>Regenerar</span>
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderHeroBoasVindasGeminiHTML(nomeUsuario, persona) {
+  const saudacaoNome = nomeUsuario ? `, ${esc(nomeUsuario)}` : "";
+  return `<div class="ia-gemini-hero" id="ia-gemini-hero">
+    <div class="ia-gemini-hero-badge">
+      ${iconeGeminiSparkleSVG(18)}
+      <span>${esc(persona.titulo)}</span>
+    </div>
+    <h2 class="ia-gemini-hero-title">Olá${saudacaoNome}</h2>
+    <p class="ia-gemini-hero-subtitle">Como posso ajudar nos seus estudos e rotina hoje?</p>
+    <div class="ia-gemini-hero-grid">
+      <button type="button" class="ia-gemini-hero-card" data-act="ia-anexar-pdf">
+        <span class="ia-gemini-card-icon">📎</span>
+        <span class="ia-gemini-card-title">Enviar PDF de Edital</span>
+        <span class="ia-gemini-card-desc">Extrair cargos, matérias e montar cronograma</span>
+      </button>
+      <button type="button" class="ia-gemini-hero-card" data-act="ia-msg-rapida" data-msg="Analise minhas tarefas de hoje e atrasadas e me diga por onde começar agora">
+        <span class="ia-gemini-card-icon">🎯</span>
+        <span class="ia-gemini-card-title">Priorizar meu dia</span>
+        <span class="ia-gemini-card-desc">Diagnóstico da agenda e tarefas pendentes</span>
+      </button>
+      <button type="button" class="ia-gemini-hero-card" data-act="ia-msg-rapida" data-msg="Cria 4 flashcards sobre Cálculo">
+        <span class="ia-gemini-card-icon">🗂️</span>
+        <span class="ia-gemini-card-title">Criar Flashcards SM-2</span>
+        <span class="ia-gemini-card-desc">Gerar cartões de revisão ativa na hora</span>
+      </button>
+      <button type="button" class="ia-gemini-hero-card" data-act="ia-msg-rapida" data-msg="Estou com dificuldade em Cálculo no ICMC, pode analisar a matéria e organizar minha semana?">
+        <span class="ia-gemini-card-icon">📅</span>
+        <span class="ia-gemini-card-title">Organizar semana em blocos</span>
+        <span class="ia-gemini-card-desc">Teoria, listas, provas antigas e revisão</span>
+      </button>
+    </div>
+  </div>`;
+}
+
 function abrirChatPrumiIA(mensagemInicial = "") {
   const modalAntigo = document.getElementById("modal-chat-ia");
   if (modalAntigo) modalAntigo.remove();
@@ -1575,91 +1678,78 @@ function abrirChatPrumiIA(mensagemInicial = "") {
   const cfg = obterConfigIA();
   const persona = obterPersonaAtual();
   const hist = obterHistoricoChatIA();
+  const nomeUsuario = (typeof S !== "undefined" && S && S.name) || "";
 
   const isInstantaneo = cfg.provedor === "local" || !cfg.provedor;
   const providerLabel =
     cfg.provedor === "prumo"
-      ? "✨ IA do Prumo (Gemini)"
+      ? "Prumi Gemini"
       : isInstantaneo
-        ? "⚡ Local Instantâneo (0ms)"
+        ? "Modo Offline"
         : cfg.chave
           ? cfg.provedor === "gemini"
-            ? "Gemini 1.5 Flash"
+            ? "Gemini 2.0 Flash"
             : cfg.provedor === "groq"
-              ? "Groq Llama 3 Turbo"
-              : "OpenAI GPT-4o"
-          : "Nuvem Gratuita";
+              ? "Llama 3.3 70B"
+              : "GPT-4o"
+          : "Prumi Gemini";
+
+  const mostrarHero = hist.length <= 1;
 
   const modalHtml = `
   <div id="modal-chat-ia" class="modal-ia-overlay">
-    <div class="modal-ia-container">
+    <div class="modal-ia-container ia-gemini-theme">
       <div class="ia-modal-header">
         <div class="ia-header-info">
           <div class="ia-avatar-wrapper">
-            <span>✨</span>
+            ${iconeGeminiSparkleSVG(24)}
             <div class="ia-online-dot"></div>
           </div>
           <div class="ia-header-titles">
-            <h3>${esc(persona.titulo)}</h3>
-            <p><span class="ia-engine-badge" data-act="ia-alternar-velocidade" style="cursor:pointer;" title="Clique para alternar entre a IA online e o modo offline">${esc(providerLabel)}</span> • Pergunte qualquer coisa</p>
+            <h3>
+              <span>${esc(providerLabel)}</span>
+              <span class="ia-engine-badge" data-act="ia-alternar-velocidade" style="cursor:pointer;" title="Clique para alternar entre IA na nuvem e modo offline">${isInstantaneo ? "⚡ Offline" : "✨ Flash"}</span>
+            </h3>
+            <p>${esc(persona.titulo)}</p>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <button class="ia-header-action-btn" data-act="ia-alternar-velocidade" title="Alternar velocidade">${isInstantaneo ? "⚡ Offline" : "🌐 Online"}</button>
-          <button class="ia-header-action-btn" data-act="limpar-chat-ia" title="Reiniciar conversa com nova reflexão">🔄</button>
-          <button class="ia-close-btn" data-act="fechar-chat-ia" aria-label="Fechar">&times;</button>
+        <div class="ia-header-actions">
+          <button type="button" class="ia-header-action-btn" data-act="ia-alternar-velocidade" title="Alternar modo Online / Offline">${isInstantaneo ? "⚡ Offline" : "🌐 Online"}</button>
+          <button type="button" class="ia-header-action-btn" data-act="limpar-chat-ia" title="Nova conversa">✨ Nova</button>
+          <button type="button" class="ia-header-action-btn" data-act="ia-expandir-chat" title="Expandir / Tela cheia">⛶</button>
+          <button type="button" class="ia-close-btn" data-act="fechar-chat-ia" aria-label="Fechar">&times;</button>
         </div>
       </div>
 
       <div class="ia-quick-pills">
-        <button class="ia-pill-btn" data-act="ia-anexar-pdf">📎 Enviar PDF de Edital</button>
-        <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Tô sem foco, me dá um empurrão agora!">⚡ Tô sem foco</button>
-        <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Como devo organizar minhas próximas horas?">🎯 Priorizar hoje</button>
-        <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Analise meu progresso e equilíbrio de hoje">📊 Como tá meu dia?</button>
-        <button class="ia-pill-btn" data-edital-act="abrir">📄 Edital → Cronograma</button>
-        <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Explique de forma simples e com exemplos um assunto que eu vou te dizer. Pergunte qual assunto.">🧠 Explicar assunto</button>
-        <button class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Quero corrigir uma redação no padrão ENEM. Peça o tema e o texto, e dê nota por competência.">✍️ Corrigir redação</button>
-        <button class="ia-pill-btn" data-act="abrir-desdobrador-ia">✨ Desdobrar Meta</button>
+        <button type="button" class="ia-pill-btn" data-act="ia-anexar-pdf">📎 PDF de Edital</button>
+        <button type="button" class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Tô sem foco, me dá um empurrão agora!">⚡ Tô sem foco</button>
+        <button type="button" class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Remarca minhas tarefas atrasadas para amanhã">🔄 Adiar atrasadas</button>
+        <button type="button" class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Analise meu progresso e equilíbrio de hoje">📊 Meu dia</button>
+        <button type="button" class="ia-pill-btn" data-edital-act="abrir">📄 Planejador de Edital</button>
+        <button type="button" class="ia-pill-btn" data-act="ia-msg-rapida" data-msg="Explique de forma simples e com exemplos um assunto que eu vou te dizer. Pergunte qual assunto.">🧠 Explicar matéria</button>
+        <button type="button" class="ia-pill-btn" data-act="abrir-desdobrador-ia">✨ Desdobrar Meta</button>
       </div>
 
       <div class="ia-chat-stream" id="ia-chat-stream">
-        ${hist
-          .map(
-            m => `
-          <div class="ia-message ${m.remetente}">
-            <div class="ia-msg-container">
-              ${
-                m.pensamento
-                  ? `
-                <details class="ia-thought-card">
-                  <summary class="ia-thought-summary">
-                    <span class="ia-thought-icon">🧠</span>
-                    <span class="ia-thought-title">Processo de Reflexão</span>
-                    <span class="ia-thought-chevron">▾</span>
-                  </summary>
-                  <div class="ia-thought-content">${formatarTextoMensagemIA(m.pensamento)}</div>
-                </details>
-              `
-                  : ""
-              }
-              <div class="ia-msg-bubble">${formatarTextoMensagemIA(m.texto)}</div>
-            </div>
-          </div>
-        `
-          )
-          .join("")}
+        ${mostrarHero ? renderHeroBoasVindasGeminiHTML(nomeUsuario, persona) : ""}
+        ${hist.map(m => renderMensagemChatGeminiHTML(m)).join("")}
       </div>
 
       <form id="form-chat-ia" class="ia-chat-input-bar">
-        <input type="file" id="ia-input-pdf" accept=".pdf,.txt,.md,application/pdf,text/plain" hidden />
-        <button type="button" class="ia-attach-btn" id="ia-btn-anexar-pdf" data-act="ia-anexar-pdf" title="Enviar PDF de Edital para montar cronograma" style="display:inline-flex;align-items:center;gap:4px;padding:8px 11px;border-radius:10px;border:1.5px solid var(--border,#cbd5e1);background:var(--surface,#fff);color:var(--text,#0f172a);font-weight:700;font-size:12.5px;cursor:pointer;flex-shrink:0;">
-          <span>📎 PDF</span>
-        </button>
-        <input type="text" id="ia-input-texto" class="ia-chat-input" placeholder="Pergunte qualquer coisa ou envie um PDF..." autocomplete="off" />
-        <button type="submit" class="ia-send-btn" id="ia-btn-enviar">
-          <span>Enviar</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-        </button>
+        <div class="ia-gemini-composer">
+          <input type="file" id="ia-input-pdf" accept=".pdf,.txt,.md,application/pdf,text/plain" hidden />
+          <button type="button" class="ia-attach-btn" id="ia-btn-anexar-pdf" data-act="ia-anexar-pdf" title="Anexar PDF de Edital para montar cronograma">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>PDF</span>
+          </button>
+          <input type="text" id="ia-input-texto" class="ia-chat-input" placeholder="Peça ao Prumi Gemini ou envie um PDF..." autocomplete="off" />
+          <button type="submit" class="ia-send-btn" id="ia-btn-enviar" title="Enviar mensagem">
+            <span class="sr-only">Enviar</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+        <div class="ia-gemini-footer-hint">O Prumi Gemini pode agendar tarefas, ler editais em PDF, criar flashcards e responder qualquer dúvida.</div>
       </form>
     </div>
   </div>`;
@@ -1939,18 +2029,15 @@ async function processarArquivoEditalNoChatIA(arquivo) {
   });
 
   if (stream) {
+    const hero = document.getElementById("ia-gemini-hero");
+    if (hero) hero.remove();
     stream.insertAdjacentHTML(
       "beforeend",
-      `<div class="ia-message user"><div class="ia-msg-container"><div class="ia-msg-bubble">${formatarTextoMensagemIA(msgUser)}</div></div></div>`
+      renderMensagemChatGeminiHTML({ remetente: "user", texto: msgUser })
     );
     stream.insertAdjacentHTML(
       "beforeend",
-      `<div class="ia-message ia" id="ia-typing-box">
-        <div class="ia-thinking-live">
-          <span class="ia-thought-icon">📄</span>
-          <span>Lendo PDF do edital e gerando cronograma das matérias...</span>
-        </div>
-      </div>`
+      renderTypingGeminiHTML("Lendo PDF do edital e gerando cronograma das matérias...")
     );
     stream.scrollTop = stream.scrollHeight;
   }
@@ -2073,25 +2160,7 @@ Clique em **📲 Importar para minhas Tarefas** abaixo para já lançar as próx
     if (stream) {
       stream.insertAdjacentHTML(
         "beforeend",
-        `<div class="ia-message ia">
-          <div class="ia-msg-container">
-            ${
-              respPensamento
-                ? `
-              <details class="ia-thought-card" open>
-                <summary class="ia-thought-summary">
-                  <span class="ia-thought-icon">🧠</span>
-                  <span class="ia-thought-title">Processo de Reflexão</span>
-                  <span class="ia-thought-chevron">▾</span>
-                </summary>
-                <div class="ia-thought-content">${formatarTextoMensagemIA(respPensamento)}</div>
-              </details>
-            `
-                : ""
-            }
-            <div class="ia-msg-bubble">${formatarTextoMensagemIA(respTexto)}</div>
-          </div>
-        </div>`
+        renderMensagemChatGeminiHTML({ remetente: "ia", texto: respTexto, pensamento: respPensamento })
       );
       stream.scrollTop = stream.scrollHeight;
     }
@@ -2126,20 +2195,10 @@ async function submeterChatIA(e) {
   });
 
   if (stream) {
-    stream.insertAdjacentHTML(
-      "beforeend",
-      `<div class="ia-message user"><div class="ia-msg-container"><div class="ia-msg-bubble">${formatarTextoMensagemIA(texto)}</div></div></div>`
-    );
-    // Adicionar indicador de pensamento ativo ao vivo
-    stream.insertAdjacentHTML(
-      "beforeend",
-      `<div class="ia-message ia" id="ia-typing-box">
-        <div class="ia-thinking-live">
-          <span class="ia-thought-icon">🧠</span>
-          <span>Prumi está pensando...</span>
-        </div>
-      </div>`
-    );
+    const hero = document.getElementById("ia-gemini-hero");
+    if (hero) hero.remove();
+    stream.insertAdjacentHTML("beforeend", renderMensagemChatGeminiHTML({ remetente: "user", texto }));
+    stream.insertAdjacentHTML("beforeend", renderTypingGeminiHTML("Prumi Gemini está pensando..."));
     stream.scrollTop = stream.scrollHeight;
   }
 
@@ -2162,25 +2221,7 @@ async function submeterChatIA(e) {
     if (stream) {
       stream.insertAdjacentHTML(
         "beforeend",
-        `<div class="ia-message ia">
-          <div class="ia-msg-container">
-            ${
-              respPensamento
-                ? `
-              <details class="ia-thought-card" open>
-                <summary class="ia-thought-summary">
-                  <span class="ia-thought-icon">🧠</span>
-                  <span class="ia-thought-title">Processo de Reflexão</span>
-                  <span class="ia-thought-chevron">▾</span>
-                </summary>
-                <div class="ia-thought-content">${formatarTextoMensagemIA(respPensamento)}</div>
-              </details>
-            `
-                : ""
-            }
-            <div class="ia-msg-bubble">${formatarTextoMensagemIA(respTexto)}</div>
-          </div>
-        </div>`
+        renderMensagemChatGeminiHTML({ remetente: "ia", texto: respTexto, pensamento: respPensamento })
       );
       stream.scrollTop = stream.scrollHeight;
     }
@@ -2205,25 +2246,7 @@ async function submeterChatIA(e) {
     if (stream) {
       stream.insertAdjacentHTML(
         "beforeend",
-        `<div class="ia-message ia">
-          <div class="ia-msg-container">
-            ${
-              fbPensamento
-                ? `
-              <details class="ia-thought-card" open>
-                <summary class="ia-thought-summary">
-                  <span class="ia-thought-icon">🧠</span>
-                  <span class="ia-thought-title">Processo de Reflexão</span>
-                  <span class="ia-thought-chevron">▾</span>
-                </summary>
-                <div class="ia-thought-content">${formatarTextoMensagemIA(fbPensamento)}</div>
-              </details>
-            `
-                : ""
-            }
-            <div class="ia-msg-bubble">${formatarTextoMensagemIA(fbTexto)}</div>
-          </div>
-        </div>`
+        renderMensagemChatGeminiHTML({ remetente: "ia", texto: fbTexto, pensamento: fbPensamento })
       );
       stream.scrollTop = stream.scrollHeight;
     }
@@ -3957,6 +3980,34 @@ document.addEventListener("click", e => {
   if (btnDesfazerRemarcacao) {
     e.preventDefault();
     desfazerUltimaRemarcacaoIA();
+    return;
+  }
+  const btnExpandirChat = e.target.closest("[data-act='ia-expandir-chat']");
+  if (btnExpandirChat) {
+    e.preventDefault();
+    const cont = document.querySelector("#modal-chat-ia .modal-ia-container");
+    if (cont) cont.classList.toggle("ia-fullscreen");
+    return;
+  }
+  const btnCopiarMsg = e.target.closest("[data-act='ia-copiar-msg-chat']");
+  if (btnCopiarMsg) {
+    e.preventDefault();
+    const msgBox = btnCopiarMsg.closest(".ia-message");
+    const bubble = msgBox ? msgBox.querySelector(".ia-msg-bubble") : null;
+    const texto = bubble ? bubble.innerText || bubble.textContent || "" : "";
+    if (texto && typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto.trim()).catch(() => {});
+    }
+    if (typeof toast === "function") toast("📋 Resposta copiada!", false, "happy");
+    return;
+  }
+  const btnRegenerarMsg = e.target.closest("[data-act='ia-regenerar-msg-chat']");
+  if (btnRegenerarMsg) {
+    e.preventDefault();
+    const ultimaUser = [...chatIaHistorico].reverse().find(m => m && m.remetente === "user" && m.texto);
+    if (ultimaUser && ultimaUser.texto) {
+      enviarMensagemRapidaIA(ultimaUser.texto);
+    }
     return;
   }
 

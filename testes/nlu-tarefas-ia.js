@@ -376,6 +376,22 @@ module.exports = async function (url) {
         resToolCalling.texto.includes("[[ACAO_FLASHCARD:"),
       "Tool Calling (<acao>{...}</acao>) da API de IA executa registrar_agua, criar_tarefa e criar_flashcards automaticamente"
     );
+
+    // 18. UX estilo Google Gemini no modal do chat (composer em pílula, ícone 4 pontas, ações copiar/regenerar e tela cheia)
+    const uxGemini = ev(`(() => {
+      reiniciarChatIA();
+      const cont = document.querySelector("#modal-chat-ia .modal-ia-container.ia-gemini-theme");
+      const hero = document.getElementById("ia-gemini-hero");
+      const composer = document.querySelector("#modal-chat-ia .ia-gemini-composer");
+      const btnExp = document.querySelector("[data-act='ia-expandir-chat']");
+      if (btnExp) btnExp.click();
+      const expandiu = cont && cont.classList.contains("ia-fullscreen");
+      return Boolean(cont && hero && composer && expandiu);
+    })()`);
+    ok(
+      uxGemini,
+      "Chat IA renderiza UX estilo Google Gemini (hero com gradiente, composer em pílula e botão de expandir tela cheia)"
+    );
   } finally {
     fechar();
   }

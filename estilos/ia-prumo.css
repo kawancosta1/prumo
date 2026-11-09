@@ -1,6 +1,6 @@
 /*
-  estilos/ia-prumo.css - Estilos da Inteligência Artificial Generativa e Coach Interativo do Prumo
-  Design moderno, fluido, responsivo e com suporte total a Dark/Light Mode.
+  estilos/ia-prumo.css - Estilos da Inteligência Artificial Generativa (UX Inspirada no Google Gemini)
+  Design amplo, editorial, fluido e com suporte completo a Light (#ffffff) e Dark Mode (#131314).
 */
 
 /* --- Modal Base da IA --- */
@@ -8,69 +8,89 @@
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  animation: iaModalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 14px;
+  animation: iaModalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes iaModalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-ia-container {
   width: 100%;
-  max-width: 580px;
-  max-height: 88vh;
-  height: 640px;
+  max-width: 780px;
+  max-height: 90vh;
+  height: min(86vh, 760px);
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: 28px;
   box-shadow:
-    0 20px 40px -15px rgba(0, 0, 0, 0.25),
-    0 0 0 1px rgba(226, 232, 240, 0.8);
+    0 24px 60px -15px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(226, 232, 240, 0.9);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  animation: iaModalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    max-width 0.25s ease,
+    height 0.25s ease,
+    border-radius 0.25s ease;
+  animation: iaModalSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-ia-container.ia-fullscreen {
+  max-width: 98vw;
+  max-height: 96vh;
+  height: 95vh;
+  border-radius: 20px;
 }
 
 @keyframes iaModalSlideUp {
-  from { transform: translateY(24px) scale(0.97); }
-  to { transform: translateY(0) scale(1); }
+  from {
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
 }
 
 [data-theme="dark"] .modal-ia-container,
 html[data-theme="dark"] .modal-ia-container,
 body.dark .modal-ia-container,
 .dark .modal-ia-container {
-  background: #18181b;
+  background: #131314;
   box-shadow:
-    0 24px 48px -12px rgba(0, 0, 0, 0.6),
+    0 24px 60px -12px rgba(0, 0, 0, 0.75),
     0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
-/* --- Header do Chat IA --- */
+/* --- Header Minimalista Estilo Gemini --- */
 .ia-modal-header {
-  padding: 16px 20px;
+  padding: 14px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  background: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.85));
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
 }
 
 [data-theme="dark"] .ia-modal-header,
 html[data-theme="dark"] .ia-modal-header,
 body.dark .ia-modal-header,
 .dark .ia-modal-header {
-  border-bottom-color: rgba(255, 255, 255, 0.08);
-  background: linear-gradient(135deg, rgba(39, 39, 42, 0.95), rgba(24, 24, 27, 0.85));
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+  background: rgba(19, 19, 20, 0.92);
 }
 
 .ia-header-info {
@@ -79,25 +99,36 @@ body.dark .ia-modal-header,
   gap: 12px;
 }
 
+.ia-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .ia-avatar-wrapper {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: rgba(66, 133, 244, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  font-size: 22px;
+}
+
+[data-theme="dark"] .ia-avatar-wrapper,
+html[data-theme="dark"] .ia-avatar-wrapper,
+body.dark .ia-avatar-wrapper,
+.dark .ia-avatar-wrapper {
+  background: rgba(155, 114, 203, 0.14);
 }
 
 .ia-online-dot {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   background: #10b981;
   border: 2px solid #ffffff;
   border-radius: 50%;
@@ -106,50 +137,57 @@ body.dark .ia-modal-header,
 html[data-theme="dark"] .ia-online-dot,
 body.dark .ia-online-dot,
 .dark .ia-online-dot {
-  border-color: #18181b;
+  border-color: #131314;
 }
 
 .ia-header-titles h3 {
   margin: 0;
   font-size: 16px;
-  font-weight: 700;
-  color: #0f172a;
+  font-weight: 600;
+  color: #1f1f1f;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  letter-spacing: -0.01em;
 }
 [data-theme="dark"] .ia-header-titles h3,
 html[data-theme="dark"] .ia-header-titles h3,
 body.dark .ia-header-titles h3,
 .dark .ia-header-titles h3 {
-  color: #f1f5f9;
+  color: #e3e3e3;
 }
 
 .ia-header-titles p {
-  margin: 2px 0 0;
+  margin: 1px 0 0;
   font-size: 12px;
-  color: #64748b;
+  color: #5f6368;
   display: flex;
   align-items: center;
   gap: 4px;
+}
+[data-theme="dark"] .ia-header-titles p,
+html[data-theme="dark"] .ia-header-titles p,
+body.dark .ia-header-titles p,
+.dark .ia-header-titles p {
+  color: #9aa0a6;
 }
 
 .ia-engine-badge {
   display: inline-flex;
   align-items: center;
-  padding: 1px 6px;
-  border-radius: 6px;
-  background: rgba(59, 130, 246, 0.12);
-  color: #2563eb;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(66, 133, 244, 0.14), rgba(155, 114, 203, 0.14));
+  color: #1a73e8;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
 }
 [data-theme="dark"] .ia-engine-badge,
 html[data-theme="dark"] .ia-engine-badge,
 body.dark .ia-engine-badge,
 .dark .ia-engine-badge {
-  background: rgba(96, 165, 250, 0.15);
-  color: #93c5fd;
+  background: linear-gradient(135deg, rgba(138, 180, 248, 0.18), rgba(197, 138, 249, 0.18));
+  color: #a8c7fa;
 }
 
 .ia-close-btn {
@@ -157,36 +195,36 @@ body.dark .ia-engine-badge,
   border: none;
   font-size: 24px;
   line-height: 1;
-  color: #94a3b8;
+  color: #5f6368;
   cursor: pointer;
-  padding: 6px;
-  border-radius: 8px;
+  padding: 6px 8px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
 }
 .ia-close-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: #334155;
+  background: rgba(0, 0, 0, 0.06);
+  color: #1f1f1f;
 }
 [data-theme="dark"] .ia-close-btn:hover,
 html[data-theme="dark"] .ia-close-btn:hover,
 body.dark .ia-close-btn:hover,
 .dark .ia-close-btn:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: #f1f5f9;
+  color: #e3e3e3;
 }
 
 /* --- Pílulas de Sugestão Rápida --- */
 .ia-quick-pills {
   display: flex;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 8px 22px;
   overflow-x: auto;
   scrollbar-width: none;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-  background: rgba(248, 250, 252, 0.5);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.45);
+  background: #ffffff;
   flex-shrink: 0;
 }
 .ia-quick-pills::-webkit-scrollbar {
@@ -196,19 +234,19 @@ body.dark .ia-close-btn:hover,
 html[data-theme="dark"] .ia-quick-pills,
 body.dark .ia-quick-pills,
 .dark .ia-quick-pills {
-  background: rgba(30, 30, 34, 0.5);
-  border-bottom-color: rgba(255, 255, 255, 0.04);
+  background: #131314;
+  border-bottom-color: rgba(255, 255, 255, 0.05);
 }
 
 .ia-pill-btn {
   flex-shrink: 0;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: #f0f4f9;
+  border: 1px solid transparent;
   border-radius: 999px;
-  padding: 6px 12px;
+  padding: 6px 13px;
   font-size: 12px;
   font-weight: 500;
-  color: #475569;
+  color: #1f1f1f;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
@@ -217,88 +255,261 @@ body.dark .ia-quick-pills,
   gap: 5px;
 }
 .ia-pill-btn:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-  color: #0f172a;
+  background: #e1e8f0;
   transform: translateY(-1px);
 }
 [data-theme="dark"] .ia-pill-btn,
 html[data-theme="dark"] .ia-pill-btn,
 body.dark .ia-pill-btn,
 .dark .ia-pill-btn {
-  background: #27272a;
-  border-color: #3f3f46;
-  color: #d4d4d8;
+  background: #1e1f20;
+  color: #e3e3e3;
 }
 [data-theme="dark"] .ia-pill-btn:hover,
 html[data-theme="dark"] .ia-pill-btn:hover,
 body.dark .ia-pill-btn:hover,
 .dark .ia-pill-btn:hover {
-  background: #3f3f46;
-  border-color: #52525b;
-  color: #ffffff;
+  background: #282a2c;
 }
 
-/* --- Área de Mensagens (Stream) --- */
+/* --- Hero de Boas-Vindas Estilo Google Gemini --- */
+.ia-gemini-hero {
+  padding: 18px 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  animation: iaMsgPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ia-gemini-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #f0f4f9;
+  color: #444746;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+[data-theme="dark"] .ia-gemini-hero-badge,
+html[data-theme="dark"] .ia-gemini-hero-badge,
+body.dark .ia-gemini-hero-badge,
+.dark .ia-gemini-hero-badge {
+  background: #1e1f20;
+  color: #c4c7c5;
+}
+
+.ia-gemini-hero-title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  background: linear-gradient(90deg, #4285f4 0%, #9b72cb 50%, #d96570 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ia-gemini-hero-subtitle {
+  margin: 4px 0 18px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #8e918f;
+  letter-spacing: -0.015em;
+}
+[data-theme="dark"] .ia-gemini-hero-subtitle,
+html[data-theme="dark"] .ia-gemini-hero-subtitle,
+body.dark .ia-gemini-hero-subtitle,
+.dark .ia-gemini-hero-subtitle {
+  color: #757775;
+}
+
+.ia-gemini-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 520px) {
+  .ia-gemini-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .ia-gemini-hero-title {
+    font-size: 26px;
+  }
+  .ia-gemini-hero-subtitle {
+    font-size: 16px;
+  }
+}
+
+.ia-gemini-hero-card {
+  background: #f0f4f9;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+.ia-gemini-hero-card:hover {
+  background: #e1e8f0;
+  transform: translateY(-2px);
+}
+[data-theme="dark"] .ia-gemini-hero-card,
+html[data-theme="dark"] .ia-gemini-hero-card,
+body.dark .ia-gemini-hero-card,
+.dark .ia-gemini-hero-card {
+  background: #1e1f20;
+}
+[data-theme="dark"] .ia-gemini-hero-card:hover,
+html[data-theme="dark"] .ia-gemini-hero-card:hover,
+body.dark .ia-gemini-hero-card:hover,
+.dark .ia-gemini-hero-card:hover {
+  background: #282a2c;
+}
+
+.ia-gemini-card-icon {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+.ia-gemini-card-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1f1f1f;
+}
+[data-theme="dark"] .ia-gemini-card-title,
+html[data-theme="dark"] .ia-gemini-card-title,
+body.dark .ia-gemini-card-title,
+.dark .ia-gemini-card-title {
+  color: #e3e3e3;
+}
+.ia-gemini-card-desc {
+  font-size: 12px;
+  color: #5f6368;
+  line-height: 1.35;
+}
+[data-theme="dark"] .ia-gemini-card-desc,
+html[data-theme="dark"] .ia-gemini-card-desc,
+body.dark .ia-gemini-card-desc,
+.dark .ia-gemini-card-desc {
+  color: #9aa0a6;
+}
+
+/* --- Área de Mensagens (Stream Estilo Gemini) --- */
 .ia-chat-stream {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 20px 26px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
 }
 
 .ia-message {
   display: flex;
-  gap: 10px;
-  max-width: 86%;
+  gap: 14px;
+  max-width: 100%;
   animation: iaMsgPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes iaMsgPop {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .ia-message.user {
   align-self: flex-end;
+  max-width: 80%;
   flex-direction: row-reverse;
+}
+
+.ia-message.ia {
+  align-self: flex-start;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.ia-gemini-msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ia-gemini-sparkle-svg.spin {
+  animation: iaGeminiSpin 2.4s linear infinite;
+}
+
+@keyframes iaGeminiSpin {
+  0% {
+    transform: rotate(0deg) scale(0.95);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(0.95);
+  }
 }
 
 .ia-msg-container {
   display: flex;
   flex-direction: column;
   max-width: 100%;
+  flex: 1;
+  min-width: 0;
 }
 
-/* --- Card de Raciocínio / Pensamento da IA --- */
+/* --- Gaveta "Mostrar raciocínio" Estilo Gemini Thinking --- */
 .ia-thought-card {
-  margin-bottom: 8px;
-  border-radius: 14px;
-  background: rgba(99, 102, 241, 0.06);
-  border: 1px dashed rgba(99, 102, 241, 0.35);
+  margin-bottom: 10px;
+  border-radius: 16px;
+  background: #f8fafd;
+  border: 1px solid #e1e8f0;
   overflow: hidden;
+  width: fit-content;
+  max-width: 100%;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.06);
+}
+.ia-thought-card[open] {
+  width: 100%;
 }
 [data-theme="dark"] .ia-thought-card,
 html[data-theme="dark"] .ia-thought-card,
 body.dark .ia-thought-card,
 .dark .ia-thought-card {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(129, 140, 248, 0.35);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: #1e1f20;
+  border-color: #282a2c;
 }
 .ia-thought-summary {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 14px;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  color: #6366f1;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #444746;
   user-select: none;
   list-style: none;
   transition: background 0.15s ease;
@@ -307,21 +518,16 @@ body.dark .ia-thought-card,
 html[data-theme="dark"] .ia-thought-summary,
 body.dark .ia-thought-summary,
 .dark .ia-thought-summary {
-  color: #a5b4fc;
+  color: #c4c7c5;
 }
 .ia-thought-summary:hover {
-  background: rgba(99, 102, 241, 0.08);
+  background: rgba(66, 133, 244, 0.08);
 }
 .ia-thought-summary::-webkit-details-marker {
   display: none;
 }
 .ia-thought-icon {
-  font-size: 14px;
-  animation: iaBrainPulse 2.2s infinite ease-in-out;
-}
-@keyframes iaBrainPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.18); }
+  font-size: 13px;
 }
 .ia-thought-title {
   flex: 1;
@@ -335,12 +541,12 @@ body.dark .ia-thought-summary,
   transform: rotate(180deg);
 }
 .ia-thought-content {
-  padding: 8px 12px 10px 12px;
-  border-top: 1px dashed rgba(99, 102, 241, 0.2);
-  font-size: 12px;
-  line-height: 1.55;
-  color: #475569;
-  background: rgba(255, 255, 255, 0.65);
+  padding: 10px 14px 12px;
+  border-top: 1px solid rgba(226, 232, 240, 0.7);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #5f6368;
+  background: transparent;
   font-family: inherit;
   word-break: break-word;
 }
@@ -348,73 +554,117 @@ body.dark .ia-thought-summary,
 html[data-theme="dark"] .ia-thought-content,
 body.dark .ia-thought-content,
 .dark .ia-thought-content {
-  color: #cbd5e1;
-  background: rgba(24, 24, 27, 0.5);
+  color: #9aa0a6;
+  border-top-color: rgba(255, 255, 255, 0.06);
 }
 .ia-thought-content strong {
-  color: #4338ca;
+  color: #1f1f1f;
 }
 [data-theme="dark"] .ia-thought-content strong,
 html[data-theme="dark"] .ia-thought-content strong,
 body.dark .ia-thought-content strong,
 .dark .ia-thought-content strong {
-  color: #c7d2fe;
+  color: #e3e3e3;
 }
 
-/* Indicador de Pensamento Ativo */
+/* Indicador de Pensamento Ativo + Shimmer Gemini */
 .ia-thinking-live {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  border-radius: 16px;
-  font-size: 13px;
-  color: #6366f1;
+  padding: 4px 0 10px;
+  font-size: 13.5px;
+  color: #5f6368;
   font-weight: 500;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
 }
 [data-theme="dark"] .ia-thinking-live,
 html[data-theme="dark"] .ia-thinking-live,
 body.dark .ia-thinking-live,
 .dark .ia-thinking-live {
-  color: #a5b4fc;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.12));
+  color: #9aa0a6;
 }
 
+.ia-gemini-shimmer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 480px;
+  margin-top: 2px;
+}
+.ia-gemini-shimmer-line {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eff3f8 0%, #dbe7f9 50%, #eff3f8 100%);
+  background-size: 200% 100%;
+  animation: iaGeminiShimmerAnim 1.6s infinite linear;
+}
+[data-theme="dark"] .ia-gemini-shimmer-line,
+html[data-theme="dark"] .ia-gemini-shimmer-line,
+body.dark .ia-gemini-shimmer-line,
+.dark .ia-gemini-shimmer-line {
+  background: linear-gradient(90deg, #1e1f20 0%, #2d3138 50%, #1e1f20 100%);
+  background-size: 200% 100%;
+}
+.ia-gemini-shimmer-line.w-85 {
+  width: 85%;
+}
+.ia-gemini-shimmer-line.w-65 {
+  width: 65%;
+}
+.ia-gemini-shimmer-line.w-45 {
+  width: 45%;
+}
+
+@keyframes iaGeminiShimmerAnim {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* --- Bolhas e Texto Editorial Estilo Gemini --- */
 .ia-msg-bubble {
-  padding: 12px 16px;
-  border-radius: 18px;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.65;
   word-break: break-word;
   position: relative;
 }
 
 .ia-message.user .ia-msg-bubble {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: #ffffff;
-  border-bottom-right-radius: 4px;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  padding: 12px 18px;
+  border-radius: 24px 24px 6px 24px;
+  background: #f0f4f9;
+  color: #1f1f1f;
+  font-weight: 450;
+}
+
+[data-theme="dark"] .ia-message.user .ia-msg-bubble,
+html[data-theme="dark"] .ia-message.user .ia-msg-bubble,
+body.dark .ia-message.user .ia-msg-bubble,
+.dark .ia-message.user .ia-msg-bubble {
+  background: #282a2c;
+  color: #e3e3e3;
 }
 
 .ia-message.ia .ia-msg-bubble {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #1e293b;
-  border-bottom-left-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  padding: 2px 0 6px;
+  background: transparent;
+  border: none;
+  color: #1f1f1f;
+  box-shadow: none;
 }
 
 [data-theme="dark"] .ia-message.ia .ia-msg-bubble,
 html[data-theme="dark"] .ia-message.ia .ia-msg-bubble,
 body.dark .ia-message.ia .ia-msg-bubble,
 .dark .ia-message.ia .ia-msg-bubble {
-  background: #27272a;
-  border-color: #3f3f46;
-  color: #f4f4f5;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  background: transparent;
+  border: none;
+  color: #e3e3e3;
+  box-shadow: none;
 }
 
 .ia-msg-bubble strong {
@@ -423,123 +673,215 @@ body.dark .ia-message.ia .ia-msg-bubble,
 }
 
 .ia-msg-bubble p {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 }
 .ia-msg-bubble p:last-child {
   margin-bottom: 0;
 }
 
-.ia-msg-bubble ul, .ia-msg-bubble ol {
-  margin: 6px 0 6px 18px;
+.ia-msg-bubble ul,
+.ia-msg-bubble ol {
+  margin: 8px 0 8px 20px;
   padding: 0;
 }
 
 .ia-msg-bubble li {
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
-/* Indicador de Digitação (Typing) */
-.ia-typing-indicator {
+/* Barra de Ações abaixo da resposta da IA (Copiar / Regenerar) */
+.ia-gemini-msg-actions {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 12px 16px;
-  background: #f1f5f9;
-  border-radius: 16px;
-  width: fit-content;
+  margin-top: 6px;
+  opacity: 0.78;
+  transition: opacity 0.15s ease;
 }
-[data-theme="dark"] .ia-typing-indicator,
-html[data-theme="dark"] .ia-typing-indicator,
-body.dark .ia-typing-indicator,
-.dark .ia-typing-indicator {
-  background: #27272a;
+.ia-message.ia:hover .ia-gemini-msg-actions {
+  opacity: 1;
 }
-.ia-typing-dot {
-  width: 6px;
-  height: 6px;
-  background: #94a3b8;
-  border-radius: 50%;
-  animation: iaTypingBlink 1.4s infinite ease-in-out both;
+.ia-gemini-act-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: #5f6368;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
-.ia-typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.ia-typing-dot:nth-child(2) { animation-delay: -0.16s; }
-@keyframes iaTypingBlink {
-  0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
-  40% { transform: scale(1); opacity: 1; }
+.ia-gemini-act-btn:hover {
+  background: #f0f4f9;
+  color: #1f1f1f;
+}
+[data-theme="dark"] .ia-gemini-act-btn,
+html[data-theme="dark"] .ia-gemini-act-btn,
+body.dark .ia-gemini-act-btn,
+.dark .ia-gemini-act-btn {
+  color: #9aa0a6;
+}
+[data-theme="dark"] .ia-gemini-act-btn:hover,
+html[data-theme="dark"] .ia-gemini-act-btn:hover,
+body.dark .ia-gemini-act-btn:hover,
+.dark .ia-gemini-act-btn:hover {
+  background: #1e1f20;
+  color: #e3e3e3;
 }
 
-/* --- Barra de Input do Chat --- */
+/* --- Composer Pílula Flutuante Estilo Google Gemini --- */
 .ia-chat-input-bar {
-  padding: 12px 16px;
-  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  padding: 8px 22px 14px;
+  border-top: none;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
   background: #ffffff;
 }
 [data-theme="dark"] .ia-chat-input-bar,
 html[data-theme="dark"] .ia-chat-input-bar,
 body.dark .ia-chat-input-bar,
 .dark .ia-chat-input-bar {
-  border-top-color: rgba(255, 255, 255, 0.08);
-  background: #18181b;
+  background: #131314;
+}
+
+.ia-gemini-composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: #f0f4f9;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  padding: 6px 8px 6px 10px;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.ia-gemini-composer:focus-within {
+  background: #ffffff;
+  border-color: rgba(66, 133, 244, 0.45);
+  box-shadow: 0 4px 18px rgba(66, 133, 244, 0.12);
+}
+[data-theme="dark"] .ia-gemini-composer,
+html[data-theme="dark"] .ia-gemini-composer,
+body.dark .ia-gemini-composer,
+.dark .ia-gemini-composer {
+  background: #1e1f20;
+}
+[data-theme="dark"] .ia-gemini-composer:focus-within,
+html[data-theme="dark"] .ia-gemini-composer:focus-within,
+body.dark .ia-gemini-composer:focus-within,
+.dark .ia-gemini-composer:focus-within {
+  background: #282a2c;
+  border-color: rgba(168, 199, 250, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.ia-attach-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  color: #444746;
+  font-weight: 600;
+  font-size: 12.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+.ia-attach-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+[data-theme="dark"] .ia-attach-btn,
+html[data-theme="dark"] .ia-attach-btn,
+body.dark .ia-attach-btn,
+.dark .ia-attach-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #c4c7c5;
+}
+[data-theme="dark"] .ia-attach-btn:hover,
+html[data-theme="dark"] .ia-attach-btn:hover,
+body.dark .ia-attach-btn:hover,
+.dark .ia-attach-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .ia-chat-input {
   flex: 1;
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 14px;
-  padding: 10px 14px;
-  font-size: 14px;
-  color: #0f172a;
+  background: transparent;
+  border: none;
+  padding: 8px 6px;
+  font-size: 15px;
+  color: #1f1f1f;
   outline: none;
   font-family: inherit;
-  transition: all 0.15s ease;
+  min-width: 0;
 }
-.ia-chat-input:focus {
-  border-color: #3b82f6;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+.ia-chat-input::placeholder {
+  color: #5f6368;
 }
 [data-theme="dark"] .ia-chat-input,
 html[data-theme="dark"] .ia-chat-input,
 body.dark .ia-chat-input,
 .dark .ia-chat-input {
-  background: #27272a;
-  border-color: #3f3f46;
-  color: #f1f5f9;
+  background: transparent;
+  color: #e3e3e3;
 }
-[data-theme="dark"] .ia-chat-input:focus,
-html[data-theme="dark"] .ia-chat-input:focus,
-body.dark .ia-chat-input:focus,
-.dark .ia-chat-input:focus {
-  background: #18181b;
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+[data-theme="dark"] .ia-chat-input::placeholder,
+html[data-theme="dark"] .ia-chat-input::placeholder,
+body.dark .ia-chat-input::placeholder,
+.dark .ia-chat-input::placeholder {
+  color: #9aa0a6;
 }
 
 .ia-send-btn {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4285f4 0%, #9b72cb 100%);
   color: #ffffff;
   border: none;
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.15s ease;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
 }
 .ia-send-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.45);
 }
 .ia-send-btn:active {
-  transform: translateY(0);
+  transform: scale(0.96);
+}
+
+.ia-gemini-footer-hint {
+  text-align: center;
+  font-size: 11px;
+  color: #747775;
+}
+[data-theme="dark"] .ia-gemini-footer-hint,
+html[data-theme="dark"] .ia-gemini-footer-hint,
+body.dark .ia-gemini-footer-hint,
+.dark .ia-gemini-footer-hint {
+  color: #8e918f;
 }
 
 /* --- Botão Flutuante do Mascote IA na Tela Inicial --- */
@@ -1045,9 +1387,18 @@ body.dark .ia-header-action-btn,
 }
 
 @keyframes iaShake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-6px); }
-  40%, 80% { transform: translateX(6px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
 }
 .ia-input-shake {
   animation: iaShake 0.4s ease;
@@ -1480,4 +1831,3 @@ html[data-theme="dark"] .ia-concurso-section select {
   color: #f8fafc;
   border-color: #3f3f46;
 }
-
