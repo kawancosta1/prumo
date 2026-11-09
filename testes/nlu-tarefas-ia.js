@@ -189,6 +189,73 @@ module.exports = async function (url) {
       "clicar em importar cronograma do PDF no chat adiciona os blocos de estudo em S.tasks: +" +
         (depoisImportEdital - antesImportEdital)
     );
+
+    // 11. Edital completo estilo Banco do Brasil (Cesgranrio): ignora seções burocráticas, pula para Anexo III, aplica Peso 3 em Vendas/Bancários e permite alternar entre Agente Comercial e Agente de Tecnologia
+    await ev(`(async () => {
+      const editalBB = [
+        "%PDF-1.4",
+        "1 0 obj << /Length 1200 >> stream",
+        "BT",
+        "(BANCO DO BRASIL S.A. - EDITAL N 01/2027 - SELECAO EXTERNA ESCRITURARIO) Tj T*",
+        "(3. DAS INSCRICOES NO PROCESSO SELETIVO) Tj T*",
+        "(3.1 A inscricao do candidato implicara o conhecimento das presentes instrucoes.) Tj T*",
+        "(4. DAS PESSOAS COM DEFICIENCIA) Tj T*",
+        "(4.1 As pessoas com deficiencia e assegurado o direito de inscricao.) Tj T*",
+        "(8. DA PRESTACAO DAS PROVAS OBJETIVAS E DE REDACAO) Tj T*",
+        "(8.1 As provas objetivas serao aplicadas em 21/03/2027.) Tj T*",
+        "(8.4 Os conteudos programaticos constam no Anexo III deste Edital, disponivel no site da banca.) Tj T*",
+        "(ANEXO III - CONTEUDOS PROGRAMATICOS) Tj T*",
+        "(CONHECIMENTOS BASICOS) Tj T*",
+        "(LINGUA PORTUGUESA: 1 Compreensao e interpretacao de textos; 2 Ortografia oficial; 3 Concordancia.) Tj T*",
+        "(LINGUA INGLESA: 1 Conhecimento de vocabulario fundamental; 2 Aspectos gramaticais basicos.) Tj T*",
+        "(MATEMATICA: 1 Numeros inteiros, racionais e reais; 2 Razoes e proporcoes; 3 Funcoes.) Tj T*",
+        "(ATUALIDADES DO MERCADO FINANCEIRO: 1 Os bancos na Era Digital; 2 Open Finance; 3 Pix; 4 Fintechs.) Tj T*",
+        "(CONHECIMENTOS ESPECIFICOS) Tj T*",
+        "(AGENTE COMERCIAL) Tj T*",
+        "(MATEMATICA FINANCEIRA: 1 Juros simples e compostos; 2 Sistemas de amortizacao.) Tj T*",
+        "(CONHECIMENTOS BANCARIOS: 1 Sistema Financeiro Nacional; 2 Produtos Bancarios; 3 Lavagem de dinheiro; 4 LGPD.) Tj T*",
+        "(CONHECIMENTOS DE INFORMATICA: 1 Sistemas operacionais; 2 Seguranca da informacao; 3 Redes de computadores.) Tj T*",
+        "(VENDAS E NEGOCIACAO: 1 Estrategia empresarial; 2 Segmentacao de mercado; 3 Tecnicas de vendas; 4 CDC.) Tj T*",
+        "(AGENTE DE TECNOLOGIA) Tj T*",
+        "(PROBABILIDADE E ESTATISTICA: 1 Medidas de tendencia central; 2 Probabilidade; 3 Inferencia.) Tj T*",
+        "(CONHECIMENTOS BANCARIOS: 1 Sistema Financeiro Nacional; 2 Mercado financeiro; 3 Pix e LGPD.) Tj T*",
+        "(TECNOLOGIA DA INFORMACAO: 1 Aprendizado de maquina; 2 Banco de dados; 3 Java, Python e TypeScript.) Tj",
+        "ET",
+        "endstream endobj",
+        "%%EOF"
+      ].join("\\n");
+      const bytes = new Uint8Array(editalBB.length);
+      for (let i = 0; i < editalBB.length; i++) bytes[i] = editalBB.charCodeAt(i) & 0xff;
+      const fakeBB = {
+        name: "edital-banco-do-brasil.pdf",
+        type: "application/pdf",
+        size: bytes.byteLength,
+        arrayBuffer: async () => bytes.buffer
+      };
+      await processarArquivoEditalNoChatIA(fakeBB);
+    })()`);
+    const analiseBB = ev(`estadoEdital.analise`);
+    ok(
+      analiseBB &&
+        !analiseBB.materias.some(m => /inscri|deficien/i.test(m.nome)) &&
+        analiseBB.materias.some(m => /vendas/i.test(m.nome) && m.peso === 3) &&
+        analiseBB.materias.some(m => /bancarios/i.test(m.nome) && m.peso === 3),
+      "edital BB ignora capítulos burocráticos (Inscrições/PcD) e atribui Peso 3 para Vendas e Conhecimentos Bancários"
+    );
+    ok(
+      Array.isArray(analiseBB.cargos) &&
+        analiseBB.cargos.length === 2 &&
+        analiseBB.cargoSelecionado === "Agente Comercial",
+      "edital BB detecta os 2 cargos (Agente Comercial e Agente de Tecnologia) separadamente"
+    );
+    ev(`ACOES_EXTRAS["ia-trocar-cargo-edital-chat"]({ dataset: { idx: "1" } })`);
+    const cargoDepoisTroca = ev(`estadoEdital.analise.cargoSelecionado`);
+    const temTI = ev(`estadoEdital.analise.materias.some(m => /tecnologia da informa/i.test(m.nome))`);
+    const temVendas = ev(`estadoEdital.analise.materias.some(m => /vendas/i.test(m.nome))`);
+    ok(
+      cargoDepoisTroca === "Agente de Tecnologia" && temTI && !temVendas,
+      "trocar para Agente de Tecnologia no chat atualiza as matérias (inclui TI e remove Vendas)"
+    );
   } finally {
     fechar();
   }

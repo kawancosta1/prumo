@@ -1290,10 +1290,33 @@ function formatarTextoMensagemIA(raw) {
   }
 
   if (temCardEditalPDF) {
+    const cargosDisponiveis =
+      typeof estadoEdital !== "undefined" &&
+      estadoEdital.analise &&
+      Array.isArray(estadoEdital.analise.cargos) &&
+      estadoEdital.analise.cargos.length >= 2
+        ? estadoEdital.analise.cargos
+        : null;
+    const cargoAtual =
+      cargosDisponiveis && estadoEdital.analise.cargoSelecionado ? estadoEdital.analise.cargoSelecionado : "";
+    const htmlSeletorCargos = cargosDisponiveis
+      ? `<div style="margin-bottom:10px;padding:8px 10px;background:rgba(255,255,255,0.65);border-radius:10px;border:1px dashed rgba(16,185,129,0.4);">
+          <div style="font-size:11.5px;font-weight:800;color:#047857;margin-bottom:6px;">🎯 Qual cargo você vai prestar neste edital?</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
+            ${cargosDisponiveis
+              .map(
+                (c, idx) =>
+                  `<button type="button" class="btn small ${c.nome === cargoAtual ? "primary" : "ghost"}" data-act="ia-trocar-cargo-edital-chat" data-idx="${idx}" style="font-weight:800;padding:5px 12px;border-radius:8px;font-size:11.5px;">${c.nome === cargoAtual ? "✅ " : ""}${esc(c.nome)} (${c.materias.length} matérias)</button>`
+              )
+              .join("")}
+          </div>
+        </div>`
+      : "";
     txt += `
     <div style="margin-top:14px;padding:14px;background:rgba(16,185,129,0.08);border-radius:14px;border:1.5px solid rgba(16,185,129,0.3);text-align:center;">
-      <div style="font-weight:800;font-size:13.5px;color:#059669;margin-bottom:4px;">📄 Cronograma do Edital Pronto!</div>
+      <div style="font-weight:800;font-size:13.5px;color:#059669;margin-bottom:4px;">📄 Cronograma do Edital Pronto${cargoAtual ? ` — ${esc(cargoAtual)}` : ""}!</div>
       <div style="font-size:12px;color:var(--muted,#64748b);margin-bottom:10px;">Importe as próximas 2 semanas direto para as suas tarefas ou abra o planejador para ajustar pesos e horas:</div>
+      ${htmlSeletorCargos}
       <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
         <button type="button" class="btn primary small" data-act="ia-importar-edital-chat" style="background:#10B981;font-weight:800;padding:8px 16px;border-radius:10px;">
           📲 Importar para minhas Tarefas (2 semanas)
@@ -1439,15 +1462,24 @@ async function processarArquivoEditalNoChatIA(arquivo) {
               .join("\n")
           : "";
 
+      const infoCargosTxt =
+        Array.isArray(analise.cargos) && analise.cargos.length >= 2
+          ? `\n• 🎯 **Cargos/Perfis detectados:** ${analise.cargos.map(c => c.nome).join(" | ")} (ativo: **${analise.cargoSelecionado}**)`
+          : "";
+      const avisoMultiCargo =
+        Array.isArray(analise.cargos) && analise.cargos.length >= 2
+          ? `\n\n> 💡 **Detectei ${analise.cargos.length} cargos neste edital** (${analise.cargos.map(c => `**${c.nome}**`).join(" e ")}). O cronograma abaixo está configurado para **${analise.cargoSelecionado}**, mas você pode alternar de cargo com 1 clique no cartão abaixo!`
+          : "";
+
       respPensamento = [
         `📄 **PARSER DE EDITAL PDF & GERADOR DE CRONOGRAMA**`,
-        `• 📎 **Arquivo Recebido:** "${nomeArq}" (${(textoBruto || "").length} caracteres lidos)`,
+        `• 📎 **Arquivo Recebido:** "${nomeArq}" (${(textoBruto || "").length} caracteres lidos)${infoCargosTxt}`,
         `• 📚 **Disciplinas Identificadas:** ${analise.materias.length} matérias e ${totalTopicos} tópicos programáticos`,
         `• 📅 **Data da Prova:** ${dataProva ? dataProva.split("-").reverse().join("/") : "Não informada (ciclo de 12 semanas)"}`,
         `• ⚡ **Cronograma Calculado:** ${plano && plano.resumo ? `${plano.resumo.totalDias} dias de estudo (${plano.resumo.horasTotais}h totais, ${plano.resumo.cobertura}% de cobertura do edital)` : "Pronto para ajuste"}`
       ].join("\n");
 
-      respTexto = `Li o seu edital **${nomeEdital}** e já montei o cronograma completo para todas as matérias! 🎯📄
+      respTexto = `Li o seu edital **${nomeEdital}**${analise.cargoSelecionado ? ` (**${analise.cargoSelecionado}**)` : ""} e já montei o cronograma completo para todas as matérias! 🎯📄${avisoMultiCargo}
 
 **📚 Disciplinas encontradas (${analise.materias.length} matérias · ${totalTopicos} tópicos):**
 ${listaMaterias}
@@ -3190,6 +3222,36 @@ if (typeof ACOES_EXTRAS !== "undefined") {
     fecharChatPrumiIA();
     if (typeof abrirEditalPrumo === "function") abrirEditalPrumo();
   };
+  ACOES_EXTRAS["ia-trocar-cargo-edital-chat"] = btn => {
+    const idx = btn && btn.dataset ? Number(btn.dataset.idx) : 0;
+    if (typeof selecionarCargoEdital === "function") {
+      const cargo = selecionarCargoEdital(idx);
+      if (cargo) {
+        const totalTopicos = cargo.materias.reduce((acc, m) => acc + (m.topicos ? m.topicos.length : 0), 0);
+        const listaMaterias = cargo.materias
+          .map((m, i) => `${i + 1}. **${m.nome}** — ${m.topicos.length} tópico(s) *(Peso ${m.peso || 1})*`)
+          .join("\n");
+        const msgCargo = `🎯 Cronograma atualizado para o cargo **${cargo.nome}** (${cargo.materias.length} matérias · ${totalTopicos} tópicos):\n\n${listaMaterias}\n\n[[ACAO_CRONOGRAMA_EDITAL_PDF]]`;
+        chatIaHistorico.push({
+          remetente: "ia",
+          texto: msgCargo,
+          hora: new Date().toLocaleTimeString().slice(0, 5)
+        });
+        salvarHistoricoChatIA();
+        const stream = document.getElementById("ia-chat-stream");
+        if (stream) {
+          stream.insertAdjacentHTML(
+            "beforeend",
+            `<div class="ia-message ia"><div class="ia-msg-container"><div class="ia-msg-bubble">${formatarTextoMensagemIA(msgCargo)}</div></div></div>`
+          );
+          stream.scrollTop = stream.scrollHeight;
+        }
+        if (typeof toast === "function") {
+          toast(`🎯 Cargo alterado para ${cargo.nome}!`, false, "happy");
+        }
+      }
+    }
+  };
 }
 
 // Delegação de cliques para botões com data-act (garante resposta direta em qualquer contexto)
@@ -3319,6 +3381,13 @@ document.addEventListener("click", e => {
     e.preventDefault();
     fecharChatPrumiIA();
     if (typeof abrirEditalPrumo === "function") abrirEditalPrumo();
+    return;
+  }
+  const btnTrocarCargoChat = e.target.closest("[data-act='ia-trocar-cargo-edital-chat']");
+  if (btnTrocarCargoChat) {
+    e.preventDefault();
+    if (ACOES_EXTRAS["ia-trocar-cargo-edital-chat"])
+      ACOES_EXTRAS["ia-trocar-cargo-edital-chat"](btnTrocarCargoChat);
     return;
   }
 

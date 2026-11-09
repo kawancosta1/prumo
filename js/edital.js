@@ -290,6 +290,25 @@ const TOPICOS_PADRAO = {
     "Meios de pagamento e Pix",
     "LGPD"
   ],
+  "vendas e negociacao": [
+    "Estratégias de marketing, segmentação de mercado e composto mercadológico (4 Ps)",
+    "Qualidade em serviços bancários, satisfação, valor e retenção de clientes",
+    "Técnicas de vendas de produtos e serviços financeiros (cross-selling e up-selling)",
+    "Negociação, manejo de objeções e experiência do cliente (Customer Experience)",
+    "Ética em vendas, conduta comercial e autorregulação bancária (SARB/FEBRABAN)",
+    "Código de Defesa do Consumidor (Lei 8.078/1990) e Resolução CMN nº 4.949/2021",
+    "Estatuto da Pessoa com Deficiência (Lei 13.146/2015) e Ouvidoria Bancária",
+    "Canais digitais, atendimento omnichannel e marketing digital bancário"
+  ],
+  "atualidades do mercado financeiro": [
+    "Os bancos na Era Digital: internet banking, mobile banking e bancos digitais",
+    "Open Finance (Sistema Financeiro Aberto) e compartilhamento de dados",
+    "Pix, arranjos de pagamento instantâneo e Drex (Real Digital)",
+    "Fintechs, startups financeiras, SCD e SEP",
+    "Marketplace, correspondente bancário e shadow banking",
+    "Moedas digitais, blockchain, criptoativos e cibersegurança financeira",
+    "Transformação digital, ESG e finanças sustentáveis no setor bancário"
+  ],
   estatistica: [
     "Medidas de posição e dispersão",
     "Probabilidade",
@@ -307,7 +326,14 @@ const ALIAS_DISCIPLINAS = {
   "tecnologia da informacao": "informatica",
   ti: "informatica",
   "nocoes de informatica": "informatica",
-  "etica profissional": "etica no servico publico"
+  "conhecimentos de informatica": "informatica",
+  "conhecimentos basicos de informatica": "informatica",
+  "conhecimentos basicos bancarios": "conhecimentos bancarios",
+  "etica profissional": "etica no servico publico",
+  "lingua inglesa": "ingles",
+  "probabilidade e estatistica": "estatistica",
+  "atendimento e vendas": "vendas e negociacao",
+  vendas: "vendas e negociacao"
 };
 
 const EXAMES_EDITAIS = {
@@ -380,12 +406,39 @@ const EXAMES_EDITAIS = {
   bancario: {
     nome: "Concurso bancário",
     materias: [
-      ["Língua Portuguesa", 2],
-      ["Matemática", 2],
-      ["Matemática Financeira", 2],
+      ["Vendas e Negociação", 3],
       ["Conhecimentos Bancários", 3],
-      ["Informática", 1],
-      ["Atualidades", 1]
+      ["Informática", 3],
+      ["Língua Portuguesa", 2],
+      ["Matemática Financeira", 2],
+      ["Matemática", 1],
+      ["Atualidades do Mercado Financeiro", 1],
+      ["Língua Inglesa", 1, "ingles"]
+    ]
+  },
+  bb_comercial: {
+    nome: "Banco do Brasil (Agente Comercial)",
+    materias: [
+      ["Vendas e Negociação", 3],
+      ["Conhecimentos Bancários", 3],
+      ["Conhecimentos de Informática", 3, "informatica"],
+      ["Língua Portuguesa", 2],
+      ["Matemática Financeira", 2],
+      ["Matemática", 1],
+      ["Atualidades do Mercado Financeiro", 1],
+      ["Língua Inglesa", 1, "ingles"]
+    ]
+  },
+  bb_ti: {
+    nome: "Banco do Brasil (Agente de TI)",
+    materias: [
+      ["Tecnologia da Informação", 3, "informatica"],
+      ["Conhecimentos Bancários", 2],
+      ["Probabilidade e Estatística", 2, "estatistica"],
+      ["Língua Portuguesa", 2],
+      ["Matemática", 1],
+      ["Atualidades do Mercado Financeiro", 1],
+      ["Língua Inglesa", 1, "ingles"]
     ]
   }
 };
@@ -430,9 +483,9 @@ function montarPresetEdital(chave) {
 
 /* ---------- 2. Leitor de edital ---------- */
 const ED_SEPARADORES =
-  /^(anexo|edital|concurso|prefeitura|tribunal|governo|ministerio|secretaria|cargo|inscri|prova|etapa|fase|quadro|tabela|requisitos|atribui|remunera|vagas|cronograma|bibliografia|referencias|observa|disposicoes|pagina|capitulo|titulo)\b/;
+  /^(anexo|edital|concurso|selecao|processo\s+seletivo|prefeitura|tribunal|governo|ministerio|secretaria|banco\s+do\s+brasil|cargo|perfil|opcao|inscri|isen|cota|reserva|deficien|atendimento\s+especial|prova|etapa|fase|quadro|tabela|requisitos|atribui|remunera|vagas|cronograma|bibliografia|referencias|observa|disposicoes|pagina|capitulo|titulo|sumario|conhecimentos\s+basicos$|conhecimentos\s+especificos$|conhecimentos\s+gerais$|parte\s+[ivx\d]+|bloco\s+[ivx\d]+|d[ao]s?\s+(?:inscri|vagas|provas|pessoas|candidat|recursos|classifica|contrata|disposicoes|etapas|avaliac|requisitos|atribui|remunera|homologa|convoca|atendimento))\b/;
 const ED_PALAVRAS_DISCIPLINA =
-  /^(lingua|portugues|matematica|raciocinio|informatica|direito|legislacao|conhecimentos|atualidades|fisica|quimica|biologia|historia|geografia|filosofia|sociologia|ingles|espanhol|redacao|literatura|contabilidade|administracao|economia|estatistica|etica|nocoes|arquivologia|auditoria|gestao|ciencias|educacao|pedagogia|enfermagem|saude|medicina|engenharia|banco|portugues)\b/;
+  /^(lingua|portugues|matematica|raciocinio|informatica|tecnologia|direito|legislacao|conhecimentos|atualidades|vendas|negociacao|atendimento|marketing|probabilidade|fisica|quimica|biologia|historia|geografia|filosofia|sociologia|ingles|espanhol|redacao|literatura|contabilidade|administracao|economia|estatistica|etica|nocoes|arquivologia|auditoria|gestao|ciencias|educacao|pedagogia|enfermagem|saude|medicina|engenharia|banco|financas|computacao|programacao|algoritmos|redes|seguranca|sistemas)\b/;
 const ED_PEQUENAS = new Set([
   "de",
   "da",
@@ -471,12 +524,65 @@ function edRazaoMaiuscula(s) {
   return up / letras.length;
 }
 
+/** Detecta se uma linha indica início de bloco comum ou de um cargo específico (ex: Agente Comercial vs Agente de Tecnologia) */
+function edDetectarCargo(l) {
+  const semNum = l.replace(/^(?:\d{1,2}[.)]|[IVX]{1,4}\s*[-–.)])\s+/, "").trim();
+  const n = edNorm(semNum.replace(/:$/, ""));
+  if (/^(?:conhecimentos\s+basicos|conhecimentos\s+gerais|parte\s+comum|comum\s+a\s+todos)\b/.test(n)) {
+    return { tipo: "comum" };
+  }
+  const mCargoExplicito =
+    /^(?:cargo|perfil|op[cç][aã]o|fun[cç][aã]o|emprego|conhecimentos\s+espec[ií]ficos)(?:\s+\d+)?\s*[:–—-]\s*(.{3,65})$/i.exec(
+      semNum
+    );
+  if (mCargoExplicito) {
+    const cand = mCargoExplicito[1].trim();
+    const nCand = edNorm(cand);
+    if (!TOPICOS_PADRAO[nCand] && !ALIAS_DISCIPLINAS[nCand]) {
+      return { tipo: "cargo", nome: edTitulo(cand) };
+    }
+  }
+  const mCargoBB =
+    /^(?:escritur[aá]rio\s*[-–—:]\s*)?(agente\s+comercial|agente\s+de\s+tecnologia(?:\s+da\s+informa[cç][aã]o)?|agente\s+de\s+ti|t[eé]cnico\s+banc[aá]rio(?:\s+novo)?(?:\s*[-–—:]\s*tecnologia\s+da\s+informa[cç][aã]o)?)\s*:?$/i.exec(
+      semNum
+    );
+  if (mCargoBB) {
+    return { tipo: "cargo", nome: edTitulo(mCargoBB[1]) };
+  }
+  return null;
+}
+
+/**
+ * Localiza o início real do Anexo de Conteúdo Programático em editais extensos (ex: 40 páginas do BB/Cesgranrio),
+ * ignorando as páginas iniciais de regras de inscrição, cotas, isenção e quadro de vagas.
+ */
+function edRecortarConteudoProgramatico(bruto) {
+  const txt = String(bruto || "");
+  if (txt.length < 600) return txt;
+  const reHeading =
+    /^[ \t]*(?:anexo\s+[ivx\d]+\s*[-–—:.\s]*)?(?:conte[uú]dos?\s+program[aá]ticos?|objetos?\s+de\s+avalia[cç][aã]o|programa\s+das?\s+provas?)\b[^\n]*$/gim;
+  let ultimoIndiceValido = -1;
+  let m;
+  while ((m = reHeading.exec(txt))) {
+    const linha = m[0].trim();
+    // Ignorar linhas longas de parágrafo (ex: "8.4 Os conteúdos programáticos constam no Anexo III deste Edital...")
+    if (linha.length <= 95 && !/[.;]$/.test(linha) && txt.length - m.index >= 120) {
+      ultimoIndiceValido = m.index;
+    }
+  }
+  if (ultimoIndiceValido > 0) {
+    return txt.slice(ultimoIndiceValido);
+  }
+  return txt;
+}
+
 /** Devolve o nome da disciplina se a linha for um cabeçalho; "" se for conteúdo; null se for separador */
 function edCabecalho(l) {
   let m = /^(?:disciplina|mat[eé]ria)\s*[:\-–]\s*(.{3,80})$/i.exec(l);
   if (m) return edTitulo(m[1]);
   const semNum = l.replace(/^(?:\d{1,2}[.)]|[IVX]{1,4}\s*[-–.)])\s+/, "").trim();
   const n = edNorm(semNum.replace(/:$/, ""));
+  if (edDetectarCargo(l)) return null;
   if (ED_SEPARADORES.test(n) && edRazaoMaiuscula(semNum) >= 0.8) return null;
   if (
     semNum.length <= 90 &&
@@ -543,7 +649,20 @@ function edDetectarData(texto, ref) {
 
 function edPesoPadrao(nome) {
   const n = edNorm(nome);
-  if (/redacao|especific|portugues|matematica/.test(n)) return 2;
+  if (
+    /vendas|negociacao|conhecimentos bancarios|conhecimentos basicos bancarios|tecnologia da informacao|conhecimentos de informatica|conhecimentos basicos de informatica|especific|redacao|direito penal|direito processual penal|contabilidade/.test(
+      n
+    )
+  ) {
+    return 3;
+  }
+  if (
+    /portugues|matematica|raciocinio|direito constitucional|direito administrativo|probabilidade|estatistica|informatica/.test(
+      n
+    )
+  ) {
+    return 2;
+  }
   return 1;
 }
 
@@ -600,40 +719,51 @@ function edDecodificarHexPDF(hex) {
 function edExtrairOperadoresTextoPDF(conteudoStream) {
   const linhas = [];
   let linhaAtual = "";
-  const blocosBT = conteudoStream.match(/BT[\s\S]*?ET/g) || [conteudoStream];
-  for (const bloco of blocosBT) {
-    const reToken = /\((?:\\.|[^\\()])*\)|<[0-9A-Fa-f\s]+>|\[(?:\\.|[^\]])*\]\s*TJ|\b(?:Td|TD|ET)\b|T\*|'/g;
-    let m;
-    while ((m = reToken.exec(bloco))) {
-      const tok = m[0];
-      if (tok === "Td" || tok === "TD" || tok === "T*" || tok === "ET" || tok === "'") {
-        if (linhaAtual.trim()) {
-          linhas.push(linhaAtual.trim());
-          linhaAtual = "";
-        }
-      } else if (tok.startsWith("(") && tok.endsWith(")")) {
-        linhaAtual += edDecodificarLiteralPDF(tok.slice(1, -1));
-      } else if (tok.startsWith("<") && tok.includes(">")) {
-        linhaAtual += edDecodificarHexPDF(tok.slice(1, tok.indexOf(">")));
-      } else if (tok.startsWith("[")) {
-        const subRe = /\((?:\\.|[^\\()])*\)|<[0-9A-Fa-f\s]+>|(-?\d+(?:\.\d+)?)/g;
-        let sm;
-        while ((sm = subRe.exec(tok))) {
-          const st = sm[0];
-          if (st.startsWith("(")) {
-            linhaAtual += edDecodificarLiteralPDF(st.slice(1, -1));
-          } else if (st.startsWith("<")) {
-            linhaAtual += edDecodificarHexPDF(st.slice(1, -1));
-          } else if (sm[1] && parseFloat(sm[1]) < -120) {
-            linhaAtual += " ";
-          }
+  const temBT = /(?:^|[\s\r\n])BT(?=[\s\r\n([]|$)/.test(conteudoStream);
+  let dentroBT = !temBT;
+  const reToken = /\((?:\\.|[^\\()])*\)|<[0-9A-Fa-f\s]+>|\[(?:\\.|[^\]])*\]\s*TJ|\b(?:BT|ET|Td|TD)\b|T\*|'/g;
+  let m;
+  while ((m = reToken.exec(conteudoStream))) {
+    const tok = m[0];
+    if (tok === "BT") {
+      dentroBT = true;
+      continue;
+    }
+    if (tok === "ET") {
+      if (linhaAtual.trim()) {
+        linhas.push(linhaAtual.trim());
+        linhaAtual = "";
+      }
+      if (temBT) dentroBT = false;
+      continue;
+    }
+    if (!dentroBT) continue;
+    if (tok === "Td" || tok === "TD" || tok === "T*" || tok === "'") {
+      if (linhaAtual.trim()) {
+        linhas.push(linhaAtual.trim());
+        linhaAtual = "";
+      }
+    } else if (tok.startsWith("(") && tok.endsWith(")")) {
+      linhaAtual += edDecodificarLiteralPDF(tok.slice(1, -1));
+    } else if (tok.startsWith("<") && tok.includes(">")) {
+      linhaAtual += edDecodificarHexPDF(tok.slice(1, tok.indexOf(">")));
+    } else if (tok.startsWith("[")) {
+      const subRe = /\((?:\\.|[^\\()])*\)|<[0-9A-Fa-f\s]+>|(-?\d+(?:\.\d+)?)/g;
+      let sm;
+      while ((sm = subRe.exec(tok))) {
+        const st = sm[0];
+        if (st.startsWith("(")) {
+          linhaAtual += edDecodificarLiteralPDF(st.slice(1, -1));
+        } else if (st.startsWith("<")) {
+          linhaAtual += edDecodificarHexPDF(st.slice(1, -1));
+        } else if (sm[1] && parseFloat(sm[1]) < -120) {
+          linhaAtual += " ";
         }
       }
     }
-    if (linhaAtual.trim()) {
-      linhas.push(linhaAtual.trim());
-      linhaAtual = "";
-    }
+  }
+  if (linhaAtual.trim()) {
+    linhas.push(linhaAtual.trim());
   }
   return linhas.join("\n");
 }
@@ -789,10 +919,30 @@ async function extrairTextoDePDF(entrada) {
   return edExtrairOperadoresTextoPDF(latin1);
 }
 
-/** Lê o texto do edital sem internet. Devolve { nome, dataProva, materias:[{nome,peso,topicos,sugerido}], fonte } */
+function edFormatarMateriaExtraida(m) {
+  const sugerido = m.topicos.length < 3;
+  const topicos = sugerido ? [...new Set([...m.topicos, ...buscarTopicosPadrao(m.nome)])] : m.topicos;
+  return { nome: m.nome, peso: edPesoPadrao(m.nome), topicos, sugerido };
+}
+
+/** Lê o texto do edital sem internet. Devolve { nome, dataProva, materias:[{nome,peso,topicos,sugerido}], cargos?, cargoSelecionado?, fonte } */
 function analisarEditalLocal(texto, ref) {
   const bruto = String(texto || "");
-  const linhasBrutas = bruto
+  const todasLinhas = bruto
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map(l => l.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+  const nomeLinha =
+    todasLinhas.find(
+      l =>
+        l.length <= 100 &&
+        /edital|concurso|processo seletivo|sele[cç][aã]o externa|vestibular|banco do brasil/i.test(l)
+    ) || "";
+  const dataDetectada = edDetectarData(bruto, ref);
+
+  const recorteProgramatico = edRecortarConteudoProgramatico(bruto);
+  const linhasBrutas = recorteProgramatico
     .replace(/\r\n?/g, "\n")
     .split("\n")
     .map(l => l.replace(/\s+/g, " ").trim())
@@ -802,7 +952,7 @@ function analisarEditalLocal(texto, ref) {
   const linhas = [];
   for (const l of linhasBrutas) {
     const mInline = /^([A-ZÀ-Ýa-zà-ÿ\s–-]{3,55}?)\s*[:–-]\s*(.+)$/.exec(l);
-    if (mInline) {
+    if (mInline && !edDetectarCargo(l)) {
       const possivelCab = mInline[1].trim();
       const resto = mInline[2].trim();
       const nCab = edNorm(possivelCab.replace(/^(?:\d{1,2}[.)]|[IVX]{1,4}\s*[-–.)])\s+/, ""));
@@ -820,41 +970,104 @@ function analisarEditalLocal(texto, ref) {
 
   const secoes = [];
   let atual = null;
+  let cargoAtual = null;
   for (const l of linhas) {
+    const infoCargo = edDetectarCargo(l);
+    if (infoCargo) {
+      atual = null;
+      cargoAtual = infoCargo.tipo === "cargo" ? infoCargo.nome : null;
+      continue;
+    }
     const cab = edCabecalho(l);
     if (cab === null) {
       atual = null;
       continue;
     }
     if (cab) {
-      atual = { nome: cab, linhas: [] };
+      atual = { nome: cab, cargo: cargoAtual, linhas: [] };
       secoes.push(atual);
       continue;
     }
     if (atual) atual.linhas.push(l);
   }
-  const porNome = new Map();
-  secoes.forEach(s => {
-    const topicos = edExtrairTopicos(s.linhas);
-    if (!topicos.length) return;
-    const k = edNorm(s.nome);
-    if (porNome.has(k)) {
-      const m = porNome.get(k);
-      topicos.forEach(t => {
-        if (!m.topicos.some(x => edNorm(x) === edNorm(t))) m.topicos.push(t);
-      });
-    } else {
-      porNome.set(k, { nome: s.nome, topicos });
+
+  const agruparSecoes = listaSecoes => {
+    const mapa = new Map();
+    listaSecoes.forEach(s => {
+      const topicos = edExtrairTopicos(s.linhas);
+      if (!topicos.length) return;
+      const k = edNorm(s.nome);
+      if (mapa.has(k)) {
+        const m = mapa.get(k);
+        topicos.forEach(t => {
+          if (!m.topicos.some(x => edNorm(x) === edNorm(t))) m.topicos.push(t);
+        });
+      } else {
+        mapa.set(k, { nome: s.nome, topicos: topicos.slice() });
+      }
+    });
+    return [...mapa.values()].slice(0, 40).map(edFormatarMateriaExtraida);
+  };
+
+  const nomesCargos = [...new Set(secoes.filter(s => s.cargo).map(s => s.cargo))];
+  if (nomesCargos.length >= 2) {
+    const comuns = agruparSecoes(secoes.filter(s => !s.cargo));
+    const cargos = nomesCargos
+      .map(nomeCargo => {
+        const especificas = agruparSecoes(secoes.filter(s => s.cargo === nomeCargo));
+        if (!especificas.length) return null;
+        const combinadas = [...comuns.map(m => ({ ...m, topicos: m.topicos.slice() }))];
+        especificas.forEach(esp => {
+          const idx = combinadas.findIndex(c => edNorm(c.nome) === edNorm(esp.nome));
+          if (idx >= 0) {
+            combinadas[idx] = esp;
+          } else {
+            combinadas.push(esp);
+          }
+        });
+        return { nome: nomeCargo, materias: combinadas };
+      })
+      .filter(Boolean);
+
+    if (cargos.length >= 2) {
+      return {
+        nome: nomeLinha.slice(0, 80),
+        dataProva: dataDetectada,
+        materias: cargos[0].materias.map(m => ({ ...m, topicos: m.topicos.slice() })),
+        cargos,
+        cargoSelecionado: cargos[0].nome,
+        fonte: "local"
+      };
     }
+  }
+
+  const materias = agruparSecoes(secoes);
+  return { nome: nomeLinha.slice(0, 80), dataProva: dataDetectada, materias, fonte: "local" };
+}
+
+function selecionarCargoEdital(indiceOuNome) {
+  if (!estadoEdital || !estadoEdital.analise || !Array.isArray(estadoEdital.analise.cargos)) return null;
+  const cargos = estadoEdital.analise.cargos;
+  const alvo =
+    typeof indiceOuNome === "number"
+      ? cargos[indiceOuNome]
+      : cargos.find(
+          (c, idx) => String(idx) === String(indiceOuNome) || edNorm(c.nome) === edNorm(indiceOuNome)
+        );
+  if (!alvo) return null;
+  estadoEdital.analise.cargoSelecionado = alvo.nome;
+  estadoEdital.analise.materias = alvo.materias.map(m => ({ ...m, topicos: m.topicos.slice() }));
+  const hoje = edHoje();
+  const plano = gerarCronogramaEdital({
+    materias: estadoEdital.analise.materias,
+    horasDia: (estadoEdital.cfg && estadoEdital.cfg.horasDia) || 3,
+    diasSemana: (estadoEdital.cfg && estadoEdital.cfg.diasSemana) || 6,
+    dataProva: (estadoEdital.cfg && estadoEdital.cfg.dataProva) || estadoEdital.analise.dataProva || "",
+    inicio: hoje
   });
-  const materias = [...porNome.values()].slice(0, 40).map(m => {
-    const sugerido = m.topicos.length < 3;
-    const topicos = sugerido ? [...new Set([...m.topicos, ...buscarTopicosPadrao(m.nome)])] : m.topicos;
-    return { nome: m.nome, peso: edPesoPadrao(m.nome), topicos, sugerido };
-  });
-  const nomeLinha =
-    linhas.find(l => l.length <= 100 && /edital|concurso|processo seletivo|vestibular/i.test(l)) || "";
-  return { nome: nomeLinha.slice(0, 80), dataProva: edDetectarData(bruto, ref), materias, fonte: "local" };
+  estadoEdital.plano = plano && !plano.erro ? plano : null;
+  atualizarAbaEdital();
+  return alvo;
 }
 
 function edLimparStr(v, max) {
@@ -899,7 +1112,11 @@ async function analisarEdital(texto, ref) {
   const t = String(texto || "").trim();
   const local = analisarEditalLocal(t, ref);
   if (t.length < 120 || typeof chamarServidorIA !== "function") return local;
-  const cortado = t.slice(0, 38000);
+  const programatico = edRecortarConteudoProgramatico(t);
+  const cortado =
+    programatico.length < t.length
+      ? t.slice(0, 2000) + "\n...\n" + programatico.slice(0, 36000)
+      : t.slice(0, 38000);
   const prompt = `Leia o texto de edital abaixo e extraia o conteúdo programático.
 Responda em JSON: {"nome": string, "dataProva": "AAAA-MM-DD" ou "", "materias": [{"nome": string, "peso": 1|2|3, "topicos": [string]}]}
 Regras:
@@ -915,7 +1132,14 @@ ${cortado}
   const r = await chamarServidorIA({ modo: "json", mensagem: prompt });
   if (r && r.texto && typeof lerJsonDaIA === "function") {
     const ok = edValidarResultadoIA(lerJsonDaIA(r.texto), ref);
-    if (ok) return ok;
+    if (ok) {
+      if (local.cargos && local.cargos.length >= 2) {
+        ok.cargos = local.cargos;
+        ok.cargoSelecionado = local.cargoSelecionado;
+      }
+      if (!ok.dataProva && local.dataProva) ok.dataProva = local.dataProva;
+      return ok;
+    }
   }
   if (r && r.cota) local.aviso = r.erro;
   return local;
@@ -1215,8 +1439,23 @@ function renderAbaEditalHTML() {
         `<button type="button" class="ia-concurso-preset-btn" data-edital-act="preset" data-k="${k}">${edEsc(EXAMES_EDITAIS[k].nome)}</button>`
     )
     .join("");
+  const seletorCargos =
+    st.analise && Array.isArray(st.analise.cargos) && st.analise.cargos.length >= 2
+      ? `<div style="margin:8px 0 10px;">
+          <span class="ia-label-titulo">Cargo / Perfil detectado no edital:</span>
+          <div class="ia-pill-select-group" style="margin-top:6px;">
+            ${st.analise.cargos
+              .map(
+                (c, idx) =>
+                  `<button type="button" class="ia-pill-select-btn ${st.analise.cargoSelecionado === c.nome ? "ativo" : ""}" data-edital-act="cargo" data-i="${idx}">🎯 ${edEsc(c.nome)} (${c.materias.length})</button>`
+              )
+              .join("")}
+          </div>
+        </div>`
+      : "";
   const mats = st.analise
     ? `<div class="ed-passo">2. Disciplinas encontradas${st.analise.fonte === "ia" ? " (lidas pela IA)" : st.analise.fonte === "preset" ? " (modelo da prova)" : ""}</div>
+      ${seletorCargos}
       ${st.analise.aviso ? `<div class="note" style="color:#b45309;">${edEsc(st.analise.aviso)}</div>` : ""}
       <div class="ed-materias">${st.analise.materias
         .map(
@@ -1485,6 +1724,10 @@ if (typeof document !== "undefined") {
       return atualizarAbaEdital();
     }
     if (act === "analisar") return edAnalisar();
+    if (act === "cargo") {
+      selecionarCargoEdital(+b.getAttribute("data-i"));
+      return;
+    }
     if (act === "remover") {
       st.analise.materias.splice(+b.getAttribute("data-i"), 1);
       st.plano = null;
@@ -1561,8 +1804,10 @@ if (typeof window !== "undefined") {
     buscarTopicosPadrao,
     montarPresetEdital,
     extrairTextoDePDF,
+    edRecortarConteudoProgramatico,
     analisarEditalLocal,
     analisarEdital,
+    selecionarCargoEdital,
     edValidarResultadoIA,
     gerarCronogramaEdital,
     edTextoPlano,
