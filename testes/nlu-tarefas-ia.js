@@ -70,6 +70,61 @@ module.exports = async function (url) {
     ev(`ACOES_EXTRAS["ia-focar-tarefa-chat"]({ dataset: { id: ${JSON.stringify(ultimaId)} } })`);
     const metaTimer = ev(`timer.goal`);
     ok(metaTimer === 90, "iniciar foco na tarefa ajusta meta do cronômetro para 90 min: " + metaTimer);
+
+    // 7. Dificuldade em matéria + instituição (ex: Cálculo no ICMC) com pesquisa online e modo offline
+    ev(
+      `window.__mockPesquisaAcademicaOnline = async () => "O ICMC-USP em São Carlos é referência nacional em Matemática e Computação, ministrando SMA0301 Cálculo I."`
+    );
+    const respDiagOnline = await ev(
+      `chamarProvedorLLM("to com dificuldade em me organizar em calculo no icmc", [])`
+    );
+    ok(
+      respDiagOnline &&
+        respDiagOnline.texto.includes("ICMC-USP") &&
+        respDiagOnline.texto.includes("SMA0301") &&
+        respDiagOnline.texto.includes("Guidorizzi") &&
+        respDiagOnline.texto.includes("Posso organizar a sua semana"),
+      "IA analisa Cálculo no ICMC-USP (código SMA0301 + bibliografia) e pergunta se pode organizar a semana"
+    );
+    ok(
+      respDiagOnline.texto.includes("referência nacional em Matemática"),
+      "IA incorpora dados da pesquisa online quando há internet disponível"
+    );
+    const htmlProposta = ev(`formatarTextoMensagemIA(${JSON.stringify(respDiagOnline.texto)})`);
+    ok(
+      htmlProposta.includes("ia-confirmar-blocos-semana") &&
+        htmlProposta.includes("Sim, organizar minha semana em blocos"),
+      "formatarTextoMensagemIA renderiza botão interativo para confirmar organização da semana"
+    );
+
+    // 8. Modo 100% offline funciona mesmo sem internet
+    ev(`window.__mockPesquisaAcademicaOnline = null;`);
+    const respDiagOffline = ev(
+      `gerarRespostaAutonomaIA("to com dificuldade em me organizar em calculo no icmc")`
+    );
+    ok(
+      respDiagOffline &&
+        respDiagOffline.texto.includes("ICMC-USP") &&
+        respDiagOffline.texto.includes("Posso organizar a sua semana"),
+      "modo offline também analisa Cálculo no ICMC-USP e pergunta se pode organizar a semana"
+    );
+
+    // 9. Confirmar ("sim, pode organizar") cria os 4 blocos de estudo na semana em S.tasks
+    const antesBlocos = ev(`S.tasks.length`);
+    const respConfirma = await ev(`chamarProvedorLLM("sim, pode organizar", [])`);
+    const depoisBlocos = ev(`S.tasks.length`);
+    ok(
+      depoisBlocos === antesBlocos + 4,
+      "confirmar organização cria os 4 blocos semanais de estudo em S.tasks: +" + (depoisBlocos - antesBlocos)
+    );
+    ok(
+      respConfirma &&
+        respConfirma.texto.includes("Semana organizada com sucesso") &&
+        respConfirma.texto.includes("[[ACAO_TAREFA_CRIADA:"),
+      "IA confirma a organização dos blocos semanais e exibe cards das tarefas criadas"
+    );
+    const temMateriaICMC = ev(`S.subjects.some(s => s.name.includes("Cálculo") && s.name.includes("ICMC"))`);
+    ok(temMateriaICMC, "cadastra a matéria 'Cálculo (ICMC-USP)' automaticamente em S.subjects");
   } finally {
     fechar();
   }

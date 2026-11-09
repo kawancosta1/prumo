@@ -218,6 +218,8 @@ const MiniPrumoAI = (() => {
         "calculo",
         "cálculo",
         "calcula",
+        "caklculo",
+        "cauculo",
         "derivada",
         "integral",
         "limite",
@@ -229,7 +231,156 @@ const MiniPrumoAI = (() => {
         "calc 3",
         "calculo 1",
         "calculo 2",
-        "calculo 3"
+        "calculo 3",
+        "calculo i",
+        "calculo ii",
+        "sma0301",
+        "sma0332"
+      ],
+      ementaPadrao:
+        "Funções reais, limites e continuidade, derivada e regras de derivação, Teorema do Valor Médio, aplicações de derivadas (otimização e taxas relacionadas), integral definida e indefinida, Teorema Fundamental do Cálculo e técnicas de integração.",
+      bibliografiaPadrao:
+        "Guidorizzi (Um Curso de Cálculo, Vol. 1), James Stewart (Cálculo, Vol. 1) e Apostol.",
+      blocosPadrao: [
+        {
+          titulo: "Bloco 1: Base Teórica & Demonstrações de Cálculo",
+          dur: 90,
+          passos: [
+            "Estudar definições formais e interpretação geométrica (limites/derivadas/integrais)",
+            "Refazer no papel os exemplos resolvidos da bibliografia (Guidorizzi/Stewart)",
+            "Anotar teoremas e propriedades-chave no formulário da semana"
+          ]
+        },
+        {
+          titulo: "Bloco 2: Resolução Ativa da Lista de Cálculo",
+          dur: 90,
+          passos: [
+            "Resolver exercícios de fixação da lista semanal sem consultar gabarito",
+            "Atacar problemas intermediários de aplicação e manipulação algébrica",
+            "Separar questões travadas para levar à monitoria/atendimento"
+          ]
+        },
+        {
+          titulo: "Bloco 3: Treino de Provas Antigas de Cálculo",
+          dur: 90,
+          passos: [
+            "Resolver 2 a 3 questões de provas anteriores (P1/P2) cronometrando o tempo",
+            "Verificar rigor na justificativa de passagens (TVM, L'Hôpital, substituição)",
+            "Conferir resolução e pontuar falhas de pré-cálculo ou sinal"
+          ]
+        },
+        {
+          titulo: "Bloco 4: Revisão Espaçada & Caderno de Erros (Cálculo)",
+          dur: 60,
+          passos: [
+            "Refazer do zero os exercícios que errou ou travou na semana",
+            "Revisar identidades trigonométricas, derivadas e integrais imediatas",
+            "Planejar os tópicos prioritários da próxima semana"
+          ]
+        }
+      ]
+    },
+    {
+      id: "ga",
+      nome: "Geometria Analítica",
+      termos: [
+        "geometria analitica",
+        "geometria analítica",
+        "vetores",
+        "conicas",
+        "cônicas",
+        "retas e planos",
+        "sma0300"
+      ],
+      ementaPadrao:
+        "Vetores no plano e no espaço, dependência linear, produto escalar, vetorial e misto, equações de retas e planos, distâncias, ângulos, cônicas e quádricas.",
+      bibliografiaPadrao:
+        "Paulo Boulos & Ivan de Camargo (Geometria Analítica: Um Tratamento Vetorial) e Steinbruch.",
+      blocosPadrao: [
+        {
+          titulo: "Bloco 1: Teoria Vetorial & Deduções Geométricas",
+          dur: 90,
+          passos: [
+            "Desenhar geometricamente as operações com vetores, retas e planos",
+            "Compreender produto escalar, vetorial e misto sem decorar apenas fórmulas",
+            "Resolver exemplos base do Boulos"
+          ]
+        },
+        {
+          titulo: "Bloco 2: Lista Prática de Geometria Analítica",
+          dur: 90,
+          passos: [
+            "Resolver exercícios de posição relativa entre retas e planos",
+            "Praticar problemas de distância, projeção ortogonal e áreas/volumes",
+            "Marcar dúvidas de interpretação espacial"
+          ]
+        },
+        {
+          titulo: "Bloco 3: Questões de Provas Antigas de GA",
+          dur: 90,
+          passos: [
+            "Simular questões clássicas de prova (lugares geométricos e cônicas)",
+            "Conferir contas de determinantes e sistemas lineares"
+          ]
+        },
+        {
+          titulo: "Bloco 4: Revisão & Caderno de Erros de GA",
+          dur: 60,
+          passos: [
+            "Refazer questões com erro de sinal ou interpretação de vetores diretores",
+            "Consolidar resumo visual de equações de retas, planos e cônicas"
+          ]
+        }
+      ]
+    },
+    {
+      id: "algebra_linear",
+      nome: "Álgebra Linear",
+      termos: [
+        "algebra linear",
+        "álgebra linear",
+        "espacos vetoriais",
+        "autovalores",
+        "autovetores",
+        "transformacoes lineares",
+        "sma0304"
+      ],
+      ementaPadrao:
+        "Sistemas lineares e matrizes, espaços e subespaços vetoriais, base e dimensão, transformações lineares, núcleo e imagem, Teorema do Núcleo e da Imagem, autovalores, autovetores e diagonalização.",
+      bibliografiaPadrao: "Boldrini (Álgebra Linear), Elon Lages Lima e Callioli.",
+      blocosPadrao: [
+        {
+          titulo: "Bloco 1: Definições & Teoremas de Álgebra Linear",
+          dur: 90,
+          passos: [
+            "Estudar definições de espaços vetoriais, base, dimensão e transformações",
+            "Refazer as demonstrações essenciais (Núcleo/Imagem e independência linear)"
+          ]
+        },
+        {
+          titulo: "Bloco 2: Lista de Exercícios de Álgebra Linear",
+          dur: 90,
+          passos: [
+            "Resolver exercícios de escalonamento, mudança de base e matrizes de transformação",
+            "Praticar cálculo de polinômio característico, autovalores e autovetores"
+          ]
+        },
+        {
+          titulo: "Bloco 3: Provas Antigas & Questões Conceituais (V ou F)",
+          dur: 90,
+          passos: [
+            "Treinar questões de Verdadeiro/Falso com justificativa formal ou contraexemplo",
+            "Resolver problemas completos de diagonalização"
+          ]
+        },
+        {
+          titulo: "Bloco 4: Revisão & Caderno de Erros de Álgebra Linear",
+          dur: 60,
+          passos: [
+            "Revisar contraexemplos clássicos e erros de escalonamento",
+            "Atualizar mapa conceitual de teoremas"
+          ]
+        }
       ]
     },
     {
@@ -245,7 +396,8 @@ const MiniPrumoAI = (() => {
         "estatística",
         "rlm",
         "raciocinio logico",
-        "probabilidade"
+        "probabilidade",
+        "discreta"
       ]
     },
     {
@@ -260,8 +412,12 @@ const MiniPrumoAI = (() => {
         "eletromagnetismo",
         "cinematica",
         "optica",
-        "óptica"
-      ]
+        "óptica",
+        "fsc0105"
+      ],
+      ementaPadrao:
+        "Cinemática vetorial, Leis de Newton e aplicações, trabalho e conservação de energia mecânica, momento linear e colisões, rotação de corpos rígidos, momento angular e gravitação.",
+      bibliografiaPadrao: "Moysés Nussenzveig (Curso de Física Básica, Vol. 1) e Halliday & Resnick."
     },
     {
       id: "quimica",
@@ -270,7 +426,7 @@ const MiniPrumoAI = (() => {
     },
     {
       id: "programacao",
-      nome: "Programação",
+      nome: "Programação e Algoritmos",
       termos: [
         "programacao",
         "programação",
@@ -279,13 +435,24 @@ const MiniPrumoAI = (() => {
         "javascript",
         "python",
         "java",
+        "linguagem c",
         "algoritmo",
+        "algoritmos",
+        "estrutura de dados",
+        "estruturas de dados",
+        "icc",
+        "scc0221",
+        "scc0202",
         "computacao",
         "computação",
         "frontend",
         "backend",
         "react"
-      ]
+      ],
+      ementaPadrao:
+        "Lógica de programação, estruturas condicionais e de repetição, funções e recursão, vetores, matrizes, ponteiros e alocação dinâmica de memória, tipos abstratos de dados (TADs), listas, pilhas, filas, ordenação e complexidade.",
+      bibliografiaPadrao:
+        "Cormen (Algoritmos), Szwarcfiter, Ziviani e prática em juízes online (Run.codes / Beecrowd)."
     },
     {
       id: "direito",
@@ -313,15 +480,172 @@ const MiniPrumoAI = (() => {
     }
   ];
 
-  function detectarMateriaEstudo(raw) {
-    for (const m of MATERIAS_CATALOGO) {
-      if (m.termos.some(t => raw.includes(t))) return m;
+  // Catálogo de Instituições de Ensino (Universidades, Institutos e Exames)
+  const INSTITUICOES_CATALOGO = [
+    {
+      id: "icmc",
+      nome: "ICMC-USP (São Carlos)",
+      sigla: "ICMC-USP",
+      termos: ["icmc", "icmc-usp", "icmc usp", "usp sao carlos", "usp são carlos", "caaso"],
+      perfil:
+        "O ICMC-USP (Instituto de Ciências Matemáticas e de Computação da USP em São Carlos) possui alto rigor analítico e matemático. As disciplinas cobram domínio conceitual profundo, demonstrações formais (estilo Guidorizzi, Boulos e Elon Lages Lima), listas extensas no e-Disciplinas/Run.codes e provas dissertativas (P1, P2 e Sub) onde o raciocínio passo a passo vale tanto quanto o resultado.",
+      especificidades: {
+        calculo: {
+          codigo: "SMA0301 / SMA0332 (Cálculo I / II - ICMC-USP)",
+          bibliografia: "Hamilton Luiz Guidorizzi (Um Curso de Cálculo, Vol. 1/2) e James Stewart",
+          foco: "Definição formal de limites (ε-δ), continuidade, Teorema do Valor Intermediário e do Valor Médio, estudo completo de variação de funções, integrais definidas/indefinidas, técnicas de integração e aplicações geométricas/físicas.",
+          dicaInstituicao:
+            "No ICMC, as provas de Cálculo (departamento SMA) costumam cobrar questões inspiradas diretamente nas listas do e-Disciplinas e nos exercícios do Guidorizzi. Não pule as justificativas de teoremas (como aplicabilidade do TVM e L'Hôpital)."
+        },
+        ga: {
+          codigo: "SMA0300 (Geometria Analítica - ICMC-USP)",
+          bibliografia: "Paulo Boulos & Ivan de Camargo (Geometria Analítica: Um Tratamento Vetorial)",
+          foco: "Álgebra vetorial em R³, dependência linear, produtos escalar, vetorial e misto, retas, planos, distâncias, ângulos e cônicas.",
+          dicaInstituicao:
+            "Em SMA0300 no ICMC, desenhar a situação geométrica antes de abrir contas algébricas evita 80% dos erros em retas reversas e projeções."
+        },
+        algebra_linear: {
+          codigo: "SMA0304 (Álgebra Linear - ICMC-USP)",
+          bibliografia: "Boldrini, Elon Lages Lima e notas de aula do SMA-ICMC",
+          foco: "Espaços e subespaços vetoriais, base e dimensão, transformações lineares, Teorema do Núcleo e da Imagem, autovalores, autovetores e operadores diagonalizáveis.",
+          dicaInstituicao:
+            "As provas de Álgebra Linear no ICMC exigem demonstrações curtas e questões de Verdadeiro/Falso com justificativa formal ou contraexemplo."
+        },
+        programacao: {
+          codigo: "SCC0221 / SCC0202 (ICC I e Algoritmos e Estruturas de Dados I - ICMC-USP)",
+          bibliografia:
+            "Linguagem C, Ponteiros, Alocação Dinâmica, TADs (Ziviani / Cormen) + Submissões no Run.codes",
+          foco: "Manipulação de ponteiros, alocação dinâmica (malloc/free sem memory leak no Valgrind), recursão, complexidade assintótica e casos de borda no Run.codes.",
+          dicaInstituicao:
+            "No departamento SCC do ICMC, comece os trabalhos práticos do Run.codes cedo e sempre teste casos limites e vazamento de memória."
+        },
+        fisica: {
+          codigo: "FSC0105 (Física I - IFSC/ICMC-USP)",
+          bibliografia: "Moysés Nussenzveig (Vol. 1) e Halliday & Resnick",
+          foco: "Mecânica newtoniana com cálculo diferencial e integral, conservação de energia, momento linear e rotação.",
+          dicaInstituicao:
+            "Resolva integralmente as listas do IFSC/ICMC deduzindo as expressões literalmente (com letras) antes de substituir valores numéricos."
+        }
+      }
+    },
+    {
+      id: "usp",
+      nome: "USP (Universidade de São Paulo)",
+      sigla: "USP",
+      termos: ["usp", "poli-usp", "poli usp", "ime-usp", "ime usp", "eesc", "ifsc", "fea-usp", "ffclrp"],
+      perfil:
+        "A USP exige forte embasamento teórico, uso de bibliografia universitária clássica (Guidorizzi, Moysés, Boulos, Cormen) e resolução autônoma de listas semanais no e-Disciplinas."
+    },
+    {
+      id: "unicamp",
+      nome: "Unicamp (Universidade Estadual de Campinas)",
+      sigla: "Unicamp",
+      termos: ["unicamp", "imecc", "ic unicamp", "feec", "fem unicamp"],
+      perfil:
+        "A Unicamp (padrão IMECC/IFGW/IC) trabalha com provas conceituais e analíticas unificadas por coordenadoria, exigindo domínio das listas oficiais e provas anteriores."
+    },
+    {
+      id: "ufscar",
+      nome: "UFSCar (Universidade Federal de São Carlos)",
+      sigla: "UFSCar",
+      termos: ["ufscar", "federal de sao carlos", "federal de são carlos"],
+      perfil:
+        "A UFSCar combina cobrança teórica consistente com listas práticas progressivas e avaliações modulares ao longo do semestre."
+    },
+    {
+      id: "unesp",
+      nome: "UNESP (Universidade Estadual Paulista)",
+      sigla: "UNESP",
+      termos: ["unesp"],
+      perfil:
+        "A UNESP valoriza o equilíbrio entre domínio dos fundamentos teóricos e resolução de listas aplicadas."
+    },
+    {
+      id: "ufmg",
+      nome: "UFMG (Universidade Federal de Minas Gerais)",
+      sigla: "UFMG",
+      termos: ["ufmg", "icex"],
+      perfil:
+        "A UFMG (padrão ICEx) aplica provas rigorosas baseadas em listas seriadas e bibliografia de referência."
+    },
+    {
+      id: "ita",
+      nome: "ITA / IME",
+      sigla: "ITA/IME",
+      termos: ["ita", "ime"],
+      perfil:
+        "Altíssimo rigor analítico, questões de aprofundamento e exigência de velocidade e precisão algébrica."
     }
-    const match = raw.match(
-      /(?:pra|para|de|sobre|estudar|matéria|materia|disciplina)\s+([a-zá-ú0-9\s]{3,25})/i
+  ];
+
+  function obterInstituicaoSalva() {
+    try {
+      if (typeof S !== "undefined" && S && S.instituicaoEnsino) return S.instituicaoEnsino;
+      const salva = localStorage.getItem("prumo_instituicao");
+      if (salva) return JSON.parse(salva);
+    } catch (e) {}
+    return null;
+  }
+
+  function salvarInstituicaoUsuario(instObj) {
+    if (!instObj) return;
+    try {
+      if (typeof S !== "undefined" && S)
+        S.instituicaoEnsino = { id: instObj.id, nome: instObj.nome, sigla: instObj.sigla };
+      localStorage.setItem(
+        "prumo_instituicao",
+        JSON.stringify({ id: instObj.id, nome: instObj.nome, sigla: instObj.sigla })
+      );
+    } catch (e) {}
+  }
+
+  function detectarInstituicaoEnsino(raw) {
+    const txt = (raw || "").toLowerCase();
+    for (const inst of INSTITUICOES_CATALOGO) {
+      if (
+        inst.termos.some(t => new RegExp(`(?:^|\\s|[,.;:!?/()-])${t}(?:$|\\s|[,.;:!?/()-])`, "i").test(txt))
+      ) {
+        salvarInstituicaoUsuario(inst);
+        return inst;
+      }
+    }
+    const matchInst = txt.match(
+      /\b(?:no|na|do|da|pelo|pela|em)\s+(uf[a-z]{2,6}|if[a-z]{2,6}|puc|mackenzie|fgv|insper|unb|ufpr|ufrgs|ufpe|ufc|ufba|ufrj|uff)\b/i
+    );
+    if (matchInst && matchInst[1]) {
+      const sigla = matchInst[1].toUpperCase();
+      const customInst = {
+        id: sigla.toLowerCase(),
+        nome: sigla,
+        sigla,
+        perfil: `Exigência acadêmica universitária (${sigla}), com foco em domínio conceitual, resolução constante de listas de exercícios e preparação antecipada para provas.`
+      };
+      salvarInstituicaoUsuario(customInst);
+      return customInst;
+    }
+    const salva = obterInstituicaoSalva();
+    if (salva && salva.id) {
+      return INSTITUICOES_CATALOGO.find(i => i.id === salva.id) || salva;
+    }
+    return null;
+  }
+
+  function detectarMateriaEstudo(raw) {
+    const txt = (raw || "").toLowerCase();
+    // Verificar "ga" isolado como Geometria Analítica
+    if (/(?:^|\s)ga(?:\s|$|[,.!?])/i.test(txt)) {
+      return MATERIAS_CATALOGO.find(m => m.id === "ga");
+    }
+    for (const m of MATERIAS_CATALOGO) {
+      if (m.termos.some(t => txt.includes(t))) return m;
+    }
+    const match = txt.match(
+      /(?:dificuldade\s+em|organizar\s+em|organizar\s+|estudar\s+|mat[ée]ria\s+de\s+|disciplina\s+de\s+|tenho\s+)([a-záàâãéêíóôõúç0-9\s]{3,28}?)(?:\s+no\s+|\s+na\s+|\s+da\s+|\s+do\s+|\s+e\s+|$|[,.!?])/i
     );
     if (match && match[1]) {
-      const capturado = match[1].trim();
+      const capturado = match[1]
+        .replace(/^(?:me\s+organizar\s+em|organizar\s+em|organizar\s+minha\s+|estudar\s+|aprender\s+)/i, "")
+        .trim();
       const ignorar = [
         "mim",
         "voce",
@@ -336,14 +660,244 @@ const MiniPrumoAI = (() => {
         "vencer",
         "dormir",
         "nada",
-        "alguem"
+        "alguem",
+        "minha semana",
+        "minha rotina"
       ];
-      if (!ignorar.includes(capturado)) {
+      if (capturado.length >= 2 && !ignorar.includes(capturado)) {
         const nomeFormatado = capturado.charAt(0).toUpperCase() + capturado.slice(1);
         return { id: "custom", nome: nomeFormatado, termos: [capturado] };
       }
     }
     return null;
+  }
+
+  function obterPropostaSemanaPendente() {
+    if (typeof window !== "undefined" && window.__propostaSemanaIA) return window.__propostaSemanaIA;
+    if (typeof S !== "undefined" && S && S.propostaSemanaIA) return S.propostaSemanaIA;
+    return null;
+  }
+
+  function salvarPropostaSemanaPendente(prop) {
+    if (typeof window !== "undefined") window.__propostaSemanaIA = prop;
+    if (typeof S !== "undefined" && S) S.propostaSemanaIA = prop;
+  }
+
+  function ehConfirmacaoOrganizarSemana(raw) {
+    const prop = obterPropostaSemanaPendente();
+    if (!prop) return false;
+    const txt = (raw || "").trim().toLowerCase();
+    if (!txt) return false;
+    return /^(?:sim|s|ss|pode|pode\s+sim|pode\s+organizar|pode\s+ser|quero|quero\s+sim|bora|vamo|vamos|organiza|organiza\s+a[íi]|por\s+favor|pfv|claro|com\s+certeza| manda|manda\s+bala|agenda\s+a[íi]|aceito|top|fechou)\b/i.test(
+      txt
+    );
+  }
+
+  function ehDificuldadeOuOrganizacaoMateria(raw) {
+    const txt = (raw || "").trim().toLowerCase();
+    if (!txt) return false;
+    if (typeof ehComandoDeTarefa === "function" && ehComandoDeTarefa(txt)) return false;
+
+    const falaDificuldadeOrganizacao =
+      /(?:dificuldade|dificil|dif[íi]cil|perdid[oa]|travad[oa]|enrolad[oa]|atrasad[oa]|n[ãa]o\s+consigo|me\s+organizar|organizar\s+minha\s+semana|organizar\s+meus\s+estudos|organizar\s+em|como\s+me\s+organizar|preciso\s+organizar|me\s+ajuda\s+em|me\s+ajuda\s+com|tenho\s+[a-záàâãéêíóôõúç]+\s+n[oa]\s+(?:icmc|usp|unicamp|ufscar|unesp|ufmg|faculdade))/i.test(
+        txt
+      );
+    const mat = detectarMateriaEstudo(txt);
+    const inst = detectarInstituicaoEnsino(txt);
+
+    if (falaDificuldadeOrganizacao && (mat || inst)) return true;
+    // Se menciona matéria + instituição explicitamente (ex: "eu tenho calculo no icmc", "faço calculo no icmc")
+    if (mat && inst && /\b(?:no|na|do|da|em)\s+(?:icmc|usp|unicamp|ufscar|unesp|ufmg|ita|ime)\b/i.test(txt)) {
+      return true;
+    }
+    return false;
+  }
+
+  function montarDiagnosticoMateriaInstituicao(matObj, instObj, pesquisaOnline) {
+    const mat = matObj || MATERIAS_CATALOGO[0];
+    const inst = instObj || {
+      id: "geral",
+      nome: "Ensino Superior / Alto Rendimento",
+      sigla: "Acadêmico",
+      perfil:
+        "Disciplina universitária que exige equilíbrio entre compreensão conceitual, prática ativa na ponta do lápis e revisão espaçada."
+    };
+
+    const esp = inst.especificidades && inst.especificidades[mat.id] ? inst.especificidades[mat.id] : null;
+
+    const codigo = esp
+      ? esp.codigo
+      : `${mat.nome}${inst.sigla && inst.sigla !== "Acadêmico" ? " (" + inst.sigla + ")" : ""}`;
+    const bibliografia = esp
+      ? esp.bibliografia
+      : mat.bibliografiaPadrao ||
+        "Bibliografia oficial da ementa + listas de exercícios e provas antigas da disciplina";
+    const foco = esp
+      ? esp.foco
+      : mat.ementaPadrao ||
+        `Domínio dos conceitos fundamentais de ${mat.nome}, resolução ativa de listas de exercícios e revisão sistemática de erros.`;
+    const dicaInstituicao = esp
+      ? esp.dicaInstituicao
+      : `Para dominar **${mat.nome}** (${inst.nome}), não acumule teoria passiva: estude em blocos focados resolvendo as listas e provas anteriores da sua instituição.`;
+
+    const instLabel = inst.sigla && inst.sigla !== "Acadêmico" ? inst.sigla : "";
+    const sufixoInst = instLabel ? ` (${instLabel})` : "";
+
+    const blocosBase = mat.blocosPadrao || [
+      {
+        titulo: `Bloco 1: Base Teórica & Conceitos de ${mat.nome}`,
+        dur: 90,
+        passos: [
+          `Mapear os tópicos da semana na ementa de ${mat.nome}${sufixoInst}`,
+          "Estudar a teoria ativa refazendo os exemplos fundamentais no papel",
+          "Anotar definições, fórmulas e propriedades essenciais"
+        ]
+      },
+      {
+        titulo: `Bloco 2: Resolução de Lista de Exercícios (${mat.nome})`,
+        dur: 90,
+        passos: [
+          `Resolver os exercícios base e intermediários da lista de ${mat.nome}`,
+          "Tentar resolver sem olhar o gabarito nos primeiros 25 minutos",
+          "Marcar as questões com dúvida para monitoria ou revisão"
+        ]
+      },
+      {
+        titulo: `Bloco 3: Prática Avançada & Provas Antigas (${mat.nome})`,
+        dur: 90,
+        passos: [
+          `Resolver questões no estilo das provas de ${mat.nome}${sufixoInst}`,
+          "Treinar ritmo de prova e organização da resolução escrita"
+        ]
+      },
+      {
+        titulo: `Bloco 4: Revisão Espaçada & Caderno de Erros (${mat.nome})`,
+        dur: 60,
+        passos: [
+          "Refazer do zero as questões que você errou ou travou na semana",
+          "Atualizar flashcards e resumo dos pontos mais cobrados"
+        ]
+      }
+    ];
+
+    const blocos = blocosBase.map(b => ({
+      titulo: b.titulo.includes(instLabel) || !instLabel ? b.titulo : `${b.titulo} [${instLabel}]`,
+      dur: b.dur || 90,
+      passos: b.passos.slice()
+    }));
+
+    return {
+      materiaId: mat.id || "custom",
+      materiaNome: mat.nome,
+      instituicaoId: inst.id || "geral",
+      instituicaoNome: inst.nome,
+      instituicaoSigla: inst.sigla || inst.nome,
+      codigo,
+      bibliografia,
+      foco,
+      dicaInstituicao,
+      perfilInstituicao: inst.perfil,
+      pesquisaOnline: pesquisaOnline || "",
+      blocos
+    };
+  }
+
+  function gerarBlocosSemanaisMateria(propostaInp) {
+    if (typeof S === "undefined" || !S || !Array.isArray(S.tasks)) return [];
+    const diag =
+      propostaInp && propostaInp.blocos
+        ? propostaInp
+        : montarDiagnosticoMateriaInstituicao(
+            MATERIAS_CATALOGO.find(m => m.id === (propostaInp && propostaInp.materiaId)) || {
+              id: (propostaInp && propostaInp.materiaId) || "calculo",
+              nome: (propostaInp && propostaInp.materiaNome) || "Cálculo"
+            },
+            INSTITUICOES_CATALOGO.find(i => i.id === (propostaInp && propostaInp.instituicaoId)) ||
+              obterInstituicaoSalva()
+          );
+
+    // Garantir que a matéria exista em S.subjects (e atualizar com a sigla da instituição se aplicável)
+    if (Array.isArray(S.subjects)) {
+      const nomeIdeal =
+        diag.instituicaoSigla && diag.instituicaoSigla !== "Acadêmico"
+          ? `${diag.materiaNome} (${diag.instituicaoSigla})`
+          : diag.materiaNome;
+      const existenteSub = S.subjects.find(
+        sub => sub.name && sub.name.toLowerCase().includes(diag.materiaNome.toLowerCase())
+      );
+      if (existenteSub) {
+        if (
+          diag.instituicaoSigla &&
+          diag.instituicaoSigla !== "Acadêmico" &&
+          !existenteSub.name.includes(diag.instituicaoSigla)
+        ) {
+          existenteSub.name = nomeIdeal;
+        }
+      } else {
+        const cores =
+          typeof SUBJ_COLORS !== "undefined" && Array.isArray(SUBJ_COLORS)
+            ? SUBJ_COLORS
+            : ["#2340C4", "#1C8350", "#AE2C76", "#A9670E", "#5B3FB8"];
+        S.subjects.push({
+          id: typeof newId === "function" ? newId() : "s_" + Math.random().toString(36).slice(2, 8),
+          name: nomeIdeal,
+          color: cores[S.subjects.length % cores.length]
+        });
+      }
+    }
+
+    const base = typeof today === "function" ? today() : new Date().toISOString().slice(0, 10);
+    const offsetsDias = [1, 2, 4, 5]; // Distribuição espaçada na semana (ex: Amanhã, Dia+2, Dia+4, Dia+5)
+    const horariosPreferidos = ["16:00", "14:00", "19:00", "09:00", "10:30"];
+    const criadas = [];
+
+    diag.blocos.forEach((bloco, idx) => {
+      const offset = offsetsDias[idx] || idx + 1;
+      const dataBloco = typeof addDays === "function" ? addDays(base, offset) : base;
+
+      // Escolher horário livre no dia para não conflitar com tarefas existentes
+      const ocupados = new Set(
+        S.tasks.filter(t => !t.done && t.date === dataBloco && t.time).map(t => t.time)
+      );
+      const horaEscolhida = horariosPreferidos.find(h => !ocupados.has(h)) || "16:00";
+
+      const subs = (bloco.passos || []).map(p => ({
+        id: typeof newId === "function" ? newId() : "sub_" + Math.random().toString(36).slice(2, 8),
+        t: p,
+        done: false
+      }));
+
+      let existente = S.tasks.find(
+        t => !t.done && t.date === dataBloco && t.title.toLowerCase() === bloco.titulo.toLowerCase()
+      );
+      if (existente) {
+        existente.time = horaEscolhida;
+        existente.dur = bloco.dur || 90;
+        existente.area = "estudo";
+        existente.sub = subs;
+        criadas.push(existente);
+      } else {
+        const nova = {
+          id: typeof newId === "function" ? newId() : "t_" + Math.random().toString(36).slice(2, 9),
+          title: bloco.titulo,
+          area: "estudo",
+          date: dataBloco,
+          time: horaEscolhida,
+          dur: bloco.dur || 90,
+          done: false,
+          prio: 2,
+          repeat: "",
+          sub: subs
+        };
+        S.tasks.push(nova);
+        if (typeof fx !== "undefined" && fx) fx.newId = nova.id;
+        criadas.push(nova);
+      }
+    });
+
+    salvarPropostaSemanaPendente(null);
+    if (typeof commit === "function") commit();
+    return criadas;
   }
 
   // 1. Extração de Tensores Semânticos
@@ -357,7 +911,23 @@ const MiniPrumoAI = (() => {
     let matchCat = "geral";
     let maxMatch = 0;
 
-    // 0. Prioridade Máxima: Detecção NLU de Agendamento/Criação de Tarefa em Linguagem Natural
+    // 0.1. Confirmação de Organização da Semana em Blocos de Estudo ("sim, pode organizar")
+    if (ehConfirmacaoOrganizarSemana(texto)) {
+      const prop = obterPropostaSemanaPendente();
+      return {
+        raw,
+        tokens,
+        valencia: 0.85,
+        energia: 0.92,
+        urgencia: 0.9,
+        categoria: "confirmar_organizacao_semana",
+        propostaSemana: prop,
+        materia: prop ? { id: prop.materiaId, nome: prop.materiaNome } : detectarMateriaEstudo(raw),
+        confianca: 0.99
+      };
+    }
+
+    // 0.2. Prioridade Máxima: Detecção NLU de Agendamento/Criação de Tarefa em Linguagem Natural
     const isCriarTarefa = typeof ehComandoDeTarefa === "function" && ehComandoDeTarefa(texto);
     if (isCriarTarefa) {
       const tarefasParsed = typeof extrairTarefasDeFrase === "function" ? extrairTarefasDeFrase(texto) : [];
@@ -371,6 +941,26 @@ const MiniPrumoAI = (() => {
         tarefasParsed,
         materia: detectarMateriaEstudo(raw),
         confianca: 0.98
+      };
+    }
+
+    // 0.3. Detecção de Dificuldade em Matéria / Pedido de Organização Semanal por Matéria e Instituição
+    const instDetectada = detectarInstituicaoEnsino(raw);
+    const matDetectada = detectarMateriaEstudo(raw);
+    if (ehDificuldadeOuOrganizacaoMateria(texto)) {
+      const diag = montarDiagnosticoMateriaInstituicao(matDetectada, instDetectada);
+      salvarPropostaSemanaPendente(diag);
+      return {
+        raw,
+        tokens,
+        valencia: 0.6,
+        energia: 0.88,
+        urgencia: 0.92,
+        categoria: "propor_organizacao_materia",
+        diagnosticoMateria: diag,
+        materia: { id: diag.materiaId, nome: diag.materiaNome },
+        instituicao: { id: diag.instituicaoId, nome: diag.instituicaoNome, sigla: diag.instituicaoSigla },
+        confianca: 0.97
       };
     }
 
@@ -583,6 +1173,67 @@ const MiniPrumoAI = (() => {
     const mlAgua = atencao.aguaMl;
     const faltaAgua = atencao.deficitAgua;
     const destaque = pendenteDestaque || "a pendência do momento";
+
+    // 4.0.0.-2. CONFIRMAÇÃO DE ORGANIZAÇÃO DA SEMANA EM BLOCOS DE ESTUDO
+    if (
+      tensor.categoria === "confirmar_organizacao_semana" &&
+      Array.isArray(tensor.blocosCriados) &&
+      tensor.blocosCriados.length
+    ) {
+      const prop = tensor.propostaSemana || {};
+      const matNome = prop.materiaNome || (tensor.materia && tensor.materia.nome) || "Estudos";
+      const instSigla =
+        prop.instituicaoSigla && prop.instituicaoSigla !== "Acadêmico" ? ` (${prop.instituicaoSigla})` : "";
+      const cardsTags = tensor.blocosCriados.map(tc => `[[ACAO_TAREFA_CRIADA:${tc.id}]]`).join("\n");
+      const listaBlocos = tensor.blocosCriados
+        .map(
+          (tc, idx) =>
+            `${idx + 1}. **${tc.title}** — 📅 ${typeof relDay === "function" ? relDay(tc.date) : tc.date} às **${tc.time || "16:00"}** (${typeof fmtMin === "function" ? fmtMin(tc.dur || 90) : (tc.dur || 90) + " min"})`
+        )
+        .join("\n");
+
+      return `Semana organizada com sucesso, **${nome}**! 🚀📅
+
+Distribuí os **${tensor.blocosCriados.length} blocos de estudo de ${matNome}${instSigla}** nos melhores horários livres da sua semana, já com os passos práticos de teoria, listas de exercícios, provas antigas e revisão:
+
+${listaBlocos}
+
+Você já pode clicar em **▶️ Focar** em qualquer bloco abaixo ou abrir sua agenda:
+
+${cardsTags}`;
+    }
+
+    // 4.0.0.-1. DIAGNÓSTICO DE MATÉRIA + INSTITUIÇÃO E PERGUNTA SE PODE ORGANIZAR A SEMANA
+    if (tensor.categoria === "propor_organizacao_materia" && tensor.diagnosticoMateria) {
+      const d = tensor.diagnosticoMateria;
+      const temInst = d.instituicaoSigla && d.instituicaoSigla !== "Acadêmico";
+      const instTxt = temInst ? ` no **${d.instituicaoNome}**` : "";
+      const tagProposta = `[[ACAO_PROPOR_BLOCOS_SEMANA:${d.materiaId}:${d.instituicaoId}:${d.materiaNome}:${d.instituicaoSigla}]]`;
+      const resumoBlocos = d.blocos
+        .map(
+          (b, i) =>
+            `${i + 1}. 📘 **${b.titulo}** (${typeof fmtMin === "function" ? fmtMin(b.dur) : b.dur + " min"}) — *${b.passos[0]}*`
+        )
+        .join("\n");
+      const trechoOnline = d.pesquisaOnline
+        ? `\n• 🌐 **Pesquisa da Ementa/Instituição:** ${d.pesquisaOnline}`
+        : "";
+
+      return `Analisei a estrutura de **${d.materiaNome}**${instTxt}, **${nome}**! 🎓🔍
+
+Aqui está o raio-x acadêmico para você destravar nessa disciplina:
+• 📌 **Disciplina Analisada:** ${d.codigo}
+• 📚 **Bibliografia & Base:** ${d.bibliografia}
+• 🎯 **O que mais exige atenção:** ${d.foco}${trechoOnline}
+• 💡 **Estratégia para ${temInst ? d.instituicaoSigla : d.materiaNome}:** ${d.dicaInstituicao}
+
+Para você não acumular matéria, estruturei **4 blocos semanais de estudo**:
+${resumoBlocos}
+
+**Posso organizar a sua semana agora e agendar esses blocos de estudo nas suas tarefas?** (Basta responder **"sim"** ou clicar no botão abaixo!)
+
+${tagProposta}`;
+    }
 
     // 4.0.0.0. AGENDAMENTO E CRIAÇÃO DE TAREFAS EM LINGUAGEM NATURAL (NLU PROFUNDO)
     if (
@@ -1040,7 +1691,9 @@ Status do runtime: **${nConcluidas} commits hoje**, heap de memória hídrica em
   // 5. Interface Pública Principal
   function processar(promptUsuario, ctxPrumo, personaId, nomeUsuario) {
     const tensor = codificarTensorPrompt(promptUsuario);
-    if (tensor.categoria === "criar_tarefa" && typeof criarTarefasPorTextoIA === "function") {
+    if (tensor.categoria === "confirmar_organizacao_semana") {
+      tensor.blocosCriados = gerarBlocosSemanaisMateria(tensor.propostaSemana);
+    } else if (tensor.categoria === "criar_tarefa" && typeof criarTarefasPorTextoIA === "function") {
       tensor.tarefasCriadas = criarTarefasPorTextoIA(promptUsuario);
     }
     const atencao = calcularAtencaoContexto(tensor, ctxPrumo);
@@ -1064,6 +1717,28 @@ Status do runtime: **${nConcluidas} commits hoje**, heap de memória hídrica em
 
     let pensamento;
     if (
+      tensor.categoria === "confirmar_organizacao_semana" &&
+      Array.isArray(tensor.blocosCriados) &&
+      tensor.blocosCriados.length
+    ) {
+      const prop = tensor.propostaSemana || {};
+      pensamento = [
+        `🧠 **ALOCADOR SEMANAL DE BLOCOS DE ESTUDO (${(prop.materiaNome || "DISCIPLINA").toUpperCase()})**`,
+        `• 🏛️ **Instituição & Ementa:** ${prop.codigo || prop.materiaNome} (${prop.instituicaoNome || "Acadêmico"})`,
+        `• 📅 **Verificação de Conflitos:** Busca de janelas livres nos próximos dias da semana em S.tasks`,
+        `• 🧱 **Blocos Gerados:** ${tensor.blocosCriados.length} blocos (Teoria, Lista de Exercícios, Provas Antigas e Revisão de Erros)`,
+        `• ⚡ **Ação Executada:** Todos os blocos foram salvos nas suas tarefas do Prumo com subtarefas detalhadas.`
+      ].join("\n");
+    } else if (tensor.categoria === "propor_organizacao_materia" && tensor.diagnosticoMateria) {
+      const d = tensor.diagnosticoMateria;
+      pensamento = [
+        `🧠 **ANÁLISE DE DISCIPLINA & INSTITUIÇÃO (${d.materiaNome.toUpperCase()} — ${d.instituicaoSigla.toUpperCase()})**`,
+        `• 🎯 **Intenção Detectada:** Dificuldade de organização na matéria "${d.materiaNome}"`,
+        `• 🏛️ **Instituição Identificada:** ${d.instituicaoNome} (${d.codigo})`,
+        `• 📚 **Bibliografia & Foco:** ${d.bibliografia} | ${d.foco}`,
+        `• 💡 **Decisão Interativa:** Apresentar o diagnóstico da matéria na instituição e perguntar ao usuário se pode organizar a semana em 4 blocos práticos.`
+      ].join("\n");
+    } else if (
       tensor.categoria === "criar_tarefa" &&
       Array.isArray(tensor.tarefasCriadas) &&
       tensor.tarefasCriadas.length
@@ -1119,7 +1794,15 @@ Status do runtime: **${nConcluidas} commits hoje**, heap de memória hídrica em
     processar,
     codificarTensorPrompt,
     calcularAtencaoContexto,
-    deliberarHipoteses
+    deliberarHipoteses,
+    ehDificuldadeOuOrganizacaoMateria,
+    ehConfirmacaoOrganizarSemana,
+    obterPropostaSemanaPendente,
+    salvarPropostaSemanaPendente,
+    gerarBlocosSemanaisMateria,
+    montarDiagnosticoMateriaInstituicao,
+    detectarMateriaEstudo,
+    detectarInstituicaoEnsino
   };
 })();
 

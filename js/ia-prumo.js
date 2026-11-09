@@ -212,13 +212,100 @@ function separarPensamentoECorpo(raw) {
   };
 }
 
+/* ---------- Pesquisa Acadêmica Online (Matéria + Instituição de Ensino) ---------- */
+async function pesquisarMateriaEInstituicaoOnline(promptUsuario) {
+  if (typeof window !== "undefined" && typeof window.__mockPesquisaAcademicaOnline === "function") {
+    try {
+      return await window.__mockPesquisaAcademicaOnline(promptUsuario);
+    } catch (_) {}
+  }
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    return "";
+  }
+  if (typeof fetch !== "function" || typeof MiniPrumoAI === "undefined") {
+    return "";
+  }
+  try {
+    const mat = MiniPrumoAI.detectarMateriaEstudo ? MiniPrumoAI.detectarMateriaEstudo(promptUsuario) : null;
+    const inst = MiniPrumoAI.detectarInstituicaoEnsino
+      ? MiniPrumoAI.detectarInstituicaoEnsino(promptUsuario)
+      : null;
+    const termoWiki =
+      inst && inst.id === "icmc"
+        ? "Instituto_de_Ci%C3%AAncias_Matem%C3%A1ticas_e_de_Computa%C3%A7%C3%A3o_da_Universidade_de_S%C3%A3o_Paulo"
+        : mat && mat.id === "calculo"
+          ? "C%C3%A1lculo_infinitesimal"
+          : mat && mat.id === "ga"
+            ? "Geometria_anal%C3%ADtica"
+            : mat && mat.id === "algebra_linear"
+              ? "%C3%81lgebra_linear"
+              : mat && mat.nome
+                ? encodeURIComponent(mat.nome)
+                : "";
+    if (!termoWiki) return "";
+
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    const resp = await fetch(`https://pt.wikipedia.org/api/rest_v1/page/summary/${termoWiki}`, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      signal: ctrl.signal
+    });
+    clearTimeout(timer);
+    if (resp && resp.ok) {
+      const dados = await resp.json();
+      if (dados && dados.extract) {
+        const resumoCurto = String(dados.extract)
+          .split(/(?<=[.!?])\s+/)
+          .slice(0, 2)
+          .join(" ");
+        return resumoCurto;
+      }
+    }
+  } catch (_) {
+    // Sem internet ou bloqueado: usa base acadêmica local offline sem interromper
+  }
+  return "";
+}
+
 /* ---------- Chamada a LLM em Nuvem (Gemini, Groq, OpenAI) ---------- */
 async function chamarProvedorLLM(promptUsuario, mensagensAnteriores = []) {
   const cfg = obterConfigIA();
 
-  // 0. Comandos naturais de criação de tarefa (NLU) executam imediatamente no Prumo
-  if (typeof ehComandoDeTarefa === "function" && ehComandoDeTarefa(promptUsuario)) {
+  // 0. Comandos naturais de criação de tarefa ou confirmação de blocos semanais executam imediatamente
+  if (
+    (typeof ehComandoDeTarefa === "function" && ehComandoDeTarefa(promptUsuario)) ||
+    (typeof MiniPrumoAI !== "undefined" &&
+      typeof MiniPrumoAI.ehConfirmacaoOrganizarSemana === "function" &&
+      MiniPrumoAI.ehConfirmacaoOrganizarSemana(promptUsuario))
+  ) {
     return gerarRespostaAutonomaIA(promptUsuario);
+  }
+
+  // 0.1. Dificuldade / Organização em Matéria + Instituição: pesquisa online (se houver internet) + diagnóstico + pergunta se pode organizar a semana
+  if (
+    typeof MiniPrumoAI !== "undefined" &&
+    typeof MiniPrumoAI.ehDificuldadeOuOrganizacaoMateria === "function" &&
+    MiniPrumoAI.ehDificuldadeOuOrganizacaoMateria(promptUsuario)
+  ) {
+    const infoOnline = await pesquisarMateriaEInstituicaoOnline(promptUsuario);
+    const respBase = gerarRespostaAutonomaIA(promptUsuario);
+    if (infoOnline && typeof MiniPrumoAI.obterPropostaSemanaPendente === "function") {
+      const prop = MiniPrumoAI.obterPropostaSemanaPendente();
+      if (prop) {
+        prop.pesquisaOnline = infoOnline;
+        MiniPrumoAI.salvarPropostaSemanaPendente(prop);
+      }
+      if (respBase && typeof respBase === "object") {
+        respBase.pensamento =
+          (respBase.pensamento || "") + `\n• 🌐 **Pesquisa Acadêmica Online:** ${infoOnline}`;
+        respBase.texto = respBase.texto.replace(
+          "• 🎯 **O que mais exige atenção:**",
+          `• 🌐 **Contexto Pesquisado Online:** ${infoOnline}\n• 🎯 **O que mais exige atenção:**`
+        );
+      }
+    }
+    return respBase;
   }
 
   // IA do Prumo no servidor (Gemini): responde qualquer assunto, sem a pessoa precisar de chave
@@ -1109,6 +1196,20 @@ function formatarTextoMensagemIA(raw) {
     txt = txt.replace(/\[\[ACAO_TAREFA_CRIADA:[^\]]+\]\]/g, "");
   }
 
+  let propostaBlocosCard = null;
+  if (txt.includes("[[ACAO_PROPOR_BLOCOS_SEMANA:")) {
+    const m = txt.match(/\[\[ACAO_PROPOR_BLOCOS_SEMANA:([^:]+):([^:]+):([^:]+):([^\]]+)\]\]/);
+    if (m) {
+      propostaBlocosCard = {
+        materiaId: m[1],
+        instituicaoId: m[2],
+        materiaNome: m[3],
+        instituicaoSigla: m[4]
+      };
+    }
+    txt = txt.replace(/\[\[ACAO_PROPOR_BLOCOS_SEMANA:[^\]]+\]\]/g, "");
+  }
+
   // Normalizar tags HTML comuns que possam ter sido passadas
   txt = txt.replace(/<\/?(b|strong)>/gi, "**");
   txt = txt.replace(/<\/?(i|em)>/gi, "*");
@@ -1159,6 +1260,21 @@ function formatarTextoMensagemIA(raw) {
       <div style="font-size:12px;color:var(--muted,#64748b);margin-bottom:10px;">Acompanhe sua meta e registre seus acertos e erros na aba Estudos:</div>
       <button type="button" class="btn primary small" data-act="ia-abrir-bateria-chat" style="background:#10B981;font-weight:800;padding:8px 18px;border-radius:10px;">
         ⚡ Ir para Bateria de Questões
+      </button>
+    </div>`;
+  }
+
+  if (propostaBlocosCard) {
+    const instBadge =
+      propostaBlocosCard.instituicaoSigla && propostaBlocosCard.instituicaoSigla !== "Acadêmico"
+        ? ` • ${esc(propostaBlocosCard.instituicaoSigla)}`
+        : "";
+    txt += `
+    <div style="margin-top:14px;padding:14px;background:rgba(79,70,229,0.08);border-radius:14px;border:1.5px solid rgba(79,70,229,0.3);text-align:center;">
+      <div style="font-weight:800;font-size:13.5px;color:var(--accent,#4f46e5);margin-bottom:4px;">📅 Organizador Semanal em Blocos (${esc(propostaBlocosCard.materiaNome)}${instBadge})</div>
+      <div style="font-size:12px;color:var(--muted,#64748b);margin-bottom:10px;">Deseja que eu agende os 4 blocos semanais (Teoria, Lista, Provas Antigas e Revisão) nos horários livres das suas tarefas?</div>
+      <button type="button" class="btn primary small" data-act="ia-confirmar-blocos-semana" data-materia="${esc(propostaBlocosCard.materiaId)}" data-instituicao="${esc(propostaBlocosCard.instituicaoId)}" style="font-weight:800;padding:8px 18px;border-radius:10px;">
+        ✅ Sim, organizar minha semana em blocos
       </button>
     </div>`;
   }
@@ -2837,6 +2953,17 @@ if (typeof ACOES_EXTRAS !== "undefined") {
     }
     render();
   };
+  ACOES_EXTRAS["ia-confirmar-blocos-semana"] = () => {
+    if (document.getElementById("modal-chat-ia")) {
+      enviarMensagemRapidaIA("Sim, pode organizar minha semana em blocos!");
+    } else if (
+      typeof MiniPrumoAI !== "undefined" &&
+      typeof MiniPrumoAI.gerarBlocosSemanaisMateria === "function"
+    ) {
+      MiniPrumoAI.gerarBlocosSemanaisMateria(MiniPrumoAI.obterPropostaSemanaPendente());
+      if (typeof render === "function") render();
+    }
+  };
 }
 
 // Delegação de cliques para botões com data-act (garante resposta direta em qualquer contexto)
@@ -2932,6 +3059,20 @@ document.addEventListener("click", e => {
       tab = "hoje";
     }
     render();
+    return;
+  }
+  const btnConfirmarBlocos = e.target.closest("[data-act='ia-confirmar-blocos-semana']");
+  if (btnConfirmarBlocos) {
+    e.preventDefault();
+    if (document.getElementById("modal-chat-ia")) {
+      enviarMensagemRapidaIA("Sim, pode organizar minha semana em blocos!");
+    } else if (
+      typeof MiniPrumoAI !== "undefined" &&
+      typeof MiniPrumoAI.gerarBlocosSemanaisMateria === "function"
+    ) {
+      MiniPrumoAI.gerarBlocosSemanaisMateria(MiniPrumoAI.obterPropostaSemanaPendente());
+      if (typeof render === "function") render();
+    }
     return;
   }
 
