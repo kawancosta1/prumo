@@ -256,6 +256,45 @@ module.exports = async function (url) {
       cargoDepoisTroca === "Agente de Tecnologia" && temTI && !temVendas,
       "trocar para Agente de Tecnologia no chat atualiza as matérias (inclui TI e remove Vendas)"
     );
+
+    // 12. Qualquer outro edital (ex: Tribunal / Cebraspe com "OBJETOS DE AVALIAÇÃO", numeração inline 1 / 2 / 3.1, múltiplos cargos de Analista e anexo de autodeclaração no fim)
+    const analiseTribunal = ev(`(() => {
+      const editalCebraspe = [
+        "TRIBUNAL REGIONAL FEDERAL - EDITAL N 01/2027 - CONCURSO PUBLICO",
+        "5. DA SOLICITACAO DE ISENCAO DE TAXA DE INSCRICAO",
+        "5.1 Nao havera isencao total ou parcial do valor da taxa, exceto nos casos previstos em lei.",
+        "9. DAS PROVAS OBJETIVAS E DISCURSIVA",
+        "9.1 As provas objetivas terao a duracao de 4 horas e 30 minutos e serao aplicadas na data de 18/04/2027.",
+        "22 DOS OBJETOS DE AVALIACAO (HABILIDADES E CONHECIMENTOS)",
+        "CONHECIMENTOS BASICOS PARA TODOS OS CARGOS",
+        "LINGUA PORTUGUESA: 1 Compreensao e interpretacao de textos de generos variados. 2 Reconhecimento de tipos e generos textuais. 3 Dominio da ortografia oficial. 3.1 Emprego das letras. 3.2 Emprego da acentuacao grafica.",
+        "DIREITO ADMINISTRATIVO: 1 Estado, governo e administracao publica. 2 Direito administrativo: conceito, objeto e fontes. 3 Ato administrativo. 4 Agentes publicos.",
+        "CARGO 1: ANALISTA JUDICIARIO - AREA JUDICIARIA",
+        "DIREITO PROCESSUAL CIVIL: 1 Normas processuais civis. 2 Jurisdicao e acao. 3 Competencia. 4 Tutela provisoria.",
+        "DIREITO PENAL: 1 Aplicacao da lei penal. 2 Teoria do crime. 3 Concurso de pessoas.",
+        "CARGO 2: ANALISTA JUDICIARIO - AREA ADMINISTRATIVA",
+        "ADMINISTRACAO FINANCEIRA E ORCAMENTARIA: 1 Orcamento publico: conceitos e principios. 2 Ciclo orcamentario. 3 PPA, LDO e LOA. 4 Receita e despesa publica.",
+        "ADMINISTRACAO PUBLICA: 1 Modelos de gestao publica. 2 Planejamento estrategico. 3 Gestao por processos.",
+        "ANEXO IV - MODELO DE AUTODECLARACAO ETNICO-RACIAL",
+        "Eu, abaixo assinado, declaro para o fim especifico de atender ao edital do concurso."
+      ].join("\\n");
+      return analisarEditalLocal(editalCebraspe, "2026-11-09");
+    })()`);
+    ok(
+      analiseTribunal &&
+        analiseTribunal.dataProva === "2027-04-18" &&
+        Array.isArray(analiseTribunal.cargos) &&
+        analiseTribunal.cargos.length === 2,
+      "edital Cebraspe/Tribunal detecta seção 'Objetos de Avaliação', data da prova e os 2 cargos de Analista"
+    );
+    const portTrib = analiseTribunal.materias.find(m => /portuguesa/i.test(m.nome));
+    ok(
+      portTrib &&
+        portTrib.topicos.length === 5 &&
+        portTrib.topicos.every(t => !/^\d/.test(t)) &&
+        !analiseTribunal.materias.some(m => /autodeclara|isencao/i.test(m.nome)),
+      "separa subitens inline estilo Cebraspe (1, 2, 3, 3.1, 3.2) sem números colados e corta Anexo de Autodeclaração"
+    );
   } finally {
     fechar();
   }

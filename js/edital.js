@@ -315,6 +315,62 @@ const TOPICOS_PADRAO = {
     "Distribuições",
     "Amostragem e inferência",
     "Correlação e regressão"
+  ],
+  "administracao financeira e orcamentaria": [
+    "Orçamento público: conceitos, princípios e ciclo orçamentário",
+    "PPA, LDO e LOA na Constituição Federal",
+    "Receita pública: classificação, estágios e renúncia de receita",
+    "Despesa pública: classificação, empenho, liquidação e pagamento",
+    "Restos a pagar, despesas de exercícios anteriores e suprimento de fundos",
+    "Créditos adicionais (suplementares, especiais e extraordinários)",
+    "Lei de Responsabilidade Fiscal (LC 101/2000) e Lei 4.320/1964"
+  ],
+  "direito processual civil": [
+    "Normas processuais civis, jurisdição e ação",
+    "Competência, partes, procuradores e litisconsórcio",
+    "Intervenção de terceiros, juiz e Ministério Público",
+    "Atos processuais, prazos, citações e intimações",
+    "Tutela provisória (urgência e evidência)",
+    "Procedimento comum: petição inicial, contestação, provas e sentença",
+    "Cumprimento de sentença e processo de execução",
+    "Recursos no Processo Civil e processos nos tribunais"
+  ],
+  "direitos humanos": [
+    "Teoria geral, histórico e gerações/dimensões dos Direitos Humanos",
+    "Declaração Universal dos Direitos Humanos (1948)",
+    "Convenção Americana sobre Direitos Humanos (Pacto de São José da Costa Rica)",
+    "Incorporação de tratados internacionais de Direitos Humanos no Direito Brasileiro",
+    "Sistema Global (ONU) e Sistema Interamericano de Proteção",
+    "Grupos vulneráveis, igualdade racial e proteção às minorias"
+  ],
+  "legislacao do sus": [
+    "Seguridade Social e Saúde na Constituição Federal (arts. 196 a 200)",
+    "Lei Orgânica da Saúde (Lei 8.080/1990): princípios, diretrizes e atribuições",
+    "Participação da comunidade e financiamento do SUS (Lei 8.142/1990)",
+    "Decreto 7.508/2011: regiões de saúde, redes de atenção e COAP",
+    "Política Nacional de Atenção Básica (PNAB) e Estratégia Saúde da Família",
+    "Vigilância epidemiológica, sanitária, ambiental e saúde do trabalhador"
+  ],
+  "conhecimentos pedagogicos": [
+    "Lei de Diretrizes e Bases da Educação Nacional (LDB - Lei 9.394/1996)",
+    "Estatuto da Criança e do Adolescente (ECA - Lei 8.069/1990)",
+    "Base Nacional Comum Curricular (BNCC) e Diretrizes Curriculares Nacionais",
+    "Tendências pedagógicas e teorias da aprendizagem (Piaget, Vygotsky, Wallon)",
+    "Didática, planejamento escolar e Projeto Político-Pedagógico (PPP)",
+    "Avaliação da aprendizagem: diagnóstica, formativa e somativa",
+    "Educação inclusiva e atendimento educacional especializado"
+  ],
+  arquivologia: [
+    "Conceitos fundamentais de Arquivologia e teoria das três idades",
+    "Gestão de documentos: protocolo, classificação e ordenação",
+    "Tabela de temporalidade e destinação de documentos",
+    "Preservação, conservação, microfilmagem e digitalização de acervos"
+  ],
+  "redacao oficial": [
+    "Atributos da Redação Oficial: clareza, precisão, objetividade, concisão e impessoalidade",
+    "Uso dos pronomes de tratamento e endereçamento",
+    "Padrão Ofício, memorando, exposição de motivos e mensagem",
+    "Manual de Redação da Presidência da República"
   ]
 };
 
@@ -322,6 +378,7 @@ const ALIAS_DISCIPLINAS = {
   portugues: "lingua portuguesa",
   rlm: "raciocinio logico",
   "raciocinio logico matematico": "raciocinio logico",
+  "raciocinio logico e matematico": "raciocinio logico",
   "matematica e suas tecnologias": "matematica",
   "tecnologia da informacao": "informatica",
   ti: "informatica",
@@ -330,10 +387,27 @@ const ALIAS_DISCIPLINAS = {
   "conhecimentos basicos de informatica": "informatica",
   "conhecimentos basicos bancarios": "conhecimentos bancarios",
   "etica profissional": "etica no servico publico",
+  "etica e legislacao": "etica no servico publico",
   "lingua inglesa": "ingles",
   "probabilidade e estatistica": "estatistica",
   "atendimento e vendas": "vendas e negociacao",
-  vendas: "vendas e negociacao"
+  vendas: "vendas e negociacao",
+  afo: "administracao financeira e orcamentaria",
+  "orcamento publico": "administracao financeira e orcamentaria",
+  "administracao financeira e orcamentaria afo": "administracao financeira e orcamentaria",
+  dpc: "direito processual civil",
+  "processo civil": "direito processual civil",
+  "processo penal": "direito processual penal",
+  "saude publica": "legislacao do sus",
+  sus: "legislacao do sus",
+  "sistema unico de saude": "legislacao do sus",
+  "legislacao educacional": "conhecimentos pedagogicos",
+  pedagogia: "conhecimentos pedagogicos",
+  didatica: "conhecimentos pedagogicos",
+  "nocoes de arquivologia": "arquivologia",
+  "nocoes de administracao": "administracao publica",
+  "administracao geral": "administracao publica",
+  "administracao geral e publica": "administracao publica"
 };
 
 const EXAMES_EDITAIS = {
@@ -483,9 +557,9 @@ function montarPresetEdital(chave) {
 
 /* ---------- 2. Leitor de edital ---------- */
 const ED_SEPARADORES =
-  /^(anexo|edital|concurso|selecao|processo\s+seletivo|prefeitura|tribunal|governo|ministerio|secretaria|banco\s+do\s+brasil|cargo|perfil|opcao|inscri|isen|cota|reserva|deficien|atendimento\s+especial|prova|etapa|fase|quadro|tabela|requisitos|atribui|remunera|vagas|cronograma|bibliografia|referencias|observa|disposicoes|pagina|capitulo|titulo|sumario|conhecimentos\s+basicos$|conhecimentos\s+especificos$|conhecimentos\s+gerais$|parte\s+[ivx\d]+|bloco\s+[ivx\d]+|d[ao]s?\s+(?:inscri|vagas|provas|pessoas|candidat|recursos|classifica|contrata|disposicoes|etapas|avaliac|requisitos|atribui|remunera|homologa|convoca|atendimento))\b/;
+  /^(anexo|edital|concurso|selecao|processo\s+seletivo|prefeitura|tribunal|governo|ministerio|secretaria|banco\s+do\s+brasil|cargo|perfil|opcao|inscri|isen|cota|reserva|deficien|atendimento\s+especial|prova|etapa|fase|quadro|tabela|requisitos|atribui|remunera|vagas|cronograma|bibliografia|referencias|observa|disposicoes|pagina|capitulo|titulo|sumario|conhecimentos\s+basicos$|conhecimentos\s+especificos$|conhecimentos\s+gerais$|parte\s+[ivx\d]+|bloco\s+[ivx\d]+|modulo\s+[ivx\d]+|d[ao]s?\s+(?:inscri|vagas|provas|pessoas|candidat|recursos|classifica|contrata|disposicoes|etapas|avaliac|requisitos|atribui|remunera|homologa|convoca|atendimento|objetos\s+de\s+avaliac))\b/;
 const ED_PALAVRAS_DISCIPLINA =
-  /^(lingua|portugues|matematica|raciocinio|informatica|tecnologia|direito|legislacao|conhecimentos|atualidades|vendas|negociacao|atendimento|marketing|probabilidade|fisica|quimica|biologia|historia|geografia|filosofia|sociologia|ingles|espanhol|redacao|literatura|contabilidade|administracao|economia|estatistica|etica|nocoes|arquivologia|auditoria|gestao|ciencias|educacao|pedagogia|enfermagem|saude|medicina|engenharia|banco|financas|computacao|programacao|algoritmos|redes|seguranca|sistemas)\b/;
+  /^(lingua|portugues|matematica|raciocinio|informatica|tecnologia|direito|direitos|legislacao|conhecimentos|atualidades|vendas|negociacao|atendimento|marketing|probabilidade|fisica|quimica|biologia|historia|geografia|filosofia|sociologia|ingles|espanhol|redacao|literatura|contabilidade|administracao|orcamento|afo|economia|estatistica|etica|nocoes|arquivologia|auditoria|gestao|ciencias|educacao|pedagogia|didatica|enfermagem|saude|sus|medicina|criminologia|engenharia|arquitetura|banco|financas|computacao|programacao|algoritmos|redes|seguranca|sistemas|governanca|politicas\s+publicas|eixo\s+tematico)\b/;
 const ED_PEQUENAS = new Set([
   "de",
   "da",
@@ -524,56 +598,83 @@ function edRazaoMaiuscula(s) {
   return up / letras.length;
 }
 
-/** Detecta se uma linha indica início de bloco comum ou de um cargo específico (ex: Agente Comercial vs Agente de Tecnologia) */
+/**
+ * Detecta se uma linha indica início de bloco comum, bloco de conhecimentos específicos
+ * ou um cargo/área/especialidade (qualquer banca: Cebraspe, FGV, FCC, Vunesp, Cesgranrio, Tribunais, Polícias, Prefeituras, Bancos).
+ */
 function edDetectarCargo(l) {
   const semNum = l.replace(/^(?:\d{1,2}[.)]|[IVX]{1,4}\s*[-–.)])\s+/, "").trim();
   const n = edNorm(semNum.replace(/:$/, ""));
-  if (/^(?:conhecimentos\s+basicos|conhecimentos\s+gerais|parte\s+comum|comum\s+a\s+todos)\b/.test(n)) {
+  if (
+    /^(?:conhecimentos\s+basicos|conhecimentos\s+gerais|disciplinas\s+comuns|parte\s+comum|comum\s+a\s+todos|modulo\s+[ivx\d]+\s*[-–:]?\s*conhecimentos\s+(?:basicos|gerais))\b/.test(
+      n
+    )
+  ) {
     return { tipo: "comum" };
   }
+  if (/^(?:conhecimentos\s+especificos|parte\s+especifica|disciplinas\s+especificas)$/.test(n)) {
+    return { tipo: "especificos" };
+  }
   const mCargoExplicito =
-    /^(?:cargo|perfil|op[cç][aã]o|fun[cç][aã]o|emprego|conhecimentos\s+espec[ií]ficos)(?:\s+\d+)?\s*[:–—-]\s*(.{3,65})$/i.exec(
+    /^(?:cargo|cargos|perfil|op[cç][aã]o|fun[cç][aã]o|emprego|especialidade|[aá]rea(?:\s+de\s+atua[cç][aã]o|\s+de\s+conhecimento)?|habilita[cç][aã]o|conhecimentos\s+espec[ií]ficos(?:\s+para\s+o\s+cargo(?:\s+de)?)?)(?:\s+\d+)?\s*[:–—-]\s*(.{3,75})$/i.exec(
       semNum
     );
   if (mCargoExplicito) {
     const cand = mCargoExplicito[1].trim();
     const nCand = edNorm(cand);
-    if (!TOPICOS_PADRAO[nCand] && !ALIAS_DISCIPLINAS[nCand]) {
+    if (!TOPICOS_PADRAO[nCand] && !ALIAS_DISCIPLINAS[nCand] && !ED_PALAVRAS_DISCIPLINA.test(nCand)) {
       return { tipo: "cargo", nome: edTitulo(cand) };
     }
   }
-  const mCargoBB =
-    /^(?:escritur[aá]rio\s*[-–—:]\s*)?(agente\s+comercial|agente\s+de\s+tecnologia(?:\s+da\s+informa[cç][aã]o)?|agente\s+de\s+ti|t[eé]cnico\s+banc[aá]rio(?:\s+novo)?(?:\s*[-–—:]\s*tecnologia\s+da\s+informa[cç][aã]o)?)\s*:?$/i.exec(
-      semNum
-    );
-  if (mCargoBB) {
-    return { tipo: "cargo", nome: edTitulo(mCargoBB[1]) };
+  // Nomes de cargos de qualquer carreira (Tribunais, Polícias, Fiscais, Bancos, Prefeituras, Saúde, Educação, Autarquias)
+  if (
+    semNum.length <= 80 &&
+    !/[.;]$/.test(semNum) &&
+    (edRazaoMaiuscula(semNum) >= 0.8 || /:$/.test(semNum)) &&
+    !TOPICOS_PADRAO[n] &&
+    !ALIAS_DISCIPLINAS[n] &&
+    !ED_PALAVRAS_DISCIPLINA.test(n) &&
+    !/^agentes?\s+publicos?\b/.test(n)
+  ) {
+    const mCarreira =
+      /^(?:cargo\s*\d*\s*[-–—:.\s]*)?(?:escritur[aá]rio\s*[-–—:]\s*)?((?:analista|t[eé]cnico|auditor(?:[- ]fiscal)?|agente|escriv[aã]o|delegado|inspetor|investigador|perito|papiloscopista|procurador|defensor|promotor|juiz|oficial|assistente|auxiliar|especialista|fiscal|gestor|contador|enfermeiro|m[eé]dico|professor|pedagogo|engenheiro|arquiteto|advogado|psic[oó]logo|farmac[eê]utico|odont[oó]logo|cirurgi[aã]o|nutricionista|fisioterapeuta|motorista|guarda|soldado)\b.{0,65}?)\s*:?$/i.exec(
+        semNum
+      );
+    if (mCarreira) {
+      return { tipo: "cargo", nome: edTitulo(mCarreira[1]) };
+    }
   }
   return null;
 }
 
 /**
- * Localiza o início real do Anexo de Conteúdo Programático em editais extensos (ex: 40 páginas do BB/Cesgranrio),
- * ignorando as páginas iniciais de regras de inscrição, cotas, isenção e quadro de vagas.
+ * Localiza o início real do Conteúdo Programático em editais extensos de qualquer banca
+ * (Cesgranrio, Cebraspe/CESPE "Objetos de Avaliação", FGV, FCC, Vunesp, CNU, Prefeituras)
+ * e descarta anexos administrativos posteriores (modelos de atestado, autodeclaração, cronograma, vagas).
  */
 function edRecortarConteudoProgramatico(bruto) {
   const txt = String(bruto || "");
   if (txt.length < 600) return txt;
   const reHeading =
-    /^[ \t]*(?:anexo\s+[ivx\d]+\s*[-–—:.\s]*)?(?:conte[uú]dos?\s+program[aá]ticos?|objetos?\s+de\s+avalia[cç][aã]o|programa\s+das?\s+provas?)\b[^\n]*$/gim;
+    /^[ \t]*(?:(?:anexo\s+[ivx\d]+|\d{1,2}(?:\.\d{1,2})?)\s*[-–—:.\s]*)?(?:d[ao]s?\s+)?(?:conte[uú]dos?\s+program[aá]ticos?|objetos?\s+de\s+avalia[cç][aã]o|programa\s+d[ea]s?\s+(?:provas?|disciplinas?)|rela[cç][aã]o\s+d[ea]s?\s+(?:mat[eé]rias|disciplinas))\b[^\n]*$/gim;
   let ultimoIndiceValido = -1;
   let m;
   while ((m = reHeading.exec(txt))) {
     const linha = m[0].trim();
-    // Ignorar linhas longas de parágrafo (ex: "8.4 Os conteúdos programáticos constam no Anexo III deste Edital...")
-    if (linha.length <= 95 && !/[.;]$/.test(linha) && txt.length - m.index >= 120) {
+    if (linha.length <= 105 && !/[.;]$/.test(linha) && txt.length - m.index >= 120) {
       ultimoIndiceValido = m.index;
     }
   }
-  if (ultimoIndiceValido > 0) {
-    return txt.slice(ultimoIndiceValido);
+  let recorte = ultimoIndiceValido > 0 ? txt.slice(ultimoIndiceValido) : txt;
+
+  // Cortar anexos administrativos posteriores que vêm depois do conteúdo programático
+  const reAnexoPosterior =
+    /^[ \t]*anexo\s+[ivx\d]+\s*[-–—:.\s]+(?:modelo|declara[cç][aã]o|autodeclara[cç][aã]o|formul[aá]rio|requerimento|cronograma|quadro\s+de\s+vagas|atribui[cç][oõ]es|descri[cç][aã]o\s+sum[aá]ria|endere[cç]os|avalia[cç][aã]o\s+de\s+t[ií]tulos|prova\s+de\s+t[ií]tulos)\b[^\n]*$/gim;
+  const mFim = reAnexoPosterior.exec(recorte.slice(120));
+  if (mFim && mFim.index > 80) {
+    recorte = recorte.slice(0, mFim.index + 120);
   }
-  return txt;
+  return recorte;
 }
 
 /** Devolve o nome da disciplina se a linha for um cabeçalho; "" se for conteúdo; null se for separador */
@@ -615,10 +716,18 @@ function edExtrairTopicos(linhas) {
   const out = [];
   const vistos = new Set();
   itens.forEach(it => {
-    const partes = it.length > 140 || it.includes(";") ? it.split(/;|\.\s+(?=[A-ZÀ-Ý])/) : [it];
+    // Suporta tanto separação por ";" / "." quanto numeração inline estilo Cebraspe ("1 Tópico A. 2 Tópico B. 3.1 Tópico C")
+    const temMarcadorInline = /(?:^|[.;]\s+|\s+)\d{1,2}(?:\.\d{1,2}){0,2}[.)]?\s+[A-ZÀ-Ý]/.test(it);
+    const partes =
+      it.length > 140 || it.includes(";") || temMarcadorInline
+        ? it.split(
+            /;|\.\s+(?=(?:\d{1,2}(?:\.\d{1,2}){0,2}[.)]?\s+)?[A-ZÀ-Ý])|\s+(?=\d{1,2}(?:\.\d{1,2}){0,2}[.)]?\s+[A-ZÀ-Ý][a-zà-ÿ]{2,})/
+          )
+        : [it];
     partes.forEach(p => {
       const t = p
         .replace(/\s+/g, " ")
+        .replace(ED_MARCADOR, "")
         .replace(/^[\s,.;:–-]+|[\s,.;:–-]+$/g, "")
         .replace(/^e\s+(?=[a-zà-ÿ])/i, "")
         .trim();
@@ -647,17 +756,18 @@ function edDetectarData(texto, ref) {
   return "";
 }
 
-function edPesoPadrao(nome) {
+function edPesoPadrao(nome, ehEspecifico) {
   const n = edNorm(nome);
   if (
-    /vendas|negociacao|conhecimentos bancarios|conhecimentos basicos bancarios|tecnologia da informacao|conhecimentos de informatica|conhecimentos basicos de informatica|especific|redacao|direito penal|direito processual penal|contabilidade/.test(
+    ehEspecifico ||
+    /vendas|negociacao|conhecimentos bancarios|conhecimentos basicos bancarios|tecnologia da informacao|conhecimentos de informatica|conhecimentos basicos de informatica|especific|redacao$|direito penal|direito processual|direito tributario|direito civil|direito previdenciario|contabilidade|auditoria|orcamento|afo|legislacao do sus|conhecimentos pedagogicos|eixo tematico/.test(
       n
     )
   ) {
     return 3;
   }
   if (
-    /portugues|matematica|raciocinio|direito constitucional|direito administrativo|probabilidade|estatistica|informatica/.test(
+    /portugues|matematica|raciocinio|direito constitucional|direito administrativo|probabilidade|estatistica|informatica|administracao|economia|arquivologia|fisica|quimica|biologia|historia|geografia/.test(
       n
     )
   ) {
@@ -852,7 +962,7 @@ async function extrairTextoDePDF(entrada) {
     try {
       const doc = await window.pdfjsLib.getDocument({ data: bytes.slice() }).promise;
       const paginasTxt = [];
-      const maxPag = Math.min(doc.numPages || 1, 80);
+      const maxPag = Math.min(doc.numPages || 1, 250);
       for (let p = 1; p <= maxPag; p++) {
         const page = await doc.getPage(p);
         const tc = await page.getTextContent();
@@ -922,7 +1032,7 @@ async function extrairTextoDePDF(entrada) {
 function edFormatarMateriaExtraida(m) {
   const sugerido = m.topicos.length < 3;
   const topicos = sugerido ? [...new Set([...m.topicos, ...buscarTopicosPadrao(m.nome)])] : m.topicos;
-  return { nome: m.nome, peso: edPesoPadrao(m.nome), topicos, sugerido };
+  return { nome: m.nome, peso: edPesoPadrao(m.nome, m.especifico), topicos, sugerido };
 }
 
 /** Lê o texto do edital sem internet. Devolve { nome, dataProva, materias:[{nome,peso,topicos,sugerido}], cargos?, cargoSelecionado?, fonte } */
@@ -937,7 +1047,9 @@ function analisarEditalLocal(texto, ref) {
     todasLinhas.find(
       l =>
         l.length <= 100 &&
-        /edital|concurso|processo seletivo|sele[cç][aã]o externa|vestibular|banco do brasil/i.test(l)
+        /edital|concurso|processo seletivo|sele[cç][aã]o externa|vestibular|banco do brasil|tribunal|prefeitura|pol[ií]cia|secretaria|minist[eé]rio/i.test(
+          l
+        )
     ) || "";
   const dataDetectada = edDetectarData(bruto, ref);
 
@@ -951,7 +1063,7 @@ function analisarEditalLocal(texto, ref) {
   // Expandir linhas onde o PDF juntou "DISCIPLINA: 1. Tópico A; 2. Tópico B" na mesma linha
   const linhas = [];
   for (const l of linhasBrutas) {
-    const mInline = /^([A-ZÀ-Ýa-zà-ÿ\s–-]{3,55}?)\s*[:–-]\s*(.+)$/.exec(l);
+    const mInline = /^([A-ZÀ-Ýa-zà-ÿ\s()–-]{3,65}?)\s*[:–-]\s*(.+)$/.exec(l);
     if (mInline && !edDetectarCargo(l)) {
       const possivelCab = mInline[1].trim();
       const resto = mInline[2].trim();
@@ -971,11 +1083,20 @@ function analisarEditalLocal(texto, ref) {
   const secoes = [];
   let atual = null;
   let cargoAtual = null;
+  let blocoEspecifico = false;
   for (const l of linhas) {
     const infoCargo = edDetectarCargo(l);
     if (infoCargo) {
       atual = null;
-      cargoAtual = infoCargo.tipo === "cargo" ? infoCargo.nome : null;
+      if (infoCargo.tipo === "comum") {
+        cargoAtual = null;
+        blocoEspecifico = false;
+      } else if (infoCargo.tipo === "especificos") {
+        blocoEspecifico = true;
+      } else if (infoCargo.tipo === "cargo") {
+        cargoAtual = infoCargo.nome;
+        blocoEspecifico = true;
+      }
       continue;
     }
     const cab = edCabecalho(l);
@@ -984,7 +1105,7 @@ function analisarEditalLocal(texto, ref) {
       continue;
     }
     if (cab) {
-      atual = { nome: cab, cargo: cargoAtual, linhas: [] };
+      atual = { nome: cab, cargo: cargoAtual, especifico: blocoEspecifico, linhas: [] };
       secoes.push(atual);
       continue;
     }
@@ -999,11 +1120,12 @@ function analisarEditalLocal(texto, ref) {
       const k = edNorm(s.nome);
       if (mapa.has(k)) {
         const m = mapa.get(k);
+        if (s.especifico) m.especifico = true;
         topicos.forEach(t => {
           if (!m.topicos.some(x => edNorm(x) === edNorm(t))) m.topicos.push(t);
         });
       } else {
-        mapa.set(k, { nome: s.nome, topicos: topicos.slice() });
+        mapa.set(k, { nome: s.nome, especifico: Boolean(s.especifico), topicos: topicos.slice() });
       }
     });
     return [...mapa.values()].slice(0, 40).map(edFormatarMateriaExtraida);
